@@ -1,0 +1,78 @@
+# *******************************************************************
+# * Copyright 2021-2080 evilbinary
+# * 作者: evilbinary on 01/01/20
+# * 邮箱: rootdebug@163.com
+# ********************************************************************
+import os
+import math
+#env = Environment()
+env = Environment(
+                CC = '/opt/local/bin/i386-elf-gcc',
+                LD='/opt/local/bin/i386-elf-ld',
+                CXX='/opt/local/bin/i386-elf-g++',
+                AR= '/opt/local/bin/i386-elf-ar',
+                STRIP="/opt/local/bin/i386-elf-strip",
+                RANLIB='/opt/local/bin/i386-elf-ranlib',
+                OBJCOPY='/opt/local/bin/i386-elf-objcopy',
+                CFLAGS='-I. -I./include -Ilibs/include -g -nostdlib -nostdinc -fno-builtin -m32 -c -std=c99 -std=gnu99 ',
+                #PATH= os.environ['PATH'],
+                LIBPATH=['.','../arch/'],
+                LINKFLAGS='-nostdlib -nostartfiles -e start  -g ',
+                OBJCOPYFLAGS='-S -g'
+                  )
+
+
+def generate_bin(source, target, env, for_signature):
+    return '$OBJCOPY %s %s %s'%(env['OBJCOPYFLAGS'],source[0], target[0])
+    
+env.Append(BUILDERS={
+    'Objcopy': Builder(
+               generator=generate_bin,
+               suffix='',)})
+
+def get_kernel_size(env,target,source):
+    file_name=str(source[0])
+    file_out=str(target[0])
+    if os.path.exists(file_name):
+        size=os.stat(file_name).st_size
+        env['KERNELSIZE'] = str(size)
+        env['KERNEL_BLOCK_SIZE'] = str(int(math.ceil(size/1024.0)*2.0))
+        print 'kernel size:',env.get('KERNEL_BLOCK_SIZE')
+    else :
+        print 'file %s not exist'%(file_name)
+    return ''
+
+def generate_kernel_size(env,target,source):
+    file_name=str(source[0])
+    file_out=str(target[0])
+    get_kernel_size(env,target,source)
+    kernel_header=file_out.upper().rsplit('/',1)[-1].replace('.','_')
+    f = open(file_out, 'w')
+    content="""#ifndef %s
+#define %s
+#define KERNEL_SIZE %s
+#endif
+"""%(kernel_header,kernel_header,env.get('KERNEL_BLOCK_SIZE'))
+    f.write(content)
+    f.close()
+    return ''
+
+env.Append(BUILDERS={
+    'GenerateKernelSize': Builder(
+               action=generate_kernel_size
+               ),
+    'KernelSize': get_kernel_size
+               })
+
+Export('env')
+
+SConscript(dirs=['arch'], exports='env')
+SConscript(dirs=['libs/libc'], exports='env')
+kernel=SConscript(dirs=['kernel'], exports='env')
+
+
+boot=SConscript(dirs=['boot/x86'], exports='env')
+Depends(boot, kernel)
+
+image=SConscript(dirs=['image'], exports='env')
+Depends(image, kernel)

@@ -1,0 +1,73 @@
+# *******************************************************************
+# * Copyright 2021-2080 evilbinary
+# * 作者: evilbinary on 01/01/20
+# * 邮箱: rootdebug@163.com
+# ********************************************************************
+import os
+Import('env')
+
+AddOption(
+    '--run',
+    dest='run',
+    nargs=1,
+    type='string',
+    action='store',
+    metavar='DIR',
+    help='run image',
+)
+AddOption(
+    '--build',
+    dest='build',
+    nargs=1,
+    type='string',
+    action='store',
+    metavar='DIR',
+    help='build image',
+)
+env = env.Clone(
+  run=GetOption('run'),
+  build=GetOption('build'),
+  ENV = os.environ,
+  PATH= [os.environ['PATH'],'/opt/local/bin' ],
+  )
+# export PATH=$PATH:/Volumes/android/u-boot/scripts/dtc/:/Volumes/android/u-boot/tools/
+env.AppendENVPath('PATH', ['/Volumes/android/u-boot/scripts/dtc/','/Volumes/android/u-boot/tools/'])
+env.KernelSize(['size'],['../kernel/kernel'])
+
+
+def build_duck_image():
+  env.Command('duck.img', 
+    [
+    ''
+    '../boot/x86/boot',
+    '../boot/x86/init.bin',
+    '../kernel/kernel' ],
+    [
+      'dd if=/dev/zero bs=512 count=2880 conv=notrunc of=$TARGET',
+      'dd if=${SOURCES[0]} bs=512 count=1 conv=notrunc of=$TARGET',
+      'dd if=${SOURCES[1]} bs=512 count=11 seek=1  conv=notrunc of=$TARGET',
+      'dd if=${SOURCES[2]} bs=512 count=%s seek=12  conv=notrunc of=$TARGET'%(env.get('KERNEL_BLOCK_SIZE'))
+  ])
+
+if env.get('build')=='uImage':
+  env.Command('uImage.img', 
+    ['../kernel/kernel' ],
+    ['mkimage -n duckos -A x86 -O u-boot -T kernel -C none -a 0x30008000 -e 0x30008000 -d ${SOURCES[0]} $TARGET'
+  ])
+elif env.get('build')=='fit':
+  env.Command('duck.fit', 
+    ['kernel.its',
+    '../kernel/kernel.bin', 
+    '../boot/x86/init.bin'
+    ],
+    ['mkimage -f ${SOURCES[0]} $TARGET'
+  ])
+
+if env.get('build')=='duck':
+  build_duck_image()
+if env.get('run')=='bochs' or env.get('run')=='b':
+  build_duck_image()
+  env.Command('bochs', 'duck.img','bochs -q -f ./bochsrc')
+elif env.get('run')=='qemu' or env.get('run')=='q':
+  build_duck_image()
+  env.Command('qemu', 'duck.img','qemu-system-i386 -monitor stdio -fda $SOURCE')
