@@ -7,16 +7,11 @@
 
 #include "kmalloc.h"
 
-extern module_t keyboard_module;
-extern module_t hello_module;
-
 module_t* modules[MAX_MODULES];
 u32 module_number;
 
 void module_init() {
   module_number = 0;
-  module_regit(&keyboard_module);
-  module_regit(&hello_module);
 }
 
 void module_regit(module_t* mod) {

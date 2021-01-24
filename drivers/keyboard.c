@@ -3,18 +3,19 @@
  * 作者: evilbinary on 01/01/20
  * 邮箱: rootdebug@163.com
  ********************************************************************/
-#include "kernel/device.h"
-#include "kernel/kmalloc.h"
-#include "kernel/module.h"
+#include "kernel/kernel.h"
+
+extern void acquire(u32* lock);
+extern void release(u32* lock);
 
 #define MAX_CHARCODE_BUFFER 32
 static u8 scan_code_buffer[MAX_CHARCODE_BUFFER];
 static u32 scan_code_index=0;
 
-
+u32 lock=0;
 static size_t read(fd_t* fd, void* buf, size_t len) {
-  //cpu_cli();
   u32 ret=0;
+  acquire(&lock);
   if (scan_code_index>0) {
     kstrncpy(buf, &scan_code_buffer[scan_code_index-1], 1);
     for(int i=0;i<scan_code_index;i++){
@@ -23,7 +24,7 @@ static size_t read(fd_t* fd, void* buf, size_t len) {
     scan_code_index--;
     ret=1;
   }
-  //cpu_sti();
+  release(&lock);
   return ret;
 }
 

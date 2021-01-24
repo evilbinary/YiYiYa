@@ -36,6 +36,7 @@ void thread_init(thread_t* thread,void* entry,u32* stack0,u32* stack3){
   thread->id=thread_ids++;
   thread->next=NULL;
   thread->priority=1;
+  thread->wait=0;
   thread->state=THREAD_CREATE;
   context_init(&thread->context,(u32*)entry,stack0,stack3,USER_MODE);
 }

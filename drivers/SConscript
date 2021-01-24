@@ -9,5 +9,8 @@ Import('env')
 
 env.Library('driver', [
     'hello.c',
-    'keyboard.c'
+    'keyboard.c',
+    '../kernel/libyiyiya.a',
+    '../arch/libarch.a',
+    '../libs/libkernel/libkernel.a',
     ])

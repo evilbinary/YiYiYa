@@ -11,7 +11,7 @@
 	images {
 		kernel {
 			description = "duck kernel";
-			data = /incbin/("../kernel/kernel");
+			data = /incbin/("../main/kernel");
 			type = "kernel";
 			arch = "x86";
 			os = "linux";

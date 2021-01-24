@@ -32,7 +32,7 @@ env = env.Clone(
   )
 # export PATH=$PATH:/Volumes/android/u-boot/scripts/dtc/:/Volumes/android/u-boot/tools/
 env.AppendENVPath('PATH', ['/Volumes/android/u-boot/scripts/dtc/','/Volumes/android/u-boot/tools/'])
-env.KernelSize(['size'],['../kernel/kernel'])
+env.KernelSize(['size'],['../app/kernel'])
 
 
 def build_duck_image():
@@ -41,7 +41,7 @@ def build_duck_image():
     ''
     '../boot/x86/boot',
     '../boot/x86/init.bin',
-    '../kernel/kernel' ],
+    '../app/kernel' ],
     [
       'dd if=/dev/zero bs=512 count=2880 conv=notrunc of=$TARGET',
       'dd if=${SOURCES[0]} bs=512 count=1 conv=notrunc of=$TARGET',
@@ -51,13 +51,13 @@ def build_duck_image():
 
 if env.get('build')=='uImage':
   env.Command('uImage.img', 
-    ['../kernel/kernel' ],
+    ['../app/kernel' ],
     ['mkimage -n duckos -A x86 -O u-boot -T kernel -C none -a 0x30008000 -e 0x30008000 -d ${SOURCES[0]} $TARGET'
   ])
 elif env.get('build')=='fit':
   env.Command('duck.fit', 
     ['kernel.its',
-    '../kernel/kernel.bin', 
+    '../app/kernel.bin', 
     '../boot/x86/init.bin'
     ],
     ['mkimage -f ${SOURCES[0]} $TARGET'

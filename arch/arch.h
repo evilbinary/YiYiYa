@@ -13,7 +13,7 @@
 #include "mm.h"
 #include "common.h"
 #include "interrupt.h"
-#include "arch.h"
+#include "lock.h"
 
 void arch_init(boot_info_t* boot_info);
 

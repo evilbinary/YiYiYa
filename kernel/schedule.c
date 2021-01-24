@@ -10,6 +10,7 @@
 volatile u32 timer_ticks = 0;
 extern thread_t* current_thread;
 extern thread_t* head_thread;
+u32 schedule_lock = 0;
 
 context_t* current_context;
 
@@ -20,7 +21,7 @@ thread_t* schedule_next() {
   current_thread->wait--;
   next = current_thread;
   for (; v != NULL; v = v->next) {
-    //if (v == current_thread) continue;
+    // if (v == current_thread) continue;
     if ((v->state == THREAD_RUNNING) && (v->wait >= next->wait)) {
       next = v;
     }
@@ -32,6 +33,9 @@ void schedule() {
   thread_t* next_thread = NULL;
   thread_t* prev_thread = NULL;
   next_thread = schedule_next();
+  if (next_thread == NULL) {
+    kprintf("schedule error next\n");
+  }
   prev_thread = current_thread;
   current_thread = next_thread;
   context_switch(&current_context, &prev_thread->context,
@@ -54,7 +58,7 @@ void do_timer() {
 
 void schedule_init() {
   interrutp_regist(ISR_TIMER, do_timer);
-  timer_init(100);
+  timer_init(1000);
   if (current_thread == NULL) {
     if (head_thread == NULL) {
       kprintf("no thread please create a thread\n");
