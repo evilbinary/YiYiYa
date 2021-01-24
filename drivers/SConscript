@@ -7,11 +7,7 @@ import os
 
 Import('env')
 
-env.Library('arch', ['arch.c','common.c','lock.c',
-    'x86/io.c',
-    'x86/cpu.c',
-    'x86/mm.c',
-    'x86/display.c',
-    'x86/interrupt.c',
-    'cpu.h'
+env.Library('driver', [
+    'hello.c',
+    'keyboard.c'
     ])
