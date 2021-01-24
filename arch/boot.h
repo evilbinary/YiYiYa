@@ -31,6 +31,8 @@
 #define GDT_ENTRY_16BIT_FLAT_CS 10
 #define GDT_ENTRY_16BIT_FLAT_DS 11
 
+#define GDT_DPL(x) (((x)&0x03)<<5)  //0-3
+
 #define GDT_NUM_ENTRIES 9
 
 #define GDT_ENTRY(base, limit, flags)                                        \
@@ -61,10 +63,23 @@ typedef struct disply_info {
   i32 height;
 } disply_info_t;
 
-struct gdt_ptr {
+typedef struct gdt_ptr {
   u16 limit;
   u32 base;
-} __attribute__((packed));
+} __attribute__((packed)) gdt_ptr_t;
+
+typedef struct idt_entry{
+   u16 basel;
+   u16 selector;
+   u8  zero;
+   u8  attrs;
+   u16 baseh;
+} __attribute__((packed)) idt_entry_t;
+
+typedef struct idt_ptr {
+  u16 limit;
+  u32 base;
+} __attribute__((packed)) idt_ptr_t;
 
 typedef struct disk_info{
   i32 heads;
@@ -99,6 +114,7 @@ typedef struct boot_info {
   tss_t tss[MAX_CPU];
   i32 tss_number;
   u32* idt_base;
+  i32 idt_number;
   
   u32* pdt_base;
   i32 page_type;

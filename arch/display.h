@@ -3,14 +3,10 @@
 * 作者: evilbinary on 01/01/20
 * 邮箱: rootdebug@163.com
 ********************************************************************/
-#include "arch.h"
+#ifndef DISPLAY_H
+#define DISPLAY_H
 
-boot_info_t* boot_info;
 
-void arch_init(boot_info_t* boot){
-    boot_info = boot;
-    display_init();
-    mm_init();
-    cpu_init();
-    interrupt_init();
-}
+void display_init();
+
+#endif

@@ -9,7 +9,21 @@ Import('env')
 
 
 
-env.Program('kernel.elf', ['main.c'],LINKFLAGS= '$LINKFLAGS -Tlink.ld')
+env.Program('kernel.elf', [
+    'main.c',
+    'thread.c',
+    'schedule.c',
+    'syscall.c',
+    'exceptions.c',
+    'kmalloc.c',
+    'module.c',
+    'device.c',
+    '../arch/libarch.a',
+    '../libs/libkernel/libkernel.a',
+    '../drivers/libdriver.a'
+    ]
+    ,LINKFLAGS= '$LINKFLAGS -Tlink.ld')
+
 env.Objcopy('kernel','kernel.elf',OBJCOPYFLAGS='-S -g')
 env.Objcopy('kernel.dbg','kernel.elf',OBJCOPYFLAGS='--only-keep-debug')
 env.Objcopy('kernel.bin','kernel',OBJCOPYFLAGS='-O binary')
