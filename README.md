@@ -18,5 +18,9 @@ scons
 ### 运行镜像
 
 ```
-scons --run bochs
+scons --run=bochs
+```
+或者
+```
+scons --run=qemu
 ```
