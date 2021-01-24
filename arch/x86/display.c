@@ -44,16 +44,15 @@ static u16* video_addr = 0;
 void move_cursor(void) {
   unsigned temp;
   temp = screen_y * screen_width + screen_x;
-  io_write8(0x3D4, 14);
+  io_write8(0x3D4, 0x0E);
   io_write8(0x3D5, temp >> 8);
-  io_write8(0x3D4, 15);
+  io_write8(0x3D4, 0x0F);
   io_write8(0x3D5, temp);
 }
 
 void set_cursor(int x, int y) {
   screen_x = x;
   screen_y = y;
-  move_cursor();
 }
 
 void get_cursor(int* x, int* y) {
@@ -74,7 +73,6 @@ void cls() {
   }
   screen_x = 0;
   screen_y = 0;
-  move_cursor();
 }
 
 void scroll(void) {
@@ -102,7 +100,7 @@ void putch(u8 c) {
   } else if (c == '\n') {
     screen_x = 0;
     screen_y++;
-  } else if (c >= ' ') {
+  } else if (c >= ' '&&c<=0xff) {
     where = video_addr + (screen_y * screen_width + screen_x);
     *where = c | att;
     screen_x++;
@@ -112,7 +110,6 @@ void putch(u8 c) {
     screen_y++;
   }
   scroll();
-  move_cursor();
 }
 
 void puts(char* text) {
@@ -124,7 +121,6 @@ void puts(char* text) {
 void test_display() {
   cls();
   puts("hello,YiYiYa\n");
-  set_color(RED, BLACK);
   for (int i = 0; i < boot_info->memory_number; i++) {
     memory_sinfo_t* m = (memory_sinfo_t*)&boot_info->memory[i];
     kprintf("base:%x %x lenght:%d %d \n", m->baseh, m->basel, m->lengthh,

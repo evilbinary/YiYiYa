@@ -12,10 +12,8 @@ extern void release(u32* lock);
 static u8 scan_code_buffer[MAX_CHARCODE_BUFFER];
 static u32 scan_code_index=0;
 
-u32 lock=0;
 static size_t read(fd_t* fd, void* buf, size_t len) {
   u32 ret=0;
-  acquire(&lock);
   if (scan_code_index>0) {
     kstrncpy(buf, &scan_code_buffer[scan_code_index-1], 1);
     for(int i=0;i<scan_code_index;i++){
@@ -24,7 +22,6 @@ static size_t read(fd_t* fd, void* buf, size_t len) {
     scan_code_index--;
     ret=1;
   }
-  release(&lock);
   return ret;
 }
 

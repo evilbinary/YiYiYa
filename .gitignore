@@ -1,8 +1,6 @@
 *.img
 boot/x86/boot
 boot/x86/init.bin
-kernel/kernel
-kernel/kernel.bin
 **/*.log
 boot/**/init
-kernel/kernel.*
+app/kernel*

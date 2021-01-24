@@ -9,9 +9,14 @@
 #include "thread.h"
 
 static int print(char* s) {
-  cpu_cli();
   kprintf("%s", s);
-  cpu_sti();
+  return 0;
+}
+
+
+static int print_at(char* s,u32 x,u32 y) {
+  set_cursor(x, y);
+  kprintf("%s", s);
   return 0;
 }
 
@@ -39,7 +44,7 @@ static size_t yeild(thread_t* thread) {
   }
 }
 
-static void* syscall_table[SYSCALL_NUMBER] = {&read, &write, &yeild, &print};
+static void* syscall_table[SYSCALL_NUMBER] = {&read, &write, &yeild, &print,&print_at};
 
 INTERRUPT_SERVICE
 void syscall_handler() {
@@ -50,12 +55,16 @@ void syscall_handler() {
 
 void syscall_init() { interrutp_regist(ISR_SYSCALL, syscall_handler); }
 
+
 void* do_syscall(interrupt_context_t context) {
   // kprintf("syscall %x\n",context.no);
   if (context.eax >= 0 && context.eax < SYSCALL_NUMBER) {
     void* fn = syscall_table[context.eax];
     if (fn != NULL) {
+      u32 sys_call_lock = 0;
+      //acquire(&sys_call_lock);
       sys_fn_call((&context), fn);
+      //release(&sys_call_lock);
       return context.eax;
     } else {
       kprintf("syscall %x no found\n", context.no);

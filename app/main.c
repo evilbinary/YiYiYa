@@ -43,7 +43,7 @@ void do_shell_thread(void) {
   u8 alt_p = 0;
   u32 col = 0;
   u32 row = 0;
-  syscall1(SYS_PRINT, "#");
+  syscall3(SYS_PRINT, "#",0,0);
   char buf[2] = {0};
   for (;;) {
     int ret = 0;
@@ -52,15 +52,13 @@ void do_shell_thread(void) {
     if (ret > 0) {
       if (scan_code & 0x80) continue;
       buf[0] = key_map[scan_code & 0x7f][shf_p];
-      acquire(&main_lock);
-      set_cursor(col, row);
-      syscall1(SYS_PRINT, buf);
+      syscall3(SYS_PRINT_AT, buf, col, row);
       if (scan_code == 0x1c) {
         row++;
         col = 0;
         syscall1(SYS_PRINT, "#");
       }
-      release(&main_lock);
+      move_cursor();
       scan_code = 0;
       col++;
     }
@@ -73,27 +71,23 @@ void do_thread1(void) {
   char buf[2] = {0};
   char wheel[] = {'\\', '|', '/', '-'};
   for (;;) {
-    // buf[0] = wheel[i++];
-    // acquire(&main_lock);
-    // set_cursor(0, 0);
-    // syscall1(SYS_PRINT, buf);
-    // release(&main_lock);
-    // count++;
-    // if (i % 4 == 0) i = 0;
+    buf[0] = wheel[i++];
+    syscall3(SYS_PRINT_AT, buf, 100, 0);
+    count++;
+    if (i % 4 == 0) i = 0;
   }
 }
 
 void do_thread2(void) {
   u32 i = 0;
   u32 count = 0;
+  char buf[2] = {0};
   char wheel[] = {'\\', '|', '/', '-'};
   for (;;) {
-    // acquire(&main_lock);
-    // set_cursor(100, 2);
-    // kprintf("task2:%d %c\n", count++, wheel[i++]);
-    // release(&main_lock);
-    // count++;
-    // if (i % 4 == 0) i = 0;
+    buf[0] = wheel[i++];
+    syscall3(SYS_PRINT_AT, buf, 101, 0);
+    count++;
+    if (i % 4 == 0) i = 0;
   }
 }
 
