@@ -3,13 +3,7 @@
  * 作者: evilbinary on 01/01/20
  * 邮箱: rootdebug@163.com
  ********************************************************************/
-#ifndef MAIN_H
-#define MAIN_H
 
-#include "arch/arch.h"
-
-extern void start();
-int kmain();
+#include "kernel.h"
 
 
-#endif
