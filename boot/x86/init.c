@@ -275,22 +275,21 @@ void init_gdt(){
   u64* gdt_addr = boot_info->gdt_base;
   printf("gdt_addr=%x\n\r", gdt_addr);
   gdt_addr[GDT_ENTRY_NULL] = 0;
-  gdt_addr[GDT_ENTRY_32BIT_CS] = GDT_ENTRY(0, 0xfffff, 0xc09b);
-  gdt_addr[GDT_ENTRY_32BIT_DS] = GDT_ENTRY(0, 0xfffff, 0xc092);
-  gdt_addr[GDT_ENTRY_32BIT_FS] = GDT_ENTRY(0, 0xfffff, 0xc093);
+  gdt_addr[GDT_ENTRY_32BIT_CS] = GDT_ENTRY(0, 0xfffff, 0xc09b); //0x8
+  gdt_addr[GDT_ENTRY_32BIT_DS] = GDT_ENTRY(0, 0xfffff, 0xc092); //0x10
+  gdt_addr[GDT_ENTRY_32BIT_FS] = GDT_ENTRY(0, 0xfffff, 0xc093); //0x18
 
   u32 tss_base=(u32)&(boot_info->tss[0]);
-  gdt_addr[GDT_ENTRY_32BIT_TSS] = GDT_ENTRY(tss_base, 0xfffff, 0xc089);
-
-  gdt_addr[GDT_ENTRY_USER_32BIT_CS] = GDT_ENTRY(0, 0xfffff, 0xc09b);
-  gdt_addr[GDT_ENTRY_USER_32BIT_DS] = GDT_ENTRY(0, 0xfffff, 0xc092);
-  gdt_addr[GDT_ENTRY_USER_32BIT_FS] = GDT_ENTRY(0, 0xfffff, 0xc092);
+  gdt_addr[GDT_ENTRY_32BIT_TSS] = GDT_ENTRY(tss_base, 0xfffff, 0xc089); //0x20
+  gdt_addr[GDT_ENTRY_USER_32BIT_CS] = GDT_ENTRY(0, 0xfffff, 0xc09b|GDT_DPL(3));//0x28
+  gdt_addr[GDT_ENTRY_USER_32BIT_DS] = GDT_ENTRY(0, 0xfffff, 0xc092|GDT_DPL(3));//0x30
+  gdt_addr[GDT_ENTRY_USER_32BIT_FS] = GDT_ENTRY(0, 0xfffff, 0xc092|GDT_DPL(3));//0x38
 
   gdt_addr[GDT_ENTRY_16BIT_CS] = GDT_ENTRY(0, 0xfffff, 0x009b);
   gdt_addr[GDT_ENTRY_16BIT_DS] = GDT_ENTRY(0, 0xfffff, 0x0093);
 
   // load gdt
-  struct gdt_ptr gdt;
+  gdt_ptr_t gdt;
   gdt.limit = (boot_info->gdt_number * GDT_SIZE) - 1;
   gdt.base = (u32)gdt_addr;
   asm volatile("lgdtl %0\n" : : "m"(gdt));

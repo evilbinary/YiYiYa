@@ -2,6 +2,9 @@
 # bochsrc.txt file for DLX Linux disk image.
 ###############################################################
 
+info: action=report
+
+
 # how much memory the emulated machine will have
 megs: 64
 magic_break: enabled=1
@@ -40,7 +43,7 @@ log: image/bochsout.log
 # disable the mouse, since DLX is text only
 mouse: enabled=0
 
-gdbstub: enabled=1, port=1234, text_base=0, data_base=0, bss_base=0
+#gdbstub: enabled=1, port=1234, text_base=0, data_base=0, bss_base=0
 
 # enable key mapping, using US layout as default.
 #
