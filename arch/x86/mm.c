@@ -84,6 +84,9 @@ void mm_alloc_init(){
     if(0x500>mem->base&& mem->base<0x4000){
       addr=0x4000;
       len=mem->base-addr;
+    }else if(mem->base>0x100000&&mem->base<0x200000){
+      addr=0x200000;
+      len=mem->base-addr;
     }
     blocks[i].addr = addr;
     blocks[i].size = len;

@@ -10,7 +10,7 @@ void exception_regist(u32 vec, interrupt_handler_t handler) {
   exception_handlers[vec] = handler;
 }
 
-void exception_info(interrupt_context_t context) {
+void exception_info(interrupt_context_t* context) {
   static const char *exception_msg[] = {
       "DIVIDE ERROR",      "DEBUG EXCEPTION",
       "BREAKPOINT",        "NMI",
@@ -31,28 +31,28 @@ void exception_info(interrupt_context_t context) {
   asm volatile("movl %%es,	%%eax" : "=a"(es));
   asm volatile("movl %%fs,	%%eax" : "=a"(fs));
   asm volatile("movl %%gs,	%%eax" : "=a"(gs));
-  if (context.no < sizeof exception_msg) {
-    kprintf("EXCEPTION %d: %s\n=======================\n", context.no,
-            exception_msg[context.no]);
+  if (context->no < sizeof exception_msg) {
+    kprintf("EXCEPTION %d: %s\n=======================\n", context->no,
+            exception_msg[context->no]);
   } else {
-    kprintf("INTERRUPT %d\n=======================\n", context.no);
+    kprintf("INTERRUPT %d\n=======================\n", context->no);
   }
-  kprintf("cs:\t%x\teip:\t%x\teflags:\t%x\n", context.cs, context.eip,
-          context.eflags);
-  kprintf("ss:\t%x\tesp:\t%x\n", context.ss, context.esp);
+  kprintf("cs:\t%x\teip:\t%x\teflags:\t%x\n", context->cs, context->eip,
+          context->eflags);
+  kprintf("ss:\t%x\tesp:\t%x\n", context->ss, context->esp);
   // kprintf("old ss:\t%x\told esp:%x\n", old_ss, old_esp);
-  kprintf("errcode:%x\tcr2:\t%x\tcr3:\t%x\n", context.code, cr2, cr3);
+  kprintf("code:%x\tcr2:\t%x\tcr3:\t%x\n", context->no, cr2, cr3);
   kprintf("General Registers:\n=======================\n");
-  kprintf("eax:\t%x\tebx:\t%x\n", context.eax, context.ebx);
-  kprintf("ecx:\t%x\tedx:\t%x\n", context.ecx, context.edx);
-  kprintf("esi:\t%x\tedi:\t%x\tebp:\t%x\n", context.esi, context.edi,
-          context.ebp);
+  kprintf("eax:\t%x\tebx:\t%x\n", context->eax, context->ebx);
+  kprintf("ecx:\t%x\tedx:\t%x\n", context->ecx, context->edx);
+  kprintf("esi:\t%x\tedi:\t%x\tebp:\t%x\n", context->esi, context->edi,
+          context->ebp);
   kprintf("Segment Registers:\n=======================\n");
   kprintf("ds:\t%x\tes:\t%x\n", ds, es);
   kprintf("fs:\t%x\tgs:\t%x\n", fs, gs);
 
-  if (exception_handlers[context.no] != 0) {
-    interrupt_handler_t handler = exception_handlers[context.no];
+  if (exception_handlers[context->no] != 0) {
+    interrupt_handler_t handler = exception_handlers[context->no];
     handler(&context);
   }
 }
@@ -167,12 +167,12 @@ void do_page_fault(interrupt_context_t *context) {
   u32 fault_addr;
   asm volatile("mov %%cr2, %0" : "=r"(fault_addr));
 
-  int present = !(context->code & 0x1);  // present
-  int rw = context->code & 0x2;          // rw
-  int us = context->code & 0x4;          // user mode
+  int present = !(context->no & 0x1);  // present
+  int rw = context->no & 0x2;          // rw
+  int us = context->no & 0x4;          // user mode
   int reserved =
-      context->code & 0x8; 
-  int id = context->code & 0x10;
+      context->no & 0x8; 
+  int id = context->no & 0x10;
 
   kprintf("[");
   if (present) {

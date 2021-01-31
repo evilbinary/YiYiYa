@@ -20,7 +20,7 @@ typedef struct thread_s{
     u32 id;
     context_t context;
     int priority;
-    int wait;
+    int counter;
     int state;
     struct thread_s * next;
 }thread_t;

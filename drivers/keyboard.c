@@ -34,7 +34,6 @@ void keyboard_handler() {
 
 int keyboard_init(void) {
   kprintf("keyboard init\n");
-
   device_t* dev = kmalloc(sizeof(device_t));
   dev->name = "keyboard";
   dev->read = read;
@@ -49,7 +48,7 @@ int keyboard_init(void) {
 
 void keyboard_exit(void) { kprintf("Goodbye World\n"); }
 
-void do_keyboard(interrupt_context_t context) {
+void do_keyboard(interrupt_context_t* context) {
   int com=0;
   int scan_code = io_read8(0x60);
   if(scan_code_index>MAX_CHARCODE_BUFFER){

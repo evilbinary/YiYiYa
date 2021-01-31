@@ -12,13 +12,13 @@ Import('env')
 env.Program('kernel.elf', [
     'main.c',
     '../drivers/libdriver.a',
-    '../arch/libarch.a',
     '../kernel/libyiyiya.a',
     '../libs/libkernel/libkernel.a',
+    '../arch/libarch.a',
     ]
     ,LINKFLAGS= '$LINKFLAGS -Tlink.ld')
 
-env.Objcopy('kernel','kernel.elf',OBJCOPYFLAGS='-S -g')
+env.Objcopy('kernel','kernel.elf',OBJCOPYFLAGS='-S')
 env.Objcopy('kernel.dbg','kernel.elf',OBJCOPYFLAGS='--only-keep-debug')
 env.Objcopy('kernel.bin','kernel',OBJCOPYFLAGS='-O binary')
 

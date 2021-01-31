@@ -7,7 +7,7 @@
 
 void* kmalloc(size_t size){
 	void *addr=NULL;
-	size=((size+4096)/4096)*4096;
+	//size=((size+4096)/4096)*4096;
 	addr= mm_alloc(size);
     memset(addr,0,size);
 	return addr;
