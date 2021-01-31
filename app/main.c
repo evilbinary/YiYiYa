@@ -43,15 +43,19 @@ void do_shell_thread(void) {
   u8 alt_p = 0;
   u32 col = 0;
   u32 row = 0;
-  syscall3(SYS_PRINT, "#",0,0);
+  syscall1(SYS_PRINT, "#");
+  move_cursor();
   char buf[2] = {0};
   for (;;) {
     int ret = 0;
-    // read key
+    //read key
     ret = syscall3(SYS_READ, 0, &scan_code, 1);
-    if (ret > 0) {
+    if (ret >=1) {
+      // kprintf("ret=%d %x", ret,scan_code);
       if (scan_code & 0x80) continue;
       buf[0] = key_map[scan_code & 0x7f][shf_p];
+      // set_cursor(col, row);
+      // kprintf("%x",key_map[scan_code & 0x7f][shf_p]);
       syscall3(SYS_PRINT_AT, buf, col, row);
       if (scan_code == 0x1c) {
         row++;
@@ -107,7 +111,7 @@ int kmain(int argc, char* argv[]) {
   module_init();
 
   module_regit(&keyboard_module);
-  module_regit(&hello_module);
+  //module_regit(&hello_module);
 
   context_restore(current_context);
 

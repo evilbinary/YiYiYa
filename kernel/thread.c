@@ -14,11 +14,9 @@ u32 thread_ids=0;
 
 thread_t* thread_create(void* entry) {
   thread_t *thread= kmalloc(sizeof(thread_t));
-  int size=sizeof(u32)*256;
+  int size=sizeof(u32)*64;
   u32* stack0=kmalloc(size);
-  stack0+=256;
   u32* stack3=kmalloc(size);
-  stack3+=256;
   thread_init(thread,entry,stack0,stack3);
   return thread;
 }
@@ -36,7 +34,7 @@ void thread_init(thread_t* thread,void* entry,u32* stack0,u32* stack3){
   thread->id=thread_ids++;
   thread->next=NULL;
   thread->priority=1;
-  thread->wait=0;
+  thread->counter=0;
   thread->state=THREAD_CREATE;
   context_init(&thread->context,(u32*)entry,stack0,stack3,USER_MODE);
 }

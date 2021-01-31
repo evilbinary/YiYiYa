@@ -8,6 +8,7 @@
 
 #include "boot.h"
 #include "libs/include/types.h"
+#include "interrupt.h"
 
 typedef uint32_t phys_address_t;
 typedef uint32_t virtual_address_t;
@@ -36,37 +37,13 @@ void cpu_halt();
 void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
                   u32 level);
 
-void context_switch(context_t** context, context_t* current_context,
+void context_switch(interrupt_context_t* context,context_t** current, 
                     context_t* next_context);
 
-#define context_save(duck_context)                      \
-  asm volatile(   \
-      "cli\n"                                        \
-      "pushal\n"                                        \
-      "movl %%esp, %0 \n"                               \
-      "movw %%ss, %1 \n"                                \
-      "movw %2,%%ax\n"                                  \
-      "movw %%ax,%%fs\n"                                \
-      "movw %%ax,%%es\n"                                \
-      "movw %%ax,%%gs\n"                                \
-      : "=m"(duck_context->esp0), "=m"(duck_context->ss0) \
-      : "m"(duck_context->ds0));
 
-#define context_restore(duck_context) \
-  asm volatile(                       \
-      "movl %0,%%esp\n"               \
-      "movw %1,%%ax\n"                \
-      "movw %%ax,%%ds\n"              \
-      "movw %%ax,%%fs\n"              \
-      "movw %%ax,%%es\n"              \
-      "movw %%ax,%%gs\n"              \
-      "popal\n"                       \
-      "sti\n" \
-      "iret\n"                        \
-      :                               \
-      : "m"(duck_context->esp0), "m"(duck_context->ds));
+#define context_restore(duck_context) interrupt_exit_context(duck_context->esp0)
 
-#define sys_fn_call(duck_interrupt_context, fn)                        \
+#define sys_fn_call(duck_interrupt_context, fn)                             \
   asm volatile(                                                             \
       " \
       push %1; \
@@ -75,13 +52,9 @@ void context_switch(context_t** context, context_t* current_context,
       push %4; \
       push %5; \
       call *%6; \
-      pop %%ebx; \
-      pop %%ebx; \
-      pop %%ebx; \
-      pop %%ebx; \
-      pop %%ebx; \
+      add $20,%%esp; \
     "                                                                   \
-      : "=a"(duck_interrupt_context->eax)                                                           \
+      : "=a"(duck_interrupt_context->eax)                                   \
       : "r"(duck_interrupt_context->edi), "r"(duck_interrupt_context->esi), \
         "r"(duck_interrupt_context->edx), "r"(duck_interrupt_context->ecx), \
         "r"(duck_interrupt_context->ebx), "r"(fn))
@@ -91,6 +64,6 @@ void context_switch(context_t** context, context_t* current_context,
 
 #define FAA(ptr) __sync_fetch_and_add(ptr, 1)
 
-int TAS(volatile int *addr, int newval);
+int TAS(volatile int* addr, int newval);
 
 #endif

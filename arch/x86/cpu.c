@@ -137,40 +137,45 @@ void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
   } else {
     kprintf("not suppport level %d\n", level);
   }
-  stack0[0] = ds;        // ss
-  stack0[-1] = stack3;   // esp
-  stack0[-2] = 0x0200;   // eflags
-  stack0[-3] = cs;       // cs
-  stack0[-4] = entry;    // eip
-  stack0[-5] = 0;        // EAX
-  stack0[-6] = 0;        // ECX
-  stack0[-7] = 0;        // EDX
-  stack0[-8] = 0;        // EBX
-  stack0[-9] = stack3;   // ESP
-  stack0[-10] = stack3;  // EBP
-  stack0[-11] = 0;       // ESI
-  stack0[-12] = 0;       // EDI
-  stack0 -= 12;
+  interrupt_context_t* c = stack0;
+  c->ss= ds;      // ss
+  c->esp = stack3;  // esp
+  c->eflags = 0x0200;  // eflags
+  c->cs = cs;      // cs
+  c->eip = entry;   // eip 4
 
-  context->esp0 = stack0;
+  c->no = 0;  // no  5
+  c->eax = 0;       // eax 6
+  c->ecx = 0;       // ecx 7
+  c->edx = 0;       // edx 8
+  c->ebx = 0;       // ebx 9
+  c->esp_null = stack0;  // esp 10
+  c->ebp = stack3;  // ebp 11
+  c->esi = 0;       // esi 12
+  c->edi = 0;       // edi 13
+  c->ds = ds;  // ds  14
+  c->es = ds;  // es  15
+  c->fs = ds;  // fs  16
+  c->gs = ds;  // gs    17
+
+  context->esp0 = c;
   context->ss0 = GDT_ENTRY_32BIT_DS * GDT_SIZE;
   context->ds0 = GDT_ENTRY_32BIT_DS * GDT_SIZE;
   context->esp = stack3;
   context->ss = ds;
   context->ds = ds;
-
-  // context->ebp = context->esp;
+  
   ulong addr = (ulong)boot_info->pdt_base;
   context->page_dir = addr;
 
   if (tss->eip == 0 && tss->cr3 == 0) {
-    tss->ss0 = GDT_ENTRY_32BIT_DS * GDT_SIZE;
-    tss->esp0 = stack0;
+    tss->ss0 = context->ss0;
+    tss->esp0 = context->esp0+sizeof(interrupt_context_t);
     tss->eip = context->eip;
-    tss->ss = tss->ss0;
-    tss->ds = tss->es = tss->fs = tss->gs = tss->ss0;
+    tss->ss = ds;
+    tss->ds = tss->es = tss->fs = tss->gs = ds;
     tss->cs = cs;
-    tss->esp = stack3;
+    tss->esp = context->esp;
     tss->cr3 = boot_info->pdt_base;
     set_ldt(GDT_ENTRY_32BIT_TSS * GDT_SIZE);
   }
@@ -183,19 +188,44 @@ void backtrace(stack_frame_t* fp, void** buf, int size) {
   }
 }
 
-void context_switch(context_t** context, context_t* prev_context,
+void context_switch(interrupt_context_t* context, context_t** current,
                     context_t* next_context) {
-  if (prev_context == next_context) {
-    return;
-  }
-  context_t* current_context = *context;
+  context_t* current_context = *current;
+  
+  current_context->esp0 = context;
+  current_context->esp = context->esp;
+
+  interrupt_context_t* c = next_context->esp0;
 
   tss_t* tss = next_context->tss;
-  tss->esp0 = next_context->esp0;
-  tss->esp = next_context->esp;
+  tss->esp0 = next_context->esp0+sizeof(interrupt_context_t);
+  tss->ss0 = next_context->ss0;
   tss->cr3 = next_context->page_dir;
 
-  *context = next_context;
+  // tss->esp= next_context->esp;
+  // tss->ss = next_context->ss;
+  /*tss->esp = next_context->esp;
+  
+  tss->eax = c->eax;
+  tss->ecx = c->ecx;
+  tss->edx = c->edx;
+  tss->ebx = c->ebx;
+  tss->esp = c->esp_n;
+  tss->ebp = c->ebp;
+  tss->esi = c->esi;
+  tss->edi = c->edi;
+
+  tss->ds = c->ds;
+  tss->es = c->es;
+  tss->fs = c->fs;
+  tss->gs = c->gs;
+  tss->eip= c->eip;
+  tss->eflags=c->eflags;
+  tss->cs = c->cs;
+  tss->ss = c->ss;
+  */
+
+  *current = next_context;
 }
 
 int TAS(volatile int* addr, int newval) {

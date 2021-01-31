@@ -1,8 +1,8 @@
 /*******************************************************************
-* Copyright 2021-2080 evilbinary
-* 作者: evilbinary on 01/01/20
-* 邮箱: rootdebug@163.com
-********************************************************************/
+ * Copyright 2021-2080 evilbinary
+ * 作者: evilbinary on 01/01/20
+ * 邮箱: rootdebug@163.com
+ ********************************************************************/
 #include "arch/boot.h"
 #include "arch/elf.h"
 #include "config.h"
@@ -19,6 +19,8 @@ asm("jmpl $0x0000, $init_boot\n");
 boot_info_t* boot_info = NULL;
 boot_info_t boot_data;
 u64 gdts[GDT_NUMBER];
+u8 kernel_stack[1024*4]; //4k
+u8 kernel_stack_top[0];
 
 void cls() {
   // clear screen
@@ -124,7 +126,7 @@ void init_boot_info() {
   boot_info->gdt_base = gdts;
   boot_info->gdt_number = GDT_NUMBER;
   boot_info->pdt_base = 0x4000;
-  boot_info->tss_number=MAX_CPU;
+  boot_info->tss_number = MAX_CPU;
 }
 
 void init_disk() {
@@ -146,7 +148,7 @@ void* memmove(void* s1, const void* s2, u32 n) {
   // dest = (char*)s1;
   // src = (char*)s2;
   // for (i = 0; i < n; i++) dest[i] = src[i];
-   u16 *dest, *src;
+  u16 *dest, *src;
   int i;
   dest = (u16*)s1;
   src = (u16*)s2;
@@ -173,8 +175,8 @@ u8 disk_read_lba(u32 lba, u32 addr, u8* status) {
   u32 cylinder = lba / (boot_info->disk.spt * boot_info->disk.hpc);
   u32 head = (lba / boot_info->disk.spt) % boot_info->disk.hpc;
   u32 sector = lba % boot_info->disk.spt + 1;
-  // printf("read lba:%x cylinder:%d head:%d sector:%d\n\r", lba, cylinder, head, sector);
-  // todo read by disk type
+  // printf("read lba:%x cylinder:%d head:%d sector:%d\n\r", lba, cylinder,
+  // head, sector); todo read by disk type
   u32* p = addr;
   u8 ret = disk_read(0, head, cylinder, sector, 1, buff, status);
   if (ret == 0) {
@@ -199,7 +201,6 @@ void read_kernel() {
     // flopy 1.44m
     u32 addr = boot_info->kernel_base;
     for (int i = 0; i < KERNEL_SIZE; i++) {
-
       // if(i>=20){
       //   u32 *p=0xffff;
       //   printf("i=%d addr=%x\n\r",i,addr);
@@ -217,7 +218,7 @@ void read_kernel() {
         break;
       }
       lba++;
-      addr += 512; 
+      addr += 512;
     }
   }
   if (ret == 0) {
@@ -271,19 +272,22 @@ static inline void write_cr0(unsigned long val) {
   asm volatile("movl %0, %%cr0" : : "r"(val) : "memory");
 }
 
-void init_gdt(){
+void init_gdt() {
   u64* gdt_addr = boot_info->gdt_base;
   printf("gdt_addr=%x\n\r", gdt_addr);
   gdt_addr[GDT_ENTRY_NULL] = 0;
-  gdt_addr[GDT_ENTRY_32BIT_CS] = GDT_ENTRY(0, 0xfffff, 0xc09b); //0x8
-  gdt_addr[GDT_ENTRY_32BIT_DS] = GDT_ENTRY(0, 0xfffff, 0xc092); //0x10
-  gdt_addr[GDT_ENTRY_32BIT_FS] = GDT_ENTRY(0, 0xfffff, 0xc093); //0x18
+  gdt_addr[GDT_ENTRY_32BIT_CS] = GDT_ENTRY(0, 0xfffff, 0xc09b);  // 0x8
+  gdt_addr[GDT_ENTRY_32BIT_DS] = GDT_ENTRY(0, 0xfffff, 0xc092);  // 0x10
+  gdt_addr[GDT_ENTRY_32BIT_FS] = GDT_ENTRY(0, 0xfffff, 0xc093);  // 0x18
 
-  u32 tss_base=(u32)&(boot_info->tss[0]);
-  gdt_addr[GDT_ENTRY_32BIT_TSS] = GDT_ENTRY(tss_base, 0xfffff, 0xc089); //0x20
-  gdt_addr[GDT_ENTRY_USER_32BIT_CS] = GDT_ENTRY(0, 0xfffff, 0xc09b|GDT_DPL(3));//0x28
-  gdt_addr[GDT_ENTRY_USER_32BIT_DS] = GDT_ENTRY(0, 0xfffff, 0xc092|GDT_DPL(3));//0x30
-  gdt_addr[GDT_ENTRY_USER_32BIT_FS] = GDT_ENTRY(0, 0xfffff, 0xc092|GDT_DPL(3));//0x38
+  u32 tss_base = (u32) & (boot_info->tss[0]);
+  gdt_addr[GDT_ENTRY_32BIT_TSS] = GDT_ENTRY(tss_base, 0xfffff, 0xc089);  // 0x20
+  gdt_addr[GDT_ENTRY_USER_32BIT_CS] =
+      GDT_ENTRY(0, 0xfffff, 0xc09b | GDT_DPL(3));  // 0x28
+  gdt_addr[GDT_ENTRY_USER_32BIT_DS] =
+      GDT_ENTRY(0, 0xfffff, 0xc092 | GDT_DPL(3));  // 0x30
+  gdt_addr[GDT_ENTRY_USER_32BIT_FS] =
+      GDT_ENTRY(0, 0xfffff, 0xc092 | GDT_DPL(3));  // 0x38
 
   gdt_addr[GDT_ENTRY_16BIT_CS] = GDT_ENTRY(0, 0xfffff, 0x009b);
   gdt_addr[GDT_ENTRY_16BIT_DS] = GDT_ENTRY(0, 0xfffff, 0x0093);
@@ -295,12 +299,11 @@ void init_gdt(){
   asm volatile("lgdtl %0\n" : : "m"(gdt));
 
   // asm volatile("movl %0, %%ss" : : "r"(GDT_ENTRY_16BIT_DS * GDT_SIZE));
-  //asm volatile("movl %0, %%ds" : : "r"(GDT_ENTRY_16BIT_DS * GDT_SIZE));
+  // asm volatile("movl %0, %%ds" : : "r"(GDT_ENTRY_16BIT_DS * GDT_SIZE));
   // asm volatile("movl %0, %%es" : : "r"(GDT_ENTRY_16BIT_DS * GDT_SIZE));
   // asm volatile("movl %0, %%gs" : : "r"(GDT_ENTRY_16BIT_DS * GDT_SIZE));
   // asm volatile("movl %0, %%fs" : : "r"(GDT_ENTRY_16BIT_DS * GDT_SIZE));
 }
-
 
 void init_cpu() {
   // enable cr0
@@ -320,16 +323,21 @@ void init_boot() {
 
   print_string("init memory\n\r");
   init_memory();
-  
+
   init_disk();
 
   read_kernel();
   init_cpu();
 
-
+   asm volatile(
+      "movl %0, %%esp\n"
+      "mov %%esp,%%ebp\n"
+      :
+      : "m"(kernel_stack_top));
   asm("jmpl %0, $start_kernel" ::"i"(GDT_ENTRY_32BIT_CS * GDT_SIZE));
 
-  for (;;);
+  for (;;)
+    ;
 }
 
 asm(".code32\n");
@@ -468,9 +476,9 @@ void start_kernel() {
   asm volatile("movl %0, %%es" : : "r"(GDT_ENTRY_32BIT_DS * GDT_SIZE));
   asm volatile("movl %0, %%gs" : : "r"(GDT_ENTRY_32BIT_DS * GDT_SIZE));
   asm volatile("movl %0, %%fs" : : "r"(GDT_ENTRY_32BIT_FS * GDT_SIZE));
-  
+
   // print_string("load kernel\n\r");
-  boot_info->kernel_entry = load_kernel(); 
+  boot_info->kernel_entry = load_kernel();
 
   entry start = boot_info->kernel_entry;
   int argc = 0;

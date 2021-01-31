@@ -13,38 +13,46 @@ static int print(char* s) {
   return 0;
 }
 
-
-static int print_at(char* s,u32 x,u32 y) {
+static int print_at(char* s, u32 x, u32 y) {
   set_cursor(x, y);
   kprintf("%s", s);
   return 0;
 }
 
 static size_t write(int fd, void* buf, size_t nbytes) {
+  u32 ret = 0;
   // get fd
   fd_t filedesc;
   filedesc.id = fd;
   device_t* dev = device_find(filedesc.id);
-  u32 ret = dev->write(&fd, buf, nbytes);
+  if (dev == NULL) {
+    return ret;
+  }
+  ret = dev->write(&fd, buf, nbytes);
   return ret;
 }
 static size_t read(int fd, void* buf, size_t nbytes) {
+  u32 ret = 0;
   // get fd
   fd_t filedesc;
   filedesc.id = fd;
   device_t* dev = device_find(filedesc.id);
-  u32 ret = dev->read(&fd, buf, nbytes);
+  if (dev == NULL) {
+    return ret;
+  }
+  ret = dev->read(&fd, buf, nbytes);
   return ret;
 }
 
 static size_t yeild(thread_t* thread) {
   if (thread != NULL) {
-    thread->wait -= 2;
+    thread->counter++;
     schedule();
   }
 }
 
-static void* syscall_table[SYSCALL_NUMBER] = {&read, &write, &yeild, &print,&print_at};
+static void* syscall_table[SYSCALL_NUMBER] = {&read, &write, &yeild, &print,
+                                              &print_at};
 
 INTERRUPT_SERVICE
 void syscall_handler() {
@@ -53,21 +61,21 @@ void syscall_handler() {
   interrupt_exit();
 }
 
+extern context_t* current_context;
 void syscall_init() { interrutp_regist(ISR_SYSCALL, syscall_handler); }
 
-
-void* do_syscall(interrupt_context_t context) {
+void* do_syscall(interrupt_context_t* context) {
   // kprintf("syscall %x\n",context.no);
-  if (context.eax >= 0 && context.eax < SYSCALL_NUMBER) {
-    void* fn = syscall_table[context.eax];
+  //current_context->esp0 = context;
+  //current_context->esp = context->esp;
+
+  if (context->eax >= 0 && context->eax < SYSCALL_NUMBER) {
+    void* fn = syscall_table[context->eax];
     if (fn != NULL) {
-      u32 sys_call_lock = 0;
-      //acquire(&sys_call_lock);
-      sys_fn_call((&context), fn);
-      //release(&sys_call_lock);
-      return context.eax;
+      sys_fn_call((context), fn);
+      return context->eax;
     } else {
-      kprintf("syscall %x no found\n", context.no);
+      kprintf("syscall %x not found\n", context->eax);
     }
   }
   return NULL;
@@ -92,12 +100,9 @@ void* syscall2(u32 num, void* arg0, void* arg1) {
   return ret;
 }
 void* syscall3(u32 num, void* arg0, void* arg1, void* arg2) {
-  u32 ret;
+  u32 ret = 0;
   asm volatile("int %1\n"
                : "=a"(ret)
                : "i"(ISR_SYSCALL), "0"(num), "b"(arg0), "c"(arg1), "d"(arg2));
-  if (ret > 0) {
-    int i = 0;
-  }
   return ret;
 }

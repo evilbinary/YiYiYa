@@ -18,18 +18,18 @@ thread_t* schedule_next() {
   thread_t* next = NULL;
   thread_t* v = head_thread;
   // find next priority
-  current_thread->wait--;
+  current_thread->counter++;
   next = current_thread;
   for (; v != NULL; v = v->next) {
-    // if (v == current_thread) continue;
-    if ((v->state == THREAD_RUNNING) && (v->wait >= next->wait)) {
+    if(v==current_thread) continue;
+    if ((v->state == THREAD_RUNNING) && (v->counter < next->counter)) {
       next = v;
     }
   }
   return next;
 }
 
-void schedule() {
+void schedule(interrupt_context_t* interrupt_context) {
   thread_t* next_thread = NULL;
   thread_t* prev_thread = NULL;
   next_thread = schedule_next();
@@ -38,22 +38,21 @@ void schedule() {
   }
   prev_thread = current_thread;
   current_thread = next_thread;
-  context_switch(&current_context, &prev_thread->context,
-                 &next_thread->context);
+  context_switch(interrupt_context,&current_context,&next_thread->context);
 }
 
-void do_schedule() {
-  schedule();
+void do_schedule(interrupt_context_t* interrupt_context) {
+  schedule(interrupt_context);
   timer_ticks++;
   io_write8(0x20, 0x20);
 }
 
 INTERRUPT_SERVICE
 void do_timer() {
-  context_save(current_context);
-  // debugger;
-  do_schedule();
-  context_restore(current_context);
+  interrupt_entering_code(ISR_TIMER,0);
+  interrupt_process(do_schedule);
+  //interrupt_exit();
+  interrupt_exit_context(current_context->esp0);
 }
 
 void schedule_init() {

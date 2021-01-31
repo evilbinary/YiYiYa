@@ -16,10 +16,21 @@
 #define IDT_NUMBER 512
 
 typedef struct interrupt_context {
-  u32 ds;
-  u32 edi, esi, ebp, esp, ebx, edx, ecx, eax;  // pushal
-  u32 no, code;
-  u32 eip, cs, eflags, useresp, ss;  // auto push
+  // ds
+  u32 gs, fs, es, ds;
+
+  // all reg
+  u32 edi, esi, ebp, esp_null, ebx, edx, ecx, eax;  // pushal
+
+  // interrup stack
+  u32 no;
+  u32 eip;
+  u32 cs;
+  u32 eflags;
+
+  // priv change
+  u32 esp;
+  u32 ss;
 } __attribute__((packed)) interrupt_context_t;
 
 typedef void (*interrupt_handler_t)(interrupt_context_t* context);
@@ -30,46 +41,72 @@ void timer_init(int hz);
 
 void interrutp_regist(u32 vec, interrupt_handler_t handler);
 
-#define interrupt_process(X) asm("\t call  " #X "\n")
+#define interrupt_process(X) \
+  asm volatile(              \
+      "push %esp\n"          \
+      "call  " #X            \
+      " \n"                  \
+      "add $4,%esp\n")
 
 #define interrupt_entering_code(VEC, CODE) \
-  asm("cli\n"                              \
-      "pushl %0 \n"                        \
-      "pushl %1 \n"                        \
+  asm volatile(                            \
+      "cli\n"                              \
+      "push %0 \n"                        \
       "pushal\n"                           \
-      "mov %%ds,%%ax\n"                    \
-      "push %%eax\n"                       \
-      "mov %2,%%ax\n"                      \
+      "push %%ds\n"                        \
+      "push %%es\n"                        \
+      "push %%fs\n"                        \
+      "push %%gs\n"                        \
+      "mov %1,%%eax\n"                     \
       "mov %%ax,%%ds\n"                    \
       "mov %%ax,%%es\n"                    \
+      "mov %%ax,%%gs\n"                    \
       "mov %%ax,%%fs\n"                    \
       :                                    \
-      : "i"(CODE), "i"(VEC), "i"(GDT_ENTRY_32BIT_DS * GDT_SIZE));
+      : "i"(CODE | VEC << 16), "i"(GDT_ENTRY_32BIT_DS * GDT_SIZE))
 
 #define interrupt_entering(VEC) \
-  asm("cli\n"                   \
-      "pushl %0 \n"             \
+  asm volatile(                 \
+      "cli\n"                   \
       "pushal\n"                \
-      "mov %%ds,%%ax\n"         \
-      "push %%eax\n"            \
-      "mov %1,%%ax\n"           \
+      "push %%ds\n"             \
+      "push %%es\n"             \
+      "push %%fs\n"             \
+      "push %%gs\n"             \
+      "mov %1,%%eax\n"          \
       "mov %%ax,%%ds\n"         \
       "mov %%ax,%%es\n"         \
+      "mov %%ax,%%gs\n"         \
       "mov %%ax,%%fs\n"         \
       :                         \
-      : "i"(VEC), "i"(GDT_ENTRY_32BIT_DS * GDT_SIZE));
+      : "i"(VEC), "i"(GDT_ENTRY_32BIT_DS * GDT_SIZE))
 
 #define interrupt_exit() \
-  asm("pop %%ebx\n"      \
-      "mov %%bx,%%ds\n"  \
-      "mov %%bx,%%es\n"  \
-      "mov %%bx,%%fs\n"  \
+  asm volatile(          \
+      "pop %%gs\n"       \
+      "pop %%fs\n"       \
+      "pop %%es\n"       \
+      "pop %%ds\n"       \
       "popal\n"          \
-      "add $8,%%esp \n"  \
+      "add $4,%%esp\n"   \
       "sti\n"            \
       "iret\n"           \
       :                  \
-      :);
+      :)
+
+#define interrupt_exit_context(esp) \
+  asm volatile(                     \
+      "mov %0,%%esp\n"             \
+      "pop %%gs\n"                  \
+      "pop %%fs\n"                  \
+      "pop %%es\n"                  \
+      "pop %%ds\n"                  \
+      "popal\n"                     \
+      "add $4,%%esp\n"              \
+      "sti\n"                       \
+      "iret\n"                      \
+      :                             \
+      : "m"(esp))
 
 void interrupt_init();
 
