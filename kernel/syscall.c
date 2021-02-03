@@ -28,7 +28,7 @@ static size_t write(int fd, void* buf, size_t nbytes) {
   if (dev == NULL) {
     return ret;
   }
-  ret = dev->write(&fd, buf, nbytes);
+  ret = dev->write(dev, buf, nbytes);
   return ret;
 }
 static size_t read(int fd, void* buf, size_t nbytes) {
@@ -40,7 +40,7 @@ static size_t read(int fd, void* buf, size_t nbytes) {
   if (dev == NULL) {
     return ret;
   }
-  ret = dev->read(&fd, buf, nbytes);
+  ret = dev->read(dev, buf, nbytes);
   return ret;
 }
 

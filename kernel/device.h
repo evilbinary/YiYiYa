@@ -8,11 +8,22 @@
 
 #include "arch/arch.h"
 
-#define DEVICE_TYPE_CHAR 1
-#define DEVICE_TYPE_BLOCK 2
-#define DEVICE_TYPE_VIRTUAL 3
-#define MAX_DEVICE 256
 
+enum {
+    DEVICE_KEYBOARD=0,
+    DEVICE_PCI,
+    DEVICE_VGA,
+};
+
+enum {
+    DEVICE_TYPE_CHAR=1,
+    DEVICE_TYPE_BLOCK,
+    DEVICE_TYPE_VIRTUAL,
+    DEVICE_TYPE_VGA,
+    DEVICE_TYPE_NET
+};
+
+#define MAX_DEVICE 256
 
 
 typedef struct fd{
@@ -25,17 +36,20 @@ typedef struct stat {
 	int is_dir;
 }stat_t;
 
-typedef size_t (*dev_read_t)(fd_t*fd, void *buf, size_t len);
-typedef size_t (*dev_write_t)(fd_t*fd, const void *buf, size_t len);
-typedef int (*dev_stat_t)(fd_t *fd, stat_t *stat);
+typedef struct device device_t;
+
+typedef size_t (*dev_read_fn)(device_t* fd, void *buf, size_t len);
+typedef size_t (*dev_write_fn)(device_t* fd, const void *buf, size_t len);
+typedef int (*dev_stat_fn)(device_t * fd, stat_t *stat);
 
 typedef struct device{
     char* name;
     u32 id;
-    u32 type; //char block 
-	dev_read_t read;
-    dev_write_t write;
-    dev_stat_t stat;
+    u32 type; //char block vga
+	dev_read_fn read;
+    dev_write_fn write;
+    dev_stat_fn stat;
+    void* data; //data
 }device_t;
 
 void device_add(device_t* device);

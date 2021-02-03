@@ -7,6 +7,8 @@
 extern context_t* current_context;
 extern module_t keyboard_module;
 extern module_t hello_module;
+extern module_t pci_module;
+extern module_t vga_module;
 
 static u32 main_lock = 0;
 
@@ -20,7 +22,6 @@ void start(int argc, char* argv[], char** envp) {
 }
 
 void do_shell_thread(void) {
-  cls();
   static const char key_map[0x3a][2] = {
       /*00*/ {0x0, 0x0},   {0x0, 0x0}, {'1', '!'},   {'2', '@'},
       /*04*/ {'3', '#'},   {'4', '$'}, {'5', '%'},   {'6', '^'},
@@ -87,15 +88,19 @@ void do_thread2(void) {
   u32 count = 0;
   char buf[2] = {0};
   char wheel[] = {'\\', '|', '/', '-'};
+  
+  u32 buf2=0xff55ff44ff22;
   for (;;) {
     buf[0] = wheel[i++];
     syscall3(SYS_PRINT_AT, buf, 101, 0);
     count++;
     if (i % 4 == 0) i = 0;
+    syscall3(SYS_WRITE,DEVICE_VGA,&buf2,4);
   }
 }
 
 int kmain(int argc, char* argv[]) {
+
   exception_init();
   syscall_init();
 
@@ -109,9 +114,10 @@ int kmain(int argc, char* argv[]) {
 
   schedule_init();
   module_init();
-
+  cls();
   module_regit(&keyboard_module);
-  //module_regit(&hello_module);
+  module_regit(&pci_module);
+  module_regit(&vga_module);
 
   context_restore(current_context);
 

@@ -1,3 +1,4 @@
+# coding:utf-8
 # *******************************************************************
 # * Copyright 2021-2080 evilbinary
 # * 作者: evilbinary on 01/01/20
@@ -10,6 +11,8 @@ Import('env')
 env.Library('driver', [
     'hello.c',
     'keyboard.c',
+    'pci.c',
+    'vga.c',
     '../kernel/libyiyiya.a',
     '../arch/libarch.a',
     '../libs/libkernel/libkernel.a',
