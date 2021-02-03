@@ -27,3 +27,13 @@ device_t* device_find(u32 id) {
   kprintf("not fond device %d\n", id);
   return NULL;
 }
+
+device_t* device_find_name(char* name) {
+  for (int i = 0; i < device_number; i++) {
+    if (kstrcmp(devices[i]->name, name)==0) {
+      return devices[i];
+    }
+  }
+  kprintf("not fond device name %s\n", name);
+  return NULL;
+}

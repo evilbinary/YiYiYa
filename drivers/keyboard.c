@@ -12,7 +12,7 @@ extern void release(u32* lock);
 static u8 scan_code_buffer[MAX_CHARCODE_BUFFER];
 static u32 scan_code_index=0;
 
-static size_t read(fd_t* fd, void* buf, size_t len) {
+static size_t read(device_t* dev, void* buf, size_t len) {
   u32 ret=0;
   if (scan_code_index>0) {
     kstrncpy(buf, &scan_code_buffer[scan_code_index-1], 1);
@@ -33,11 +33,12 @@ void keyboard_handler() {
 }
 
 int keyboard_init(void) {
-  kprintf("keyboard init\n");
   device_t* dev = kmalloc(sizeof(device_t));
   dev->name = "keyboard";
   dev->read = read;
-  dev->id = 0;
+  dev->id = DEVICE_KEYBOARD;
+  dev->type=DEVICE_TYPE_CHAR;
+  dev->data=scan_code_buffer;
   device_add(dev);
   scan_code_index=0;
 

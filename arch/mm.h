@@ -36,5 +36,6 @@ typedef struct mem_block{
 void mm_init();
 void* mm_alloc(size_t size);
 void mm_free(void* p);
+void* mm_alloc_zero_align(size_t size,int alignment);
 
 #endif

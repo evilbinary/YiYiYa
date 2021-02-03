@@ -1,3 +1,4 @@
+# coding:utf-8
 # *******************************************************************
 # * Copyright 2021-2080 evilbinary
 # * 作者: evilbinary on 01/01/20
@@ -70,4 +71,4 @@ if env.get('run')=='bochs' or env.get('run')=='b':
   env.Command('bochs', 'duck.img','bochs -q -f ./bochsrc')
 elif env.get('run')=='qemu' or env.get('run')=='q':
   build_duck_image()
-  env.Command('qemu', 'duck.img','qemu-system-i386 -monitor stdio -fda $SOURCE')
+  env.Command('qemu', 'duck.img','qemu-system-i386 -monitor stdio -serial stdio -fda $SOURCE')
