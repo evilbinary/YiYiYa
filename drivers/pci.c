@@ -13,6 +13,10 @@ static size_t read(fd_t* fd, void* buf, size_t len) {
   return ret;
 }
 
+u32 pci_dev_read32(pci_device_t* pdev, u16 offset) {
+  return pci_read32(pdev->bus, pdev->slot, pdev->function, offset);
+}
+
 u32 pci_read32(u16 bus, u16 slot, u16 func, u16 offset) {
   u32 address;
   u32 ret = 0;
@@ -51,15 +55,14 @@ pci_device_t* pci_get_device(u16 bus, u16 slot, u16 function) {
   pdev->device = device;
   pdev->function = function;
   pdev->class = class;
-  pdev->bus=bus;
-  pdev->slot=slot;
-  pdev->function=function;
+  pdev->bus = bus;
+  pdev->slot = slot;
+  pdev->function = function;
   // kprintf("bus:%d  slot:%d fun:%d ", bus, slot, function);
   // kprintf("vendorId:%x  deviceid:%x classId:%x", vendor, device, class);
   // kprintf("\n");
   return pdev;
 }
-
 
 void pci_probe() {
   for (u32 bus = 0; bus < 256; bus++) {
@@ -72,6 +75,16 @@ void pci_probe() {
       }
     }
   }
+}
+
+pci_device_t* pci_find_vendor_device(u32 vendor, u32 device) {
+  for (int i = 0; i < pci_number; i++) {
+    if (pci_device[i]->vendor == vendor && pci_device[i]->device == device) {
+      return pci_device[i];
+    }
+  }
+  kprintf("not fond pci device vendor id: %d device id:%d\n", vendor,device);
+  return NULL;
 }
 
 pci_device_t* pci_find_class(u32 class) {

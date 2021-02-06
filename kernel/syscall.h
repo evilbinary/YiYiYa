@@ -15,7 +15,8 @@ enum {
     SYS_WRITE,
     SYS_YIELD,
     SYS_PRINT,
-    SYS_PRINT_AT
+    SYS_PRINT_AT,
+    SYS_IOCTL
 };
 
 void* syscall0(u32 num);

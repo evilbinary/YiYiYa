@@ -12,6 +12,7 @@ Import('env')
 
 env.Program('kernel.elf', [
     'main.c',
+    'screen.c',
     '../drivers/libdriver.a',
     '../kernel/libyiyiya.a',
     '../libs/libkernel/libkernel.a',

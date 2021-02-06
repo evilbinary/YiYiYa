@@ -8,55 +8,58 @@
 
 #include "arch/arch.h"
 
-
 enum {
-    DEVICE_KEYBOARD=0,
-    DEVICE_PCI,
-    DEVICE_VGA,
+  DEVICE_KEYBOARD = 0,
+  DEVICE_PCI,
+  DEVICE_VGA,
+  DEVICE_VGA_QEMU,
+  DEVICE_MOUSE,
+  DEVICE_SERIAL
+
 };
 
 enum {
-    DEVICE_TYPE_CHAR=1,
-    DEVICE_TYPE_BLOCK,
-    DEVICE_TYPE_VIRTUAL,
-    DEVICE_TYPE_VGA,
-    DEVICE_TYPE_NET
+  DEVICE_TYPE_CHAR = 1,
+  DEVICE_TYPE_BLOCK,
+  DEVICE_TYPE_VIRTUAL,
+  DEVICE_TYPE_VGA,
+  DEVICE_TYPE_NET
 };
 
 #define MAX_DEVICE 256
 
-
-typedef struct fd{
-    u32 id;
-    u32 type; // file ,socket, pipe dir
-}fd_t;
+typedef struct fd {
+  u32 id;
+  u32 type;  // file ,socket, pipe dir
+} fd_t;
 
 typedef struct stat {
-	size_t size;
-	int is_dir;
-}stat_t;
+  size_t size;
+  int is_dir;
+} stat_t;
 
 typedef struct device device_t;
 
-typedef size_t (*dev_read_fn)(device_t* fd, void *buf, size_t len);
-typedef size_t (*dev_write_fn)(device_t* fd, const void *buf, size_t len);
-typedef int (*dev_stat_fn)(device_t * fd, stat_t *stat);
+typedef size_t (*dev_read_fn)(device_t* dev, void* buf, size_t len);
+typedef size_t (*dev_write_fn)(device_t* dev, const void* buf, size_t len);
+typedef size_t (*dev_stat_fn)(device_t* dev, stat_t* stat);
+typedef size_t (*dev_ioctl_fn)(device_t* dev, u32 cmd, ...);
 
-typedef struct device{
-    char* name;
-    u32 id;
-    u32 type; //char block vga
-	dev_read_fn read;
-    dev_write_fn write;
-    dev_stat_fn stat;
-    void* data; //data
-}device_t;
+typedef struct device {
+  char* name;
+  u32 id;
+  u32 type;  // char block vga
+  dev_read_fn read;
+  dev_write_fn write;
+  dev_ioctl_fn ioctl;
+  dev_stat_fn stat;
+  void* data;  // data
+} device_t;
 
 void device_add(device_t* device);
 
 void device_remove();
 
 device_t* device_find(u32 id);
-
 
 #endif
