@@ -71,4 +71,4 @@ if env.get('run')=='bochs' or env.get('run')=='b':
   env.Command('bochs', 'duck.img','bochs -q -f ./bochsrc')
 elif env.get('run')=='qemu' or env.get('run')=='q':
   build_duck_image()
-  env.Command('qemu', 'duck.img','qemu-system-i386 -monitor stdio -serial stdio -fda $SOURCE')
+  env.Command('qemu', 'duck.img','qemu-system-i386 -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor  -serial stdio -fda $SOURCE')
