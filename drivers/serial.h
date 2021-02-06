@@ -17,6 +17,6 @@
 
 
 void serial_printf(char *fmt, ...);
-
+void serial_write(char a);
 
 #endif

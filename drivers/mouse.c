@@ -12,8 +12,8 @@ mouse_device_t mouse_device;
 
 static size_t read(device_t* dev, void* buf, size_t len) {
   u32 ret = len;
-  mouse_device_t* data=buf;
-  *data=mouse_device;
+  mouse_device_t* data = buf;
+  *data = mouse_device;
   return ret;
 }
 
@@ -39,7 +39,7 @@ void mouse_write(u8 data) {
 void mouse_wait(u8 type) {
   u32 time_out = 1000000;
   for (; time_out > 0; time_out--) {
-    if ((io_read8(MOUSE_STATUS) & 1 + type) == 1) {
+    if ((io_read8(MOUSE_STATUS) & (1 + type)) == (1-type) ) {
       break;
     }
   }
@@ -56,26 +56,36 @@ int mouse_init(void) {
   device_add(dev);
   interrutp_regist(ISR_MOUSE, mouse_handler);
 
+
   mouse_device.x = 0;
   mouse_device.y = 0;
 
-  io_write8(MOUSE_COMMAND,
-            0xa8);  // Enable second PS/2 port (only if 2 PS/2 ports supported)
+  mouse_wait(1);
+  // Enable second PS/2 port (only if 2 PS/2 ports supported)
+  io_write8(MOUSE_COMMAND, 0xa8);
   mouse_wait(1);
 
-  io_write8(MOUSE_COMMAND, 0x20);  // Read "byte 0" from internal RAM
-
+  // Read "byte 0" from internal RAM
+  io_write8(MOUSE_COMMAND, 0x20);
+  mouse_wait(0);
   u8 status = (io_read8(MOUSE_DATA) | 2);
   mouse_wait(1);
-  io_write8(MOUSE_COMMAND, 0x60);  // Write next byte to "byte 0" of internal
-                                   // RAM (Controller Configuration Byte
 
+  // Write next byte to "byte 0" of internal RAM (Controller Configuration Byte
+  io_write8(MOUSE_COMMAND, 0x60);
+  mouse_wait(1);
   io_write8(MOUSE_DATA, status);
 
-  mouse_write(0xf6);  // Set Defaults
+
+
+  mouse_wait(1);
+
+  // Set Defaults
+  mouse_write(0xf6);
   mouse_read();
 
-  mouse_write(0xf4);  // Enable Data Reporting
+  // Enable Data Reporting
+  mouse_write(0xf4);
   mouse_read();
 
   pic_enable(ISR_MOUSE);
@@ -95,7 +105,7 @@ void do_mouse(interrupt_context_t* context) {
       mouse_device.x = mouse_device.x + data - ((state << 4) & 0x100);
     } else if (read_count == 2) {
       mouse_device.y = mouse_device.y + data - ((state << 3) & 0x100);
-      
+
       if (mouse_device.x < 0) {
         mouse_device.x = 0;
       }

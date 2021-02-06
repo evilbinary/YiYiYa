@@ -61,12 +61,4 @@ void do_timer() {
 void schedule_init() {
   interrutp_regist(ISR_TIMER, do_timer);
   timer_init(1000);
-  if (current_thread == NULL) {
-    if (head_thread == NULL) {
-      kprintf("no thread please create a thread\n");
-      cpu_halt();
-    }
-    current_thread = head_thread;
-    current_context = &current_thread->context;
-  }
 }

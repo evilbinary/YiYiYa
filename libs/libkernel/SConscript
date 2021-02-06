@@ -11,4 +11,6 @@ Import('env')
 env.Library('kernel', 
     ['string.c',
     'vsprintf.c',
+    'common.c',
+    'io.c',
     ],CFLAGS='$CFLAGS -Ilibs/include/kernel')

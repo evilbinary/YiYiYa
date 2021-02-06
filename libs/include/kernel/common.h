@@ -3,18 +3,15 @@
 * 作者: evilbinary on 01/01/20
 * 邮箱: rootdebug@163.com
 ********************************************************************/
-#ifndef ARCH_H
-#define ARCH_H
+#ifndef COMMON_H
+#define COMMON_H
 
 #include "libs/include/types.h"
-#include "boot.h"
-#include "cpu.h"
-#include "display.h"
-#include "mm.h"
-#include "libs/include/kernel/common.h"
-#include "interrupt.h"
-#include "lock.h"
+#include "io.h"
 
-void arch_init(boot_info_t* boot_info);
+void* memcpy(void* /* restrict */ s1, const void* /* restrict */ s2, size_t n);
+void* memset(void* s, int c, size_t n);
+
+
 
 #endif
