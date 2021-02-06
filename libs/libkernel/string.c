@@ -28,7 +28,7 @@ void* kmemcpy(void* /* restrict */ s1, const void* /* restrict */ s2,
   return s1;
 }
 
-void* memmove(void* s1, const void* s2, size_t n) {
+void* kmemmove(void* s1, const void* s2, size_t n) {
   char *dest, *src;
   int i;
 

@@ -33,7 +33,7 @@ void interrupt_init() {
   io_write8(0x20, 0x11);
   io_write8(0xa0, 0x11);
 
-  // icw2 map irqs
+  // icw2 map irqs  0-7 =>0x20-0x27 8-f => 0x28-0x2f
   io_write8(0x21, 0x20);
   io_write8(0xa1, 0x28);
 
@@ -55,7 +55,7 @@ void timer_init(int hz) {
   io_write8(0x36, 0x43);
   io_write8(divisor & 0xff, 0x40);
   io_write8(divisor >> 8, 0x40);
-  io_write8(io_read8(0x21) & 0xfe, 0x21);
+  io_write8(0x21,io_read8(0x21) & 0xfe);
 }
 
 static inline u16 pic_get_irr() {

@@ -4,11 +4,17 @@
  * 邮箱: rootdebug@163.com
  ********************************************************************/
 #include "main.h"
+
 extern context_t* current_context;
 extern module_t keyboard_module;
 extern module_t hello_module;
 extern module_t pci_module;
 extern module_t vga_module;
+extern module_t qemu_module;
+extern module_t mouse_module;
+extern module_t serial_module;
+
+extern void do_screen_thread(void);
 
 static u32 main_lock = 0;
 
@@ -49,9 +55,9 @@ void do_shell_thread(void) {
   char buf[2] = {0};
   for (;;) {
     int ret = 0;
-    //read key
+    // read key
     ret = syscall3(SYS_READ, 0, &scan_code, 1);
-    if (ret >=1) {
+    if (ret >= 1) {
       // kprintf("ret=%d %x", ret,scan_code);
       if (scan_code & 0x80) continue;
       buf[0] = key_map[scan_code & 0x7f][shf_p];
@@ -73,40 +79,23 @@ void do_shell_thread(void) {
 void do_thread1(void) {
   u32 i = 0;
   u32 count = 0;
-  char buf[2] = {0};
+  char* test="hello,do_thread1\n";
   char wheel[] = {'\\', '|', '/', '-'};
+  syscall3(SYS_WRITE, DEVICE_SERIAL, test,kstrlen(test));
   for (;;) {
-    buf[0] = wheel[i++];
-    syscall3(SYS_PRINT_AT, buf, 100, 0);
+    syscall3(SYS_PRINT_AT, &wheel[i++], 100, 1);
     count++;
     if (i % 4 == 0) i = 0;
-  }
-}
-
-void do_thread2(void) {
-  u32 i = 0;
-  u32 count = 0;
-  char buf[2] = {0};
-  char wheel[] = {'\\', '|', '/', '-'};
-  
-  u32 buf2=0xff55ff44ff22;
-  for (;;) {
-    buf[0] = wheel[i++];
-    syscall3(SYS_PRINT_AT, buf, 101, 0);
-    count++;
-    if (i % 4 == 0) i = 0;
-    syscall3(SYS_WRITE,DEVICE_VGA,&buf2,4);
   }
 }
 
 int kmain(int argc, char* argv[]) {
-
   exception_init();
   syscall_init();
 
   thread_t* t0 = thread_create((u32*)&do_shell_thread);
   thread_t* t1 = thread_create((u32*)&do_thread1);
-  thread_t* t2 = thread_create((u32*)&do_thread2);
+  thread_t* t2 = thread_create((u32*)&do_screen_thread);
 
   thread_run(t0);
   thread_run(t1);
@@ -117,7 +106,11 @@ int kmain(int argc, char* argv[]) {
   cls();
   module_regit(&keyboard_module);
   module_regit(&pci_module);
-  module_regit(&vga_module);
+  module_regit(&serial_module);
+
+  // module_regit(&vga_module);
+  module_regit(&qemu_module);
+  module_regit(&mouse_module);
 
   context_restore(current_context);
 

@@ -18,14 +18,17 @@ thread_t* schedule_next() {
   thread_t* next = NULL;
   thread_t* v = head_thread;
   // find next priority
-  current_thread->counter++;
+  // if(current_thread->counter<0){
+  //   current_thread->counter=0;
+  // }
   next = current_thread;
   for (; v != NULL; v = v->next) {
     if(v==current_thread) continue;
-    if ((v->state == THREAD_RUNNING) && (v->counter < next->counter)) {
+    if ((v->state == THREAD_RUNNING) && ( v->counter <= next->counter )) {
       next = v;
     }
   }
+  next->counter++;
   return next;
 }
 

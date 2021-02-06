@@ -13,5 +13,7 @@
 #include "kernel/syscall.h"
 #include "kernel/thread.h"
 #include "kernel/exceptions.h"
+#include "kernel/stdarg.h"
+#include "kernel/ioctl.h"
 
 #endif

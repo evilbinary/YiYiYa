@@ -12,7 +12,7 @@ int hello_init(void) {
   return 0;
 }
 
-void hello_exit(void) { kprintf("Goodbye World\n"); }
+void hello_exit(void) { kprintf("hello exit\n"); }
 
 
 module_t hello_module = {

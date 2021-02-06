@@ -4,9 +4,11 @@
  * 邮箱: rootdebug@163.com
  ********************************************************************/
 #include "kernel/kernel.h"
+#include "pic.h"
 
-extern void acquire(u32* lock);
-extern void release(u32* lock);
+#define KEYBOARD_DATA 0x60
+#define KEYBOARD_STATUS   0x64
+
 
 #define MAX_CHARCODE_BUFFER 32
 static u8 scan_code_buffer[MAX_CHARCODE_BUFFER];
@@ -32,6 +34,10 @@ void keyboard_handler() {
   interrupt_exit();
 }
 
+void keyboard_wait() {
+	while(io_read8(KEYBOARD_STATUS) & 2);
+}
+
 int keyboard_init(void) {
   device_t* dev = kmalloc(sizeof(device_t));
   dev->name = "keyboard";
@@ -43,15 +49,17 @@ int keyboard_init(void) {
   scan_code_index=0;
 
   interrutp_regist(ISR_KEYBOARD, keyboard_handler);
-  io_write8(io_read8(0x21) & 0xfd, 0x21);
+  //io_write8(PIC1_DATA,io_read8(PIC1_DATA) & 0xfd);
+  pic_enable(ISR_KEYBOARD);
   return 0;
 }
 
-void keyboard_exit(void) { kprintf("Goodbye World\n"); }
+void keyboard_exit(void) { kprintf("keyboard exit\n"); }
 
 void do_keyboard(interrupt_context_t* context) {
   int com=0;
-  int scan_code = io_read8(0x60);
+  keyboard_wait();
+  int scan_code = io_read8(KEYBOARD_DATA);
   if(scan_code_index>MAX_CHARCODE_BUFFER){
     scan_code_index=0;
     kprintf("key buffer is full\n");
@@ -59,8 +67,8 @@ void do_keyboard(interrupt_context_t* context) {
   scan_code_buffer[scan_code_index++]=scan_code;
   // io_write8((com = io_read8(0x61)) | 0x80, 0x61);
   // io_write8(com & 0x7f, 0x61);
-  io_write8(0x20, 0x20);
-  io_write8(0xa0, 0x20);
+
+  pic_eof(ISR_KEYBOARD);
 }
 
 module_t keyboard_module = {

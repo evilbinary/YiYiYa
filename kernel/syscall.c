@@ -4,9 +4,9 @@
  * 邮箱: rootdebug@163.com
  ********************************************************************/
 #include "syscall.h"
-
 #include "device.h"
 #include "thread.h"
+#include "kernel/stdarg.h"
 
 static int print(char* s) {
   kprintf("%s", s);
@@ -17,6 +17,23 @@ static int print_at(char* s, u32 x, u32 y) {
   set_cursor(x, y);
   kprintf("%s", s);
   return 0;
+}
+
+static size_t ioctl(int fd, u32 cmd,...) {
+  u32 ret = 0;
+  // get fd
+  fd_t filedesc;
+  filedesc.id = fd;
+  device_t* dev = device_find(filedesc.id);
+  if (dev == NULL) {
+    return ret;
+  }
+  va_list args;
+	va_start(args, cmd);
+   ret = dev->ioctl(dev, cmd,args);
+	va_end(args);
+
+  return ret;
 }
 
 static size_t write(int fd, void* buf, size_t nbytes) {
@@ -52,7 +69,7 @@ static size_t yeild(thread_t* thread) {
 }
 
 static void* syscall_table[SYSCALL_NUMBER] = {&read, &write, &yeild, &print,
-                                              &print_at};
+                                              &print_at,&ioctl};
 
 INTERRUPT_SERVICE
 void syscall_handler() {
