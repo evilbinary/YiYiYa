@@ -5,8 +5,6 @@
  ********************************************************************/
 #include "../cpu.h"
 
-#include "../common.h"
-
 extern boot_info_t* boot_info;
 
 static inline unsigned long read_cr0(void) {

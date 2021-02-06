@@ -8,7 +8,7 @@ import os
 
 Import('env')
 
-env.Library('arch', ['arch.c','common.c','lock.c',
+env.Library('arch', ['arch.c','lock.c',
     'x86/io.c',
     'x86/cpu.c',
     'x86/mm.c',

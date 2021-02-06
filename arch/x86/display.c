@@ -6,7 +6,6 @@
 #include "../display.h"
 
 #include "../boot.h"
-#include "../common.h"
 #include "../io.h"
 #include "../lock.h"
 
