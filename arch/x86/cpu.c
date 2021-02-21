@@ -143,6 +143,7 @@ void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
   c->eip = entry;   // eip 4
 
   c->no = 0;  // no  5
+  c->code = 0;  // no  5
   c->eax = 0;       // eax 6
   c->ecx = 0;       // ecx 7
   c->edx = 0;       // edx 8

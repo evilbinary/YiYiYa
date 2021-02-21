@@ -112,5 +112,3 @@ int pci_init(void) {
 void pci_exit(void) { kprintf("pci exit\n"); }
 
 module_t pci_module = {.name = "pci", .init = pci_init, .exit = pci_exit};
-
-module_regit(pci_module);

@@ -119,4 +119,3 @@ void qemu_exit(void) { kprintf("vga exit\n"); }
 
 module_t qemu_module = {.name = "vga", .init = qemu_init, .exit = qemu_exit};
 
-module_regit(qemu_module);

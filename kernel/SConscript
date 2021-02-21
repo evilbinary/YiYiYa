@@ -18,6 +18,7 @@ env.Library('yiyiya', [
     'kmalloc.c',
     'module.c',
     'device.c',
+    'vfs.c',
     '../arch/libarch.a',
     '../libs/libkernel/libkernel.a',
     ]

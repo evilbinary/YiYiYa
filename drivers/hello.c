@@ -20,5 +20,3 @@ module_t hello_module = {
     .init=hello_init,
     .exit=hello_exit
 };
-
-module_regit(hello_module);

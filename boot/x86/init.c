@@ -3,14 +3,12 @@
  * 作者: evilbinary on 01/01/20
  * 邮箱: rootdebug@163.com
  ********************************************************************/
+#include "init.h"
 #include "arch/boot.h"
 #include "arch/elf.h"
 #include "config.h"
 #include "libs/include/types.h"
 
-#define debugger asm("xchg %bx,%bx\n")
-
-typedef int (*entry)(int, char**, char**);
 
 asm(".code16gcc\n");
 asm("cli\n");
@@ -19,7 +17,7 @@ asm("jmpl $0x0000, $init_boot\n");
 boot_info_t* boot_info = NULL;
 boot_info_t boot_data;
 u64 gdts[GDT_NUMBER];
-u8 kernel_stack[1024*4]; //4k
+u8 kernel_stack[1024];  // 1k
 u8 kernel_stack_top[0];
 
 void cls() {
@@ -122,7 +120,8 @@ void printf(const char* format, ...) {
 void init_boot_info() {
   boot_info = &boot_data;
   boot_info->version = 0x01;
-  boot_info->kernel_base = 0x8000;
+  boot_info->kernel_origin_base = KERNEL_ORIGIN_BASE;
+  boot_info->kernel_base = KERNEL_BASE;
   boot_info->gdt_base = gdts;
   boot_info->gdt_number = GDT_NUMBER;
   boot_info->pdt_base = 0x4000;
@@ -165,23 +164,28 @@ u8 disk_read(u32 disk, u32 head, u32 cylinder, u32 sector, u32 number, u32 addr,
       "mov %%ah,%1  \n"
       "setc	%0  \n"
       : "=qm"(carry), "=qm"(*status)
-      : "a"(0x0200 | number), "b"(addr & 0xFFFF), "c"(cylinder << 8 | sector),
+      : "a"(0x0200 | number),
+        "b"(addr&0xffff),
+        "ES"((addr>>16)&0xffff),
+        "c"(cylinder << 8 | sector&0xff),
         "d"(head << 8 | disk));
   return carry;
 }
-u8 buff[512];
+
+u8 buff[READ_BLOCK_SIZE];
 
 u8 disk_read_lba(u32 lba, u32 addr, u8* status) {
   u32 cylinder = lba / (boot_info->disk.spt * boot_info->disk.hpc);
   u32 head = (lba / boot_info->disk.spt) % boot_info->disk.hpc;
-  u32 sector = lba % boot_info->disk.spt + 1;
-  // printf("read lba:%x cylinder:%d head:%d sector:%d\n\r", lba, cylinder,
-  // head, sector); todo read by disk type
+  u32 sector = (lba % boot_info->disk.spt)+1;
+  //todo read by disk type
   u32* p = addr;
   u8 ret = disk_read(0, head, cylinder, sector, 1, buff, status);
   if (ret == 0) {
-    // printf("addr %x \n\r",addr);
-    memmove(addr, buff, 512);
+    //printf("addr %x ", addr);
+    memmove(addr, buff, READ_BLOCK_SIZE);
+  }else{
+      printf("\n\rread erro on lba:%x cylinder:%d head:%d sector:%d\n\r", lba, cylinder,head, sector); 
   }
   return ret;
 }
@@ -199,7 +203,11 @@ void read_kernel() {
           (sector);
     // lba=sector;
     // flopy 1.44m
+    #ifdef KERNEL_MOVE
+    u32 addr = boot_info->kernel_origin_base;
+    #else
     u32 addr = boot_info->kernel_base;
+    #endif
     for (int i = 0; i < KERNEL_SIZE; i++) {
       // if(i>=20){
       //   u32 *p=0xffff;
@@ -214,15 +222,18 @@ void read_kernel() {
       if (ret == 0) {
         print_string(".");
       } else {
-        printf("\n\rload kernel offset %d error code %d\n\r", i, status);
+        printf("\n\rload kernel offset %d error code %d addr:%x\n\r", i, status,addr);
         break;
       }
       lba++;
-      addr += 512;
+      addr += READ_BLOCK_SIZE;
     }
   }
   if (ret == 0) {
     print_string("\n\rload kernel success\n\r");
+  }else{
+    print_string("\n\rload kernel error\n\r");
+    for(;;);
   }
 }
 
@@ -298,11 +309,15 @@ void init_gdt() {
   gdt.base = (u32)gdt_addr;
   asm volatile("lgdtl %0\n" : : "m"(gdt));
 
-  // asm volatile("movl %0, %%ss" : : "r"(GDT_ENTRY_16BIT_DS * GDT_SIZE));
-  // asm volatile("movl %0, %%ds" : : "r"(GDT_ENTRY_16BIT_DS * GDT_SIZE));
-  // asm volatile("movl %0, %%es" : : "r"(GDT_ENTRY_16BIT_DS * GDT_SIZE));
+  //asm volatile("movl %0, %%ss" : : "r"(GDT_ENTRY_16BIT_DS * GDT_SIZE));
+  //asm volatile("movl %0, %%ds" : : "r"(GDT_ENTRY_16BIT_DS * GDT_SIZE));
+  //asm volatile("movl %0, %%es" : : "r"(GDT_ENTRY_16BIT_DS * GDT_SIZE));
   // asm volatile("movl %0, %%gs" : : "r"(GDT_ENTRY_16BIT_DS * GDT_SIZE));
   // asm volatile("movl %0, %%fs" : : "r"(GDT_ENTRY_16BIT_DS * GDT_SIZE));
+  // debugger;
+  // asm volatile("movl %0, %%cs" : : "r"(GDT_ENTRY_16BIT_CS * GDT_SIZE));
+  // asm("jmpl %0,$here\n"
+  //     "  here:\n" ::"i"(GDT_ENTRY_16BIT_CS * GDT_SIZE));
 }
 
 void init_cpu() {
@@ -329,7 +344,7 @@ void init_boot() {
   read_kernel();
   init_cpu();
 
-   asm volatile(
+  asm volatile(
       "movl %0, %%esp\n"
       "mov %%esp,%%ebp\n"
       :
@@ -343,7 +358,12 @@ void init_boot() {
 asm(".code32\n");
 
 void* load_kernel() {
+  #ifdef KERNEL_MOVE
+  u32* elf = boot_info->kernel_origin_base;
+  #else
   u32* elf = boot_info->kernel_base;
+  #endif
+
   Elf32_Ehdr* elf_header = (Elf32_Ehdr*)elf;
   if (elf_header->e_ident[0] == ELFMAG0 || elf_header->e_ident[1] == ELFMAG1) {
     // printf("header: ");
@@ -476,10 +496,8 @@ void start_kernel() {
   asm volatile("movl %0, %%es" : : "r"(GDT_ENTRY_32BIT_DS * GDT_SIZE));
   asm volatile("movl %0, %%gs" : : "r"(GDT_ENTRY_32BIT_DS * GDT_SIZE));
   asm volatile("movl %0, %%fs" : : "r"(GDT_ENTRY_32BIT_FS * GDT_SIZE));
-
   // print_string("load kernel\n\r");
   boot_info->kernel_entry = load_kernel();
-
   entry start = boot_info->kernel_entry;
   int argc = 0;
   char** argv = 0;

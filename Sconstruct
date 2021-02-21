@@ -15,7 +15,7 @@ env = Environment(
                 STRIP="/opt/local/bin/i386-elf-strip",
                 RANLIB='/opt/local/bin/i386-elf-ranlib',
                 OBJCOPY='/opt/local/bin/i386-elf-objcopy',
-                CFLAGS='-march=i486 -I. -I./include -Ilibs/include -g -nostdlib -nostdinc -fno-builtin -m32 -c -std=c99 -std=gnu99 ',
+                CFLAGS='-march=i486 -I. -I./include -Ilibs/include -g -nostdlib -nostdinc -fno-builtin -m32 -c -std=c99 -std=gnu99 -w',
                 #PATH= os.environ['PATH'],
                 LIBPATH=['.','../arch/','../driver'],
                 LINKFLAGS='-nostdlib -nostartfiles -e start  -g ',
