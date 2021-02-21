@@ -14,7 +14,15 @@ enum {
   DEVICE_VGA,
   DEVICE_VGA_QEMU,
   DEVICE_MOUSE,
-  DEVICE_SERIAL
+  DEVICE_SERIAL,
+  DEVICE_SATA,
+  DEVICE_SATA0,
+  DEVICE_SATA1,
+  DEVICE_SATA2,
+  DEVICE_SATA3,
+  DEVICE_SATA4,
+  DEVICE_SATA5,
+  DEVICE_SATA6,
 
 };
 
@@ -22,6 +30,7 @@ enum {
   DEVICE_TYPE_CHAR = 1,
   DEVICE_TYPE_BLOCK,
   DEVICE_TYPE_VIRTUAL,
+  DEVICE_TYPE_FILE,
   DEVICE_TYPE_VGA,
   DEVICE_TYPE_NET
 };
@@ -31,6 +40,7 @@ enum {
 typedef struct fd {
   u32 id;
   u32 type;  // file ,socket, pipe dir
+  u32 *data;
 } fd_t;
 
 typedef struct stat {

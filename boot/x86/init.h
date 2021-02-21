@@ -3,13 +3,23 @@
 * 作者: evilbinary on 01/01/20
 * 邮箱: rootdebug@163.com
 ********************************************************************/
-#ifdef SETUP_H
-#define SETUP_H
+#ifndef INIT_H
+#define INIT_H
+
+#define KERNEL_MOVE 
+#define READ_BLOCK_SIZE 512
+#define KERNEL_BASE 0x100000
+#define KERNEL_ORIGIN_BASE 0x6000
+
+
+#define debugger asm("xchg %bx,%bx\n")
+
+typedef int (*entry)(int, char**, char**);
 
 void init_boot();
 void init_display();
 
-void load_kernel();
+void* load_kernel();
 void init_memory();
 void init_kernel();
 

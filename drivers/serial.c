@@ -73,5 +73,3 @@ void serial_exit(void) { kprintf("serial exit\n"); }
 
 module_t serial_module = {
     .name = "serial", .init = serial_init, .exit = serial_exit};
-
-module_regit(serial_module);

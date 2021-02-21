@@ -67,13 +67,13 @@ int mouse_init(void) {
 
   // Read "byte 0" from internal RAM
   io_write8(MOUSE_COMMAND, 0x20);
-  mouse_wait(0);
+  //mouse_wait(0);
   u8 status = (io_read8(MOUSE_DATA) | 2);
   mouse_wait(1);
 
   // Write next byte to "byte 0" of internal RAM (Controller Configuration Byte
   io_write8(MOUSE_COMMAND, 0x60);
-  mouse_wait(1);
+  //mouse_wait(1);
   io_write8(MOUSE_DATA, status);
 
 
@@ -123,4 +123,3 @@ void mouse_exit(void) { kprintf("mouse exit\n"); }
 
 module_t mouse_module = {
     .name = "mouse", .init = mouse_init, .exit = mouse_exit};
-module_regit(mouse_module);

@@ -73,4 +73,3 @@ void do_keyboard(interrupt_context_t* context) {
 
 module_t keyboard_module = {
     .name = "keyboard", .init = keyboard_init, .exit = keyboard_exit};
-module_regit(keyboard_module);

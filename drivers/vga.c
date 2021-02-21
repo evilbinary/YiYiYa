@@ -50,8 +50,7 @@ void vga_init_device(device_t* dev) {
     kprintf("can not find pci device\n");
     return;
   }
-  u32 bar0 =
-      pci_read32(pdev->bus, pdev->slot, pdev->function, 0x10) & 0xFFFFFFF0;
+  u32 bar0 =pci_dev_read32(pdev, PCI_BASE_ADDR0) & 0xFFFFFFF0;
   // u32 bar1 =
   //     pci_read32(pdev->bus, pdev->slot, pdev->function, 0x14) & 0xFFFFFFF0;
   // u32 bar2 =
@@ -89,4 +88,3 @@ void vga_exit(void) { kprintf("vga exit\n"); }
 
 module_t vga_module = {.name = "vga", .init = vga_init, .exit = vga_exit};
 
-module_regit(vga_module);

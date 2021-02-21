@@ -13,6 +13,10 @@ extern module_t vga_module;
 extern module_t qemu_module;
 extern module_t mouse_module;
 extern module_t serial_module;
+extern module_t ahci_module;
+extern module_t devfs_module;
+extern module_t fat32_module;
+
 extern void serial_write(char a);
 extern void putch(char a);
 
@@ -36,14 +40,18 @@ int kmain(int argc, char* argv[]) {
   cls();
   schedule_init();
   module_init();
-  module_regit(&pci_module);
-  module_regit(&serial_module);
-  module_regit(&keyboard_module);
+  module_regist(&pci_module);
+  module_regist(&serial_module);
+  module_regist(&keyboard_module);
+  
   io_add_write_channel(serial_write);
 
-  // module_regit(&vga_module);
-  module_regit(&qemu_module);
-  // module_regit(&mouse_module);
+  // module_regist(&vga_module);
+  module_regist(&qemu_module);
+  // module_regist(&mouse_module);
+  module_regist(&ahci_module);
+  module_regist(&devfs_module);
+  module_regist(&fat32_module);
 
   thread_t* t0 = thread_create((u32*)&do_shell_thread);
   thread_t* t1 = thread_create((u32*)&do_serial_thread);

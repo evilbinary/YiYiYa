@@ -14,7 +14,7 @@ void module_init() {
   module_number = 0;
 }
 
-void module_regit(module_t* mod) {
+void module_regist(module_t* mod) {
   if (module_number > MAX_MODULES) {
     kprintf("add module full %d\n", module_number);
     return;
@@ -26,7 +26,7 @@ void module_regit(module_t* mod) {
   }
 }
 
-void module_unregit(module_t* mod) {
+void module_unregist(module_t* mod) {
   for (int i = 0; i < module_number; i++) {
     if (modules[i] == mod) {
       // todo xxx

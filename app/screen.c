@@ -528,7 +528,7 @@ void do_screen_thread(void) {
 
   for (;;) {
     buf[0] = wheel[i++];
-    syscall3(SYS_PRINT_AT, buf, 101, 0);
+    //syscall3(SYS_PRINT_AT, buf, 101, 0);
     count++;
     if (i % 4 == 0) i = 0;
     for (u32 y = 0; y < screen_height; y++) {
@@ -539,7 +539,7 @@ void do_screen_thread(void) {
     screen_fill_rect(10, 20 , 30, 30, 0xff0000);
     screen_printf(200,10,"hello,YiYiYa");
 
-    syscall3(SYS_READ, DEVICE_MOUSE,&mouse_data,sizeof(mouse_data_t));
+    //syscall3(SYS_READ, DEVICE_MOUSE,&mouse_data,sizeof(mouse_data_t));
     screen_printf(10,100,"%d %d",mouse_data.x,mouse_data.y);
     screen_fill_rect(mouse_data.x, screen_height-mouse_data.y , 4, 4, 0x00ff00);
     

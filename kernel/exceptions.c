@@ -10,7 +10,7 @@ void exception_regist(u32 vec, interrupt_handler_t handler) {
   exception_handlers[vec] = handler;
 }
 
-void exception_info(interrupt_context_t* context) {
+void exception_info(interrupt_context_t *context) {
   static const char *exception_msg[] = {
       "DIVIDE ERROR",      "DEBUG EXCEPTION",
       "BREAKPOINT",        "NMI",
@@ -24,7 +24,7 @@ void exception_info(interrupt_context_t* context) {
   };
   cls();
   u32 cr2, cr3;
-  u32 ds,es,fs,gs; 
+  u32 ds, es, fs, gs;
   asm volatile("movl	%%cr2,	%%eax" : "=a"(cr2));
   asm volatile("movl %%cr3,	%%eax" : "=a"(cr3));
   asm volatile("movl %%ds,	%%eax" : "=a"(ds));
@@ -53,55 +53,55 @@ void exception_info(interrupt_context_t* context) {
 
   if (exception_handlers[context->no] != 0) {
     interrupt_handler_t handler = exception_handlers[context->no];
-    handler(&context);
+    handler(context);
   }
 }
 INTERRUPT_SERVICE
 void divide_error() {
-  interrupt_entering_code(0,0);
+  interrupt_entering_code(0, 0);
   interrupt_process(exception_info);
   cpu_halt();
 }
 INTERRUPT_SERVICE
 void debug_exception() {
-  interrupt_entering_code(1,0);
+  interrupt_entering_code(1, 0);
   interrupt_process(exception_info);
   cpu_halt();
 }
 INTERRUPT_SERVICE
 void nmi() {
-  interrupt_entering_code(2,0);
+  interrupt_entering_code(2, 0);
   interrupt_process(exception_info);
   cpu_halt();
 }
 INTERRUPT_SERVICE
 void breakpoint() {
-  interrupt_entering_code(3,0);
+  interrupt_entering_code(3, 0);
   interrupt_process(exception_info);
   cpu_halt();
 }
 INTERRUPT_SERVICE
 void overflow() {
-  interrupt_entering_code(4,0);
+  interrupt_entering_code(4, 0);
   interrupt_process(exception_info);
   cpu_halt();
 }
 INTERRUPT_SERVICE
 void bounds_check() {
-  interrupt_entering_code(5,0);
+  interrupt_entering_code(5, 0);
   interrupt_process(exception_info);
   cpu_halt();
 }
 
 INTERRUPT_SERVICE
 void invalid_opcode() {
-  interrupt_entering_code(6,0);
+  interrupt_entering_code(6, 0);
   interrupt_process(exception_info);
   cpu_halt();
 }
 INTERRUPT_SERVICE
 void cop_not_avalid() {
-  interrupt_entering_code(7,0);
+  interrupt_entering_code(7, 0);
   interrupt_process(exception_info);
   cpu_halt();
 }
@@ -113,7 +113,7 @@ void double_fault() {
 }
 INTERRUPT_SERVICE
 void overrun() {
-  interrupt_entering_code(9,0);
+  interrupt_entering_code(9, 0);
   interrupt_process(exception_info);
   cpu_halt();
 }
@@ -146,36 +146,34 @@ void general_protection() {
 INTERRUPT_SERVICE void page_fault() {
   interrupt_entering(14);
   interrupt_process(exception_info);
-  cpu_halt();
+  // cpu_halt();
   interrupt_exit();
 }
 INTERRUPT_SERVICE
 void reversed() {
-  interrupt_entering_code(15,0);
+  interrupt_entering_code(15, 0);
   interrupt_process(exception_info);
   cpu_halt();
 }
 INTERRUPT_SERVICE
 void coprocessor_error() {
-  interrupt_entering_code(16,0);
+  interrupt_entering_code(16, 0);
   interrupt_process(exception_info);
   cpu_halt();
 }
-
 
 void do_page_fault(interrupt_context_t *context) {
   u32 fault_addr;
   asm volatile("mov %%cr2, %0" : "=r"(fault_addr));
 
-  int present = !(context->no & 0x1);  // present
-  int rw = context->no & 0x2;          // rw
-  int us = context->no & 0x4;          // user mode
-  int reserved =
-      context->no & 0x8; 
-  int id = context->no & 0x10;
+  int present = context->code & 0x1;  // present
+  int rw = context->code & 0x2;          // rw
+  int us = context->code & 0x4;          // user mode
+  int reserved = context->code & 0x8;
+  int id = context->code & 0x10;
 
   kprintf("[");
-  if (present) {
+  if (present==1) {
     kprintf("present ");
   }
   if (rw) {
@@ -188,8 +186,12 @@ void do_page_fault(interrupt_context_t *context) {
     kprintf("reserved ");
   }
   kprintf("]  fault_addr:");
-  kprintf("0x%x",fault_addr);
+  kprintf("0x%x", fault_addr);
   kprintf("\n");
+
+  if(present==0){
+    map_page(fault_addr, fault_addr, PAGE_P | PAGE_USU | PAGE_RWW);
+  }
 }
 
 void exception_init() {
@@ -213,7 +215,6 @@ void exception_init() {
   interrutp_regist(17, reversed);
   interrutp_regist(18, reversed);
 
-  //exception
+  // exception
   exception_regist(14, do_page_fault);
 }
-
