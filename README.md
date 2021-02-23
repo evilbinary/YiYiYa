@@ -21,3 +21,5 @@ scons --run=bochs
 ```
 scons --run=qemu
 ```
+
+qq群 26893532 可以加入一起讨论学习
