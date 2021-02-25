@@ -27,12 +27,12 @@ void map_page(u32 virtualaddr, u32 physaddr, u32 flags) {
 
   u64* page_dir_ptr = (u64)page_dir_ptr_tab[pdpte_index] & ~0xFFF;
   if (page_dir_ptr == NULL) {
-    page_dir_ptr = mm_alloc_zero_align(sizeof(u64) * 512,4096);
+    page_dir_ptr = mm_alloc_zero_align(sizeof(u64) * 512, 4096);
     page_dir_ptr_tab[pdpte_index] = ((u64)page_dir_ptr) | PAGE_P;
   }
   u64* page_tab_ptr = (u64)page_dir_ptr[pde_index] & ~0xFFF;
   if (page_tab_ptr == NULL) {
-    page_tab_ptr = mm_alloc_zero_align(sizeof(u64) * 512,4096);
+    page_tab_ptr = mm_alloc_zero_align(sizeof(u64) * 512, 4096);
     page_dir_ptr[pde_index] = (u64)page_tab_ptr | flags;
   }
   page_tab_ptr[pte_index] = (u64)physaddr & ~0xFFF | flags;
@@ -73,11 +73,12 @@ void mm_init() {
 
 void mm_alloc_init() {
   memory_info_t* first_mem = (memory_info_t*)&boot_info->memory[0];
-  mem_block_t* blocks = (mem_block_t*)first_mem->base + 0x10;
+  mem_block_t* blocks = (mem_block_t*)(first_mem->base + 0x10);
   u32 size = sizeof(mem_block_t) * boot_info->memory_number;
+  u32 pos = 0;
   for (int i = 0; i < boot_info->memory_number; i++) {
     memory_info_t* mem = (memory_info_t*)&boot_info->memory[i];
-    if (mem->type != 1) {
+    if (mem->type != 1) {  // normal ram
       continue;
     }
     // skip
@@ -85,20 +86,25 @@ void mm_alloc_init() {
     u32 len = mem->length;
     if (0x500 > mem->base && mem->base < 0x4000) {
       addr = 0x4000;
-      len = mem->base - addr;
+      len = len - (addr - mem->base);
     } else if (mem->base > boot_info->kernel_base && mem->base < 0x200000) {
       addr = 0x200000;
-      len = mem->base - addr;
+      len = len - (addr - mem->base);
     }
-    blocks[i].addr = addr;
-    blocks[i].size = len;
-    blocks[i].type = MEM_FREE;
-    blocks[i].next = NULL;
+    blocks[pos].addr = addr;
+    blocks[pos].size = len;
+    blocks[pos].type = MEM_FREE;
+    blocks[pos].next = NULL;
+    blocks[pos].prev = NULL;
+    pos++;
   }
-  blocks[0].addr = blocks[0].addr + size;
-  blocks[0].size = blocks[0].size - size;
-  for (int i = 0; i < (boot_info->memory_number - 1); i++) {
-    blocks[i].next = &blocks[i + 1];
+  // blocks[0].type=MEM_USED;
+  // blocks[0].addr = blocks[0].addr + size;
+  // blocks[0].size = blocks[0].size - size;
+  for (int i = 0; i < pos; i++) {
+    if (i < (pos - 1)) {
+      blocks[i].next = &blocks[i + 1];
+    }
     if (i > 0) {
       blocks[i].prev = &blocks[i - 1];
     } else {
@@ -108,8 +114,7 @@ void mm_alloc_init() {
   block_head = blocks;
 }
 
-
-void* mm_alloc_zero_align(size_t size,int alignment) {
+void* mm_alloc_zero_align(size_t size, int alignment) {
   int offset = alignment - 1 + sizeof(void*);
   void* addr = mm_alloc(size + offset);
   memset(addr, 0, size + offset);
@@ -118,41 +123,76 @@ void* mm_alloc_zero_align(size_t size,int alignment) {
   return align;
 }
 
-void mm_free_align(void* addr){
-    void* real = ((void**)addr)[-1];
-    mm_free(real);
+void mm_free_align(void* addr) {
+  void* real = ((void**)addr)[-1];
+  mm_free(real);
+}
+
+void mm_dump() {
+  kprintf("dump memory\n");
+  mem_block_t* p = block_head;
+  u32 use = 0;
+  u32 free = 0;
+  for (; p != NULL; p = p->next) {
+    if ((p->type == MEM_FREE)) {
+      kprintf("free %x %d\n", p->addr, p->size);
+      free += p->size;
+    } else {
+      kprintf("use %x %d\n", p->addr, p->size);
+      use += p->size;
+    }
+  }
+  kprintf("toal use:%d free:%d\n", use, free);
 }
 
 void* mm_alloc(size_t size) {
   mem_block_t* p = block_head;
+  u32 static count = 0;
+  int i = 0;
+  if (count >= 46) {
+    i = 0;
+  }
+  u32 alloc_size = size + sizeof(mem_block_t);
   for (; p != NULL; p = p->next) {
-    if ((p->type == MEM_FREE)) {
-      if (p->size == size) {
-        p->type = MEM_USED;
-        return p->addr;
-      } else if ((size + sizeof(mem_block_t)) < p->size) {
-        mem_block_t* b = (mem_block_t*)p->addr;
-        u32 rest = p->size - size - sizeof(mem_block_t);
-        b->size = size;
-        b->addr = b + sizeof(mem_block_t);
-        b->type = MEM_USED;
-        mem_block_t* prev = p->prev;
-        if (prev != NULL) {
-          prev->next = b;
-        } else {
-          block_head = b;
-        }
-        p = b->addr + size;
-        p->size = rest;
-        p->addr = p + sizeof(mem_block_t);
-        p->prev = b;
-        p->type = MEM_FREE;
-        b->next = p;
-        return b->addr;
+    if ((p->type != MEM_FREE)) {
+      i++;
+      continue;
+    }
+    count++;
+    if (p->size == size) {
+      p->type = MEM_USED;
+      return p->addr;
+    } else if (alloc_size <= p->size) {
+      mem_block_t* b = (mem_block_t*)p->addr;
+      u32 rest = p->size - alloc_size;
+      b->size = size;
+      b->addr = b + sizeof(mem_block_t);
+      b->type = MEM_USED;
+      mem_block_t* prev = p->prev;
+      if (prev != NULL) {
+        prev->next = b;
+        b->prev = prev;
+      } else {
+        block_head = b;
+        b->prev = NULL;
       }
+      mem_block_t* next = p;
+      p = b->addr + alloc_size;
+      p->size = rest;
+      p->addr = p + sizeof(mem_block_t);
+      p->prev = b;
+      p->next = next->next;
+      p->type = MEM_FREE;
+      b->next = p;
+      next->prev = p;
+
+      return b->addr;
+    } else {
+      kprintf("size is not enought\n");
     }
   }
-  kprintf("erro malloc end");
+  kprintf("erro malloc size %d\n", size);
+  mm_dump();
   return NULL;
 }
 

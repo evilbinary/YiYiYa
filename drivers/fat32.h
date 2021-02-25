@@ -87,4 +87,10 @@ typedef struct fat32_info{
     u32 data;
 }fat32_info_t;
 
+
+void fat32_init_op(vnode_t* node);
+int fat32_init(void);
+void fat32_close(vnode_t *node);
+vnode_t *fat32_find(vnode_t *node, char *name);
+
 #endif

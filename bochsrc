@@ -16,6 +16,10 @@ cpu: count=1, ips=1000000
 romimage: file=$BXSHARE/BIOS-bochs-latest
 vgaromimage: file=$BXSHARE/VGABIOS-lgpl-latest
 
+# pci
+pci: enabled=1, chipset=i440fx, slot1=pcivga
+#pcidev: vendor=0x1234, device=0x5678
+
 # what disk images will be used
 floppya: 1_44=image/duck.img, status=inserted
 #floppyb: 1_44=floppyb.img, status=inserted

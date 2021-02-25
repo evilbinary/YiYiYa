@@ -22,7 +22,7 @@ u32 vwrite(vnode_t *node, u32 offset, u32 size, u8 *buffer) {
     return 0;
   }
 }
-void vopen(vnode_t *node) {
+u32 vopen(vnode_t *node) {
   if (node->open != NULL) {
     return node->open(node);
   } else {
@@ -98,15 +98,24 @@ void vfs_add_child(vnode_t *parent, vnode_t *child) {
 vnode_t *vfs_find(vnode_t *root, u8 *path) {
   char *token;
   const char *split = "/";
-  token = kstrtok(path, split);
-  if(root==NULL){
-	  root=root_node;
+  char buf[256];
+  char *start;
+  char *s = buf;
+  u32 path_len = kstrlen(path);
+  if (path_len >= 256) {
+    s = kmalloc(path_len);
+    start = s;
+  }
+  kstrcpy(s, path);
+  token = kstrtok(s, split);
+  if (root == NULL) {
+    root = root_node;
   }
   vnode_t *parent = root;
   while (token != NULL) {
-    if (kstrcmp(token, parent->name) == 0) {
-      continue;
-    }
+    // if (kstrcmp(token, parent->name) == 0) {
+    //   continue;
+    // }
     for (int i = 0; i < parent->child_number; i++) {
       vnode_t *n = parent->child[i];
       if (n == NULL) continue;
@@ -116,6 +125,9 @@ vnode_t *vfs_find(vnode_t *root, u8 *path) {
       }
     }
     token = kstrtok(NULL, split);
+  }
+  if (path_len >= 256) {
+    kfree(start);
   }
   return parent;
 }

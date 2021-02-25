@@ -41,6 +41,8 @@ typedef struct fd {
   u32 id;
   u32 type;  // file ,socket, pipe dir
   u32 *data;
+  u32 offset;
+  u8 *name;
 } fd_t;
 
 typedef struct stat {

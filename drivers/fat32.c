@@ -28,9 +28,14 @@ static u32 write(vnode_t *node, u32 offset, size_t nbytes, u8 *buffer) {
 }
 
 dir_entry_t *fat32_find_file_entry(fat32_info_t *fat32, char *name) {
+  char pre_name[8];
+  memset(pre_name,32,8);
+  u32 len=kstrlen(name);
+  char* s=name+len-3;
+  kstrncpy(pre_name,name,len-4);
   for (int i = 0; i < fat32->entries_number; i++) {
     dir_entry_t *e = &fat32->entries[i];
-    if (kstrcmp(name, e->name) == 0) {
+    if (kstrncmp(pre_name, e->name,8) == 0&&kstrncmp(s,e->ext,3)==0) {
       return e;
     }
   }
@@ -68,32 +73,46 @@ u32 fat32_open(vnode_t *node) {
     kprintf("open file %s error\n", name);
     return 0;
   }
-  return 0;
+  return 1;
 }
 
-void fat32_close(vnode_t *node) {
-  
+vnode_t *fat32_find(vnode_t *node, char *name) {
+  fat32_info_t *fat32 = node->data;
+  dir_entry_t *e = fat32_find_file_entry(fat32, name);
+  if (e == NULL) {
+    kprintf("find file %s error\n", name);
+    return NULL;
+  }
+  vnode_t* file=vfs_create(name,V_FILE);
+  fat32_init_op(file);
+  return file;
 }
+
+void fat32_init_op(vnode_t* node){
+  node->read = fat32_read;
+  node->write = fat32_write;
+  node->open = fat32_open;
+  node->close = fat32_close;
+  node->find = fat32_find;
+}
+
+void fat32_close(vnode_t *node) {}
 
 int fat32_init(void) {
   vnode_t *node = vfs_find(NULL, "/dev/sda");
   if (node == NULL) {
     kprintf("not found sda\n");
   }
-  node->read = fat32_read;
-  node->write = fat32_write;
-  node->open = fat32_open;
-  node->close = fat32_close;
+  fat32_init_op(node);
 
   fat32_info_t *fat32 = kmalloc(sizeof(fat32_info_t));
   node->data = fat32;
 
   fat32->vbr = kmalloc(sizeof(vbr_t));
-  fat32_read(node, 0, sizeof(vbr_t), fat32->vbr);
+  read(node, 0, sizeof(vbr_t), fat32->vbr);
 
   fat32->fs_info = kmalloc(sizeof(fs_info_t));
-  fat32_read(node, fat32->vbr->fs_info * 512, sizeof(fs_info_t),
-             fat32->fs_info);
+  read(node, fat32->vbr->fs_info * 512, sizeof(fs_info_t), fat32->fs_info);
 
   u32 reserved =
       fat32->vbr->reserved_sector_count * fat32->vbr->byte_per_sector;
@@ -113,7 +132,7 @@ int fat32_init(void) {
 
   fat32->entries_number = 20;
   dir_entry_t *entries = kmalloc(sizeof(dir_entry_t) * fat32->entries_number);
-  fat32_read(node, data, sizeof(dir_entry_t) * fat32->entries_number, entries);
+  read(node, data, sizeof(dir_entry_t) * fat32->entries_number, entries);
   fat32->entries = entries;
 
   return 0;
