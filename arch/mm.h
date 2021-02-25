@@ -25,7 +25,7 @@
 #define PAGE_USU   4
 
 typedef struct mem_block{
-    u32* addr;
+    u8* addr;
 	u32 size;
 	int type;
 	struct mem_block * next;

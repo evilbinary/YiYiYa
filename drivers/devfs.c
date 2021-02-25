@@ -12,7 +12,7 @@ vnode_t *devfs_create_device(device_t *dev) {
   t->flags = V_BLOCKDEVICE;
   t->write = NULL;
   t->read = NULL;
-  t->data=dev;
+  t->device=dev;
   return t;
 }
 
@@ -64,8 +64,8 @@ int devfs_init(void) {
   stdin_dev->read=std_read;
   stdout_dev->write=std_write;
 
-  sys_open(stdin_dev,0);
-  sys_open(stdout_dev,0);
+  sys_open("/dev/stdin",0);
+  sys_open("/dev/stdout",0);
 
   return 0;
 }

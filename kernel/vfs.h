@@ -61,7 +61,7 @@ typedef struct vnode{
 
 u32 vread(vnode_t *node, u32 offset, u32 size, u8 *buffer);
 u32 vwrite(vnode_t *node, u32 offset, u32 size, u8 *buffer);
-void vopen(vnode_t *node);
+u32 vopen(vnode_t *node);
 void vclose(vnode_t *node);
 struct vdirent *vreaddir(vnode_t *node, u32 index);
 vnode_t *vfinddir(vnode_t *node, char *name);

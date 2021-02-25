@@ -321,6 +321,11 @@ i32 ahci_get_port_type(hba_port_t* port) {
 
 void ahci_dev_prob(ahci_device_t* ahci_dev) {
   hba_memory_t* hab_memory = ahci_dev->abar;
+  // u32 addr=hab_memory;
+  // for (int i = 0; i < sizeof(hba_memory_t) / 0x1000; i++) {
+  //   map_page(addr, addr, PAGE_P | PAGE_USU | PAGE_RWW);
+  //   addr += 0x1000;
+  // }
   u32 pi = hab_memory->pi;
   for (int i = 0; i < 32; i++, pi >>= 1) {
     if (!(pi & 1)) {

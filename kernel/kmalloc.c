@@ -8,7 +8,12 @@
 void* kmalloc(size_t size){
 	void *addr=NULL;
 	size=((size+4096)/4096)*4096;
+	// size=((size+1024)/1024)*1024;
 	addr= mm_alloc(size);
+	if(addr==NULL){
+		kprintf("kmalloc error\n");
+		return addr;
+	}
     memset(addr,0,size);
 	return addr;
 }
