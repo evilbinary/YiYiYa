@@ -7,6 +7,7 @@
 #define VFS_H
 
 #include "arch/arch.h"
+#include "kernel/stdarg.h"
 
 #define V_FILE        0x01
 #define V_DIRECTORY   0x02
@@ -28,6 +29,8 @@ typedef u32 (*vread_t)(struct vnode*,u32,u32,u8*);
 typedef u32 (*vwrite_t)(struct vnode*,u32,u32,u8*);
 typedef u32 (*vopen_t)(struct vnode*);
 typedef void (*vclose_t)(struct vnode*);
+typedef size_t (*vioctl_t)(struct vnode*,u32 cmd, ...);
+
 typedef struct vdirent * (*vreaddir_t)(struct vnode*,u32);
 typedef struct vnode * (*vfinddir_t)(struct vnode*,char *name);
 typedef struct vnode * (*vfind_t)(struct vnode*,char *name);
@@ -48,6 +51,7 @@ typedef struct vnode{
    vclose_t close;
    vreaddir_t readdir;
    vfinddir_t finddir;
+   vioctl_t ioctl;
    vfind_t find;
    vmount_t mount;
    vnode_t *parent; // Used by mountpoints and symlinks.
@@ -68,6 +72,7 @@ vnode_t *vfinddir(vnode_t *node, char *name);
 vnode_t *vfind(vnode_t *node, char *name);
 vnode_t *vcreate(u8 *name, u32 flags);
 void vmount(vnode_t* node,u8 *path, vnode_t *node1);
+size_t vioctl(vnode_t *node, u32 cmd, ...);
 
 vnode_t* vfs_find(vnode_t* root,u8 *path);
 void vfs_mount(vnode_t *root, u8 *path, vnode_t *node);

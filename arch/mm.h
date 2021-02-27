@@ -25,12 +25,11 @@
 #define PAGE_USU   4
 
 typedef struct mem_block{
-    u8* addr;
+    u32 addr;
 	u32 size;
-	int type;
+	u32 type;
 	struct mem_block * next;
-	struct mem_block * prev;
-}mem_block_t;
+} mem_block_t;
 
 
 void mm_init();

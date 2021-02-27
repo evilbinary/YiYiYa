@@ -344,13 +344,21 @@ void ahci_dev_prob(ahci_device_t* ahci_dev) {
 static size_t ahci_read(device_t* dev, void* buf, size_t len) {
   ahci_device_t* ahci_dev = dev->data;
   int no = dev->id - DEVICE_SATA;
-  u32 startl = ahci_dev->offsetl/512;
-  u32 starth = ahci_dev->offseth/512;
-  u32 count = len/512;
-  if(count==0){
-    count=1;
+  u32 startl = ahci_dev->offsetl/BYTE_PER_SECTOR;
+  u32 starth = ahci_dev->offseth/BYTE_PER_SECTOR;
+  u32 count = len/BYTE_PER_SECTOR;
+  u32 rest =len%BYTE_PER_SECTOR;
+  u8 small_buf[BYTE_PER_SECTOR];
+  u32 ret=0;
+
+  if(count>0){
+    ret = ahci_dev_port_read(ahci_dev, no, startl, starth, count, buf);
   }
-  int ret = ahci_dev_port_read(ahci_dev, no, startl, starth, count, buf);
+  if(rest>0){
+    startl=startl+len-rest;
+    ret =ahci_dev_port_read(ahci_dev, no, startl, starth, 1, small_buf);
+    kmemcpy(buf+count*BYTE_PER_SECTOR,small_buf,rest);
+  }
   if(ret==0) return 0;
   return len;
 }
@@ -358,13 +366,21 @@ static size_t ahci_read(device_t* dev, void* buf, size_t len) {
 static size_t ahci_write(device_t* dev, void* buf, size_t len) {
   ahci_device_t* ahci_dev = dev->data;
   int no = dev->id - DEVICE_SATA;
-  u32 startl = ahci_dev->offsetl/512;
-  u32 starth = ahci_dev->offseth/512;
-  u32 count = len/512;
-  if(count==0){
-    count=1;
+  u32 startl = ahci_dev->offsetl/BYTE_PER_SECTOR;
+  u32 starth = ahci_dev->offseth/BYTE_PER_SECTOR;
+  u32 count = len/BYTE_PER_SECTOR;
+  u32 rest =len%BYTE_PER_SECTOR;
+  u8 small_buf[BYTE_PER_SECTOR];
+  int ret=0;
+  if(count>0){
+    ret = ahci_dev_port_write(ahci_dev, no, startl, starth, count, buf);
   }
-  int ret = ahci_dev_port_write(ahci_dev, no, startl, starth, count, buf);
+  if(rest>0){
+    startl=startl+len-rest;
+    memset(small_buf,0,BYTE_PER_SECTOR);
+    kmemcpy(buf+count*BYTE_PER_SECTOR,small_buf,rest);
+    ret =ahci_dev_port_write(ahci_dev, no, startl, starth, 1, small_buf);
+  }
   if(ret==0) return 0;
   return 0;
 }

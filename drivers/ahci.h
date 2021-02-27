@@ -13,6 +13,8 @@
 #define IOC_READ_OFFSET _IOW(IOC_AHCI_MAGIC, 3, int)
 #define IOC_WRITE_OFFSET _IOW(IOC_AHCI_MAGIC, 4, int)
 
+#define BYTE_PER_SECTOR 512
+
 
 #define SATA_SIG_ATA 0x00000101    // SATA drive
 #define SATA_SIG_ATAPI 0xEB140101  // SATAPI drive

@@ -12,7 +12,7 @@
 #include "kernel/module.h"
 #include "kernel/vfs.h"
 
-#define FAT_EOC (0xFFFFFFFF)
+#define FAT_EOC (0xfffffff)
 
 typedef struct vbr {
   u8 jmp[3];
@@ -68,10 +68,10 @@ typedef struct dir_entry {
   u16 create_time;
   u16 create_date;
   u16 last_access_date;
-  u16 first_cluster_number;  //文件起始簇号的高16位 0x0000
+  u16 start_file_cluster_hight;  //文件起始簇号的高16位 0x0000
   u16 last_modify_time;      //文件最近修改时间
   u16 last_modify_date;      //文件最近修改日期
-  u16 start_file_cluster;    //文件起始簇号的地16位 0x0003
+  u16 start_file_cluster_low;    //文件起始簇号的地16位 0x0003
   u32 file_size;             //文件的长度bytes
 } __attribute__((packed)) dir_entry_t;
 
@@ -85,6 +85,7 @@ typedef struct fat32_info{
     u32 fat2;
     u32 root_dir;
     u32 data;
+    u32 fat_size;
 }fat32_info_t;
 
 

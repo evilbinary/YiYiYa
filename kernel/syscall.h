@@ -8,7 +8,7 @@
 
 #include "arch/arch.h"
 
-#define SYSCALL_NUMBER 10
+#define SYSCALL_NUMBER 20
 
 enum {
     SYS_READ=0,
@@ -18,7 +18,10 @@ enum {
     SYS_PRINT_AT,
     SYS_IOCTL,
     SYS_OPEN,
-    SYS_CLOSE
+    SYS_CLOSE,
+    DEV_READ,
+    DEV_WRITE,
+    DEV_IOCTL
 };
 
 void* syscall0(u32 num);

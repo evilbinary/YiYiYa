@@ -8,6 +8,19 @@
 
 vnode_t *root_node = NULL;
 
+size_t vioctl(vnode_t *node, u32 cmd, ...) {
+  if (node->read != NULL) {
+    u32 ret = 0;
+    va_list args;
+    va_start(args, cmd);
+    ret = node->ioctl(node, cmd,args);
+    va_end(args);
+    return ret;
+  } else {
+    return 0;
+  }
+}
+
 u32 vread(vnode_t *node, u32 offset, u32 size, u8 *buffer) {
   if (node->read != NULL) {
     return node->read(node, offset, size, buffer);
