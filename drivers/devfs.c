@@ -56,16 +56,22 @@ int devfs_init(void) {
 
 
   //SYS_READ,SYS_WRITE
-  vnode_t *stdin_dev = vfs_create("stdin", V_FILE);
-  vnode_t *stdout_dev = vfs_create("stdout", V_FILE);
-  vfs_mount(NULL, "/dev", stdin_dev);
-  vfs_mount(NULL, "/dev", stdout_dev);
+  vnode_t *stdin = vfs_create("stdin", V_FILE);
+  vnode_t *stdout = vfs_create("stdout", V_FILE);
+  vfs_mount(NULL, "/dev", stdin);
+  vfs_mount(NULL, "/dev", stdout);
 
-  stdin_dev->read=std_read;
-  stdout_dev->write=std_write;
+  stdin->device=device_find(DEVICE_KEYBOARD);
+  stdout->device=device_find(DEVICE_VGA);
+  if(stdout->device==NULL){
+    stdout->device=device_find(DEVICE_VGA_QEMU);
+  }
+  if(stdout->device==NULL){
+    stdout->device=device_find(DEVICE_SERIAL);
+  }
 
-  sys_open("/dev/stdin",0);
-  sys_open("/dev/stdout",0);
+  stdin->read=std_read;
+  stdout->write=std_write;
 
   return 0;
 }

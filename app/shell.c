@@ -31,10 +31,12 @@ void do_shell_thread(void) {
   syscall1(SYS_PRINT, "#");
   move_cursor();
   char buf[2] = {0};
+
+  int fd = syscall2(SYS_OPEN, "/dev/stdin", 0);
   for (;;) {
     int ret = 0;
     // read key
-    ret = syscall3(SYS_READ, 0, &scan_code, 1);
+    ret = syscall3(SYS_READ,fd, &scan_code, 1);
     if (ret >= 1) {
       // kprintf("ret=%d %x", ret,scan_code);
       if (scan_code & 0x80) continue;

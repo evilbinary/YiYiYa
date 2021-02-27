@@ -519,12 +519,12 @@ void do_screen_thread(void) {
   char wheel[] = {'\\', '|', '/', '-'};
   
   mouse_data_t mouse_data;
-  screen_buffer = syscall2(SYS_IOCTL, DEVICE_VGA_QEMU, IOC_READ_FRAMBUFFER);
+  screen_buffer = syscall2(DEV_IOCTL, DEVICE_VGA_QEMU, IOC_READ_FRAMBUFFER);
   screen_width =
-      syscall2(SYS_IOCTL, DEVICE_VGA_QEMU, IOC_READ_FRAMBUFFER_WIDTH);
+      syscall2(DEV_IOCTL, DEVICE_VGA_QEMU, IOC_READ_FRAMBUFFER_WIDTH);
   screen_height =
-      syscall2(SYS_IOCTL, DEVICE_VGA_QEMU, IOC_READ_FRAMBUFFER_HEIGHT);
-  screen_bpp = syscall2(SYS_IOCTL, DEVICE_VGA_QEMU, IOC_READ_FRAMBUFFER_BPP);
+      syscall2(DEV_IOCTL, DEVICE_VGA_QEMU, IOC_READ_FRAMBUFFER_HEIGHT);
+  screen_bpp = syscall2(DEV_IOCTL, DEVICE_VGA_QEMU, IOC_READ_FRAMBUFFER_BPP);
 
   for (;;) {
     buf[0] = wheel[i++];
@@ -539,7 +539,7 @@ void do_screen_thread(void) {
     screen_fill_rect(10, 20 , 30, 30, 0xff0000);
     screen_printf(200,10,"hello,YiYiYa");
 
-    //syscall3(SYS_READ, DEVICE_MOUSE,&mouse_data,sizeof(mouse_data_t));
+    //syscall3(DEV_READ, DEVICE_MOUSE,&mouse_data,sizeof(mouse_data_t));
     screen_printf(10,100,"%d %d",mouse_data.x,mouse_data.y);
     screen_fill_rect(mouse_data.x, screen_height-mouse_data.y , 4, 4, 0x00ff00);
     

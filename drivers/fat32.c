@@ -5,6 +5,8 @@
  ********************************************************************/
 #include "fat32.h"
 
+fat32_info_t *fat32_info = NULL;
+
 static u32 read(vnode_t *node, u32 offset, size_t nbytes, u8 *buffer) {
   u32 ret = 0;
   device_t *dev = (device_t *)node->device;
@@ -28,14 +30,18 @@ static u32 write(vnode_t *node, u32 offset, size_t nbytes, u8 *buffer) {
 }
 
 dir_entry_t *fat32_find_file_entry(fat32_info_t *fat32, char *name) {
+  if (fat32 == NULL) {
+    kprintf("fat32_find_file_entry fat32 is null\n");
+    return NULL;
+  }
   char pre_name[8];
-  memset(pre_name,32,8);
-  u32 len=kstrlen(name);
-  char* s=name+len-3;
-  kstrncpy(pre_name,name,len-4);
+  memset(pre_name, 32, 8);
+  u32 len = kstrlen(name);
+  char *s = name + len - 3;
+  kstrncpy(pre_name, name, len - 4);
   for (int i = 0; i < fat32->entries_number; i++) {
     dir_entry_t *e = &fat32->entries[i];
-    if (kstrncmp(pre_name, e->name,8) == 0&&kstrncmp(s,e->ext,3)==0) {
+    if (kstrncmp(pre_name, e->name, 8) == 0 && kstrncmp(s, e->ext, 3) == 0) {
       return e;
     }
   }
@@ -44,22 +50,29 @@ dir_entry_t *fat32_find_file_entry(fat32_info_t *fat32, char *name) {
 
 u32 fat32_read(vnode_t *node, u32 offset, size_t nbytes, u8 *buffer) {
   char *name = node->name;
-  fat32_info_t *fat32 = node->data;
-  dir_entry_t *e = fat32_find_file_entry(fat32, name);
+  dir_entry_t *e = node->data;
   if (e == NULL) {
-    kprintf("read file %s error\n", name);
+    kprintf("read file %s entry error\n", name);
     return 0;
   }
-  fat32_t *fat_entry = fat32->fat1;
-  fat_entry += e->start_file_cluster;
 
-  while (*fat_entry != FAT_EOC) {
-    u32 offset = (*fat_entry) * fat32->vbr->sector_per_cluster *
-                 fat32->vbr->byte_per_sector;
-    read(node, offset,
-         fat32->vbr->sector_per_cluster * fat32->vbr->byte_per_sector, buffer);
-    buffer += fat32->vbr->sector_per_cluster * fat32->vbr->byte_per_sector;
-    fat_entry = *fat_entry;
+  char buf[512];
+  //read entry
+  read(node, fat32_info->fat1, 512, buf);
+  u8* read_buffer=buffer;
+  fat32_t first_number=e->start_file_cluster_low-2;
+  fat32_t *fat_entry = buf;
+  fat32_t* fat_n=&first_number;
+  u32 total_bytes=0;
+  while (*fat_n != FAT_EOC&&total_bytes<nbytes) {
+    u32 offset =fat32_info->data+ (*fat_n) * fat32_info->vbr->sector_per_cluster *
+                 fat32_info->vbr->byte_per_sector;
+    u32 bytes =
+        fat32_info->vbr->sector_per_cluster * fat32_info->vbr->byte_per_sector;
+    u32 ret=read(node, offset, bytes, read_buffer);
+    total_bytes+=ret;
+    read_buffer += fat32_info->vbr->sector_per_cluster * fat32_info->vbr->byte_per_sector;
+    fat_n = &fat_entry[*fat_n];
   }
 }
 
@@ -83,12 +96,15 @@ vnode_t *fat32_find(vnode_t *node, char *name) {
     kprintf("find file %s error\n", name);
     return NULL;
   }
-  vnode_t* file=vfs_create(name,V_FILE);
+
+  vnode_t *file = vfs_create(name, V_FILE);
+  file->data = e;
+  file->device=node->device;
   fat32_init_op(file);
   return file;
 }
 
-void fat32_init_op(vnode_t* node){
+void fat32_init_op(vnode_t *node) {
   node->read = fat32_read;
   node->write = fat32_write;
   node->open = fat32_open;
@@ -105,35 +121,40 @@ int fat32_init(void) {
   }
   fat32_init_op(node);
 
-  fat32_info_t *fat32 = kmalloc(sizeof(fat32_info_t));
-  node->data = fat32;
+  fat32_info = kmalloc(sizeof(fat32_info_t));
+  node->data = fat32_info;
 
-  fat32->vbr = kmalloc(sizeof(vbr_t));
-  read(node, 0, sizeof(vbr_t), fat32->vbr);
+  fat32_info->vbr = kmalloc(sizeof(vbr_t));
+  read(node, 0, sizeof(vbr_t), fat32_info->vbr);
 
-  fat32->fs_info = kmalloc(sizeof(fs_info_t));
-  read(node, fat32->vbr->fs_info * 512, sizeof(fs_info_t), fat32->fs_info);
+  fat32_info->fs_info = kmalloc(sizeof(fs_info_t));
+  read(node, fat32_info->vbr->fs_info * 512, sizeof(fs_info_t),
+       fat32_info->fs_info);
 
   u32 reserved =
-      fat32->vbr->reserved_sector_count * fat32->vbr->byte_per_sector;
+      fat32_info->vbr->reserved_sector_count * fat32_info->vbr->byte_per_sector;
   u32 fat1 = reserved;
-  u32 fat2 = reserved +
-             fat32->vbr->sector_per_fat_number * fat32->vbr->byte_per_sector;
-  u32 root_dir = (fat32->vbr->reserved_sector_count +
-                  fat32->vbr->sector_per_fat_number * fat32->vbr->fat_number) *
-                 fat32->vbr->byte_per_sector;
+  u32 fat2 = reserved + fat32_info->vbr->sector_per_fat_number *
+                            fat32_info->vbr->byte_per_sector;
+  u32 root_dir =
+      (fat32_info->vbr->reserved_sector_count +
+       fat32_info->vbr->sector_per_fat_number * fat32_info->vbr->fat_number) *
+      fat32_info->vbr->byte_per_sector;
   u32 data =
-      root_dir + fat32->vbr->root_dir_number * 32;  // only for fat16 fat32
+      root_dir + fat32_info->vbr->root_dir_number * 32;  // only for fat16 fat32
 
-  fat32->fat1 = fat1;
-  fat32->fat2 = fat2;
-  fat32->root_dir = root_dir;
-  fat32->data = data;
+  u32 fat_size=fat32_info->vbr->sector_per_fat_number *fat32_info->vbr->byte_per_sector;
+  fat32_info->fat_size=fat_size;
+  fat32_info->fat1 = fat1;
+  fat32_info->fat2 = fat2;
+  fat32_info->root_dir = root_dir;
+  fat32_info->data = data;
 
-  fat32->entries_number = 20;
-  dir_entry_t *entries = kmalloc(sizeof(dir_entry_t) * fat32->entries_number);
-  read(node, data, sizeof(dir_entry_t) * fat32->entries_number, entries);
-  fat32->entries = entries;
+  fat32_info->entries_number = 20;
+  dir_entry_t *entries =
+      kmalloc(sizeof(dir_entry_t) * fat32_info->entries_number);
+  read(node, data, sizeof(dir_entry_t) * fat32_info->entries_number, entries);
+  fat32_info->entries = entries;
 
   return 0;
 }

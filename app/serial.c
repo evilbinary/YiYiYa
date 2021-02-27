@@ -5,7 +5,7 @@
  ********************************************************************/
 #include "main.h"
 
-char* file_name = "/dev/sda/A.TXT";
+char* file_name = "/dev/sda/B.TXT";
 
 void do_serial_thread(void) {
   u32 i = 0;

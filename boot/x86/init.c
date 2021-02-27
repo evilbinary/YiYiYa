@@ -122,6 +122,7 @@ void init_boot_info() {
   boot_info->version = 0x01;
   boot_info->kernel_origin_base = KERNEL_ORIGIN_BASE;
   boot_info->kernel_base = KERNEL_BASE;
+  boot_info->kernel_size = KERNEL_SIZE*READ_BLOCK_SIZE;
   boot_info->gdt_base = gdts;
   boot_info->gdt_number = GDT_NUMBER;
   boot_info->pdt_base = 0x4000;
@@ -247,6 +248,7 @@ int memory_prob() {
   u32 id = 0;
   int count = 0, signature, bytes;
   memory_info_t* ptr = boot_info->memory;
+  boot_info->total_memory=0;
   for (; count < MAX_MEMORY_BLOCK;) {
     asm("int  $0x15"
         : "=a"(signature), "=c"(bytes), "=b"(id)

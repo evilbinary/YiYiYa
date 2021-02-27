@@ -9,6 +9,11 @@ write_channel_fn write_channels[10];
 u32 write_channel_number = 0;
 
 void io_add_write_channel(write_channel_fn fn) {
+  for(int i=0;i<write_channel_number;i++){
+    if(fn==write_channels[i]){
+      return;
+    }
+  }
   write_channels[write_channel_number++] = fn;
 }
 
