@@ -13,8 +13,9 @@ thread_t* tail_thread = NULL;
 u32 thread_ids = 0;
 extern context_t* current_context;
 
-thread_t* thread_create(void* entry) {
+thread_t* thread_create(void* entry,void* data) {
   thread_t* thread = kmalloc(sizeof(thread_t));
+  thread->data=data;
   int size = sizeof(u32) * 64;
   u32* stack0 = kmalloc(size);
   u32* stack3 = kmalloc(size);

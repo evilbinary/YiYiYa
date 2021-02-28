@@ -23,10 +23,11 @@ typedef struct thread_s{
     int counter;
     int state;
     struct thread_s * next;
+    void* data;
 }thread_t;
 
 
-thread_t * thread_create();
+thread_t * thread_create(void* entry,void* data);
 
 void thread_sleep(thread_t * thread);
 

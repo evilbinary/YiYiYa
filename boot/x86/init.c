@@ -5,7 +5,7 @@
  ********************************************************************/
 #include "init.h"
 #include "arch/boot.h"
-#include "arch/elf.h"
+#include "arch/arch.h"
 #include "config.h"
 #include "libs/include/types.h"
 

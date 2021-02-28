@@ -8,4 +8,11 @@ import os
 
 Import('env')
 
-env.Library('c', ['string.c','malloc.c'])
+env.Library('c', [
+    'string.c',
+    'malloc.c',
+    'vsprintf.c',
+    'stdio.c',
+    'stdlib.c',
+    'syscall.c'
+],CFLAGS='$CFLAGS -Ilibs/include/c/')

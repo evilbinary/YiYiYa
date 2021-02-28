@@ -55,25 +55,37 @@ u32 fat32_read(vnode_t *node, u32 offset, size_t nbytes, u8 *buffer) {
     kprintf("read file %s entry error\n", name);
     return 0;
   }
-
+  u32 bytes =
+        fat32_info->vbr->sector_per_cluster * fat32_info->vbr->byte_per_sector;
+  static u8* read_buffer=NULL;
+  if(read_buffer==NULL){
+    read_buffer=kmalloc(bytes);
+    //  read_buffer=mm_alloc_zero_align(bytes, 0x1000);
+  }else{
+    memset(read_buffer,0,bytes);
+  }
   char buf[512];
   //read entry
   read(node, fat32_info->fat1, 512, buf);
-  u8* read_buffer=buffer;
   fat32_t first_number=e->start_file_cluster_low-2;
   fat32_t *fat_entry = buf;
   fat32_t* fat_n=&first_number;
   u32 total_bytes=0;
-  while (*fat_n != FAT_EOC&&total_bytes<nbytes) {
-    u32 offset =fat32_info->data+ (*fat_n) * fat32_info->vbr->sector_per_cluster *
-                 fat32_info->vbr->byte_per_sector;
-    u32 bytes =
-        fat32_info->vbr->sector_per_cluster * fat32_info->vbr->byte_per_sector;
-    u32 ret=read(node, offset, bytes, read_buffer);
-    total_bytes+=ret;
-    read_buffer += fat32_info->vbr->sector_per_cluster * fat32_info->vbr->byte_per_sector;
+  while ( !FAT32_CLUSTER_IS_EOF(*fat_n) &&total_bytes<nbytes) {
+    u32 read_offset =fat32_info->data+ (*fat_n) * fat32_info->vbr->sector_per_cluster *
+                 fat32_info->vbr->byte_per_sector+offset;
+    u32 ret=read(node, read_offset, bytes, read_buffer);
+    if(nbytes<bytes){
+      kmemmove(buffer+total_bytes,read_buffer,nbytes);
+      total_bytes+=nbytes;
+    }else{
+      kmemmove(buffer+total_bytes,read_buffer,ret);
+      total_bytes+=ret;
+    }
+    
     fat_n = &fat_entry[*fat_n];
   }
+  return total_bytes;
 }
 
 u32 fat32_write(vnode_t *node, u32 offset, size_t nbytes, u8 *buffer) {}

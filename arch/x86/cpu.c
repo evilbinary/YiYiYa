@@ -136,26 +136,26 @@ void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
     kprintf("not suppport level %d\n", level);
   }
   interrupt_context_t* c = stack0;
-  c->ss= ds;      // ss
-  c->esp = stack3;  // esp
+  c->ss = ds;          // ss
+  c->esp = stack3;     // esp
   c->eflags = 0x0200;  // eflags
-  c->cs = cs;      // cs
-  c->eip = entry;   // eip 4
+  c->cs = cs;          // cs
+  c->eip = entry;      // eip 4
 
-  c->no = 0;  // no  5
-  c->code = 0;  // no  5
-  c->eax = 0;       // eax 6
-  c->ecx = 0;       // ecx 7
-  c->edx = 0;       // edx 8
-  c->ebx = 0;       // ebx 9
+  c->no = 0;             // no  5
+  c->code = 0;           // no  5
+  c->eax = 0;            // eax 6
+  c->ecx = 0;            // ecx 7
+  c->edx = 0;            // edx 8
+  c->ebx = 0;            // ebx 9
   c->esp_null = stack0;  // esp 10
-  c->ebp = stack3;  // ebp 11
-  c->esi = 0;       // esi 12
-  c->edi = 0;       // edi 13
-  c->ds = ds;  // ds  14
-  c->es = ds;  // es  15
-  c->fs = ds;  // fs  16
-  c->gs = ds;  // gs    17
+  c->ebp = stack3;       // ebp 11
+  c->esi = 0;            // esi 12
+  c->edi = 0;            // edi 13
+  c->ds = ds;            // ds  14
+  c->es = ds;            // es  15
+  c->fs = ds;            // fs  16
+  c->gs = ds;            // gs    17
 
   context->esp0 = c;
   context->ss0 = GDT_ENTRY_32BIT_DS * GDT_SIZE;
@@ -163,13 +163,13 @@ void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
   context->esp = stack3;
   context->ss = ds;
   context->ds = ds;
-  
+
   ulong addr = (ulong)boot_info->pdt_base;
   context->page_dir = addr;
 
   if (tss->eip == 0 && tss->cr3 == 0) {
     tss->ss0 = context->ss0;
-    tss->esp0 = context->esp0+sizeof(interrupt_context_t);
+    tss->esp0 = context->esp0 + sizeof(interrupt_context_t);
     tss->eip = context->eip;
     tss->ss = ds;
     tss->ds = tss->es = tss->fs = tss->gs = ds;
@@ -190,21 +190,22 @@ void backtrace(stack_frame_t* fp, void** buf, int size) {
 void context_switch(interrupt_context_t* context, context_t** current,
                     context_t* next_context) {
   context_t* current_context = *current;
-  
+
   current_context->esp0 = context;
   current_context->esp = context->esp;
 
   interrupt_context_t* c = next_context->esp0;
 
   tss_t* tss = next_context->tss;
-  tss->esp0 = next_context->esp0+sizeof(interrupt_context_t);
+  tss->esp0 = next_context->esp0 + sizeof(interrupt_context_t);
   tss->ss0 = next_context->ss0;
   tss->cr3 = next_context->page_dir;
 
+  //asm volatile("mov %%cr3, %0" : "=r" (current_context->page_dir));
   // tss->esp= next_context->esp;
   // tss->ss = next_context->ss;
   /*tss->esp = next_context->esp;
-  
+
   tss->eax = c->eax;
   tss->ecx = c->ecx;
   tss->edx = c->edx;
@@ -225,6 +226,7 @@ void context_switch(interrupt_context_t* context, context_t** current,
   */
 
   *current = next_context;
+  asm volatile("mov %0, %%cr3" : : "r" (next_context->page_dir));
 }
 
 int TAS(volatile int* addr, int newval) {

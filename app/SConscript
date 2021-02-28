@@ -26,4 +26,6 @@ env.Objcopy('kernel','kernel.elf',OBJCOPYFLAGS='-S')
 env.Objcopy('kernel.dbg','kernel.elf',OBJCOPYFLAGS='--only-keep-debug')
 env.Objcopy('kernel.bin','kernel',OBJCOPYFLAGS='-O binary')
 
+SConscript(dirs=['hello'], exports='env')
+
 

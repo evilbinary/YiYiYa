@@ -53,9 +53,9 @@ int kmain(int argc, char* argv[]) {
   module_regist(&devfs_module);
   module_regist(&fat32_module);
 
-  thread_t* t0 = thread_create((u32*)&do_shell_thread);
-  thread_t* t1 = thread_create((u32*)&do_serial_thread);
-  thread_t* t2 = thread_create((u32*)&do_screen_thread);
+  thread_t* t0 = thread_create((u32*)&do_shell_thread,NULL);
+  thread_t* t1 = thread_create((u32*)&do_serial_thread,NULL);
+  thread_t* t2 = thread_create((u32*)&do_screen_thread,NULL);
 
   thread_run(t0);
   thread_run(t1);

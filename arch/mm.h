@@ -32,9 +32,12 @@ typedef struct mem_block{
 } mem_block_t;
 
 
+typedef u64* page_dir_t;
+
 void mm_init();
 void* mm_alloc(size_t size);
 void mm_free(void* p);
 void* mm_alloc_zero_align(size_t size,int alignment);
+void map_page_on(page_dir_t* page,u32 virtualaddr, u32 physaddr, u32 flags);
 
 #endif

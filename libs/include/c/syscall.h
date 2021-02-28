@@ -5,10 +5,9 @@
 ********************************************************************/
 #ifndef SYSCALL_H
 #define SYSCALL_H
+#include "stdint.h"
 
-#include "arch/arch.h"
-
-#define SYSCALL_NUMBER 20
+#define ISR_SYSCALL 0x30
 
 enum {
     SYS_READ=0,
@@ -31,14 +30,5 @@ void* syscall1(u32 num,void* arg0);
 void* syscall2(u32 num,void* arg0,void* arg1);
 void* syscall3(u32 num,void* arg0,void* arg1,void* arg2);
 
-
-void syscall_init();
-
-
-u32 sys_open(char* name, int attr);
-size_t sys_ioctl(u32 fd, u32 cmd,...);
-void sys_close(u32 fd);
-size_t sys_write(u32 fd, void* buf, size_t nbytes);
-size_t sys_read(u32 fd, void* buf, size_t nbytes);
 
 #endif
