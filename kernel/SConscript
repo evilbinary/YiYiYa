@@ -19,6 +19,8 @@ env.Library('yiyiya', [
     'module.c',
     'device.c',
     'vfs.c',
+    'syscallfn.c',
+    'devcallfn.c',
     '../arch/libarch.a',
     '../libs/libkernel/libkernel.a',
     ]

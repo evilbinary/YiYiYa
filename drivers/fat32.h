@@ -12,7 +12,9 @@
 #include "kernel/module.h"
 #include "kernel/vfs.h"
 
-#define FAT_EOC (0xfffffff)
+#define FAT32_CLUSTER_IS_EOF(c) ((c) == 0xFFFFFF8 || (c) == 0xFFFFFF9 || (c) == 0xFFFFFFA || \
+                                 (c) == 0xFFFFFFB || (c) == 0xFFFFFFC || (c) == 0xFFFFFFD || \
+                                 (c) == 0xFFFFFFE || (c) == 0xFFFFFFF)
 
 typedef struct vbr {
   u8 jmp[3];

@@ -41,6 +41,28 @@ void map_page(u32 virtualaddr, u32 physaddr, u32 flags) {
   // page_tab_ptr[offset] = (u32)physaddr | (flags & 0xFFF);
 }
 
+void map_page_on(page_dir_t* page,u32 virtualaddr, u32 physaddr, u32 flags) {
+  u32 pdpte_index = (u32)virtualaddr >> 30 & 0x03;
+  u32 pde_index = (u32)virtualaddr >> 21 & 0x01FF;
+  u32 pte_index = (u32)virtualaddr >> 12 & 0x01FF;
+  u32 offset = (u32)virtualaddr & 0x0FFF;
+  // kprintf("pdpte_index=>%d pde_index=%d  pte_index=%d\n", pdpte_index,
+  //         pde_index, pte_index);
+
+  u64* page_dir_ptr = (u64)page[pdpte_index] & ~0xFFF;
+  if (page_dir_ptr == NULL) {
+    page_dir_ptr = mm_alloc_zero_align(sizeof(u64) * 512, 0x1000);
+    page[pdpte_index] = ((u64)page_dir_ptr) | PAGE_P;
+  }
+  u64* page_tab_ptr = (u64)page_dir_ptr[pde_index] & ~0xFFF;
+  if (page_tab_ptr == NULL) {
+    page_tab_ptr = mm_alloc_zero_align(sizeof(u64) * 512, 0x1000);
+    page_dir_ptr[pde_index] = (u64)page_tab_ptr | flags;
+  }
+  page_tab_ptr[pte_index] = (u64)physaddr & ~0xFFF | flags;
+  // page_tab_ptr[offset] = (u32)physaddr | (flags & 0xFFF);
+}
+
 void mm_test() {
   // map_page(0x90000,0x600000,3);
   // 0xfd000000

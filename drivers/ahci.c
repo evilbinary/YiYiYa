@@ -348,16 +348,21 @@ static size_t ahci_read(device_t* dev, void* buf, size_t len) {
   u32 starth = ahci_dev->offseth/BYTE_PER_SECTOR;
   u32 count = len/BYTE_PER_SECTOR;
   u32 rest =len%BYTE_PER_SECTOR;
+  u32 start_rest = (ahci_dev->offsetl) % BYTE_PER_SECTOR;
   u8 small_buf[BYTE_PER_SECTOR];
   u32 ret=0;
 
+ 
   if(count>0){
     ret = ahci_dev_port_read(ahci_dev, no, startl, starth, count, buf);
   }
   if(rest>0){
     startl=startl+len-rest;
     ret =ahci_dev_port_read(ahci_dev, no, startl, starth, 1, small_buf);
-    kmemcpy(buf+count*BYTE_PER_SECTOR,small_buf,rest);
+    kmemmove(buf+count*BYTE_PER_SECTOR,small_buf,rest);
+  }
+  if(start_rest>0){
+    kmemmove(buf,buf+start_rest,len);
   }
   if(ret==0) return 0;
   return len;
@@ -395,10 +400,10 @@ static size_t ahci_ioctl(device_t* dev, u32 cmd, ...) {
   }
   va_list ap;
   va_start(ap, cmd);
+  u32 offset=va_arg(ap,u32);
   if (cmd == IOC_READ_OFFSET) {
     ret = ahci_dev->offsetl|ahci_dev->offseth<<32;
   }else if(cmd==IOC_WRITE_OFFSET){
-    u32 offset=va_arg(ap,u32);
     ahci_dev->offsetl=offset;
     ahci_dev->offseth=0;
     // ahci_dev->offseth=(u32*)va_arg(ap,u32);

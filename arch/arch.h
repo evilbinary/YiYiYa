@@ -12,6 +12,7 @@
 #include "display.h"
 #include "mm.h"
 #include "libs/include/kernel/common.h"
+#include "libs/include/kernel/elf.h"
 #include "interrupt.h"
 #include "lock.h"
 

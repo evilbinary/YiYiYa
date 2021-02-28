@@ -4,7 +4,7 @@
 * 邮箱: rootdebug@163.com
 ********************************************************************/
 #include "arch/boot.h"
-#include "arch/elf.h"
+#include "arch/arch.h"
 #include "config.h"
 #include "libs/include/types.h"
 
