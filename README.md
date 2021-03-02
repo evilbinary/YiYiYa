@@ -1,6 +1,8 @@
 # YiYiYa
 YiYiYa is an os
 
+https://github.com/evilbinary/YiYiYa
+
 ## 使用
 
 ### 编译
@@ -17,6 +19,7 @@ scons
 ```
 scons --run=qemu
 ```
+## 开发
 
 qq群 26893532 可以加入一起讨论学习
 
