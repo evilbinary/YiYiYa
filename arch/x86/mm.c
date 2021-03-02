@@ -76,6 +76,22 @@ void mm_test() {
   // }
 }
 
+void map_addr(u32 addr){
+  mem_block_t* p = block_available;
+  for (; p != NULL; p = p->next) {
+    if(p->addr>addr){
+      //map_page(p->addr,p->addr,PAGE_P | PAGE_USU | PAGE_RWW);
+      u32 address=p->addr;
+      for(int i=0;i<p->size/0x1000;i++){
+        map_page(address,address,PAGE_P | PAGE_USU | PAGE_RWW);
+        kprintf("map %x %x\n",address,address);
+        address+=0x1000;
+      }
+    }
+  }
+}
+
+
 void mm_init() {
   boot_info->pdt_base = (ulong)page_dir_ptr_tab;
   boot_info->page_type = 1;  // pae mode
@@ -97,6 +113,9 @@ void mm_init() {
 
   // mm init
   mm_alloc_init();
+  //map > 4GB addr
+  map_addr(address);
+
 
   mm_test();
 }
@@ -119,7 +138,7 @@ void mm_alloc_init() {
     if (boot_info >= mem->base && mem->base < boot_end) {
       addr = boot_end;
       len = len - (addr - mem->base);
-    } else if (mem->base > kernel_start && mem->base < kernel_end) {
+    } else if (kernel_start>= mem->base   && mem->base < kernel_end) {
       addr = kernel_end;
       len = len - (addr - mem->base);
     }

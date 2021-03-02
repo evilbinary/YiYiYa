@@ -4,6 +4,7 @@
  * 邮箱: rootdebug@163.com
  ********************************************************************/
 #include "exceptions.h"
+#include "thread.h"
 
 interrupt_handler_t *exception_handlers[IDT_NUMBER];
 void exception_regist(u32 vec, interrupt_handler_t handler) {
@@ -189,9 +190,15 @@ void do_page_fault(interrupt_context_t *context) {
   kprintf("0x%x", fault_addr);
   kprintf("\n");
 
-  if(present==0){
-    map_page(fault_addr, fault_addr, PAGE_P | PAGE_USU | PAGE_RWW);
-  }
+  //if(present==0){
+    thread_t* current = thread_current();
+    if(current!=NULL){
+      kprintf("current tid: %x\n",current->id);
+      map_page_on(current->context.page_dir,fault_addr, fault_addr, PAGE_P | PAGE_USU | PAGE_RWW);
+    }else{
+      map_page(fault_addr, fault_addr, PAGE_P | PAGE_USU | PAGE_RWW);
+    }
+  //}
 }
 
 void exception_init() {
