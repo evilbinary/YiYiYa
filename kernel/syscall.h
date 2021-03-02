@@ -7,24 +7,12 @@
 #define SYSCALL_H
 
 #include "arch/arch.h"
+#include "device.h"
+#include "kernel/stdarg.h"
+#include "devcallfn.h"
+#include "syscallfn.h"
 
 #define SYSCALL_NUMBER 20
-
-enum {
-    SYS_READ=0,
-    SYS_WRITE,
-    SYS_YIELD,
-    SYS_PRINT,
-    SYS_PRINT_AT,
-    SYS_IOCTL,
-    SYS_OPEN,
-    SYS_CLOSE,
-    DEV_READ,
-    DEV_WRITE,
-    DEV_IOCTL,
-    SYS_EXEC,
-    SYS_TEST
-};
 
 void* syscall0(u32 num);
 void* syscall1(u32 num,void* arg0);
