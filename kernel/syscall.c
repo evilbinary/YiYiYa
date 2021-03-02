@@ -5,11 +5,6 @@
  ********************************************************************/
 #include "syscall.h"
 
-#include "device.h"
-#include "kernel/stdarg.h"
-#include "devcallfn.h"
-#include "syscallfn.h"
-
 static void* syscall_table[SYSCALL_NUMBER] = {
     &sys_read, &sys_write, &sys_yeild, &sys_print, &sys_print_at, &sys_ioctl,
     &sys_open, &sys_close, &dev_read,  &dev_write, &dev_ioctl,&sys_exec,&sys_test};

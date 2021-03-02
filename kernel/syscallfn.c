@@ -119,12 +119,17 @@ size_t sys_seek(u32 fd, u32 offset) {
   return 1;
 }
 
-size_t sys_yeild(thread_t* thread) {
-  if (thread != NULL) {
-    thread->counter++;
-    schedule();
-  }
+size_t sys_yeild() {
+  thread_yield();
 }
+
+void sys_exit(int status){
+  thread_t* current = thread_current();
+  current->state=THREAD_STOPPED;
+  schedule();
+  thread_remove(current);
+}
+
 
 void* load_elf(Elf32_Ehdr* elf_header, u32 fd, page_dir_t* page) {
   // printf("e_phnum:%d\n\r", elf_header->e_phnum);

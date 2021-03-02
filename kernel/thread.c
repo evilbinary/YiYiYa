@@ -13,9 +13,9 @@ thread_t* tail_thread = NULL;
 u32 thread_ids = 0;
 extern context_t* current_context;
 
-thread_t* thread_create(void* entry,void* data) {
+thread_t* thread_create(void* entry, void* data) {
   thread_t* thread = kmalloc(sizeof(thread_t));
-  thread->data=data;
+  thread->data = data;
   int size = sizeof(u32) * 64;
   u32* stack0 = kmalloc(size);
   u32* stack3 = kmalloc(size);
@@ -90,8 +90,12 @@ void thread_run(thread_t* thread) {
 
 void thread_yield() {
   thread_t* current = thread_current;
+  if (current == NULL) {
+    return;
+  }
   if (current->state == THREAD_RUNNING) {
-    syscall1(SYS_YIELD, current);
+    current->counter++;
+    schedule();
   }
 }
 

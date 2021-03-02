@@ -38,9 +38,9 @@ def get_kernel_size(env,target,source):
         size=os.stat(file_name).st_size
         env['KERNELSIZE'] = str(size)
         env['KERNEL_BLOCK_SIZE'] = str(int(math.ceil(size/1024.0)*2.0))
-        print 'kernel size:',env.get('KERNEL_BLOCK_SIZE')
+        print('kernel size:',env.get('KERNEL_BLOCK_SIZE'))
     else :
-        print 'file %s not exist'%(file_name)
+        print('file %s not exist'%(file_name))
     return ''
 
 def generate_kernel_size(env,target,source):

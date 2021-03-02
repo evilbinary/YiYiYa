@@ -5,6 +5,9 @@
 # * 邮箱: rootdebug@163.com
 # ********************************************************************
 import os
+import platform 
+plt = platform.system()
+
 Import('env')
 
 
@@ -31,9 +34,10 @@ env.Program('hello.elf', [
     CFLAGS='$CFLAGS -Ilibs/include/c/ ',
     LINKFLAGS= '$LINKFLAGS --entry main -Tuser.ld')
 
-#if env.get('w')=='hello':
-env.Command('sh', 
-    ['hello.elf' ],
-    ['hdid  image/disk.img &&  cp ${SOURCES[0]} /Volumes/NO\ NAME/ && hdiutil eject /Volumes/NO\ NAME/'
-])
+if plt=='Darwin':
+    #if env.get('w')=='hello':
+    env.Command('sh', 
+        ['hello.elf' ],
+        ['hdid  image/disk.img &&  cp ${SOURCES[0]} /Volumes/NO\ NAME/ && hdiutil eject /Volumes/NO\ NAME/'
+    ])
 
