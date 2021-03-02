@@ -11,7 +11,6 @@
 
 
 #define NR_BLOCKS   30
-#define NULL 0
 #define MEM_FREE	1
 #define MEM_USED	0x10
 #define MEM_LOCK	3

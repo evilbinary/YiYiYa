@@ -17,7 +17,7 @@ env = Environment(
                 OBJCOPY='/opt/local/bin/i386-elf-objcopy',
                 CFLAGS='-march=i486 -I. -I./include -Ilibs/include -g -nostdlib -nostdinc -fno-builtin -m32 -c -std=c99 -std=gnu99 -w',
                 #PATH= os.environ['PATH'],
-                LIBPATH=['.','../arch/','../driver'],
+                LIBPATH=['.','../arch/','../driver','../libs/'],
                 LINKFLAGS='-nostdlib -nostartfiles -e start  -g ',
                 OBJCOPYFLAGS='-S -g'
                   )
@@ -70,6 +70,7 @@ Export('env')
 SConscript(dirs=['arch'], exports='env')
 SConscript(dirs=['kernel'], exports='env')
 SConscript(dirs=['libs/libkernel'], exports='env')
+SConscript(dirs=['libs/libc'], exports='env')
 SConscript(dirs=['drivers'], exports='env')
 kernel=SConscript(dirs=['app'], exports='env')
 

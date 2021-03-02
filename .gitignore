@@ -4,3 +4,4 @@ boot/x86/init.bin
 **/*.log
 boot/**/init
 app/kernel*
+**.elf

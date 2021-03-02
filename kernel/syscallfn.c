@@ -28,9 +28,7 @@ int sys_print(char* s) {
   return 0;
 }
 
-void sys_test(){
-  kprintf("sys test\n");
-}
+void sys_test() { kprintf("sys test\n"); }
 
 int sys_print_at(char* s, u32 x, u32 y) {
   set_cursor(x, y);
@@ -131,13 +129,13 @@ size_t sys_yeild(thread_t* thread) {
 void* load_elf(Elf32_Ehdr* elf_header, u32 fd, page_dir_t* page) {
   // printf("e_phnum:%d\n\r", elf_header->e_phnum);
   u32 offset = elf_header->e_phoff;
-  Elf32_Phdr* phdr = kmalloc(sizeof(Elf32_Phdr));
+  Elf32_Phdr* phdr = kmalloc(sizeof(Elf32_Phdr) * elf_header->e_phnum);
   sys_seek(fd, offset);
   u32 nbytes = sys_read(fd, phdr, sizeof(Elf32_Phdr));
   // printf("addr %x elf=%x\n\r", phdr, elf);
-  u32 entry=0;
+  u32 entry = 0;
   for (int i = 0; i < elf_header->e_phnum; i++) {
-    //kprintf("type:%d\n\r", phdr[i].p_type);
+    // kprintf("type:%d\n\r", phdr[i].p_type);
     switch (phdr[i].p_type) {
       case PT_NULL:
         // printf(" %s %x %x %x %s %x %x \r\n", "NULL", phdr[i].p_offset,
@@ -153,25 +151,25 @@ void* load_elf(Elf32_Ehdr* elf_header, u32 fd, page_dir_t* page) {
         // printf("load start:%x vaddr:%x size:%x \n\r", start, vaddr,
         //        phdr[i].p_filesz);
         sys_seek(fd, start);
-        char* buf = mm_alloc_zero_align(phdr[i].p_filesz, 0x1000);
+        char* buf = mm_alloc_zero_align(phdr[i].p_filesz, phdr[i].p_align);
         // char* buf = kmalloc(phdr[i].p_filesz);
-        entry=buf;
+        entry = buf;
         u32 ret = sys_read(fd, buf, phdr[i].p_filesz);
-        u32 file_4k=0x1000;
-        if(phdr[i].p_filesz>0x1000){
-          file_4k=phdr[i].p_filesz;
+        u32 file_4k = 0x1000;
+        if (phdr[i].p_filesz > 0x1000) {
+          file_4k = phdr[i].p_filesz;
         }
         // bug to fix
-        kmemmove(buf,buf+10,phdr[i].p_filesz);
+        kmemmove(buf, buf + 10, phdr[i].p_filesz);
         for (int i = 0; i < file_4k / 0x1000; i++) {
-          kprintf("map vaddr:%x paddr:%x\n",vaddr,buf);
+          kprintf("map vaddr:%x paddr:%x\n", vaddr, buf);
           map_page_on(page, (u32)vaddr, (u32)buf, PAGE_P | PAGE_USU | PAGE_RWW);
           vaddr += 0x1000;
           buf += 0x1000;
         }
-        
+
         // kmemmove(vaddr+nbytes, buf, ret);
-        //kprintf("map end\n");
+        // kprintf("map end\n");
       } break;
       // case PT_DYNAMIC:
       //   printf(" %s %x %x %x\r\n %s %x %x ",
@@ -237,6 +235,43 @@ void* load_elf(Elf32_Ehdr* elf_header, u32 fd, page_dir_t* page) {
         break;
     }
   }
+  // data section
+  offset = elf_header->e_shoff;
+  Elf32_Shdr* shdr = kmalloc(sizeof(Elf32_Shdr) * elf_header->e_shnum);
+  sys_seek(fd, offset);
+  nbytes = sys_read(fd, shdr, sizeof(Elf32_Shdr) * elf_header->e_shnum);
+  for (int i = 0; i < elf_header->e_shnum; i++) {
+    if (SHT_NOBITS == shdr[i].sh_type) {
+      char* buf = kmalloc(shdr[i].sh_size);
+      char* vaddr = shdr[i].sh_addr;
+      map_page_on(page, (u32)vaddr, (u32)buf, PAGE_P | PAGE_USU | PAGE_RWW);
+    } else if (elf_header->e_entry!=shdr[i].sh_addr&& SHT_PROGBITS == shdr[i].sh_type &&
+               shdr[i].sh_flags & SHF_ALLOC&& shdr[i].sh_flags) {
+      char* start = shdr[i].sh_offset;
+      char* vaddr = shdr[i].sh_addr;
+      // kprintf("load start:%x vaddr:%x size:%x \n\r", start, vaddr,
+      //        phdr[i].p_filesz);
+      sys_seek(fd, start);
+      char* buf = mm_alloc_zero_align(shdr[i].sh_size, shdr[i].sh_addralign);
+      // char* buf = kmalloc(phdr[i].p_filesz);
+      entry = buf;
+      u32 ret = sys_read(fd, buf, shdr[i].sh_size);
+      u32 file_4k = 0x1000;
+      if (shdr[i].sh_size > 0x1000) {
+        file_4k = shdr[i].sh_size;
+      }
+      // bug to fix
+      //kmemmove(buf, buf + 10, shdr[i].sh_size);
+      for (int i = 0; i < file_4k / 0x1000; i++) {
+        kprintf("map vaddr:%x paddr:%x\n", vaddr, buf);
+        map_page_on(page, (u32)vaddr, (u32)buf, PAGE_P | PAGE_USU | PAGE_RWW);
+        vaddr += 0x1000;
+        buf += 0x1000;
+      }
+      break;
+    }
+  }
+
   return entry;
 }
 
@@ -257,25 +292,35 @@ void map_2gb(u64* page_dir_ptr_tab, u64* page_dir, u64* page_tab) {
   kprintf("- 0x%x\n", address);  // 0x200000 2GB
 }
 
-void page_clone(u64* page,u64* page_dir_ptr_tab){
-  for(int i=0;i<4;i++){
-    page_dir_ptr_tab[i]=page[i];
-    if(page[i]==0) continue;
-    // for(int j=0;j<512;j++){
-    //   u64* page_dir=page_dir_ptr_tab[i];
-    //   if(page_dir==0) continue;
-    //   for(int k=0;k<512;k++){
-    //     u64* page_tab=page_dir[j];
-    //     if(page_tab==0) continue;
-    //      page_tab[k]
-    //   }
-    // }
+void page_clone(u64* page, u64* page_dir_ptr_tab) {
+  for (int pdpte_index = 0; pdpte_index < 4; pdpte_index++) {
+    u64* page_dir_ptr = page[pdpte_index] & ~0xFFF;
+    if (page_dir_ptr != NULL) {
+      u64* new_page_dir_ptr = mm_alloc_zero_align(sizeof(u64) * 512, 0x1000);
+      page_dir_ptr_tab[pdpte_index] =
+          ((u64)new_page_dir_ptr) | PAGE_P | PAGE_USU | PAGE_RWW;
+      for (int pde_index = 0; pde_index < 512; pde_index++) {
+        u64* page_tab_ptr = (u64)page_dir_ptr[pde_index] & ~0xFFF;
+        if (page_tab_ptr != NULL) {
+          u64* new_page_tab_ptr =
+              mm_alloc_zero_align(sizeof(u64) * 512, 0x1000);
+          new_page_dir_ptr[pde_index] =
+              ((u64)new_page_tab_ptr) | PAGE_P | PAGE_USU | PAGE_RWW;
+          for (int pte_index = 0; pte_index < 512; pte_index++) {
+            u64* page_tab_item = page_tab_ptr[pte_index] & ~0xFFF;
+            if (page_tab_item != NULL) {
+              new_page_tab_ptr[pte_index] = page_tab_ptr[pte_index];
+              u32 virtualaddr = (pdpte_index & 0x03) << 30 |
+                                (pde_index & 0x01FF) << 21 |
+                                (pte_index & 0x01FF) << 12;
+              // kprintf("map vir:%x phy:%x \n", virtualaddr,
+              // new_page_tab_ptr[pte_index]& ~0xFFF);
+            }
+          }
+        }
+      }
+    }
   }
-  // u32 addr=0xfebf100c;
-  // for(int i=0;i<100;i++){
-  //   map_page_on(page, (u32)addr, (u32)addr, PAGE_P | PAGE_USU | PAGE_RWW);
-  //   addr+=0x1000;
-  // }
 }
 
 void do_run_elf_thread() {
@@ -290,9 +335,9 @@ void do_run_elf_thread() {
   }
   u32 nbytes = sys_read(fd, &elf, sizeof(Elf32_Ehdr));
   Elf32_Ehdr* elf_header = (Elf32_Ehdr*)&elf;
-  u32* kentry=0;
+  u32* kentry = 0;
   if (elf_header->e_ident[0] == ELFMAG0 || elf_header->e_ident[1] == ELFMAG1) {
-    kentry=load_elf(elf_header, fd, current->context.page_dir);
+    kentry = load_elf(elf_header, fd, current->context.page_dir);
   } else {
     kprintf("load faild not elf\n");
   }
@@ -308,11 +353,9 @@ u32 sys_exec(char* filename, char* const argv[]) {
 
   context_t* context = &t->context;
   u64* page_dir_ptr_tab = mm_alloc_zero_align(sizeof(u64) * 4, 0x1000);
-  u64* page_dir = mm_alloc_zero_align(sizeof(64) * 512, 0x1000);
-  u64* page_tab = mm_alloc_zero_align(sizeof(64) * 512, 0x1000);
   // init 2GB
   // map_2gb(page_dir_ptr_tab, page_dir, page_tab);
-  page_clone(t->context.page_dir,page_dir_ptr_tab);
+  page_clone(t->context.page_dir, page_dir_ptr_tab);
   context->page_dir = page_dir_ptr_tab;
 
   thread_run(t);
