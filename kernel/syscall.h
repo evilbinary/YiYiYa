@@ -12,7 +12,7 @@
 #include "devcallfn.h"
 #include "syscallfn.h"
 
-#define SYSCALL_NUMBER 20
+#define SYSCALL_NUMBER 40
 
 void* syscall0(u32 num);
 void* syscall1(u32 num,void* arg0);

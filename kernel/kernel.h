@@ -8,7 +8,7 @@
 
 #include "arch/arch.h"
 #include "kernel/device.h"
-#include "kernel/kmalloc.h"
+#include "kernel/memory.h"
 #include "kernel/module.h"
 #include "kernel/syscall.h"
 #include "kernel/thread.h"

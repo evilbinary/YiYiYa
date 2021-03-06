@@ -5,9 +5,27 @@
  ********************************************************************/
 #include "syscall.h"
 
-static void* syscall_table[SYSCALL_NUMBER] = {
-    &sys_read, &sys_write, &sys_yeild, &sys_print, &sys_print_at, &sys_ioctl,
-    &sys_open, &sys_close, &dev_read,  &dev_write, &dev_ioctl,&sys_exec,&sys_test};
+static void* syscall_table[SYSCALL_NUMBER] = {&sys_read,
+                                              &sys_write,
+                                              &sys_yeild,
+                                              &sys_print,
+                                              &sys_print_at,
+                                              &sys_ioctl,
+                                              &sys_open,
+                                              &sys_close,
+                                              &dev_read,
+                                              &dev_write,
+                                              &dev_ioctl,
+                                              &sys_exec,
+                                              &sys_test,
+                                              &sys_exit,
+                                              &sys_alloc,
+                                              &sys_free,
+                                              &sys_alloc_alignment,
+                                              &sys_free_alignment,
+                                              &sys_seek,
+                                              &sys_valloc,
+                                              &sys_vfree};
 
 INTERRUPT_SERVICE
 void syscall_handler() {

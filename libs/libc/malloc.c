@@ -4,15 +4,15 @@
 * 邮箱: rootdebug@163.com
 ********************************************************************/
 #include <malloc.h>
+#include "syscall.h"
 
 //implements 
 void *malloc(unsigned long size){
-	// return kmalloc(size);
-	return NULL;
+	return syscall1(SYS_ALLOC,size);
 }
 
 void free(void *addr){
-	// kfree(addr);
+	syscall1(SYS_FREE,addr);
 }
 void *realloc (void *block,unsigned long size){
 	void *p;

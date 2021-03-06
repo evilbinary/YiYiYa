@@ -15,7 +15,7 @@ env.Library('yiyiya', [
     'schedule.c',
     'syscall.c',
     'exceptions.c',
-    'kmalloc.c',
+    'memory.c',
     'module.c',
     'device.c',
     'vfs.c',

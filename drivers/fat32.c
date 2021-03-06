@@ -48,6 +48,24 @@ dir_entry_t *fat32_find_file_entry(fat32_info_t *fat32, char *name) {
   return NULL;
 }
 
+fat32_t *fat32_next_fat(vnode_t *node, u32 cluster, u32 *cluster_n_offset) {
+  static fat32_t *fat_entry = NULL;
+  if (fat_entry == NULL) {
+    // fat_entry = mm_alloc_zero_align(512, 0x1000);
+    fat_entry=kmalloc(512);
+  }
+  // read entry
+  if (cluster > (*cluster_n_offset)) {
+    u32 read_offset = fat32_info->fat1 + sizeof(fat32_t) * (cluster );
+    memset(fat_entry, 0, 512);
+    read(node, read_offset, 512, fat_entry);
+    *cluster_n_offset = cluster;
+  }
+  u32 pos = (cluster - *cluster_n_offset);
+  fat32_t *fat = &fat_entry[pos];
+  return fat;
+}
+
 u32 fat32_read(vnode_t *node, u32 offset, size_t nbytes, u8 *buffer) {
   char *name = node->name;
   dir_entry_t *e = node->data;
@@ -55,35 +73,32 @@ u32 fat32_read(vnode_t *node, u32 offset, size_t nbytes, u8 *buffer) {
     kprintf("read file %s entry error\n", name);
     return 0;
   }
-  u32 bytes =
-        fat32_info->vbr->sector_per_cluster * fat32_info->vbr->byte_per_sector;
-  static u8* read_buffer=NULL;
-  if(read_buffer==NULL){
-    read_buffer=kmalloc(bytes);
+  u32 bytes = fat32_info->bytes_per_cluster;
+  static u8 *read_buffer = NULL;
+  if (read_buffer == NULL) {
+    read_buffer = kmalloc(bytes);
     //  read_buffer=mm_alloc_zero_align(bytes, 0x1000);
-  }else{
-    memset(read_buffer,0,bytes);
   }
-  char buf[512];
-  //read entry
-  read(node, fat32_info->fat1, 512, buf);
-  fat32_t first_number=e->start_file_cluster_low-2;
-  fat32_t *fat_entry = buf;
-  fat32_t* fat_n=&first_number;
-  u32 total_bytes=0;
-  while ( !FAT32_CLUSTER_IS_EOF(*fat_n) &&total_bytes<nbytes) {
-    u32 read_offset =fat32_info->data+ (*fat_n) * fat32_info->vbr->sector_per_cluster *
-                 fat32_info->vbr->byte_per_sector+offset;
-    u32 ret=read(node, read_offset, bytes, read_buffer);
-    if(nbytes<bytes){
-      kmemmove(buffer+total_bytes,read_buffer,nbytes);
-      total_bytes+=nbytes;
-    }else{
-      kmemmove(buffer+total_bytes,read_buffer,ret);
-      total_bytes+=ret;
+  fat32_t first_cluster =
+      (e->start_file_cluster_hight << 16) | e->start_file_cluster_low;
+  fat32_t *fat = &first_cluster;
+  u32 total_bytes = 0;
+  u32 cluster_n_offset = 0;
+  while (!FAT32_CLUSTER_IS_EOF(*fat) && *fat != 0 && total_bytes < nbytes) {
+    u32 read_offset = fat32_info->data +
+                      ((*fat) - 2) * fat32_info->vbr->sector_per_cluster *
+                          fat32_info->vbr->byte_per_sector +
+                      offset;
+    memset(read_buffer, 0, bytes);
+    u32 ret = read(node, read_offset, bytes, read_buffer);
+    if (nbytes < bytes) {
+      kmemmove(buffer + total_bytes, read_buffer, nbytes);
+      total_bytes += nbytes;
+    } else {
+      kmemmove(buffer + total_bytes, read_buffer, ret);
+      total_bytes += ret;
     }
-    
-    fat_n = &fat_entry[*fat_n];
+    fat = fat32_next_fat(node, *fat, &cluster_n_offset);
   }
   return total_bytes;
 }
@@ -111,7 +126,7 @@ vnode_t *fat32_find(vnode_t *node, char *name) {
 
   vnode_t *file = vfs_create(name, V_FILE);
   file->data = e;
-  file->device=node->device;
+  file->device = node->device;
   fat32_init_op(file);
   return file;
 }
@@ -155,8 +170,9 @@ int fat32_init(void) {
   u32 data =
       root_dir + fat32_info->vbr->root_dir_number * 32;  // only for fat16 fat32
 
-  u32 fat_size=fat32_info->vbr->sector_per_fat_number *fat32_info->vbr->byte_per_sector;
-  fat32_info->fat_size=fat_size;
+  u32 fat_size =
+      fat32_info->vbr->sector_per_fat_number * fat32_info->vbr->byte_per_sector;
+  fat32_info->fat_size = fat_size;
   fat32_info->fat1 = fat1;
   fat32_info->fat2 = fat2;
   fat32_info->root_dir = root_dir;
@@ -167,6 +183,9 @@ int fat32_init(void) {
       kmalloc(sizeof(dir_entry_t) * fat32_info->entries_number);
   read(node, data, sizeof(dir_entry_t) * fat32_info->entries_number, entries);
   fat32_info->entries = entries;
+
+  fat32_info->bytes_per_cluster =
+      fat32_info->vbr->sector_per_cluster * fat32_info->vbr->byte_per_sector;
 
   return 0;
 }

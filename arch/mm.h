@@ -18,10 +18,10 @@
 #define MEM_HEAD	5
 
 #define PAGE_P   1
-#define PAGE_RWR   0
-#define PAGE_RWW   2
-#define PAGE_USS   0
-#define PAGE_USU   4
+#define PAGE_RWR   0 //读执行
+#define PAGE_RWW   2 //读/写/执行
+#define PAGE_USS   0 //系统级
+#define PAGE_USU   4 //用户级
 
 typedef struct mem_block{
     u32 addr;

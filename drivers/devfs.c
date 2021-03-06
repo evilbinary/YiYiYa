@@ -16,7 +16,7 @@ vnode_t *devfs_create_device(device_t *dev) {
   return t;
 }
 
-u32 std_write(vnode_t *node, u32 offset, size_t nbytes, u8 *buf){
+u32 device_write(vnode_t *node, u32 offset, size_t nbytes, u8 *buf){
   u32 ret = 0;
   device_t* dev = node->device;
   if (dev == NULL) {
@@ -25,13 +25,26 @@ u32 std_write(vnode_t *node, u32 offset, size_t nbytes, u8 *buf){
   ret = dev->write(dev, buf, nbytes);
 }
 
-void std_read(vnode_t *node, u32 offset, size_t nbytes, u8 *buf){
+void device_read(vnode_t *node, u32 offset, size_t nbytes, u8 *buf){
   u32 ret = 0;
   device_t* dev = node->device;
   if (dev == NULL) {
     return ret;
   }
   ret = dev->read(dev, buf, nbytes);
+}
+
+size_t device_ioctl(vnode_t* node,u32 cmd, ...){
+  u32 ret = 0;
+  device_t* dev = node->device;
+  if (dev == NULL) {
+    return ret;
+  }
+  va_list args;
+  va_start(args, cmd);
+  ret = dev->ioctl(dev, cmd,args);
+  va_end(args);
+  return ret;
 }
 
 int devfs_init(void) {
@@ -63,15 +76,25 @@ int devfs_init(void) {
 
   stdin->device=device_find(DEVICE_KEYBOARD);
   stdout->device=device_find(DEVICE_VGA);
-  if(stdout->device==NULL){
-    stdout->device=device_find(DEVICE_VGA_QEMU);
+  if(stdin->device==NULL){
+    stdin->device=device_find(DEVICE_SERIAL);
   }
   if(stdout->device==NULL){
     stdout->device=device_find(DEVICE_SERIAL);
   }
 
-  stdin->read=std_read;
-  stdout->write=std_write;
+  stdin->read=device_read;
+  stdout->write=device_write;
+
+  //frambuffer
+  vnode_t *frambuffer = vfs_create("fb", V_FILE);
+  vfs_mount(NULL, "/dev", frambuffer);
+  frambuffer->device=device_find(DEVICE_VGA);
+  if(frambuffer->device==NULL){
+    frambuffer->device=device_find(DEVICE_VGA_QEMU);
+  }
+  frambuffer->write=device_write;
+  frambuffer->ioctl=device_ioctl;
 
   return 0;
 }

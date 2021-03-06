@@ -20,7 +20,6 @@ extern module_t fat32_module;
 extern void serial_write(char a);
 extern void putch(char a);
 
-extern void do_screen_thread(void);
 extern void do_shell_thread(void);
 extern void do_serial_thread();
 
@@ -53,13 +52,11 @@ int kmain(int argc, char* argv[]) {
   module_regist(&devfs_module);
   module_regist(&fat32_module);
 
-  thread_t* t0 = thread_create((u32*)&do_shell_thread,NULL);
-  thread_t* t1 = thread_create((u32*)&do_serial_thread,NULL);
-  thread_t* t2 = thread_create((u32*)&do_screen_thread,NULL);
+  thread_t* t0 = thread_create((u32*)&do_serial_thread,NULL);
+  thread_t* t1 = thread_create((u32*)&do_shell_thread,NULL);
 
   thread_run(t0);
   thread_run(t1);
-  thread_run(t2);
 
   context_restore(current_context);
 

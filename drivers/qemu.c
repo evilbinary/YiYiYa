@@ -93,7 +93,7 @@ void qemu_init_device(device_t* dev) {
   dev->data = vga;
   u32 addr = bar0;
 
-  u32 mem = qemu_read_reg(VBE_DISPI_INDEX_VIDEO_MEMORY_64K) * 64 * 1024;
+  u32 mem = qemu_read_reg(VBE_DISPI_INDEX_VIDEO_MEMORY_64K) * 64 * 1024*8;
   for (int i = 0; i < mem / 0x1000; i++) {
     map_page(addr, addr, PAGE_P | PAGE_USU | PAGE_RWW);
     addr += 0x1000;

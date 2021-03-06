@@ -3,34 +3,13 @@
  * 作者: evilbinary on 01/01/20
  * 邮箱: rootdebug@163.com
  ********************************************************************/
+#include "screen.h"
+
 #include "bmp.h"
-#include "drivers/vga.h"
-#include "main.h"
+#include "stdarg.h"
+#include "syscall.h"
 
-#define ASC_WIDTH 8
-#define CHS_WIDTH 16
-#define SPACING 2
-#define CHAR_HEIGHT 16
-
-struct point_t {
-  i32 x;
-  i32 y;
-};
-
-typedef struct mouse_data {
-  u32 sate;
-  i32 x;
-  i32 y;
-} mouse_data_t;
-
-int screen_width;
-int screen_height;
-int screen_bpp;
-u32 *screen_buffer;
-struct point_t cur;
-
-#define ASC_NUM 256
-u8 *ASC;
+screen_info_t gscreen;
 
 u8 ASCII[] = {
 
@@ -223,13 +202,13 @@ u8 ASCII[] = {
 };
 
 void screen_put_pixel(u32 x, u32 y, u32 c) {
-  screen_buffer[screen_width * y + x] = c;
+  gscreen.buffer[gscreen.width * y + x] = c;
 }
 
 // 画点函数
 void screen_draw_poi32(i32 x, i32 y, i32 color) {
-  i32 x_max = screen_width - 1;   // 每行像素数
-  i32 y_max = screen_height - 1;  // 每列像素数
+  i32 x_max = gscreen.width - 1;   // 每行像素数
+  i32 y_max = gscreen.height - 1;  // 每列像素数
 
   // 防止越界
   if (x > x_max) {
@@ -240,7 +219,7 @@ void screen_draw_poi32(i32 x, i32 y, i32 color) {
   }
 
   // 取得显存线性地址
-  u32 *video = (u32 *)(*((u32 *)screen_buffer));
+  u32 *video = (u32 *)(*((u32 *)gscreen.buffer));
 
   // 计算点的偏移量
   i32 offset = y * (x_max + 1) + x;
@@ -249,8 +228,8 @@ void screen_draw_poi32(i32 x, i32 y, i32 color) {
 
 // 取得指定点色彩
 i32 screen_get_poi32_color(i32 x, i32 y) {
-  i32 x_max = screen_width - 1;   // 每行像素数
-  i32 y_max = screen_height - 1;  // 每列像素数
+  i32 x_max = gscreen.width - 1;   // 每行像素数
+  i32 y_max = gscreen.height - 1;  // 每列像素数
 
   // 防止越界
   if (x > x_max) {
@@ -261,7 +240,7 @@ i32 screen_get_poi32_color(i32 x, i32 y) {
   }
 
   // 取得显存线性地址
-  u32 *video = (u32 *)(*((u32 *)screen_buffer));
+  u32 *video = (u32 *)(*((u32 *)gscreen.buffer));
 
   // 计算点的偏移量
   i32 offset = y * (x_max + 1) + x;
@@ -271,9 +250,9 @@ i32 screen_get_poi32_color(i32 x, i32 y) {
 void screen_draw_vline(i32 x1, i32 x2, i32 y, i32 color) {
   register i32 i;
   i32 start_pos, end_pos;
-  start_pos = y * screen_width + x1;
-  end_pos = y * screen_width + x2;
-  for (i = start_pos; i < end_pos; i++) screen_buffer[i] = color;
+  start_pos = y * gscreen.width + x1;
+  end_pos = y * gscreen.width + x2;
+  for (i = start_pos; i < end_pos; i++) gscreen.buffer[i] = color;
 }
 void screen_draw_hline(i32 y1, i32 y2, i32 x, i32 color) {
   register i32 i;
@@ -325,8 +304,8 @@ void screen_draw_line(u32 x1, u32 y1, u32 x2, u32 y2, u32 color) {
 
 void screen_clear_screen(void) {
   i32 screen_size, i;
-  screen_size = screen_width * screen_height;
-  for (i = 0; i < screen_size; i++) screen_buffer[i] = 0;
+  screen_size = gscreen.width * gscreen.height;
+  for (i = 0; i < screen_size; i++) gscreen.buffer[i] = 0;
 }
 void screen_fill_rect(i32 x, i32 y, i32 w, i32 h, u32 color) {
   register i32 i;
@@ -337,7 +316,7 @@ void screen_put_ascii(i32 x, i32 y, u8 ch, i32 color) {
   register i32 i, j;
   for (i = 0; i < CHAR_HEIGHT; i++)
     for (j = 0; j < ASC_WIDTH; j++)
-      if ((*(ASC + ch * ASC_WIDTH + i) >> (ASC_WIDTH - j - 1)) & 1)
+      if ((*(gscreen.ASC + ch * ASC_WIDTH + i) >> (ASC_WIDTH - j - 1)) & 1)
         screen_put_pixel(x + j, y + i, color);
 }
 
@@ -394,12 +373,12 @@ void screen_draw_char_witdh_color(i32 x, i32 y, u16 ch, u32 frcolor,
   code = ch;
   if (code < 0x20) return;
   if (code < 0x7f) {
-    if (x > (screen_width - 1)) return;
+    if (x > (gscreen.width - 1)) return;
     code = code - 0x20;
     lp = ASCII + code * 16;
     for (i = 0; i < 16; i++) {
       z = *lp++;
-      pp = (u8 *)(screen_buffer + (y + i) * screen_width + x);
+      pp = (u8 *)(gscreen.buffer + (y + i) * gscreen.width + x);
       for (j = 0; j < 8; j++) {
         if (z & 0x01)
         // if(z & 0x80)
@@ -414,14 +393,14 @@ void screen_draw_char_witdh_color(i32 x, i32 y, u16 ch, u32 frcolor,
     }
     x = x + 1;
   } else if (code > 0xa1a1) {
-    if (x > (screen_width - 1)) return;
+    if (x > (gscreen.width - 1)) return;
     code = code - 0xa1a1;
     if (code > 0x0f00) code = code - 0x600;
     lp = ((u8 *)0x40000 + ((code >> 8) * 94 + (code & 0xff)) * 32);
     for (i = 0; i < 16; i++) {
       z = *lp++;
       z = (z << 8) + *lp++;
-      pp = (u8 *)(screen_buffer + (y + i) * screen_width + cur.x);
+      pp = (u8 *)(gscreen.buffer + (y + i) * gscreen.width + gscreen.cur.x);
       for (j = 0; j < 16; j++) {
         if (z & 0x8000) {
           *pp++ = frcolor;
@@ -512,36 +491,42 @@ void screen_show_bmp_picture(i32 x, i32 y, void *bmp_addr, i32 mask_color,
   }
 }
 
+void screen_init(){
+   int fd = syscall2(SYS_OPEN, "/dev/fb", 0);
+  gscreen.buffer = syscall2(SYS_IOCTL, fd, IOC_READ_FRAMBUFFER);
+  gscreen.width = syscall2(SYS_IOCTL, fd, IOC_READ_FRAMBUFFER_WIDTH);
+  gscreen.height = syscall2(SYS_IOCTL, fd, IOC_READ_FRAMBUFFER_HEIGHT);
+  gscreen.bpp = syscall2(SYS_IOCTL, fd, IOC_READ_FRAMBUFFER_BPP);
+}
+
+screen_info_t * screen_info(){
+  return &gscreen;
+}
+
 void do_screen_thread(void) {
   u32 i = 0;
   u32 count = 0;
   char buf[2] = {0};
   char wheel[] = {'\\', '|', '/', '-'};
-  
-  mouse_data_t mouse_data;
-  screen_buffer = syscall2(DEV_IOCTL, DEVICE_VGA_QEMU, IOC_READ_FRAMBUFFER);
-  screen_width =
-      syscall2(DEV_IOCTL, DEVICE_VGA_QEMU, IOC_READ_FRAMBUFFER_WIDTH);
-  screen_height =
-      syscall2(DEV_IOCTL, DEVICE_VGA_QEMU, IOC_READ_FRAMBUFFER_HEIGHT);
-  screen_bpp = syscall2(DEV_IOCTL, DEVICE_VGA_QEMU, IOC_READ_FRAMBUFFER_BPP);
 
+  mouse_data_t mouse_data;
   for (;;) {
     buf[0] = wheel[i++];
-    //syscall3(SYS_PRINT_AT, buf, 101, 0);
+    // continue;
+    // syscall3(SYS_PRINT_AT, buf, 101, 0);
     count++;
     if (i % 4 == 0) i = 0;
-    for (u32 y = 0; y < screen_height; y++) {
-      screen_put_pixel((screen_width - screen_height) / 2 + y, y, 0x0000ff);
-      screen_put_pixel((screen_height + screen_width) / 2 - y, y, 0xff0000);
+    for (u32 y = 0; y < gscreen.height; y++) {
+      screen_put_pixel((gscreen.width - gscreen.height) / 2 + y, y, 0x0000ff);
+      screen_put_pixel((gscreen.height + gscreen.width) / 2 - y, y, 0xff0000);
     }
     screen_draw_line(0, 0, 140, 140, 0xff0000);
-    screen_fill_rect(10, 20 , 30, 30, 0xff0000);
-    screen_printf(200,10,"hello,YiYiYa");
+    screen_fill_rect(10, 20, 30, 30, 0xff0000);
+    screen_printf(200, 10, "hello,YiYiYa");
 
-    //syscall3(DEV_READ, DEVICE_MOUSE,&mouse_data,sizeof(mouse_data_t));
-    screen_printf(10,100,"%d %d",mouse_data.x,mouse_data.y);
-    screen_fill_rect(mouse_data.x, screen_height-mouse_data.y , 4, 4, 0x00ff00);
-    
+    // syscall3(DEV_READ, DEVICE_MOUSE,&mouse_data,sizeof(mouse_data_t));
+    screen_printf(10, 100, "%d %d", mouse_data.x, mouse_data.y);
+    screen_fill_rect(mouse_data.x, gscreen.height - mouse_data.y, 4, 4,
+                     0x00ff00);
   }
 }

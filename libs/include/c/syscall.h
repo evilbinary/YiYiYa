@@ -22,7 +22,13 @@ enum {
     DEV_WRITE,
     DEV_IOCTL,
     SYS_EXEC,
-    SYS_TEST
+    SYS_TEST,
+    SYS_EXIT,
+    SYS_ALLOC,
+    SYS_FREE,
+    SYS_ALLOC_ALIGNMENT,
+    SYS_FREE_ALIGNMENT,
+    SYS_SEEK
 };
 
 void* syscall0(u32 num);

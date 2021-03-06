@@ -12,7 +12,6 @@ Import('env')
 
 env.Program('kernel.elf', [
     'main.c',
-    'screen.c',
     'shell.c',
     'serial.c',
     '../drivers/libdriver.a',
@@ -27,5 +26,6 @@ env.Objcopy('kernel.dbg','kernel.elf',OBJCOPYFLAGS='--only-keep-debug')
 env.Objcopy('kernel.bin','kernel',OBJCOPYFLAGS='-O binary')
 
 SConscript(dirs=['hello'], exports='env')
+SConscript(dirs=['gui'], exports='env')
 
 

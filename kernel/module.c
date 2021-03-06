@@ -5,8 +5,6 @@
  ********************************************************************/
 #include "module.h"
 
-#include "kmalloc.h"
-
 module_t* modules[MAX_MODULES];
 u32 module_number;
 
