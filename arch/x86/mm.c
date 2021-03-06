@@ -84,7 +84,7 @@ void map_addr(u32 addr){
       u32 address=p->addr;
       for(int i=0;i<p->size/0x1000;i++){
         map_page(address,address,PAGE_P | PAGE_USU | PAGE_RWW);
-        kprintf("map %x %x\n",address,address);
+        kprintf("map addr %x %x\n",address,address);
         address+=0x1000;
       }
     }
@@ -116,8 +116,11 @@ void mm_init() {
   //map > 4GB addr
   map_addr(address);
 
-
-  mm_test();
+  // move to new addr
+  // boot_info_t *new_boot=kmalloc(sizeof(boot_info_t));
+  // *new_boot=*boot_info;
+  // boot_info=new_boot;
+ 
 }
 
 void mm_alloc_init() {
@@ -246,7 +249,9 @@ void* mm_alloc(size_t size) {
     }
   }
   kprintf("erro alloc size %d\n", size);
+  for(;;);
   mm_dump();
+  for(;;);
   return NULL;
 }
 

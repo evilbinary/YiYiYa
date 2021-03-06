@@ -16,6 +16,8 @@
                                  (c) == 0xFFFFFFB || (c) == 0xFFFFFFC || (c) == 0xFFFFFFD || \
                                  (c) == 0xFFFFFFE || (c) == 0xFFFFFFF)
 
+#define FAT32_ENTRY_MASK  0x0FFFFFFF
+
 typedef struct vbr {
   u8 jmp[3];
   u8 oem_name[8];
@@ -88,6 +90,7 @@ typedef struct fat32_info{
     u32 root_dir;
     u32 data;
     u32 fat_size;
+    u32 bytes_per_cluster;
 }fat32_info_t;
 
 

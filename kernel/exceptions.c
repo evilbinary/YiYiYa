@@ -32,11 +32,16 @@ void exception_info(interrupt_context_t *context) {
   asm volatile("movl %%es,	%%eax" : "=a"(es));
   asm volatile("movl %%fs,	%%eax" : "=a"(fs));
   asm volatile("movl %%gs,	%%eax" : "=a"(gs));
+
+  thread_t* current = thread_current();
   if (context->no < sizeof exception_msg) {
     kprintf("EXCEPTION %d: %s\n=======================\n", context->no,
             exception_msg[context->no]);
   } else {
     kprintf("INTERRUPT %d\n=======================\n", context->no);
+  }
+   if(current!=NULL){
+    kprintf("tid:%d\n",current->id);
   }
   kprintf("cs:\t%x\teip:\t%x\teflags:\t%x\n", context->cs, context->eip,
           context->eflags);
@@ -190,15 +195,15 @@ void do_page_fault(interrupt_context_t *context) {
   kprintf("0x%x", fault_addr);
   kprintf("\n");
 
-  //if(present==0){
+  if(present==0){
     thread_t* current = thread_current();
     if(current!=NULL){
       kprintf("current tid: %x\n",current->id);
-      map_page_on(current->context.page_dir,fault_addr, fault_addr, PAGE_P | PAGE_USU | PAGE_RWW);
+
     }else{
-      map_page(fault_addr, fault_addr, PAGE_P | PAGE_USU | PAGE_RWW);
+      //map_page(fault_addr, fault_addr, PAGE_P | PAGE_USU | PAGE_RWW);
     }
-  //}
+  }
 }
 
 void exception_init() {

@@ -8,6 +8,7 @@
 #define MODULE_H
 
 #include "arch/arch.h"
+#include "memory.h"
 
 #define MAX_MODULES 256
 

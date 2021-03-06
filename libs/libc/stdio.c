@@ -10,7 +10,8 @@ int putchar(int ch) {
   if (STDOUT == NULL) {
     STDOUT = syscall2(SYS_OPEN, "/dev/stdout", 0);
   }
-  int ret = syscall3(SYS_WRITE, STDOUT, ch, 1);
+  int ret = syscall3(SYS_WRITE, STDOUT, &ch, 1);
+  
   return ret;
 }
 

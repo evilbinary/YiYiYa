@@ -22,7 +22,14 @@ enum {
     DEV_IOCTL,
     SYS_EXEC,
     SYS_TEST,
-    SYS_EXIT
+    SYS_EXIT,
+    SYS_ALLOC,
+    SYS_FREE,
+    SYS_ALLOC_ALIGNMENT,
+    SYS_FREE_ALIGNMENT,
+    SYS_SEEK,
+    SYS_VALLOC,
+    SYS_VFREE
 };
 
 typedef struct exec{
@@ -45,5 +52,16 @@ u32 sys_exec(char* filename,char *const argv[]);
 void sys_test();
 void sys_exit(int status);
 
+void* sys_alloc(size_t size);
+
+void sys_free(void* ptr);
+
+void* sys_alloc_alignment(size_t size,u32 alignment);
+
+void sys_free_alignment(void* ptr);
+size_t sys_seek(u32 fd, u32 offset);
+
+void* sys_valloc(void* addr,size_t size);
+void sys_vfree(void* addr);
 
 #endif

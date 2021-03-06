@@ -14,7 +14,6 @@ void do_serial_thread(void) {
   memset(buf, 1, 512);
   // syscall3(SYS_WRITE, DEVICE_SERIAL, test, kstrlen(test));
   //int fd = syscall2(SYS_OPEN, "/dev/sda/B.TXT", 0);
-  syscall2(SYS_EXEC,"/dev/sda/HELLO.ELF",NULL);
   for (;;) {
     //syscall3(SYS_READ, fd, buf, 512);
   

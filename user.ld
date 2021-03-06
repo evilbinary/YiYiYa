@@ -1,6 +1,6 @@
 ENTRY(_start)
-K_VIR_ADDR = 0x1000;
-K_PHY_ADDR = 0x1000;
+K_VIR_ADDR = 0x10000;
+K_PHY_ADDR = 0x10000;
 PAGE_SIZE    = 0x1000;
 SECTIONS
 {
@@ -28,6 +28,10 @@ SECTIONS
         {
                 *(COMMON)
                 *(.bss)
+        }
+        .eh_frame BLOCK(4K) : ALIGN(4K)
+        {
+                *(.eh_frame)
         }
        _end = .;
 }

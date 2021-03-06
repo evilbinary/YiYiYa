@@ -9,7 +9,7 @@
 vnode_t *root_node = NULL;
 
 size_t vioctl(vnode_t *node, u32 cmd, ...) {
-  if (node->read != NULL) {
+  if (node->ioctl != NULL) {
     u32 ret = 0;
     va_list args;
     va_start(args, cmd);
