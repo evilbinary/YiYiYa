@@ -96,6 +96,13 @@ int devfs_init(void) {
   frambuffer->write=device_write;
   frambuffer->ioctl=device_ioctl;
 
+  //mouse
+  vnode_t *mouse = vfs_create("mouse", V_FILE);
+  vfs_mount(NULL, "/dev", mouse);
+  mouse->device=device_find(DEVICE_MOUSE);
+  mouse->read=device_read;
+  mouse->ioctl=device_ioctl;
+
   return 0;
 }
 

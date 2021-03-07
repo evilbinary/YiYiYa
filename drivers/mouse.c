@@ -56,7 +56,6 @@ int mouse_init(void) {
   device_add(dev);
   interrutp_regist(ISR_MOUSE, mouse_handler);
 
-
   mouse_device.x = 0;
   mouse_device.y = 0;
 
@@ -67,18 +66,17 @@ int mouse_init(void) {
 
   // Read "byte 0" from internal RAM
   io_write8(MOUSE_COMMAND, 0x20);
-  //mouse_wait(0);
+  mouse_wait(0);
+
   u8 status = (io_read8(MOUSE_DATA) | 2);
   mouse_wait(1);
 
   // Write next byte to "byte 0" of internal RAM (Controller Configuration Byte
-  io_write8(MOUSE_COMMAND, 0x60);
-  //mouse_wait(1);
+  io_write8(MOUSE_STATUS, 0x60);
+  mouse_wait(1);
   io_write8(MOUSE_DATA, status);
 
-
-
-  mouse_wait(1);
+  // mouse_wait(1);
 
   // Set Defaults
   mouse_write(0xf6);
