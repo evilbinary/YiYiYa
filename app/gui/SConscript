@@ -17,17 +17,14 @@ env = env.Clone(
   )
 
 env.Program('gui.elf', [
-    'gui.c',
+    'main.c',
     'screen.c',
     '../../libs/libc/libc.a',
     ],
     CFLAGS='$CFLAGS -Ilibs/include/c/ ',
     LINKFLAGS= '$LINKFLAGS --entry main -Tuser.ld')
 
-if plt=='Darwin':
-    #if env.get('w')=='hello':
-    env.Command('sh', 
-        ['gui.elf' ],
-        ['hdid  image/disk.img &&  cp ${SOURCES[0]} /Volumes/NO\ NAME/ && hdiutil eject /Volumes/NO\ NAME/'
-    ])
-
+env.Library('gui', [
+    'screen.c',
+    '../../libs/libc/libc.a',
+],CFLAGS='$CFLAGS -Ilibs/include/c/')

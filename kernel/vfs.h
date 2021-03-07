@@ -72,7 +72,7 @@ vnode_t *vfinddir(vnode_t *node, char *name);
 vnode_t *vfind(vnode_t *node, char *name);
 vnode_t *vcreate(u8 *name, u32 flags);
 void vmount(vnode_t* node,u8 *path, vnode_t *node1);
-size_t vioctl(vnode_t *node, u32 cmd, ...);
+size_t vioctl(vnode_t *node, u32 cmd,va_list args);
 
 vnode_t* vfs_find(vnode_t* root,u8 *path);
 void vfs_mount(vnode_t *root, u8 *path, vnode_t *node);

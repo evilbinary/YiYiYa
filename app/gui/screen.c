@@ -491,16 +491,28 @@ void screen_show_bmp_picture(i32 x, i32 y, void *bmp_addr, i32 mask_color,
   }
 }
 
-void screen_init(){
-   int fd = syscall2(SYS_OPEN, "/dev/fb", 0);
-  gscreen.buffer = syscall2(SYS_IOCTL, fd, IOC_READ_FRAMBUFFER);
-  gscreen.width = syscall2(SYS_IOCTL, fd, IOC_READ_FRAMBUFFER_WIDTH);
-  gscreen.height = syscall2(SYS_IOCTL, fd, IOC_READ_FRAMBUFFER_HEIGHT);
-  gscreen.bpp = syscall2(SYS_IOCTL, fd, IOC_READ_FRAMBUFFER_BPP);
+void screen_init() {
+  int fd = syscall2(SYS_OPEN, "/dev/fb", 0);
+  gscreen.fd = fd;
+  printf("sizeof(framebuffer_info_t)=%d\n", sizeof(framebuffer_info_t));
+  syscall4(SYS_IOCTL, fd, IOC_READ_FRAMBUFFER_INFO, &(gscreen.fb),
+           sizeof(framebuffer_info_t));
+  gscreen.buffer = gscreen.fb.frambuffer;
+  gscreen.width = gscreen.fb.width;
+  gscreen.height = gscreen.fb.height;
+  gscreen.bpp = gscreen.fb.bpp;
 }
 
-screen_info_t * screen_info(){
-  return &gscreen;
+screen_info_t *screen_info() { return &gscreen; }
+
+void screen_flush() {
+  syscall3(SYS_IOCTL, gscreen.fd, IOC_FLUSH_FRAMBUFFER,
+           gscreen.fb.framebuffer_index);
+  // gscreen.fb.framebuffer_index=1;
+  gscreen.fb.framebuffer_index =
+      (++gscreen.fb.framebuffer_index) % gscreen.fb.framebuffer_count;
+  gscreen.buffer = gscreen.fb.frambuffer +
+                   gscreen.width*gscreen.height * gscreen.fb.framebuffer_index;
 }
 
 void do_screen_thread(void) {

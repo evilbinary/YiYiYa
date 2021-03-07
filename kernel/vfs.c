@@ -8,13 +8,13 @@
 
 vnode_t *root_node = NULL;
 
-size_t vioctl(vnode_t *node, u32 cmd, ...) {
+size_t vioctl(vnode_t *node, u32 cmd, va_list args) {
   if (node->ioctl != NULL) {
     u32 ret = 0;
-    va_list args;
-    va_start(args, cmd);
+    // va_list args;
+    // va_start(args, cmd);
     ret = node->ioctl(node, cmd,args);
-    va_end(args);
+    // va_end(args);
     return ret;
   } else {
     return 0;

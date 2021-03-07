@@ -35,6 +35,7 @@ void* syscall0(u32 num);
 void* syscall1(u32 num,void* arg0);
 void* syscall2(u32 num,void* arg0,void* arg1);
 void* syscall3(u32 num,void* arg0,void* arg1,void* arg2);
-
+void* syscall4(u32 num, void* arg0, void* arg1, void* arg2,void* arg3);
+void* syscall5(u32 num, void* arg0, void* arg1, void* arg2,void* arg3,void* arg4);
 
 #endif

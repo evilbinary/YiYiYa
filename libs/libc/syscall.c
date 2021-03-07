@@ -25,3 +25,19 @@ void* syscall3(u32 num, void* arg0, void* arg1, void* arg2) {
                : "i"(ISR_SYSCALL), "0"(num), "b"(arg0), "c"(arg1), "d"(arg2));
   return ret;
 }
+
+void* syscall4(u32 num, void* arg0, void* arg1, void* arg2,void* arg3) {
+  u32 ret = 0;
+  asm volatile("int %1\n"
+               : "=a"(ret)
+               : "i"(ISR_SYSCALL), "0"(num), "b"(arg0), "c"(arg1), "d"(arg2), "S"(arg3));
+  return ret;
+}
+
+void* syscall5(u32 num, void* arg0, void* arg1, void* arg2,void* arg3,void* arg4) {
+  u32 ret = 0;
+  asm volatile("int %1\n"
+               : "=a"(ret)
+               : "i"(ISR_SYSCALL), "0"(num), "b"(arg0), "c"(arg1), "d"(arg2), "S"(arg3),"D"(arg4));
+  return ret;
+}

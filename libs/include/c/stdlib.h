@@ -8,5 +8,8 @@
 #include "stdint.h"
 
 void itoa(char* buf, int base, int d);
+void abort();
+void qsort(void *, size_t, size_t, int (*)(const void *, const void *));
+double    strtod(const char *, char **);
 
 #endif

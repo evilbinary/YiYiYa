@@ -34,7 +34,8 @@ void do_shell_thread(void) {
 
   int fd = syscall2(SYS_OPEN, "/dev/stdin", 0);
   // syscall2(SYS_EXEC,"/dev/sda/HELLO.ELF",NULL);
-  syscall2(SYS_EXEC,"/dev/sda/GUI.ELF",NULL);
+  // syscall2(SYS_EXEC,"/dev/sda/GUI.ELF",NULL);
+  syscall2(SYS_EXEC,"/dev/sda/MICROUI.ELF",NULL);
   for (;;) {
     int ret = 0;
     // read key

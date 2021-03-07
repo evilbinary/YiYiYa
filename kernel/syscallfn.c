@@ -255,7 +255,7 @@ void* load_elf(Elf32_Ehdr* elf_header, u32 fd, page_dir_t* page) {
   nbytes = syscall3(SYS_READ,fd, shdr, sizeof(Elf32_Shdr) * elf_header->e_shnum);
   for (int i = 0; i < elf_header->e_shnum; i++) {
     if (SHT_NOBITS == shdr[i].sh_type) {
-      char* buf = syscall2(SYS_ALLOC_ALIGNMENT,shdr[i].sh_size, shdr[i].sh_addralign);
+      //char* buf = syscall2(SYS_ALLOC_ALIGNMENT,shdr[i].sh_size, shdr[i].sh_addralign);
       char* vaddr = shdr[i].sh_addr;
       //map_alignment(page,vaddr,buf,shdr[i].sh_size);
     } else if (elf_header->e_entry != shdr[i].sh_addr &&
@@ -268,7 +268,8 @@ void* load_elf(Elf32_Ehdr* elf_header, u32 fd, page_dir_t* page) {
       syscall2(SYS_SEEK,fd, start);
       //char* buf = syscall2(SYS_ALLOC_ALIGNMENT,shdr[i].sh_size, shdr[i].sh_addralign);
       // char* buf = kmalloc(phdr[i].p_filesz);
-      u32 ret = syscall3(SYS_READ,fd, vaddr, shdr[i].sh_size);
+      u32 phyaddr=virtual_to_physic(page,vaddr);
+      u32 ret = syscall3(SYS_READ,fd, phyaddr, shdr[i].sh_size);
       //map_alignment(page,vaddr,buf,shdr[i].sh_size);
     }
   }
@@ -308,9 +309,9 @@ u32 sys_exec(char* filename, char* const argv[]) {
 
   context_t* context = &t->context;
   u64* page_dir_ptr_tab = kmalloc_alignment(sizeof(u64) * 4, 0x1000);
-  // init 2GB
-  // map_2gb(page_dir_ptr_tab, page_dir, page_tab);
   page_clone(t->context.page_dir, page_dir_ptr_tab);
+  // init 2GB
+  map_2gb(page_dir_ptr_tab);
   context->page_dir = page_dir_ptr_tab;
 
   thread_run(t);
