@@ -501,6 +501,12 @@ void screen_init() {
   gscreen.width = gscreen.fb.width;
   gscreen.height = gscreen.fb.height;
   gscreen.bpp = gscreen.fb.bpp;
+  gscreen.mouse_fd=syscall2(SYS_OPEN, "/dev/mouse", 0);
+}
+
+void screen_read_mouse(mouse_data_t* mouse){
+  syscall3(SYS_READ, gscreen.mouse_fd, &gscreen.mouse, sizeof(mouse_data_t));
+  *mouse=gscreen.mouse;
 }
 
 screen_info_t *screen_info() { return &gscreen; }
@@ -522,6 +528,7 @@ void do_screen_thread(void) {
   char wheel[] = {'\\', '|', '/', '-'};
 
   mouse_data_t mouse_data;
+  int fd = syscall2(SYS_OPEN, "/dev/mouse", 0);
   for (;;) {
     buf[0] = wheel[i++];
     // continue;
@@ -536,7 +543,7 @@ void do_screen_thread(void) {
     screen_fill_rect(10, 20, 30, 30, 0xff0000);
     screen_printf(200, 10, "hello,YiYiYa");
 
-    // syscall3(DEV_READ, DEVICE_MOUSE,&mouse_data,sizeof(mouse_data_t));
+    syscall3(SYS_READ, fd,&mouse_data,sizeof(mouse_data_t));
     screen_printf(10, 100, "%d %d", mouse_data.x, mouse_data.y);
     screen_fill_rect(mouse_data.x, gscreen.height - mouse_data.y, 4, 4,
                      0x00ff00);

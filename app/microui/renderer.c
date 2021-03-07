@@ -59,6 +59,7 @@ void r_set_clip_rect(mu_Rect rect) {
 
 void r_clear(mu_Color clr) {
   flush();
+  screen_fill_rect(0, 0,screen->width,screen->height,color_rgba(clr));
 }
 
 

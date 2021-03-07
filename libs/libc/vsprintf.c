@@ -236,7 +236,9 @@ repeat:
 			ip = va_arg(args, int *);
 			*ip = (str - buf);
 			break;
-
+		case 'f':
+			str = number(str, va_arg(args, double), 10, field_width, precision, flags);
+			break;
 		default:
 			if (*fmt != '%')
 				*str++ = '%';

@@ -83,6 +83,7 @@ u32 sys_open(char* name, int attr) {
   open_list[open_number].type = DEVICE_TYPE_FILE;
   open_list[open_number].data = file;
   open_list[open_number].offset = 0;
+  open_list[open_number].name = name;
   return open_list[open_number++].id;
 }
 

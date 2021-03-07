@@ -47,7 +47,7 @@ int kmain(int argc, char* argv[]) {
 
   // module_regist(&vga_module);
   module_regist(&qemu_module);
-  // module_regist(&mouse_module);
+  module_regist(&mouse_module);
   module_regist(&ahci_module);
   module_regist(&devfs_module);
   module_regist(&fat32_module);

@@ -16,7 +16,8 @@ static int text_width(mu_Font font, const char *text, int len) {
 
 static int text_height(mu_Font font) { return r_get_text_height(); }
 
-static int uint8_slider(mu_Context *ctx, unsigned char *value, int low, int high) {
+static int uint8_slider(mu_Context *ctx, unsigned char *value, int low,
+                        int high) {
   static float tmp;
   mu_push_id(ctx, &value, sizeof(value));
   tmp = *value;
@@ -190,21 +191,58 @@ static void process_frame(mu_Context *ctx) {
   test_window(ctx);
   mu_end(ctx);
 }
+// static const char button_map[256] = {
+//     [SDL_BUTTON_LEFT & 0xff] = MU_MOUSE_LEFT,
+//     [SDL_BUTTON_RIGHT & 0xff] = MU_MOUSE_RIGHT,
+//     [SDL_BUTTON_MIDDLE & 0xff] = MU_MOUSE_MIDDLE,
+// };
+
+// static const char key_map[256] = {
+//     // [ SDLK_LSHIFT       & 0xff ] = MU_KEY_SHIFT,
+//     // [ SDLK_RSHIFT       & 0xff ] = MU_KEY_SHIFT,
+//     // [ SDLK_LCTRL        & 0xff ] = MU_KEY_CTRL,
+//     // [ SDLK_RCTRL        & 0xff ] = MU_KEY_CTRL,
+//     // [ SDLK_LALT         & 0xff ] = MU_KEY_ALT,
+//     // [ SDLK_RALT         & 0xff ] = MU_KEY_ALT,
+//     // [ SDLK_RETURN       & 0xff ] = MU_KEY_RETURN,
+//     // [ SDLK_BACKSPACE    & 0xff ] = MU_KEY_BACKSPACE,
+// };
 
 int main(int argc, char *argv[]) {
-  int fd=syscall2(SYS_OPEN,"/dev/stdout",0);
   printf(buf);
   r_init();
-  // printf("sizeof=%d\n",sizeof(mu_Context));
   mu_Context *ctx = malloc(sizeof(mu_Context));
   mu_init(ctx);
   ctx->text_width = text_width;
   ctx->text_height = text_height;
 
-  int i=0;
+  mouse_data_t mouse;
+  screen_info_t *screen;
+  screen = screen_info();
+  int i = 0;
   for (;;) {
     screen_printf(200, 10, "hello,YiYiYa OS");
-    screen_printf(0, 600,"%d",i++);
+    screen_printf(0, 600, "%d", i++);
+
+    screen_read_mouse(&mouse);
+    if (mouse.sate) {
+      mu_input_mousemove(ctx, mouse.x, screen->height - screen->mouse.y);
+    }
+    u8 button = mouse.sate & BUTTON_MASK;
+    
+    if (button == BUTTON_LEFT) {
+      screen_printf(0, 620, "%x", button);
+      mu_input_mousedown(ctx, mouse.x, screen->height - screen->mouse.y, MU_MOUSE_LEFT);
+    } else if (button == BUTTON_RIGHT) {
+      mu_input_mousedown(ctx, mouse.x, screen->height - screen->mouse.y, MU_MOUSE_RIGHT);
+    } else if (button == BUTTON_MIDDLE) {
+      mu_input_mousedown(ctx, mouse.x, screen->height - screen->mouse.y, MU_MOUSE_MIDDLE);
+    }else if(button==0){
+      mu_input_mouseup(ctx, mouse.x, screen->height - screen->mouse.y, MU_MOUSE_LEFT);
+      mu_input_mouseup(ctx, mouse.x, screen->height - screen->mouse.y, MU_MOUSE_RIGHT);
+      mu_input_mouseup(ctx, mouse.x, screen->height - screen->mouse.y, MU_MOUSE_MIDDLE);
+    }
+
     process_frame(ctx);
     /* render */
     r_clear(mu_color(bg[0], bg[1], bg[2], 255));
@@ -225,6 +263,9 @@ int main(int argc, char *argv[]) {
           break;
       }
     }
+
+    screen_fill_rect(mouse.x, screen->height - screen->mouse.y, 4, 4,
+                       0x00ff00);
     r_present();
   }
   return 0;

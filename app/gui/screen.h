@@ -16,6 +16,12 @@
 #define CHAR_HEIGHT 16
 #define ASC_NUM 256
 
+#define BUTTON_MASK 0x7
+
+#define BUTTON_LEFT 1
+#define BUTTON_RIGHT 2
+#define BUTTON_MIDDLE 4
+
 struct point_t {
   i32 x;
   i32 y;
@@ -50,6 +56,7 @@ typedef struct screen_info {
   u8 *ASC;
   mouse_data_t mouse;
   int fd;
+  int mouse_fd;
   framebuffer_info_t fb;
 } screen_info_t;
 
@@ -66,6 +73,7 @@ typedef struct screen_info {
 
 void screen_init();
 screen_info_t *screen_info();
+void screen_read_mouse(mouse_data_t* mouse);
 void screen_put_pixel(u32 x, u32 y, u32 c);
 void screen_draw_poi32(i32 x, i32 y, i32 color);
 i32 screen_get_poi32_color(i32 x, i32 y);
