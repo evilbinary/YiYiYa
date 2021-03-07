@@ -199,11 +199,12 @@ void do_page_fault(interrupt_context_t *context) {
     thread_t* current = thread_current();
     if(current!=NULL){
       kprintf("current tid: %x\n",current->id);
-
+      
     }else{
       //map_page(fault_addr, fault_addr, PAGE_P | PAGE_USU | PAGE_RWW);
     }
   }
+  cpu_halt();
 }
 
 void exception_init() {

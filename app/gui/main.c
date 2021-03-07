@@ -1,11 +1,11 @@
 #include "screen.h"
 #include "stdio.h"
 
-char* buf = "hello,gui\n";
+char* buf = "hello,gui gaga\n";
 int main(int argc, char* argv[]) {
   printf(buf);
   screen_init();
-  screen_printf(200, 10, "hello,YiYiYa os");
+  screen_printf(200, 10, "hello,YiYiYa OS");
   screen_info_t* screen = screen_info();
   for (;;) {
     for (u32 y = 0; y < screen->height; y++) {

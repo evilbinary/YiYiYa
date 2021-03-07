@@ -14,5 +14,7 @@ env.Library('c', [
     'vsprintf.c',
     'stdio.c',
     'stdlib.c',
-    'syscall.c'
+    'syscall.c',
+    'errno.c',
+    'ctype.c'
 ],CFLAGS='$CFLAGS -Ilibs/include/c/')

@@ -27,7 +27,21 @@ typedef struct mouse_data {
   i32 y;
 } mouse_data_t;
 
-typedef struct screen_info{
+typedef struct framebuffer_info {
+  u32 width;
+  u32 height;
+  u32 bpp;
+  u32 mode;
+  u32 *frambuffer;
+  u32 framebuffer_count;
+  u32 framebuffer_index;
+  u32 framebuffer_length;
+  u32 inited;
+  u32* write;
+  u32* flip_buffer;
+} framebuffer_info_t;
+
+typedef struct screen_info {
   int width;
   int height;
   int bpp;
@@ -35,7 +49,9 @@ typedef struct screen_info{
   struct point_t cur;
   u8 *ASC;
   mouse_data_t mouse;
-}screen_info_t;
+  int fd;
+  framebuffer_info_t fb;
+} screen_info_t;
 
 #define IOC_MAGIC 'v'
 #define IOC_INIT _IO(IOC_MAGIC, 0)
@@ -45,9 +61,11 @@ typedef struct screen_info{
 #define IOC_READ_FRAMBUFFER_WIDTH _IOW(IOC_MAGIC, 4, int)
 #define IOC_READ_FRAMBUFFER_HEIGHT _IOW(IOC_MAGIC, 5, int)
 #define IOC_READ_FRAMBUFFER_BPP _IOW(IOC_MAGIC, 6, int)
+#define IOC_FLUSH_FRAMBUFFER _IOW(IOC_MAGIC, 7, int)
+#define IOC_READ_FRAMBUFFER_INFO _IOW(IOC_MAGIC, 8, int)
 
 void screen_init();
-screen_info_t * screen_info();
+screen_info_t *screen_info();
 void screen_put_pixel(u32 x, u32 y, u32 c);
 void screen_draw_poi32(i32 x, i32 y, i32 color);
 i32 screen_get_poi32_color(i32 x, i32 y);

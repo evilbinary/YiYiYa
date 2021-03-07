@@ -43,6 +43,11 @@ u16 qemu_read_reg(u16 index) {
 
 void qemu_clear_screen(vga_device_t* vga) {}
 
+void qemu_flip_screen(vga_device_t* vga, u32 index) {
+  vga->framebuffer_index=index;
+  qemu_write_reg(VBE_DISPI_INDEX_Y_OFFSET, index*vga->height);
+}
+
 void qemu_init_mode(pci_device_t* pdev, vga_device_t* vga, int mode) {
   if (mode == VGA_MODE_80x25) {
     vga->width = 80;
@@ -89,16 +94,37 @@ void qemu_init_device(device_t* dev) {
 
   // kprintf("bar0:%x ", bar0);
   vga_device_t* vga = kmalloc(sizeof(vga_device_t));
-  vga->frambuffer = bar0;
   dev->data = vga;
   u32 addr = bar0;
 
-  u32 mem = qemu_read_reg(VBE_DISPI_INDEX_VIDEO_MEMORY_64K) * 64 * 1024*8;
-  for (int i = 0; i < mem / 0x1000; i++) {
-    map_page(addr, addr, PAGE_P | PAGE_USU | PAGE_RWW);
-    addr += 0x1000;
-  }
   qemu_init_mode(pdev, vga, VGA_MODE_1024x768x32);
+
+  u32 size = 1024 * 768 * 16;
+  vga->framebuffer_count = 4;
+  vga->framebuffer_index = 0;
+  vga->framebuffer_length = size;
+  vga->frambuffer = bar0;
+  vga->flip_buffer = qemu_flip_screen;
+  // qemu_read_reg(VBE_DISPI_INDEX_VIDEO_MEMORY_64K)
+  for (int i = 0; i < size* vga->framebuffer_count / PAGE_SIZE; i++) {
+    map_page(addr, addr, PAGE_P | PAGE_USU | PAGE_RWW);
+    addr += PAGE_SIZE;
+  }
+  
+
+  // #ifdef DOUBLE_BUFFER
+  //   vga->frambuffer = bar0 + size * 2;
+  //   u32 phy = kmalloc_alignment(size, PAGE_SIZE);
+  //   addr = vga->frambuffer;
+  //   for (int i = 0; i < size / PAGE_SIZE; i++) {
+  //     map_page(addr, phy, PAGE_P | PAGE_USU | PAGE_RWW);
+  //     kprintf("qemu map %x %x\n", addr, phy);
+  //     addr += PAGE_SIZE;
+  //     phy += PAGE_SIZE;
+  //   }
+  // #else
+  //   vga->frambuffer = bar0;
+  // #endif
 }
 
 int qemu_init(void) {
@@ -118,4 +144,3 @@ int qemu_init(void) {
 void qemu_exit(void) { kprintf("vga exit\n"); }
 
 module_t qemu_module = {.name = "vga", .init = qemu_init, .exit = qemu_exit};
-

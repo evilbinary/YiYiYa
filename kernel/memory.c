@@ -6,7 +6,6 @@
 #include "memory.h"
 
 #include "thread.h"
-
 void* kmalloc(size_t size) {
   void* addr = NULL;
   size = ((size + PAGE_SIZE) / PAGE_SIZE) * PAGE_SIZE;
@@ -103,4 +102,22 @@ void page_clone(u64* page, u64* page_dir_ptr_tab) {
       }
     }
   }
+}
+
+void* virtual_to_physic(u64* page_dir_ptr_tab, void* vaddr){
+  u32 pdpte_index = (u32)vaddr >> 30 & 0x03;
+  u32 pde_index = (u32)vaddr >> 21 & 0x01FF;
+  u32 pte_index = (u32)vaddr >> 12 & 0x01FF;
+  u32 offset = (u32)vaddr & 0x0FFF;
+  u64* page_dir_ptr = (u64)page_dir_ptr_tab[pdpte_index] & ~0xFFF;
+  if (page_dir_ptr == NULL) {
+    kprintf("page dir find errro\n");
+    return NULL;
+  }
+  u64* page_tab_ptr = (u64)page_dir_ptr[pde_index] & ~0xFFF;
+  if (page_tab_ptr == NULL) {
+    kprintf("page tab find errro\n");
+  }
+  void* phyaddr=page_tab_ptr[pte_index]& ~0xFFF;
+  return phyaddr;
 }

@@ -5,6 +5,8 @@
  ********************************************************************/
 #include "vga.h"
 
+#include "dma.h"
+
 size_t vga_read(device_t* dev, void* buf, size_t len) {
   u32 ret = 0;
   return ret;
@@ -21,26 +23,32 @@ size_t vga_write(device_t* dev, const void* buf, size_t len) {
   return ret;
 }
 
-size_t vga_ioctl(device_t* dev, u32 cmd, ...) {
+size_t vga_ioctl(device_t* dev, u32 cmd, va_list args) {
   u32 ret = 0;
   vga_device_t* vga = dev->data;
   if (vga == NULL) {
     kprintf("not found vga\n");
     return ret;
   }
-  va_list args;
-  va_start(args, cmd);
   if (cmd == IOC_READ_FRAMBUFFER) {
     ret = vga->frambuffer;
   } else if (cmd == IOC_READ_FRAMBUFFER_WIDTH) {
     ret = vga->width;
   } else if (cmd == IOC_READ_FRAMBUFFER_HEIGHT) {
     ret = vga->height;
-  }else if (cmd==IOC_READ_FRAMBUFFER_BPP){
-    ret=vga->bpp;
+  } else if (cmd == IOC_READ_FRAMBUFFER_BPP) {
+    ret = vga->bpp;
+  } else if (cmd == IOC_FLUSH_FRAMBUFFER) {
+    if (vga->frambuffer != NULL&&vga->flip_buffer!=NULL) {
+      u32 offset=va_arg(args,u32);
+      vga->flip_buffer(vga,offset%vga->framebuffer_count);
+    }
   }
-  va_end(args);
-
+  else if (cmd == IOC_READ_FRAMBUFFER_INFO) {
+   vga_device_t* buffer_info=va_arg(args,u32);
+   u32 size=va_arg(args,u32);
+   *buffer_info=*vga;
+  }
   return ret;
 }
 
@@ -50,7 +58,7 @@ void vga_init_device(device_t* dev) {
     kprintf("can not find pci device\n");
     return;
   }
-  u32 bar0 =pci_dev_read32(pdev, PCI_BASE_ADDR0) & 0xFFFFFFF0;
+  u32 bar0 = pci_dev_read32(pdev, PCI_BASE_ADDR0) & 0xFFFFFFF0;
   // u32 bar1 =
   //     pci_read32(pdev->bus, pdev->slot, pdev->function, 0x14) & 0xFFFFFFF0;
   // u32 bar2 =
@@ -87,4 +95,3 @@ int vga_init(void) {
 void vga_exit(void) { kprintf("vga exit\n"); }
 
 module_t vga_module = {.name = "vga", .init = vga_init, .exit = vga_exit};
-

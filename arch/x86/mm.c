@@ -80,7 +80,7 @@ void map_addr(u32 addr){
   mem_block_t* p = block_available;
   for (; p != NULL; p = p->next) {
     if(p->addr>addr){
-      //map_page(p->addr,p->addr,PAGE_P | PAGE_USU | PAGE_RWW);
+      map_page(p->addr,p->addr,PAGE_P | PAGE_USU | PAGE_RWW);
       u32 address=p->addr;
       for(int i=0;i<p->size/0x1000;i++){
         map_page(address,address,PAGE_P | PAGE_USU | PAGE_RWW);
@@ -155,6 +155,7 @@ void mm_alloc_init() {
       block_available_tail = block;
     } else {
       block_available_tail->next = block;
+      block_available_tail=block;
     }
   }
 }
@@ -221,9 +222,11 @@ void* mm_alloc(size_t size) {
   u32 static count = 0;
   u32 pre_alloc_size = size + sizeof(mem_block_t);
   for (; p != NULL; p = p->next) {
+    // kprintf("p->type:%d\n",p->type);
     if ((p->type != MEM_FREE)) {
       continue;
     }
+  //kprintf("pre_alloc_size:%d p->size:%d\n",pre_alloc_size,p->size);
   if ((pre_alloc_size) <= p->size) {
       mem_block_t* new_block = (mem_block_t*)p->addr;
       if(new_block==NULL) continue;
@@ -243,28 +246,28 @@ void* mm_alloc(size_t size) {
         block_alloc_tail=new_block;
       }
       count++;
-      //kprintf("alloc %d: %x %d\n",count,new_block->addr,new_block->size);
+      // kprintf("alloc %d: %x %d\n",count,new_block->addr,new_block->size);
       //mm_dump();
+      // mm_dump_print(block_available);
       return (void*)new_block->addr;
     }
   }
-  kprintf("erro alloc size %d\n", size);
+  kprintf("erro alloc size %d kb\n", size/1024);
   for(;;);
   mm_dump();
-  for(;;);
   return NULL;
 }
 
 void mm_free(void* addr) {
-  mem_block_t* p = block_alloc_head;
-  for (; p != NULL; p = p->next) {
-    if (p->addr == addr) {
-      p->type = MEM_FREE;
-      // todo merging mem
-      kprintf("free %x\n", addr);
-      break;
-    }
+  if(addr==NULL) return;
+  mem_block_t* block = (mem_block_t*)((u32)addr);
+  if(block->addr==0){
+    kprintf("mm free error %x\n",addr);
   }
+  block->next=NULL;
+  block->type=MEM_FREE;
+  block_available_tail->next=block;
+  block_available_tail=block;
 }
 
 u32 mm_get_size(void* addr) {

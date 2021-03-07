@@ -1,6 +1,8 @@
 #ifndef _STDDEF_H
 #define _STDDEF_H
 
+#include "../types.h"
+
 #ifndef	NULL
 #define NULL		0
 #endif
@@ -13,8 +15,10 @@ typedef signed long int	ptrdiff_t;
 
 #ifndef _HAVE_SIZE_T
 #define _HAVE_SIZE_T
+#ifndef size_t
 //typedef	unsigned int	size_t;
-typedef long unsigned int size_t;
+// typedef long unsigned int size_t;
+#endif
 #endif
 
 

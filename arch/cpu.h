@@ -21,6 +21,7 @@ typedef struct context_t {
   u32 eip;
   tss_t* tss;
   u32* page_dir;
+  u32* kernel_page_dir;
 } context_t;
 
 typedef struct stack_frame {
@@ -61,6 +62,8 @@ void context_switch(interrupt_context_t* context,context_t** current,
 
 #define cpu_cli() asm("cli")
 #define cpu_sti() asm("sti")
+
+#define context_switch_page(page_dir) asm volatile("mov %0, %%cr3" : : "r" (page_dir))
 
 #define FAA(ptr) __sync_fetch_and_add(ptr, 1)
 

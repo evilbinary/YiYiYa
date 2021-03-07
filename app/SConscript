@@ -5,6 +5,8 @@
 # * 邮箱: rootdebug@163.com
 # ********************************************************************
 import os
+import platform 
+plt = platform.system()
 
 Import('env')
 
@@ -27,5 +29,24 @@ env.Objcopy('kernel.bin','kernel',OBJCOPYFLAGS='-O binary')
 
 SConscript(dirs=['hello'], exports='env')
 SConscript(dirs=['gui'], exports='env')
+SConscript(dirs=['microui'], exports='env')
+
+
+
+if plt=='Darwin':
+    env.Command('copyhello', 
+        ['hello/hello.elf' ],
+        ['hdid  image/disk.img &&  cp ${SOURCES[0]} /Volumes/NO\ NAME/ && hdiutil eject /Volumes/NO\ NAME/'
+    ])
+    env.Command('copygui', 
+        ['gui/gui.elf' ],
+        ['hdid  image/disk.img &&  cp ${SOURCES[0]} /Volumes/NO\ NAME/ && hdiutil eject /Volumes/NO\ NAME/'
+    ])
+    #if env.get('w')=='hello':
+    env.Command('copymicroui', 
+        ['microui/microui.elf' ],
+        ['hdid  image/disk.img &&  cp ${SOURCES[0]} /Volumes/NO\ NAME/ && hdiutil eject /Volumes/NO\ NAME/'
+    ])
+    pass
 
 

@@ -34,16 +34,16 @@ void device_read(vnode_t *node, u32 offset, size_t nbytes, u8 *buf){
   ret = dev->read(dev, buf, nbytes);
 }
 
-size_t device_ioctl(vnode_t* node,u32 cmd, ...){
+size_t device_ioctl(vnode_t* node,u32 cmd,va_list args){
   u32 ret = 0;
   device_t* dev = node->device;
   if (dev == NULL) {
     return ret;
   }
-  va_list args;
-  va_start(args, cmd);
+  // va_list args;
+  // va_start(args, cmd);
   ret = dev->ioctl(dev, cmd,args);
-  va_end(args);
+  // va_end(args);
   return ret;
 }
 

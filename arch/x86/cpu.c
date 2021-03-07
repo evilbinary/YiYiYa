@@ -166,6 +166,7 @@ void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
 
   ulong addr = (ulong)boot_info->pdt_base;
   context->page_dir = addr;
+  context->kernel_page_dir=addr;
 
   if (tss->eip == 0 && tss->cr3 == 0) {
     tss->ss0 = context->ss0;
@@ -226,7 +227,7 @@ void context_switch(interrupt_context_t* context, context_t** current,
   */
 
   *current = next_context;
-  asm volatile("mov %0, %%cr3" : : "r" (next_context->page_dir));
+  context_switch_page(next_context->page_dir);
 }
 
 int TAS(volatile int* addr, int newval) {

@@ -10,27 +10,23 @@ plt = platform.system()
 
 Import('env')
 
-
-AddOption(
-    '--w',
-    dest='w',
-    nargs=1,
-    type='string',
-    action='store',
-    metavar='DIR',
-    help='w image',
-)
-
 env = env.Clone(
   w=GetOption('w'),
   ENV = os.environ,
   PATH= [os.environ['PATH'],'/opt/local/bin' ],
   )
 
-env.Program('hello.elf', [
-    'hello.c',
+env.Program('microui', [
+    'main.c',
+    'microui.c',
+    'renderer.c',
     '../../libs/libc/libc.a',
+    '../../app/gui/libgui.a',
     ],
-    CFLAGS='$CFLAGS -Ilibs/include/c/ ',
+    CFLAGS='$CFLAGS -Ilibs/include/c/ -Iapp/gui/',
     LINKFLAGS= '$LINKFLAGS --entry main -Tuser.ld')
+
+env.Objcopy('microui.elf','microui',OBJCOPYFLAGS='-S')
+env.Objcopy('microui.dbg','microui.elf',OBJCOPYFLAGS='--only-keep-debug')
+
 
