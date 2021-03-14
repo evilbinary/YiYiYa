@@ -16,5 +16,11 @@ env.Library('c', [
     'stdlib.c',
     'syscall.c',
     'errno.c',
-    'ctype.c'
+    'ctype.c',
+    'support.c',
+    'unistd.c',
+    'fcntl.c',
+    'setjmp.c',
+    'liballoc.c',
+    'yiyiya.c'
 ],CFLAGS='$CFLAGS -Ilibs/include/c/')

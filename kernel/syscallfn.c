@@ -110,7 +110,7 @@ size_t sys_read(u32 fd, void* buf, size_t nbytes) {
   return ret;
 }
 
-size_t sys_seek(u32 fd, u32 offset) {
+size_t sys_seek(u32 fd, ulong offset) {
   fd_t* f = find_fd(fd);
   if (f == NULL) {
     kprintf("read not found fd %d\n", fd);
@@ -129,31 +129,40 @@ void sys_exit(int status) {
   thread_remove(current);
 }
 
-void* sys_alloc(size_t size) { return kmalloc(size); }
-
-void sys_free(void* ptr) { kfree(ptr); }
-
-void* sys_alloc_alignment(size_t size, u32 alignment) {
-  return kmalloc_alignment(size, alignment);
+void* sys_vmalloc(size_t size) {
+  thread_t* current = thread_current();
+  vmemory_area_t* area = vmemory_area_create(
+      current->vmm->vaddr + current->vmm->size, size, MEMORY_HEAP);
+  vmemory_area_add(current->vmm, area);
+  return area->vaddr;
 }
 
-void sys_free_alignment(void* ptr) { kfree_alignment(ptr); }
-
-void* sys_valloc(void* addr,size_t size){
-  return valloc(addr,size);
+void* sys_vmheap() {
+  thread_t* current = thread_current();
+  return current->vmm->vaddr;
 }
 
-void sys_vfree(void* addr){
-  vfree(addr);
+void sys_vmfree(void* ptr, size_t size) {
+  thread_t* current = thread_current();
+  vmemory_area_t* area = vmemory_area_find(current->vmm, ptr, size);
+  if (area == NULL) return;
+  vmemory_area_free(area);
 }
+
+void* sys_valloc(void* addr, size_t size) { return valloc(addr, size); }
+
+void sys_vfree(void* addr) { 
+  //todo
+  //vfree(addr);
+ }
 
 void* load_elf(Elf32_Ehdr* elf_header, u32 fd, page_dir_t* page) {
   // printf("e_phnum:%d\n\r", elf_header->e_phnum);
   u32 offset = elf_header->e_phoff;
-  Elf32_Phdr* phdr =
-      syscall1(SYS_ALLOC, sizeof(Elf32_Phdr) * elf_header->e_phnum);
+  Elf32_Phdr* phdr = syscall0(SYS_HEAP);
   syscall2(SYS_SEEK, fd, offset);
-  u32 nbytes = syscall3(SYS_READ, fd, phdr, sizeof(Elf32_Phdr)* elf_header->e_phnum);
+  u32 nbytes =
+      syscall3(SYS_READ, fd, phdr, sizeof(Elf32_Phdr) * elf_header->e_phnum);
   // printf("addr %x elf=%x\n\r", phdr, elf);
   u32 entry = 0;
   for (int i = 0; i < elf_header->e_phnum; i++) {
@@ -171,19 +180,8 @@ void* load_elf(Elf32_Ehdr* elf_header, u32 fd, page_dir_t* page) {
         char* start = phdr[i].p_offset;
         char* vaddr = phdr[i].p_vaddr;
         syscall2(SYS_SEEK, fd, start);
-        
-        // char* buf=syscall2(SYS_VALLOC,vaddr,phdr[i].p_filesz);
-        // u32 ret = syscall3(SYS_READ, fd, buf, phdr[i].p_filesz);
-        // kmemmove(buf, buf + 10, phdr[i].p_filesz);
-
-        // printf("load start:%x vaddr:%x size:%x \n\r", start, vaddr,
-        //        phdr[i].p_filesz);
-        char* buf =
-            syscall2(SYS_ALLOC_ALIGNMENT, phdr[i].p_filesz, phdr[i].p_align);
-        entry = buf;
-        u32 ret = syscall3(SYS_READ, fd, buf, phdr[i].p_filesz);
-        map_alignment(page, vaddr, buf, phdr[i].p_memsz);
-        // kmemmove(vaddr+nbytes, buf, ret);
+        entry = vaddr;
+        u32 ret = syscall3(SYS_READ, fd, vaddr, phdr[i].p_filesz);
       } break;
       // case PT_DYNAMIC:
       //   printf(" %s %x %x %x\r\n %s %x %x ",
@@ -249,16 +247,16 @@ void* load_elf(Elf32_Ehdr* elf_header, u32 fd, page_dir_t* page) {
         break;
     }
   }
-  //data
+  // data
   offset = elf_header->e_shoff;
-  Elf32_Shdr* shdr = syscall1(SYS_ALLOC,sizeof(Elf32_Shdr) * elf_header->e_shnum);
-  syscall2(SYS_SEEK,fd, offset);
-  nbytes = syscall3(SYS_READ,fd, shdr, sizeof(Elf32_Shdr) * elf_header->e_shnum);
+  Elf32_Shdr* shdr = syscall0(SYS_HEAP);
+  syscall2(SYS_SEEK, fd, offset);
+  nbytes =
+      syscall3(SYS_READ, fd, shdr, sizeof(Elf32_Shdr) * elf_header->e_shnum);
   for (int i = 0; i < elf_header->e_shnum; i++) {
     if (SHT_NOBITS == shdr[i].sh_type) {
-      //char* buf = syscall2(SYS_ALLOC_ALIGNMENT,shdr[i].sh_size, shdr[i].sh_addralign);
       char* vaddr = shdr[i].sh_addr;
-      //map_alignment(page,vaddr,buf,shdr[i].sh_size);
+      // map_alignment(page,vaddr,buf,shdr[i].sh_size);
     } else if (elf_header->e_entry != shdr[i].sh_addr &&
                SHT_PROGBITS == shdr[i].sh_type &&
                shdr[i].sh_flags & SHF_ALLOC && shdr[i].sh_flags) {
@@ -266,12 +264,9 @@ void* load_elf(Elf32_Ehdr* elf_header, u32 fd, page_dir_t* page) {
       char* vaddr = shdr[i].sh_addr;
       // kprintf("load start:%x vaddr:%x size:%x \n\r", start, vaddr,
       //        phdr[i].p_filesz);
-      syscall2(SYS_SEEK,fd, start);
-      //char* buf = syscall2(SYS_ALLOC_ALIGNMENT,shdr[i].sh_size, shdr[i].sh_addralign);
-      // char* buf = kmalloc(phdr[i].p_filesz);
-      u32 phyaddr=virtual_to_physic(page,vaddr);
-      u32 ret = syscall3(SYS_READ,fd, phyaddr, shdr[i].sh_size);
-      //map_alignment(page,vaddr,buf,shdr[i].sh_size);
+      syscall2(SYS_SEEK, fd, start);
+      u32 ret = syscall3(SYS_READ, fd, vaddr, shdr[i].sh_size);
+      // map_alignment(page,vaddr,buf,shdr[i].sh_size);
     }
   }
   return entry;
@@ -281,12 +276,13 @@ void do_run_elf_thread() {
   Elf32_Ehdr elf;
   thread_t* current = thread_current();
   exec_t* exec = current->data;
-  kprintf("load elf %s\n", exec->filename);
   u32 fd = syscall2(SYS_OPEN, exec->filename, 0);
+  kprintf("load elf %s fd:%d\n", exec->filename, fd);
   if (fd < 0) {
     kprintf("open elf %s error\n", exec->filename);
     return;
   }
+
   u32 nbytes = syscall3(SYS_READ, fd, &elf, sizeof(Elf32_Ehdr));
   Elf32_Ehdr* elf_header = (Elf32_Ehdr*)&elf;
   u32* kentry = 0;
@@ -303,17 +299,36 @@ void do_run_elf_thread() {
 }
 
 u32 sys_exec(char* filename, char* const argv[]) {
-  exec_t* data = kmalloc(sizeof(exec_t));
-  data->filename = filename;
-  data->argv = argv;
-  thread_t* t = thread_create((u32*)&do_run_elf_thread, data);
-
+  thread_t* t = thread_create((u32*)&do_run_elf_thread, NULL);
   context_t* context = &t->context;
   u64* page_dir_ptr_tab = kmalloc_alignment(sizeof(u64) * 4, 0x1000);
-  page_clone(t->context.page_dir, page_dir_ptr_tab);
+
+  page_clone_user(t->context.kernel_page_dir, page_dir_ptr_tab);
   // init 2GB
-  map_2gb(page_dir_ptr_tab);
+  map_2gb(page_dir_ptr_tab, PAGE_P | PAGE_USU | PAGE_RWW);
   context->page_dir = page_dir_ptr_tab;
+
+  // init vmm
+  t->vmm = vmemory_area_create(HEAP_ADDR, MEMORY_CREATE_SIZE, MEMORY_HEAP);
+  vmemory_area_t* vmexec =
+      vmemory_area_create(EXEC_ADDR, MEMORY_EXEC_SIZE, MEMORY_EXEC);
+  vmemory_area_add(t->vmm, vmexec);
+  vmemory_area_t* vmdata =
+      vmemory_area_create(DATA_ADDR, PAGE_SIZE, MEMORY_DATA);
+  vmemory_area_add(t->vmm, vmdata);
+
+  // init data
+  void* paddr = kmalloc_alignment(sizeof(exec_t), PAGE_SIZE);
+  map_page_on(t->context.page_dir, vmdata->vaddr, paddr,
+              PAGE_P | PAGE_USU | PAGE_RWW);
+  exec_t* data = paddr;
+  kstrcpy(data->filename, filename);
+  data->argv = argv;
+  t->data = vmdata->vaddr;
+
+  // init stack
+  kfree(t->stack3);
+  t->stack3 = t->vmm->vaddr;
 
   thread_run(t);
   return 0;

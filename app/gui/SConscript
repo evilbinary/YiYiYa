@@ -16,15 +16,20 @@ env = env.Clone(
   PATH= [os.environ['PATH'],'/opt/local/bin' ],
   )
 
-env.Program('gui.elf', [
-    'main.c',
-    'screen.c',
-    '../../libs/libc/libc.a',
-    ],
-    CFLAGS='$CFLAGS -Ilibs/include/c/ ',
-    LINKFLAGS= '$LINKFLAGS --entry main -Tuser.ld')
-
 env.Library('gui', [
     'screen.c',
     '../../libs/libc/libc.a',
 ],CFLAGS='$CFLAGS -Ilibs/include/c/')
+
+env.Program('gui.elf', [
+    'main.c',
+    'jpeg_decoder.c',
+    'libgui.a',
+    '../jpeg/libjpeg.a',
+    '../../libs/libc/libc.a',
+    ],
+    CFLAGS='$CFLAGS -Ilibs/include/c/',
+    LINKFLAGS= '$LINKFLAGS --entry main -Tuser.ld')
+
+# env.Objcopy('gui.elf','gui',OBJCOPYFLAGS='-S --strip-all')
+#env.Objcopy('gui.dbg','gui.elf',OBJCOPYFLAGS='--only-keep-debug')

@@ -41,7 +41,7 @@ void map_page(u32 virtualaddr, u32 physaddr, u32 flags) {
   // page_tab_ptr[offset] = (u32)physaddr | (flags & 0xFFF);
 }
 
-void map_page_on(page_dir_t* page,u32 virtualaddr, u32 physaddr, u32 flags) {
+void map_page_on(page_dir_t* page, u32 virtualaddr, u32 physaddr, u32 flags) {
   u32 pdpte_index = (u32)virtualaddr >> 30 & 0x03;
   u32 pde_index = (u32)virtualaddr >> 21 & 0x01FF;
   u32 pte_index = (u32)virtualaddr >> 12 & 0x01FF;
@@ -63,6 +63,33 @@ void map_page_on(page_dir_t* page,u32 virtualaddr, u32 physaddr, u32 flags) {
   // page_tab_ptr[offset] = (u32)physaddr | (flags & 0xFFF);
 }
 
+void unmap_page_on(page_dir_t* page, u32 virtualaddr) {
+  u32 pdpte_index = (u32)virtualaddr >> 30 & 0x03;
+  u32 pde_index = (u32)virtualaddr >> 21 & 0x01FF;
+  u32 pte_index = (u32)virtualaddr >> 12 & 0x01FF;
+  u32 offset = (u32)virtualaddr & 0x0FFF;
+  // kprintf("pdpte_index=>%d pde_index=%d  pte_index=%d\n", pdpte_index,
+  //         pde_index, pte_index);
+
+  u64* page_dir_ptr = (u64)page[pdpte_index] & ~0xFFF;
+  if (page_dir_ptr != NULL) {
+    page[pdpte_index] = 0;
+  }
+  u64* page_tab_ptr = (u64)page_dir_ptr[pde_index] & ~0xFFF;
+  if (page_tab_ptr != NULL) {
+    page_dir_ptr[pde_index] = 0;
+  }
+  if (page_tab_ptr != NULL) {
+    page_tab_ptr[pte_index] = 0;
+  }
+  if (page_dir_ptr != NULL) {
+    mm_free_align(page_dir_ptr);
+  }
+  if (page_tab_ptr != NULL) {
+    mm_free_align(page_tab_ptr);
+  }
+}
+
 void mm_test() {
   // map_page(0x90000,0x600000,3);
   // 0xfd000000
@@ -76,21 +103,37 @@ void mm_test() {
   // }
 }
 
-void map_addr(u32 addr){
+void map_mem_block(u32 addr) {
   mem_block_t* p = block_available;
   for (; p != NULL; p = p->next) {
-    if(p->addr>addr){
-      map_page(p->addr,p->addr,PAGE_P | PAGE_USU | PAGE_RWW);
-      u32 address=p->addr;
-      for(int i=0;i<p->size/0x1000;i++){
-        map_page(address,address,PAGE_P | PAGE_USU | PAGE_RWW);
-        kprintf("map addr %x %x\n",address,address);
-        address+=0x1000;
+    if (p->addr > addr) {
+      // map_page(p->addr,p->addr,PAGE_P | PAGE_USU | PAGE_RWW);
+      u32 address = p->addr;
+      for (int i = 0; i < p->size / 0x1000; i++) {
+        map_page(address, address, PAGE_P | PAGE_USU | PAGE_RWW);
+        kprintf("map addr %x %x\n", address, address);
+        address += 0x1000;
       }
     }
   }
 }
 
+void unmap_mem_block(u32* page, u32 addr) {
+  for (int i = 0; i < boot_info->memory_number; i++) {
+    memory_info_t* mem = (memory_info_t*)&boot_info->memory[i];
+    if (mem->type != 1) {  // normal ram
+      continue;
+    }
+    if (mem->base > addr) {
+      u32 address = mem->base;
+      for (int i = 0; i < mem->length / 0x1000; i++) {
+        unmap_page_on(page, address);
+        kprintf("unmap addr %x %x\n", address, address);
+        address += 0x1000;
+      }
+    }
+  }
+}
 
 void mm_init() {
   boot_info->pdt_base = (ulong)page_dir_ptr_tab;
@@ -103,6 +146,7 @@ void mm_init() {
   page_dir_ptr_tab[0] = (u32)page_dir | PAGE_P;
 
   page_dir[0] = (u32)page_tab | (PAGE_P | PAGE_USU | PAGE_RWW);
+  // map 0-0x200000 2GB
   unsigned int i, address = 0;
   kprintf("start 0x%x ", address);
   for (i = 0; i < 512; i++) {
@@ -113,14 +157,13 @@ void mm_init() {
 
   // mm init
   mm_alloc_init();
-  //map > 4GB addr
-  map_addr(address);
+  // map > 4GB addr
+  map_mem_block(address);
 
   // move to new addr
   // boot_info_t *new_boot=kmalloc(sizeof(boot_info_t));
   // *new_boot=*boot_info;
   // boot_info=new_boot;
- 
 }
 
 void mm_alloc_init() {
@@ -141,7 +184,7 @@ void mm_alloc_init() {
     if (boot_info >= mem->base && mem->base < boot_end) {
       addr = boot_end;
       len = len - (addr - mem->base);
-    } else if (kernel_start>= mem->base   && mem->base < kernel_end) {
+    } else if (kernel_start >= mem->base && mem->base < kernel_end) {
       addr = kernel_end;
       len = len - (addr - mem->base);
     }
@@ -155,7 +198,7 @@ void mm_alloc_init() {
       block_available_tail = block;
     } else {
       block_available_tail->next = block;
-      block_available_tail=block;
+      block_available_tail = block;
     }
   }
 }
@@ -199,14 +242,13 @@ void mm_dump_print(mem_block_t* p) {
   }
   kprintf("------------\n");
   kprintf("total ");
-  if(use>0){
-    kprintf(" use: %dkb ", use/1024);
+  if (use > 0) {
+    kprintf(" use: %dkb ", use / 1024);
   }
-  if(free>0){
-    kprintf(" free: %dkb ",free/1024);
+  if (free > 0) {
+    kprintf(" free: %dkb ", free / 1024);
   }
   kprintf("\n");
-  
 }
 
 void mm_dump() {
@@ -226,48 +268,49 @@ void* mm_alloc(size_t size) {
     if ((p->type != MEM_FREE)) {
       continue;
     }
-  //kprintf("pre_alloc_size:%d p->size:%d\n",pre_alloc_size,p->size);
-  if ((pre_alloc_size) <= p->size) {
+    // kprintf("pre_alloc_size:%d p->size:%d\n",pre_alloc_size,p->size);
+    if ((pre_alloc_size) <= p->size) {
       mem_block_t* new_block = (mem_block_t*)p->addr;
-      if(new_block==NULL) continue;
-      p->addr+=pre_alloc_size;
-      p->size-=pre_alloc_size;
+      if (new_block == NULL) continue;
+      p->addr += pre_alloc_size;
+      p->size -= pre_alloc_size;
 
-      new_block->addr=new_block+sizeof(mem_block_t);
-      new_block->size=size;
-      new_block->next=NULL;
-      new_block->type=MEM_USED;
-      
-      if(block_alloc_head==NULL){
-        block_alloc_head=new_block;
-        block_alloc_tail=new_block;
-      }else{
-        block_alloc_tail->next=new_block;
-        block_alloc_tail=new_block;
+      new_block->addr = new_block + sizeof(mem_block_t);
+      new_block->size = size;
+      new_block->next = NULL;
+      new_block->type = MEM_USED;
+
+      if (block_alloc_head == NULL) {
+        block_alloc_head = new_block;
+        block_alloc_tail = new_block;
+      } else {
+        block_alloc_tail->next = new_block;
+        block_alloc_tail = new_block;
       }
       count++;
       // kprintf("alloc %d: %x %d\n",count,new_block->addr,new_block->size);
-      //mm_dump();
+      // mm_dump();
       // mm_dump_print(block_available);
       return (void*)new_block->addr;
     }
   }
-  kprintf("erro alloc size %d kb\n", size/1024);
-  for(;;);
+  kprintf("erro alloc size %d kb\n", size / 1024);
+  for (;;)
+    ;
   mm_dump();
   return NULL;
 }
 
 void mm_free(void* addr) {
-  if(addr==NULL) return;
+  if (addr == NULL) return;
   mem_block_t* block = (mem_block_t*)((u32)addr);
-  if(block->addr==0){
-    kprintf("mm free error %x\n",addr);
+  if (block->addr == 0) {
+    kprintf("mm free error %x\n", addr);
   }
-  block->next=NULL;
-  block->type=MEM_FREE;
-  block_available_tail->next=block;
-  block_available_tail=block;
+  block->next = NULL;
+  block->type = MEM_FREE;
+  block_available_tail->next = block;
+  block_available_tail = block;
 }
 
 u32 mm_get_size(void* addr) {

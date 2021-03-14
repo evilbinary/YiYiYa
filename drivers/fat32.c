@@ -41,7 +41,7 @@ dir_entry_t *fat32_find_file_entry(fat32_info_t *fat32, char *name) {
   kstrncpy(pre_name, name, len - 4);
   for (int i = 0; i < fat32->entries_number; i++) {
     dir_entry_t *e = &fat32->entries[i];
-    //kprintf("%s==%s\n",pre_name,e->name);
+    // kprintf("%s==%s\n",pre_name,e->name);
     if (kstrncmp(pre_name, e->name, 8) == 0 && kstrncmp(s, e->ext, 3) == 0) {
       return e;
     }
@@ -53,11 +53,11 @@ fat32_t *fat32_next_fat(vnode_t *node, u32 cluster, u32 *cluster_n_offset) {
   static fat32_t *fat_entry = NULL;
   if (fat_entry == NULL) {
     // fat_entry = mm_alloc_zero_align(512, 0x1000);
-    fat_entry=kmalloc(512);
+    fat_entry = kmalloc(512);
   }
   // read entry
   if (cluster >= (*cluster_n_offset)) {
-    u32 read_offset = fat32_info->fat1 + sizeof(fat32_t) * (cluster );
+    u32 read_offset = fat32_info->fat1 + sizeof(fat32_t) * (cluster);
     memset(fat_entry, 0, 512);
     read(node, read_offset, 512, fat_entry);
     *cluster_n_offset = cluster;
@@ -80,29 +80,46 @@ u32 fat32_read(vnode_t *node, u32 offset, size_t nbytes, u8 *buffer) {
     read_buffer = kmalloc(bytes);
     //  read_buffer=mm_alloc_zero_align(bytes, 0x1000);
   }
+#ifdef DEUBG
+  kprintf("read %s ", name);
+#endif
   fat32_t first_cluster =
-      (e->start_file_cluster_hight << 16) | e->start_file_cluster_low;
+      ((e->start_file_cluster_hight << 16) | e->start_file_cluster_low);
   fat32_t *fat = &first_cluster;
   u32 total_bytes = 0;
   u32 cluster_n_offset = 0;
+  u32 n_cluster = 0;
+
+  u32 read_offset = fat32_info->data +
+                    ((*fat) - 2) * fat32_info->vbr->sector_per_cluster *
+                        fat32_info->vbr->byte_per_sector +
+                    offset;
   while (!FAT32_CLUSTER_IS_EOF(*fat) && *fat != 0 && total_bytes < nbytes) {
-    u32 read_offset = fat32_info->data +
-                      ((*fat) - 2) * fat32_info->vbr->sector_per_cluster *
-                          fat32_info->vbr->byte_per_sector +
-                      offset;
-    memset(read_buffer, 0, bytes);
-    u32 ret = read(node, read_offset, bytes, read_buffer);
-    if (nbytes < bytes) {
-      kmemmove(buffer + total_bytes, read_buffer, nbytes);
-      total_bytes += nbytes;
-    } else {
-      kmemmove(buffer + total_bytes, read_buffer, ret);
-      total_bytes += ret;
+    // if (((fat32_info->bytes_per_cluster+ offset) /
+    // fat32_info->bytes_per_cluster-1) <= n_cluster) {
+    if ((offset / fat32_info->bytes_per_cluster) <= n_cluster) {
+      memset(read_buffer, 0, bytes);
+      u32 ret = read(node, read_offset, bytes, read_buffer);
+      if ((nbytes-total_bytes) >= bytes) {
+        kmemmove(buffer + total_bytes, read_buffer, bytes);
+        total_bytes += bytes;
+        read_offset += bytes;
+      } else {
+        u32 rest = nbytes-total_bytes;
+        kmemmove(buffer + total_bytes, read_buffer, rest);
+        total_bytes += rest;
+        read_offset += rest;
+      }
     }
-    //kprintf("%d->",(*fat));
+#ifdef DEUBG
+    kprintf("%d->", (*fat));
+#endif
     fat = fat32_next_fat(node, *fat, &cluster_n_offset);
+    n_cluster++;
   }
-  // kprintf("=end\n");
+#ifdef DEUBG
+  kprintf("=end total:%d\n", total_bytes);
+#endif
   return total_bytes;
 }
 
@@ -126,7 +143,7 @@ vnode_t *fat32_find(vnode_t *node, char *name) {
     kprintf("find file %s error\n", name);
     return NULL;
   }
-  //kprintf("find cluster:%d\n",e->start_file_cluster_low);
+  // kprintf("find cluster:%d\n",e->start_file_cluster_low);
   vnode_t *file = vfs_create(name, V_FILE);
   file->data = e;
   file->device = node->device;

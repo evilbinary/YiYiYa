@@ -32,6 +32,8 @@ void thread_init(thread_t* thread, void* entry, u32* stack0, u32* stack3) {
   thread->priority = 1;
   thread->counter = 0;
   thread->state = THREAD_CREATE;
+  thread->stack0 = stack0;
+  thread->stack3 = stack3;
   context_init(&thread->context, (u32*)entry, stack0, stack3, USER_MODE);
 }
 
@@ -62,10 +64,22 @@ void thread_remove(thread_t* thread) {
       t = v->next;
       v->next = t->next;
       t->state = THREAD_STOPPED;
+      thread_destroy(thread);
       break;
       // kprintf("addr:%x state:%d p:%d",v,v->state,v->priority);
     }
   }
+}
+
+void thread_destroy(thread_t* thread) {
+  if (thread == NULL) return;
+  if (thread->stack0 != NULL) {
+    // kfree(thread->stack0);
+  }
+  if (thread->stack3 != NULL) {
+    // kfree(thread->stack3);
+  }
+  kfree(thread);
 }
 
 thread_t* thread_find(thread_t* thread) {

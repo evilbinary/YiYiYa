@@ -4,9 +4,10 @@
 
 #include "stddef.h"
 
-void *malloc(unsigned long size);
-void free(void *addr);
-void * realloc (void *block,unsigned long size);
+#include "liballoc.h"
+// void *malloc(unsigned long size);
+// void free(void *addr);
+// void * realloc (void *block,unsigned long size);
 
 
 

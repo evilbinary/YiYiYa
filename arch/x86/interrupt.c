@@ -52,9 +52,9 @@ void interrupt_init() {
 
 void timer_init(int hz) {
   unsigned int divisor = 1193180 / hz;
-  io_write8(0x36, 0x43);
-  io_write8(divisor & 0xff, 0x40);
-  io_write8(divisor >> 8, 0x40);
+  io_write8(0x43,0x36);
+  io_write8(0x40,divisor & 0xff);
+  io_write8(0x40,divisor >> 8);
   io_write8(0x21,io_read8(0x21) & 0xfe);
 }
 

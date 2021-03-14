@@ -22,6 +22,7 @@ env.Library('yiyiya', [
     'syscallfn.c',
     'devcallfn.c',
     '../arch/libarch.a',
+    '../libs/libalgorithm/libalgorithm.a',
     '../libs/libkernel/libkernel.a',
     ]
     )

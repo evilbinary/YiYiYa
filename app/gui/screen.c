@@ -248,6 +248,9 @@ i32 screen_get_poi32_color(i32 x, i32 y) {
 }
 
 void screen_draw_vline(i32 x1, i32 x2, i32 y, i32 color) {
+  if (y > gscreen.height || y < 0) {
+    return;
+  }
   register i32 i;
   i32 start_pos, end_pos;
   start_pos = y * gscreen.width + x1;
@@ -366,6 +369,9 @@ void screen_draw_char(i32 x, i32 y, u16 ch) {
 
 void screen_draw_char_witdh_color(i32 x, i32 y, u16 ch, u32 frcolor,
                                   u32 bgcolor) {
+  if (y < 0 || y > gscreen.height) {
+    return 0;
+  }
   u32 i, j;
   u16 code, z;
   u8 *lp;
@@ -458,6 +464,36 @@ i32 screen_change_color_form_555_to_565(i32 color_form_555) {
   return u1.color;
 }
 
+void screen_show_bitmap(i32 x, i32 y, i32 width, i32 height, bitmap_t *bitmap) {
+  i32 desi, desj, srci, srcj;
+  if(bitmap==NULL){
+    return;
+  }
+  if (bitmap->bitperpixel == 16) {
+    u16 *p16 = (u16 *)(gscreen.buffer);
+    u16 *p16src = (u16 *)(bitmap->bits);
+    for (srci = x, desi = x; desi < (x + width) && srci < (x + width);
+         desi++, srci++) {
+      for (srcj = y, desj = y; desj < (y + height) && srcj < (y + height);
+           desj++, srcj++) {
+        p16[(desj * width) + desi] = p16src[srcj * width + srci];
+      }
+    }
+  } else if (bitmap->bitperpixel == 32) {
+    u32 *p32des = NULL;
+    u32 *p32src = NULL;
+    int i, j;
+    for (j = 0; j < height && j < height; j++) {
+      p32src = (u32 *)(bitmap->bits) + (y + j) * bitmap->w + x;
+      p32des = (u32 *)(gscreen.buffer) + (y + j) * bitmap->w + x;
+      for (i = 0; i < width && i < width; i++) {
+        // screen_put_pixel(i,j,p32src[i]);
+        p32des[i] = p32src[i];
+      }
+    }
+  }
+}
+
 // 显示 pbmp 格式的图片
 void screen_show_bmp_picture(i32 x, i32 y, void *bmp_addr, i32 mask_color,
                              i32 dose_use_mask_color) {
@@ -465,7 +501,7 @@ void screen_show_bmp_picture(i32 x, i32 y, void *bmp_addr, i32 mask_color,
   struct bmp_bmp_head_struct *bmp_head = (struct bmp_bmp_head_struct *)bmp_addr;
   i32 width = bmp_head->info_head.width;
   i32 height = bmp_head->info_head.height;
-
+  if(width<0||height<0) return;
   // 下面记算存储每个点的色彩的信息所在的位置
   i32 *color = (i32 *)((i32)bmp_addr + bmp_head->offset);
 
@@ -494,31 +530,34 @@ void screen_show_bmp_picture(i32 x, i32 y, void *bmp_addr, i32 mask_color,
 void screen_init() {
   int fd = syscall2(SYS_OPEN, "/dev/fb", 0);
   gscreen.fd = fd;
-  printf("sizeof(framebuffer_info_t)=%d\n", sizeof(framebuffer_info_t));
   syscall4(SYS_IOCTL, fd, IOC_READ_FRAMBUFFER_INFO, &(gscreen.fb),
            sizeof(framebuffer_info_t));
   gscreen.buffer = gscreen.fb.frambuffer;
   gscreen.width = gscreen.fb.width;
   gscreen.height = gscreen.fb.height;
   gscreen.bpp = gscreen.fb.bpp;
-  gscreen.mouse_fd=syscall2(SYS_OPEN, "/dev/mouse", 0);
+  gscreen.mouse_fd = syscall2(SYS_OPEN, "/dev/mouse", 0);
+  // printf("gscreen.buffer=%x\n", gscreen.buffer);
 }
 
-void screen_read_mouse(mouse_data_t* mouse){
+void screen_read_mouse(mouse_data_t *mouse) {
   syscall3(SYS_READ, gscreen.mouse_fd, &gscreen.mouse, sizeof(mouse_data_t));
-  *mouse=gscreen.mouse;
+  *mouse = gscreen.mouse;
 }
 
 screen_info_t *screen_info() { return &gscreen; }
 
 void screen_flush() {
+  if (gscreen.fb.framebuffer_count <= 0) {
+    printf("init screen has some error\n");
+    return;
+  }
   syscall3(SYS_IOCTL, gscreen.fd, IOC_FLUSH_FRAMBUFFER,
            gscreen.fb.framebuffer_index);
-  // gscreen.fb.framebuffer_index=1;
   gscreen.fb.framebuffer_index =
       (++gscreen.fb.framebuffer_index) % gscreen.fb.framebuffer_count;
-  gscreen.buffer = gscreen.fb.frambuffer +
-                   gscreen.width*gscreen.height * gscreen.fb.framebuffer_index;
+  gscreen.buffer = gscreen.fb.frambuffer + gscreen.width * gscreen.height *
+                                               gscreen.fb.framebuffer_index;
 }
 
 void do_screen_thread(void) {
@@ -543,7 +582,7 @@ void do_screen_thread(void) {
     screen_fill_rect(10, 20, 30, 30, 0xff0000);
     screen_printf(200, 10, "hello,YiYiYa");
 
-    syscall3(SYS_READ, fd,&mouse_data,sizeof(mouse_data_t));
+    syscall3(SYS_READ, fd, &mouse_data, sizeof(mouse_data_t));
     screen_printf(10, 100, "%d %d", mouse_data.x, mouse_data.y);
     screen_fill_rect(mouse_data.x, gscreen.height - mouse_data.y, 4, 4,
                      0x00ff00);

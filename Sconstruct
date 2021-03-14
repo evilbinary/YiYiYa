@@ -15,7 +15,7 @@ env = Environment(
                 STRIP="/opt/local/bin/i386-elf-strip",
                 RANLIB='/opt/local/bin/i386-elf-ranlib',
                 OBJCOPY='/opt/local/bin/i386-elf-objcopy',
-                CFLAGS='-march=i486 -I. -I./include -Ilibs/include -g -nostdlib -nostdinc -fno-builtin -m32 -c -std=c99 -std=gnu99 -w',
+                CFLAGS=' -march=i486 -I. -I./include -Ilibs/include -g -nostdlib -nostdinc -fno-builtin -m32 -c -std=c99 -std=gnu99 -w',
                 #PATH= os.environ['PATH'],
                 LIBPATH=['.','../arch/','../driver','../libs/'],
                 LINKFLAGS='-nostdlib -nostartfiles -e start  -g ',
@@ -51,7 +51,8 @@ def generate_kernel_size(env,target,source):
     f = open(file_out, 'w')
     content="""#ifndef %s
 #define %s
-#define KERNEL_SIZE %s
+#define KERNEL_BLOCK_SIZE %s
+#define KERNEL_SIZE
 #endif
 """%(kernel_header,kernel_header,env.get('KERNEL_BLOCK_SIZE'))
     f.write(content)
@@ -67,6 +68,7 @@ env.Append(BUILDERS={
 
 Export('env')
 
+SConscript(dirs=['libs/libalgorithm'], exports='env')
 SConscript(dirs=['arch'], exports='env')
 SConscript(dirs=['kernel'], exports='env')
 SConscript(dirs=['libs/libkernel'], exports='env')

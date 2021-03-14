@@ -1,12 +1,16 @@
-#include "stdint.h"
-#include "stdio.h"
-#include "syscall.h"
 #include "errno.h"
 #include "float.h"
 #include "math.h"
+#include "stdint.h"
+#include "stdio.h"
+#include "syscall.h"
 
-void itoa(char* buf, int base, int d) {
-  char* p = buf;
+void exit(int status) {
+	
+}
+
+void itoa(char *buf, int base, int d) {
+  char *p = buf;
   char *p1, *p2;
   unsigned long ud = d;
   int divisor = 10;
@@ -43,31 +47,31 @@ void itoa(char* buf, int base, int d) {
 
 void abort() {}
 
-void qsort(void* base, size_t n, size_t size,
-           int (*cmp)(const void*, const void*)) {
+void qsort(void *base, size_t n, size_t size,
+           int (*cmp)(const void *, const void *)) {
   void *a, *b, *swap;
   int i, j;
   unsigned int pos = (unsigned int)base;
-  static void* tmp=NULL;
-  static int malloc_size=0;
-  if(size>malloc_size){
-	  if(tmp==NULL){
-	  	tmp=malloc(size);
-	  }else{
-		  free(tmp);
-		  tmp=malloc(size);
-	  }
-	  malloc_size=size;
+  static void *tmp = NULL;
+  static int malloc_size = 0;
+  if (size > malloc_size) {
+    if (tmp == NULL) {
+      tmp = malloc(size);
+    } else {
+      free(tmp);
+      tmp = malloc(size);
+    }
+    malloc_size = size;
   }
 
   // This is actually a bubble sort. It should be a quick sort.
 
   for (i = 0; i < (n - 1); i++) {
-    a = (void*)(pos + i * size);
+    a = (void *)(pos + i * size);
     swap = a;
 
     for (j = i + 1; j < n; j++) {
-      b = (void*)(pos + j * size);
+      b = (void *)(pos + j * size);
       if (cmp(b, swap) < 0) swap = b;
     }
 
@@ -79,103 +83,97 @@ void qsort(void* base, size_t n, size_t size,
     }
   }
 
-  //free(tmp);
+  // free(tmp);
 }
 
-double strtod(const char *str, char **endptr)
-{
-	double number;
-	int exponent;
-	int negative;
-	char *p = (char *) str;
-	double p10;
-	int n;
-	int num_digits;
-	int num_decimals;
-	// Skip leading whitespace
-	while (isspace(*p)) p++;
-	// Handle optional sign
-	negative = 0;
-	switch (*p) 
-	{             
-		case '-': negative = 1; // Fall through to increment position
-		case '+': p++;
-	}
-	number = 0.;
-	exponent = 0;
-	num_digits = 0;
-	num_decimals = 0;
-	// Process string of digits
-	while (isdigit(*p))
-	{
-		number = number * 10. + (*p - '0');
-		p++;
-		num_digits++;
-	}
-	// Process decimal part
-	if (*p == '.') 
-	{
-		p++;
-		while (isdigit(*p))
-		{
-			number = number * 10. + (*p - '0');
-			p++;
-			num_digits++;
-			num_decimals++;
-		}
-		exponent -= num_decimals;
-	}
-	if (num_digits == 0)
-	{
-		errno = ERANGE;
-		return 0.0;
-	}
-	// Correct for sign
-	if (negative) number = -number;
-	// Process an exponent string
-	if (*p == 'e' || *p == 'E') 
-	{
-		// Handle optional sign
-		negative = 0;
-		switch(*++p) 
-		{   
-			case '-': negative = 1;   // Fall through to increment pos
-			case '+': p++;
-		}
-		// Process string of digits
-		n = 0;
-		while (isdigit(*p)) 
-		{   
-			n = n * 10 + (*p - '0');
-			p++;
-		}
-		if (negative) exponent -= n;
-				else exponent += n;
-	}
-	if (exponent < DBL_MIN_EXP  || exponent > DBL_MAX_EXP)
-	{
-		errno = ERANGE;
-		return HUGE_VAL;
-	}
-	// Scale the result
-	p10 = 10.;
-	n = exponent;
-	if (n < 0) n = -n;
-	while (n) 
-	{
-		if (n & 1) 
-		{
-			if (exponent < 0)
-				number /= p10;
-			else
-				number *= p10;
-		}
-		n >>= 1;
-		p10 *= p10;
-	}
+double strtod(const char *str, char **endptr) {
+  double number;
+  int exponent;
+  int negative;
+  char *p = (char *)str;
+  double p10;
+  int n;
+  int num_digits;
+  int num_decimals;
+  // Skip leading whitespace
+  while (isspace(*p)) p++;
+  // Handle optional sign
+  negative = 0;
+  switch (*p) {
+    case '-':
+      negative = 1;  // Fall through to increment position
+    case '+':
+      p++;
+  }
+  number = 0.;
+  exponent = 0;
+  num_digits = 0;
+  num_decimals = 0;
+  // Process string of digits
+  while (isdigit(*p)) {
+    number = number * 10. + (*p - '0');
+    p++;
+    num_digits++;
+  }
+  // Process decimal part
+  if (*p == '.') {
+    p++;
+    while (isdigit(*p)) {
+      number = number * 10. + (*p - '0');
+      p++;
+      num_digits++;
+      num_decimals++;
+    }
+    exponent -= num_decimals;
+  }
+  if (num_digits == 0) {
+    errno = ERANGE;
+    return 0.0;
+  }
+  // Correct for sign
+  if (negative) number = -number;
+  // Process an exponent string
+  if (*p == 'e' || *p == 'E') {
+    // Handle optional sign
+    negative = 0;
+    switch (*++p) {
+      case '-':
+        negative = 1;  // Fall through to increment pos
+      case '+':
+        p++;
+    }
+    // Process string of digits
+    n = 0;
+    while (isdigit(*p)) {
+      n = n * 10 + (*p - '0');
+      p++;
+    }
+    if (negative)
+      exponent -= n;
+    else
+      exponent += n;
+  }
+  if (exponent < DBL_MIN_EXP || exponent > DBL_MAX_EXP) {
+    errno = ERANGE;
+    return HUGE_VAL;
+  }
+  // Scale the result
+  p10 = 10.;
+  n = exponent;
+  if (n < 0) n = -n;
+  while (n) {
+    if (n & 1) {
+      if (exponent < 0)
+        number /= p10;
+      else
+        number *= p10;
+    }
+    n >>= 1;
+    p10 *= p10;
+  }
 
-	if (number == HUGE_VAL) errno = ERANGE;
-	if (endptr) *endptr = p;
+  if (number == HUGE_VAL) errno = ERANGE;
+  if (endptr) *endptr = p;
 
-	return number;
+  return number;
 }

@@ -24,5 +24,6 @@ env.Library('driver', [
     'dma.c',
     '../kernel/libyiyiya.a',
     '../arch/libarch.a',
+    '../libs/libalgorithm/libalgorithm.a',
     '../libs/libkernel/libkernel.a',
     ])

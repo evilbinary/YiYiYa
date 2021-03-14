@@ -22,6 +22,7 @@ typedef struct context_t {
   tss_t* tss;
   u32* page_dir;
   u32* kernel_page_dir;
+  u32 level;
 } context_t;
 
 typedef struct stack_frame {
@@ -34,6 +35,8 @@ void cpu_halt();
 
 #define KERNEL_MODE 0
 #define USER_MODE 3
+#define GET_CPL(x) (((x)&0x03))  //0-3
+
 
 void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
                   u32 level);
@@ -62,6 +65,7 @@ void context_switch(interrupt_context_t* context,context_t** current,
 
 #define cpu_cli() asm("cli")
 #define cpu_sti() asm("sti")
+#define cpu_cpl() (cpu_get_cs()&0x3)
 
 #define context_switch_page(page_dir) asm volatile("mov %0, %%cr3" : : "r" (page_dir))
 

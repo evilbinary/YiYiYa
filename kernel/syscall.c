@@ -19,13 +19,13 @@ static void* syscall_table[SYSCALL_NUMBER] = {&sys_read,
                                               &sys_exec,
                                               &sys_test,
                                               &sys_exit,
-                                              &sys_alloc,
-                                              &sys_free,
-                                              &sys_alloc_alignment,
-                                              &sys_free_alignment,
+                                              &sys_vmalloc,
+                                              &sys_vmfree,
                                               &sys_seek,
                                               &sys_valloc,
-                                              &sys_vfree};
+                                              &sys_vfree,
+                                              &sys_vmheap
+                                              };
 
 INTERRUPT_SERVICE
 void syscall_handler() {
@@ -43,15 +43,15 @@ void* do_syscall(interrupt_context_t* context) {
   if (context->eax >= 0 && context->eax < SYSCALL_NUMBER) {
     void* fn = syscall_table[context->eax];
     if (fn != NULL) {
-      if (current_context != NULL) {
-        current_context->tss->cr3 = current_context->kernel_page_dir;
-        context_switch_page(current_context->kernel_page_dir);
-      }
+      // if (current_context != NULL) {
+      //   current_context->tss->cr3 = current_context->kernel_page_dir;
+      //   context_switch_page(current_context->kernel_page_dir);
+      // }
       sys_fn_call((context), fn);
-      if (current_context != NULL) {
-        current_context->tss->cr3 = current_context->page_dir;
-        context_switch_page(current_context->page_dir);
-      }
+      // if (current_context != NULL) {
+      //   current_context->tss->cr3 = current_context->page_dir;
+      //   context_switch_page(current_context->page_dir);
+      // }
       return context->eax;
     } else {
       kprintf("syscall %x not found\n", context->eax);

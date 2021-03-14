@@ -100,7 +100,7 @@ void qemu_init_device(device_t* dev) {
   qemu_init_mode(pdev, vga, VGA_MODE_1024x768x32);
 
   u32 size = 1024 * 768 * 16;
-  vga->framebuffer_count = 4;
+  vga->framebuffer_count = 3;
   vga->framebuffer_index = 0;
   vga->framebuffer_length = size;
   vga->frambuffer = bar0;

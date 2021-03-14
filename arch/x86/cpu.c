@@ -98,6 +98,12 @@ static inline u32 cpu_get_ip(void) {
   return result;
 }
 
+ulong cpu_get_cs(void) {
+  ulong result;
+  asm volatile("mov %%cs, %%eax" : "=a"(result));
+  return result;
+}
+
 static inline void set_ldt(u16 tss) {
   asm volatile(
       "movw %0, %%ax\n"
@@ -124,7 +130,7 @@ void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
   tss_t* tss = &boot_info->tss[0];
   context->tss = tss;
   context->eip = entry;
-
+  context->level=level;
   u32 cs, ds;
   if (level == 0) {
     cs = GDT_ENTRY_32BIT_CS * GDT_SIZE;

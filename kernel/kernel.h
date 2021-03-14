@@ -16,4 +16,12 @@
 #include "kernel/stdarg.h"
 #include "kernel/ioctl.h"
 
+#define fn_malloc kmalloc
+#define fn_free kfree
+#include "algorithm/circle_queue.h"
+#include "algorithm/queue_pool.h"
+
+void kernel_init();
+void kernel_run();
+
 #endif

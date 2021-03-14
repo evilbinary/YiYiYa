@@ -361,7 +361,9 @@ static size_t ahci_read(device_t* dev, void* buf, size_t len) {
   if(start_rest>0){
     kmemmove(buf,buf+start_rest,len);
   }
-  if(ret==0) return 0;
+  if(ret==0){
+    return -1;
+  }
   return len;
 }
 

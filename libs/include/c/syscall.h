@@ -26,9 +26,10 @@ enum {
     SYS_EXIT,
     SYS_ALLOC,
     SYS_FREE,
-    SYS_ALLOC_ALIGNMENT,
-    SYS_FREE_ALIGNMENT,
-    SYS_SEEK
+    SYS_SEEK,
+    SYS_VALLOC,
+    SYS_VFREE,
+    SYS_HEAP
 };
 
 void* syscall0(u32 num);
