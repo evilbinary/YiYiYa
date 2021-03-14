@@ -4,7 +4,7 @@
  * 邮箱: rootdebug@163.com
  ********************************************************************/
 
-#include "syscallfn.h"
+#include "sysfn.h"
 
 #include "kernel.h"
 #include "kernel/elf.h"

@@ -3,8 +3,8 @@
 * 作者: evilbinary on 01/01/20
 * 邮箱: rootdebug@163.com
 ********************************************************************/
-#ifndef SYSCALLFN_H
-#define SYSCALLFN_H
+#ifndef SYSFN_H
+#define SYSFN_H
 
 #include "kernel.h"
 

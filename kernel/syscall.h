@@ -9,8 +9,8 @@
 #include "arch/arch.h"
 #include "device.h"
 #include "kernel/stdarg.h"
-#include "devcallfn.h"
-#include "syscallfn.h"
+#include "devfn.h"
+#include "sysfn.h"
 
 #define SYSCALL_NUMBER 40
 

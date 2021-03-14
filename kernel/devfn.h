@@ -3,8 +3,8 @@
 * 作者: evilbinary on 01/01/20
 * 邮箱: rootdebug@163.com
 ********************************************************************/
-#ifndef DEVCALLFN_H
-#define DEVCALLFN_H
+#ifndef DEVCFN_H
+#define DEVCFN_H
 
 #include "arch/arch.h"
 
