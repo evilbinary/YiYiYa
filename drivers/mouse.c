@@ -9,11 +9,18 @@
 #include "pic.h"
 
 mouse_device_t mouse_device;
+mouse_event_t event;
 
 static size_t read(device_t* dev, void* buf, size_t len) {
   u32 ret = len;
-  mouse_device_t* data = buf;
-  *data = mouse_device;
+  // mouse_event_t* e = cqueue_peek(mouse_device.events);
+  // if (e == NULL) {
+  //   return 0;
+  // }
+  mouse_event_t* data = buf;
+  *data = event;
+  // cqueue_put(mouse_device.events,e);
+  // kpool_put(e);
   return ret;
 }
 
@@ -39,7 +46,7 @@ void mouse_write(u8 data) {
 void mouse_wait(u8 type) {
   u32 time_out = 1000000;
   for (; time_out > 0; time_out--) {
-    if ((io_read8(MOUSE_STATUS) & (1 + type)) == (1-type) ) {
+    if ((io_read8(MOUSE_STATUS) & (1 + type)) == (1 - type)) {
       break;
     }
   }
@@ -56,8 +63,12 @@ int mouse_init(void) {
   device_add(dev);
   interrutp_regist(ISR_MOUSE, mouse_handler);
 
-  mouse_device.x = 0;
-  mouse_device.y = 0;
+  mouse_device.events = cqueue_create(EVENT_NUMBER, CQUEUE_DROP);
+
+  // for(int i=0;i<EVENT_NUMBER;i++){
+  //   void* e=kpool_poll();
+  //   cqueue_put(mouse_device.events,e);
+  // }
 
   mouse_wait(1);
   // Enable second PS/2 port (only if 2 PS/2 ports supported)
@@ -97,19 +108,25 @@ void do_mouse(interrupt_context_t* context) {
   for (; io_read8(MOUSE_STATUS) & 1;) {
     u8 data = io_read8(MOUSE_DATA);
     if (read_count == 0) {
-      mouse_device.sate = data;
+      event.sate = data;
       state = data;
     } else if (read_count == 1) {
-      mouse_device.x = mouse_device.x + data - ((state << 4) & 0x100);
+      event.x = event.x + data - ((state << 4) & 0x100);
     } else if (read_count == 2) {
-      mouse_device.y = mouse_device.y + data - ((state << 3) & 0x100);
+      event.y = event.y + data - ((state << 3) & 0x100);
 
-      if (mouse_device.x < 0) {
-        mouse_device.x = 0;
+      if (event.x < 0) {
+        event.x = 0;
       }
-      if (mouse_device.y < 0) {
-        mouse_device.y = 0;
+      if (event.y < 0) {
+        event.y = 0;
       }
+      // mouse_event_t* e = kpool_poll();
+      // if(e==NULL){
+      //  mouse_event_t* e=cqueue_poll(mouse_device.events);
+      // }
+      // *e = event;
+      // cqueue_put(mouse_device.events, e);
     }
     read_count = (read_count + 1) % 3;
   }

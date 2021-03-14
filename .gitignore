@@ -5,3 +5,8 @@ boot/x86/init.bin
 boot/**/init
 app/kernel*
 **.elf
+**/*.elf
+**/*.jpg
+**/*.bmp
+**/*.vdi
+**/*.dbg

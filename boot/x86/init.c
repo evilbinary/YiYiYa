@@ -122,7 +122,7 @@ void init_boot_info() {
   boot_info->version = 0x01;
   boot_info->kernel_origin_base = KERNEL_ORIGIN_BASE;
   boot_info->kernel_base = KERNEL_BASE;
-  boot_info->kernel_size = KERNEL_SIZE*READ_BLOCK_SIZE;
+  boot_info->kernel_size = KERNEL_BLOCK_SIZE*READ_BLOCK_SIZE;
   boot_info->gdt_base = gdts;
   boot_info->gdt_number = GDT_NUMBER;
   boot_info->pdt_base = 0x4000;
@@ -166,10 +166,10 @@ u8 disk_read(u32 disk, u32 head, u32 cylinder, u32 sector, u32 number, u32 addr,
       "setc	%0  \n"
       : "=qm"(carry), "=qm"(*status)
       : "a"(0x0200 | number),
-        "b"(addr&0xffff),
+        "b"((addr&0xffff)),
         "ES"((addr>>16)&0xffff),
-        "c"(cylinder << 8 | sector&0xff),
-        "d"(head << 8 | disk));
+        "c"( (cylinder << 8) | sector&0xff),
+        "d"( (head << 8) | disk));
   return carry;
 }
 
@@ -177,13 +177,13 @@ u8 buff[READ_BLOCK_SIZE];
 
 u8 disk_read_lba(u32 lba, u32 addr, u8* status) {
   u32 cylinder = lba / (boot_info->disk.spt * boot_info->disk.hpc);
-  u32 head = (lba / boot_info->disk.spt) % boot_info->disk.hpc;
-  u32 sector = (lba % boot_info->disk.spt)+1;
+  u32 head = ((lba %(boot_info->disk.hpc* boot_info->disk.spt)) / boot_info->disk.spt);
+  u32 sector = ((lba %(boot_info->disk.hpc* boot_info->disk.spt)) % boot_info->disk.spt+1);
   //todo read by disk type
   u32* p = addr;
   u8 ret = disk_read(0, head, cylinder, sector, 1, buff, status);
   if (ret == 0) {
-    //printf("addr %x ", addr);
+    // printf("addr %x ", addr);
     memmove(addr, buff, READ_BLOCK_SIZE);
   }else{
       printf("\n\rread erro on lba:%x cylinder:%d head:%d sector:%d\n\r", lba, cylinder,head, sector); 
@@ -209,7 +209,7 @@ void read_kernel() {
     #else
     u32 addr = boot_info->kernel_base;
     #endif
-    for (int i = 0; i < KERNEL_SIZE; i++) {
+    for (int i = 0; i < KERNEL_BLOCK_SIZE; i++) {
       // if(i>=20){
       //   u32 *p=0xffff;
       //   printf("i=%d addr=%x\n\r",i,addr);

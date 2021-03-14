@@ -12,10 +12,16 @@
 #define MOUSE_STATUS 0x64
 #define MOUSE_COMMAND 0x64
 
-typedef struct mouse_device {
+#define EVENT_NUMBER 64
+
+typedef struct mouse_event{
   u32 sate;
   i32 x;
   i32 y;
+}mouse_event_t;
+
+typedef struct mouse_device {
+  queue_pool_t* events;
 } mouse_device_t;
 
 #endif

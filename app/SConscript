@@ -18,8 +18,9 @@ env.Program('kernel.elf', [
     'serial.c',
     '../drivers/libdriver.a',
     '../kernel/libyiyiya.a',
-    '../libs/libkernel/libkernel.a',
     '../arch/libarch.a',
+    '../libs/libalgorithm/libalgorithm.a',
+    '../libs/libkernel/libkernel.a',
     ]
     ,LINKFLAGS= '$LINKFLAGS -Tlink.ld')
 
@@ -30,22 +31,15 @@ env.Objcopy('kernel.bin','kernel',OBJCOPYFLAGS='-O binary')
 SConscript(dirs=['hello'], exports='env')
 SConscript(dirs=['gui'], exports='env')
 SConscript(dirs=['microui'], exports='env')
+SConscript(dirs=['jpeg'], exports='env')
+SConscript(dirs=['file'], exports='env')
 
 
 
 if plt=='Darwin':
     env.Command('copyhello', 
-        ['hello/hello.elf' ],
-        ['hdid  image/disk.img &&  cp ${SOURCES[0]} /Volumes/NO\ NAME/ && hdiutil eject /Volumes/NO\ NAME/'
-    ])
-    env.Command('copygui', 
-        ['gui/gui.elf' ],
-        ['hdid  image/disk.img &&  cp ${SOURCES[0]} /Volumes/NO\ NAME/ && hdiutil eject /Volumes/NO\ NAME/'
-    ])
-    #if env.get('w')=='hello':
-    env.Command('copymicroui', 
-        ['microui/microui.elf' ],
-        ['hdid  image/disk.img &&  cp ${SOURCES[0]} /Volumes/NO\ NAME/ && hdiutil eject /Volumes/NO\ NAME/'
+        ['hello/hello.elf','gui/gui.elf','microui/microui.elf','file/file.elf' ],
+        ['hdid  image/disk.img &&  cp ${SOURCES} /Volumes/NO\ NAME/ && hdiutil eject /Volumes/NO\ NAME/'
     ])
     pass
 

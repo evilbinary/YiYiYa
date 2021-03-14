@@ -60,6 +60,14 @@ typedef struct screen_info {
   framebuffer_info_t fb;
 } screen_info_t;
 
+
+typedef struct bitmap {
+  i32 w, h;
+  i32 length;
+  i32 bitperpixel;
+  void* bits;
+} bitmap_t;
+
 #define IOC_MAGIC 'v'
 #define IOC_INIT _IO(IOC_MAGIC, 0)
 #define IOC_READ_REG _IOW(IOC_MAGIC, 1, int)
@@ -109,5 +117,7 @@ i32 screen_change_color_form_555_to_565(i32 color_form_555);
 // 显示 pbmp 格式的图片
 void screen_show_bmp_picture(i32 x, i32 y, void *bmp_addr, i32 mask_color,
                              i32 dose_use_mask_color);
+
+void screen_flush();
 
 #endif

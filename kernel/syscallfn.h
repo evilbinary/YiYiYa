@@ -25,15 +25,14 @@ enum {
     SYS_EXIT,
     SYS_ALLOC,
     SYS_FREE,
-    SYS_ALLOC_ALIGNMENT,
-    SYS_FREE_ALIGNMENT,
     SYS_SEEK,
     SYS_VALLOC,
-    SYS_VFREE
+    SYS_VFREE,
+    SYS_HEAP
 };
 
 typedef struct exec{
-    char* filename;
+    char filename[256];
     char** argv;
 }exec_t;
 
@@ -52,16 +51,18 @@ u32 sys_exec(char* filename,char *const argv[]);
 void sys_test();
 void sys_exit(int status);
 
-void* sys_alloc(size_t size);
+void* sys_vmalloc(size_t size);
 
-void sys_free(void* ptr);
+void sys_vmfree(void* ptr,size_t size);
 
 void* sys_alloc_alignment(size_t size,u32 alignment);
 
 void sys_free_alignment(void* ptr);
-size_t sys_seek(u32 fd, u32 offset);
+size_t sys_seek(u32 fd, ulong offset);
 
 void* sys_valloc(void* addr,size_t size);
 void sys_vfree(void* addr);
+
+void* sys_vmheap();
 
 #endif

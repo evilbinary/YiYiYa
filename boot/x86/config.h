@@ -1,4 +1,5 @@
 #ifndef CONFIG_H
 #define CONFIG_H
-#define KERNEL_SIZE 98
+#define KERNEL_BLOCK_SIZE 106
+#define KERNEL_SIZE
 #endif

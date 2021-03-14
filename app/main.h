@@ -7,8 +7,6 @@
 #define MAIN_H
 
 #include "kernel/kernel.h"
-#include "drivers/ahci.h"
-
 
 extern void start();
 int kmain();

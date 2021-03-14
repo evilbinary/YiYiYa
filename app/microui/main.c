@@ -243,9 +243,9 @@ int main(int argc, char *argv[]) {
       mu_input_mouseup(ctx, mouse.x, screen->height - screen->mouse.y, MU_MOUSE_MIDDLE);
     }
 
-    process_frame(ctx);
+   process_frame(ctx);
     /* render */
-    r_clear(mu_color(bg[0], bg[1], bg[2], 255));
+    r_clear(mu_color(bg[0], bg[1], bg[2], 100));
     mu_Command *cmd = NULL;
     while (mu_next_command(ctx, &cmd)) {
       switch (cmd->type) {

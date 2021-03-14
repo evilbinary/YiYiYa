@@ -34,7 +34,9 @@ void* kmemmove(void* s1, const void* s2, size_t n) {
 
   dest = (char*)s1;
   src = (char*)s2;
-  for (i = 0; i < n; i++) dest[i] = src[i];
+  for (i = 0; i < n; i++) {
+    dest[i] = src[i];
+  }
 
   return s1;
 }

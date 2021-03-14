@@ -7,6 +7,7 @@
 #define THREAD_H
 
 #include "arch/arch.h"
+#include "memory.h"
 
 #define THREAD_CREATE	0
 #define THREAD_RUNNING	1
@@ -22,8 +23,11 @@ typedef struct thread_s{
     int priority;
     int counter;
     int state;
+    void* stack0;
+    void* stack3;
     struct thread_s * next;
     void* data;
+    vmemory_area_t* vmm;
 }thread_t;
 
 

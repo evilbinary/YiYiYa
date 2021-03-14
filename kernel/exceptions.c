@@ -4,6 +4,7 @@
  * 邮箱: rootdebug@163.com
  ********************************************************************/
 #include "exceptions.h"
+
 #include "thread.h"
 
 interrupt_handler_t *exception_handlers[IDT_NUMBER];
@@ -32,31 +33,31 @@ void exception_info(interrupt_context_t *context) {
   asm volatile("movl %%es,	%%eax" : "=a"(es));
   asm volatile("movl %%fs,	%%eax" : "=a"(fs));
   asm volatile("movl %%gs,	%%eax" : "=a"(gs));
-
-  thread_t* current = thread_current();
-  if (context->no < sizeof exception_msg) {
-    kprintf("EXCEPTION %d: %s\n=======================\n", context->no,
-            exception_msg[context->no]);
-  } else {
-    kprintf("INTERRUPT %d\n=======================\n", context->no);
+  if(context->no!=14){
+    thread_t *current = thread_current();
+    if (context->no < sizeof exception_msg) {
+      kprintf("EXCEPTION %d: %s\n=======================\n", context->no,
+              exception_msg[context->no]);
+    } else {
+      kprintf("INTERRUPT %d\n=======================\n", context->no);
+    }
+    if (current != NULL) {
+      kprintf("tid:%d\n", current->id);
+    }
+    kprintf("cs:\t%x\teip:\t%x\teflags:\t%x\n", context->cs, context->eip,
+            context->eflags);
+    kprintf("ss:\t%x\tesp:\t%x\n", context->ss, context->esp);
+    // kprintf("old ss:\t%x\told esp:%x\n", old_ss, old_esp);
+    kprintf("code:%x\tcr2:\t%x\tcr3:\t%x\n", context->no, cr2, cr3);
+    kprintf("General Registers:\n=======================\n");
+    kprintf("eax:\t%x\tebx:\t%x\n", context->eax, context->ebx);
+    kprintf("ecx:\t%x\tedx:\t%x\n", context->ecx, context->edx);
+    kprintf("esi:\t%x\tedi:\t%x\tebp:\t%x\n", context->esi, context->edi,
+            context->ebp);
+    kprintf("Segment Registers:\n=======================\n");
+    kprintf("ds:\t%x\tes:\t%x\n", ds, es);
+    kprintf("fs:\t%x\tgs:\t%x\n", fs, gs);
   }
-   if(current!=NULL){
-    kprintf("tid:%d\n",current->id);
-  }
-  kprintf("cs:\t%x\teip:\t%x\teflags:\t%x\n", context->cs, context->eip,
-          context->eflags);
-  kprintf("ss:\t%x\tesp:\t%x\n", context->ss, context->esp);
-  // kprintf("old ss:\t%x\told esp:%x\n", old_ss, old_esp);
-  kprintf("code:%x\tcr2:\t%x\tcr3:\t%x\n", context->no, cr2, cr3);
-  kprintf("General Registers:\n=======================\n");
-  kprintf("eax:\t%x\tebx:\t%x\n", context->eax, context->ebx);
-  kprintf("ecx:\t%x\tedx:\t%x\n", context->ecx, context->edx);
-  kprintf("esi:\t%x\tedi:\t%x\tebp:\t%x\n", context->esi, context->edi,
-          context->ebp);
-  kprintf("Segment Registers:\n=======================\n");
-  kprintf("ds:\t%x\tes:\t%x\n", ds, es);
-  kprintf("fs:\t%x\tgs:\t%x\n", fs, gs);
-
   if (exception_handlers[context->no] != 0) {
     interrupt_handler_t handler = exception_handlers[context->no];
     handler(context);
@@ -173,13 +174,13 @@ void do_page_fault(interrupt_context_t *context) {
   asm volatile("mov %%cr2, %0" : "=r"(fault_addr));
 
   int present = context->code & 0x1;  // present
-  int rw = context->code & 0x2;          // rw
-  int us = context->code & 0x4;          // user mode
+  int rw = context->code & 0x2;       // rw
+  int us = context->code & 0x4;       // user mode
   int reserved = context->code & 0x8;
   int id = context->code & 0x10;
 
-  kprintf("[");
-  if (present==1) {
+  kprintf("eip:%x cs:%x ds:%x [",context->eip,context->cs,context->ds);
+  if (present == 1) {
     kprintf("present ");
   }
   if (rw) {
@@ -191,20 +192,19 @@ void do_page_fault(interrupt_context_t *context) {
   if (reserved) {
     kprintf("reserved ");
   }
-  kprintf("]  fault_addr:");
+  kprintf("] fault_addr:");
   kprintf("0x%x", fault_addr);
-  kprintf("\n");
 
-  if(present==0){
-    thread_t* current = thread_current();
-    if(current!=NULL){
-      kprintf("current tid: %x\n",current->id);
-      
-    }else{
-      //map_page(fault_addr, fault_addr, PAGE_P | PAGE_USU | PAGE_RWW);
+  if (present == 0) {
+    thread_t *current = thread_current();
+    if (current != NULL) {
+      kprintf(" tid: %x ", current->id);
+      valloc(fault_addr, PAGE_SIZE);
+    } else {
+      map_page(fault_addr, fault_addr, PAGE_P | PAGE_USU | PAGE_RWW);
     }
   }
-  cpu_halt();
+  kprintf("\n");
 }
 
 void exception_init() {

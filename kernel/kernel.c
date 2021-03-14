@@ -6,4 +6,19 @@
 
 #include "kernel.h"
 
+extern void putch(char a);
+extern context_t* current_context;
 
+void kernel_init() {
+  io_add_write_channel(putch);
+  exception_init();
+  syscall_init();
+  cls();
+  schedule_init();
+  module_init();
+  memory_init();
+}
+
+void kernel_run(){
+  context_restore(current_context);
+}
