@@ -6,22 +6,34 @@
 # ********************************************************************
 import os
 import math
-#env = Environment()
-env = Environment(
-                CC = '/opt/local/bin/i386-elf-gcc',
-                LD='/opt/local/bin/i386-elf-ld',
-                CXX='/opt/local/bin/i386-elf-g++',
-                AR= '/opt/local/bin/i386-elf-ar',
-                STRIP="/opt/local/bin/i386-elf-strip",
-                RANLIB='/opt/local/bin/i386-elf-ranlib',
-                OBJCOPY='/opt/local/bin/i386-elf-objcopy',
-                CFLAGS=' -march=i486 -I. -I./include -Ilibs/include -g -nostdlib -nostdinc -fno-builtin -m32 -c -std=c99 -std=gnu99 -w',
-                #PATH= os.environ['PATH'],
-                LIBPATH=['.','../arch/','../driver','../libs/'],
-                LINKFLAGS='-nostdlib -nostartfiles -e start  -g ',
-                OBJCOPYFLAGS='-S -g'
-                  )
+import platform 
+plt = platform.system()
 
+
+env = Environment(
+        CC = '/opt/local/bin/i386-elf-gcc',
+        LD='/opt/local/bin/i386-elf-ld',
+        CXX='/opt/local/bin/i386-elf-g++',
+        AR= '/opt/local/bin/i386-elf-ar',
+        STRIP="/opt/local/bin/i386-elf-strip",
+        RANLIB='/opt/local/bin/i386-elf-ranlib',
+        OBJCOPY='/opt/local/bin/i386-elf-objcopy',
+        CFLAGS=' -march=i486 -I. -I./include -Ilibs/include -g -nostdlib -nostdinc -fno-builtin -m32 -c -std=c99 -std=gnu99 -w',
+        #PATH= os.environ['PATH'],
+        LIBPATH=['.','../arch/','../driver','../libs/'],
+        LINKFLAGS='-nostdlib -nostartfiles -e start  -g ',
+        OBJCOPYFLAGS='-S -g'
+        )
+
+if plt=='Linux':
+    env['CC']='/usr/bin/gcc'
+    env['LD']='/usr/bin/ld'
+    env['CXX']='/usr/bin/g++'
+    env['AR']='/usr/bin/ar'
+    env['STRIP']='/usr/bin/strip'
+    env['RANLIB']='/usr/bin/ranlib'
+    env['OBJCOPY']='/usr/bin/objcopy',
+    pass
 
 def generate_bin(source, target, env, for_signature):
     return '$OBJCOPY %s %s %s'%(env['OBJCOPYFLAGS'],source[0], target[0])
