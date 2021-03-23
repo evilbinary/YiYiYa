@@ -58,16 +58,20 @@ void thread_add(thread_t* thread) {
 
 void thread_remove(thread_t* thread) {
   thread_t* v = head_thread;
-  thread_t* t = NULL;
+  thread->state = THREAD_STOPPED;
+  thread_t* prev = v;
+  if(head_thread==v){
+    head_thread=v->next;
+    thread_destroy(thread);
+    return;
+  }
   for (; v; v = v->next) {
-    if (v->next == thread) {
-      t = v->next;
-      v->next = t->next;
-      t->state = THREAD_STOPPED;
+    if (v == thread) {
+      prev->next=v->next;
       thread_destroy(thread);
       break;
-      // kprintf("addr:%x state:%d p:%d",v,v->state,v->priority);
     }
+    prev=v;
   }
 }
 

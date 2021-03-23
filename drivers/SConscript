@@ -22,8 +22,10 @@ env.Library('driver', [
     'devfs.c',
     'fat32.c',
     'dma.c',
+    'rtc.c',
     '../kernel/libyiyiya.a',
     '../arch/libarch.a',
     '../libs/libalgorithm/libalgorithm.a',
-    '../libs/libkernel/libkernel.a',
-    ])
+    '../libs/libkernel/libkernel.a'
+    ],
+    CFLAGS='$CFLAGS ')

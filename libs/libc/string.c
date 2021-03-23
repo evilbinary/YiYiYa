@@ -205,20 +205,18 @@ size_t strspn(const char* s1, const char* s2) {
   return len1;
 }
 
-char* strstr(const char* s1, const char* s2) {
-  int len1;
-  int len2;
-  int i;
-
-  len2 = strlen(s2);
-  if (len2 == 0) return (char*)s1;
-  len1 = strlen(s1);
-
-  for (i = 0; i < len1; i++) {
-    if (strcmp(s1 + i, s2) == 0) return (char*)(s1 + i);
+char* strstr(const char* haystack, const char* needle) {
+  const char *a = haystack, *b = needle;
+  for (;;) {
+    if (!*b) {
+      return (char*)haystack;
+    } else if (!*a) {
+      return NULL;
+    } else if (*a++ != *b++) {
+      a = ++haystack;
+      b = needle;
+    }
   }
-
-  return NULL;
 }
 
 void* memset(void* s, int c, size_t n) {

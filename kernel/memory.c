@@ -29,9 +29,9 @@ void* kmalloc(size_t size) {
 }
 
 void kfree(void* ptr) {
-  // use_kernel_page();
+  use_kernel_page();
   mm_free(ptr);
-  // use_user_page();
+  use_user_page();
 }
 
 void* kmalloc_alignment(size_t size, int alignment) {
@@ -76,7 +76,7 @@ void vfree(void* addr) {
   if (addr == NULL) return;
   thread_t* current = thread_current();
   void* phy = virtual_to_physic(current->context.page_dir, addr);
-  map_page_on(current->context.page_dir, addr, addr, 0);
+  //unmap_page_on(current->context.page_dir, addr);
   if(phy!=NULL){
     kfree(phy);
   }

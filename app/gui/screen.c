@@ -390,7 +390,9 @@ void screen_draw_char_witdh_color(i32 x, i32 y, u16 ch, u32 frcolor,
         // if(z & 0x80)
         {
           *pp++ = frcolor;
-        } else {
+        } else if(bgcolor==0) {
+          pp++;
+        }else{
           *pp++ = bgcolor;
         }
         // z = z <<1;
@@ -410,7 +412,9 @@ void screen_draw_char_witdh_color(i32 x, i32 y, u16 ch, u32 frcolor,
       for (j = 0; j < 16; j++) {
         if (z & 0x8000) {
           *pp++ = frcolor;
-        } else {
+        } else if(bgcolor==0) {
+          pp++;
+        }else{
           *pp++ = bgcolor;
         }
         z = z << 1;
@@ -465,29 +469,35 @@ i32 screen_change_color_form_555_to_565(i32 color_form_555) {
 }
 
 void screen_show_bitmap(i32 x, i32 y, i32 width, i32 height, bitmap_t *bitmap) {
-  i32 desi, desj, srci, srcj;
-  if(bitmap==NULL){
+  int i, j;
+  int hsrc = bitmap->h;
+  int wsrc = bitmap->w;
+  int hdes = height;
+  int wdes = width;
+  int ysrc = 0;
+  int xsrc = 0;
+  int xdes = x;
+  int ydes = y;
+  if (bitmap == NULL) {
     return;
   }
   if (bitmap->bitperpixel == 16) {
-    u16 *p16 = (u16 *)(gscreen.buffer);
-    u16 *p16src = (u16 *)(bitmap->bits);
-    for (srci = x, desi = x; desi < (x + width) && srci < (x + width);
-         desi++, srci++) {
-      for (srcj = y, desj = y; desj < (y + height) && srcj < (y + height);
-           desj++, srcj++) {
-        p16[(desj * width) + desi] = p16src[srcj * width + srci];
+    u16 *pdes = NULL;
+    u16 *psrc = NULL;
+    for (j = 0; j < hsrc && j < hdes; j++) {
+      psrc = (u16 *)(bitmap->bits) + (ysrc + j) * bitmap->w + xsrc;
+      pdes = (u16 *)(gscreen.buffer) + (ydes + j) * gscreen.width + xdes;
+      for (i = 0; i < wsrc && i < wdes; i++) {
+        pdes[i] = psrc[i];
       }
     }
   } else if (bitmap->bitperpixel == 32) {
     u32 *p32des = NULL;
     u32 *p32src = NULL;
-    int i, j;
-    for (j = 0; j < height && j < height; j++) {
-      p32src = (u32 *)(bitmap->bits) + (y + j) * bitmap->w + x;
-      p32des = (u32 *)(gscreen.buffer) + (y + j) * bitmap->w + x;
-      for (i = 0; i < width && i < width; i++) {
-        // screen_put_pixel(i,j,p32src[i]);
+    for (j = 0; j < hsrc && j < hdes; j++) {
+      p32src = (u32 *)(bitmap->bits) + (ysrc + j) * bitmap->w + xsrc;
+      p32des = (u32 *)(gscreen.buffer) + (ydes + j) * gscreen.width + xdes;
+      for (i = 0; i < wsrc && i < wdes; i++) {
         p32des[i] = p32src[i];
       }
     }
@@ -501,7 +511,7 @@ void screen_show_bmp_picture(i32 x, i32 y, void *bmp_addr, i32 mask_color,
   struct bmp_bmp_head_struct *bmp_head = (struct bmp_bmp_head_struct *)bmp_addr;
   i32 width = bmp_head->info_head.width;
   i32 height = bmp_head->info_head.height;
-  if(width<0||height<0) return;
+  if (width < 0 || height < 0) return;
   // 下面记算存储每个点的色彩的信息所在的位置
   i32 *color = (i32 *)((i32)bmp_addr + bmp_head->offset);
 

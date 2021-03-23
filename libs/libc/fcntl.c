@@ -16,7 +16,7 @@ int open(const char *filename, int flags, ...) {
   mode = va_arg(vargs, mode_t);
   va_end(vargs);
 
-  fd = syscall2(SYS_OPEN, filename, flags);
+  fd = ya_open(filename, flags);
 
   if (fd < 0) return -1;
 

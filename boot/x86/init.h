@@ -6,10 +6,16 @@
 #ifndef INIT_H
 #define INIT_H
 
+#include "arch/arch.h"
+#include "config.h"
+
+
 #define KERNEL_MOVE 
 #define READ_BLOCK_SIZE 512
 #define KERNEL_BASE 0x100000
-#define KERNEL_ORIGIN_BASE 0x6000
+#define KERNEL_ORIGIN_BASE 0x10000
+#define PDT_BASE 0x9000
+#define BOOT_VERSION 0x01
 
 
 #define debugger asm("xchg %bx,%bx\n")

@@ -14,11 +14,11 @@ FILE* stderr = NULL;
 
 int putchar(int ch) {
   if (stdout == NULL) {
-    STDIN.fd = syscall2(SYS_OPEN, "/dev/stdout", 0);
+    STDIN.fd = ya_open("/dev/stdout", 0);
     stdout = &STDIN;
     stderr = stdout;
   }
-  int ret = syscall3(SYS_WRITE, (u32)stdout->fd, &ch, 1);
+  int ret = ya_write((u32)stdout->fd, &ch, 1);
 
   return ret;
 }
@@ -92,7 +92,7 @@ FILE* fopen(const char* filename, const char* mode) {
 
 int fseek(FILE* stream, long int offset, int origin) {
   int rc;
-  rc=syscall2(SYS_SEEK, stream->fd, offset);
+  rc = ya_seek((u32)stream->fd, offset);
   return rc;
 }
 
@@ -106,19 +106,18 @@ size_t fread(void* /* restrict */ ptr, size_t size, size_t nmemb,
   // C99 sanity check.
   if (size == 0) return 0;
   if (nmemb == 0) return 0;
-
-  // For each member...
-  for (i = 0; i < nmemb; i++) {
-    for (j = 0; j < size; j++) {
-      c = fgetc(stream);
-      if ((feof(stream) != 0) || (ferror(stream) != 0)) return i;
-
-      *buffer = (unsigned char)c;
-      buffer++;
+  for (size_t i = 0; i < size; ++i) {
+    size_t r = ya_read(stream->fd, buffer, nmemb);
+    stream->offset += nmemb;
+    fseek(stream, stream->offset, SEEK_SET);
+    if (r < 0) {
+      return -1;
+    }
+    buffer += r;
+    if (r < (int)size) {
+      return i;
     }
   }
-
-  // Apparently successful.
   return nmemb;
 }
 
@@ -154,11 +153,11 @@ int fgetc(FILE* stream) {
   int rc;
   if (feof(stream) != 0) return EOF;
 
-  rc=syscall3(SYS_READ,stream->fd,&c, 1);
+  rc = ya_read(stream->fd, &c, 1);
   stream->offset++;
-  fseek(stream,stream->offset, SEEK_SET);
-  
-  if (rc == EOF||rc ==0) {
+  fseek(stream, stream->offset, SEEK_SET);
+
+  if (rc == EOF || rc == 0) {
     stream->eof = 1;
     return EOF;
   }
@@ -173,22 +172,18 @@ int fgetc(FILE* stream) {
 int fputc(int c, FILE* stream) {
   int rc;
   unsigned char ch = (unsigned char)c;
-
-  /*if ( os_write( stream->data, &ch, 1, &rc ) == NOTIMPLEMENTED )
-                                  os_freakout();
-
-  if ( rc == EOF )
-  {
-          stream->eof = 1;
-          return EOF;
+  rc = ya_write(stream->fd, &ch, 1);
+  stream->offset++;
+  fseek(stream, stream->offset, SEEK_SET);
+  if (rc == EOF) {
+    stream->eof = 1;
+    return EOF;
   }
-  if ( rc != 1 )
-  {
-          /// \todo confirm this action
-          stream->error = 1;
-          return EOF;
+  if (rc != 1) {
+    /// \todo confirm this action
+    stream->error = 1;
+    return EOF;
   }
-  */
   return c;
 }
 

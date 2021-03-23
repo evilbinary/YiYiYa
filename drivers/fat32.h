@@ -16,7 +16,9 @@
                                  (c) == 0xFFFFFFB || (c) == 0xFFFFFFC || (c) == 0xFFFFFFD || \
                                  (c) == 0xFFFFFFE || (c) == 0xFFFFFFF)
 
+#define FAT32_CLUSTER_EOF 0xFFFFFFE
 #define FAT32_ENTRY_MASK  0x0FFFFFFF
+#define FAT32_CLUSTER_FREE 0
 
 typedef struct vbr {
   u8 jmp[3];
@@ -93,10 +95,19 @@ typedef struct fat32_info{
     u32 bytes_per_cluster;
 }fat32_info_t;
 
+typedef struct file_info{
+  dir_entry_t* entry;
+  u32 entry_index;
+}file_info_t;
 
 void fat32_init_op(vnode_t* node);
 int fat32_init(void);
 void fat32_close(vnode_t *node);
 vnode_t *fat32_find(vnode_t *node, char *name);
+u32 fat32_write(vnode_t *node, u32 offset, size_t nbytes, u8 *buffer);
+u32 fat32_read(vnode_t *node, u32 offset, size_t nbytes, u8 *buffer);
+
+size_t fat32_read_bytes(vnode_t *node, u32 offset, size_t nbytes, u8 *buf);
+size_t fat32_write_bytes(vnode_t *node, u32 offset, size_t nbytes, u8 *buf);
 
 #endif

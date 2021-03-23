@@ -101,14 +101,10 @@ int kmemcmp(const void* s1, const void* s2, size_t n) {
   return 0;
 }
 
-int kstrcmp(const char* s1, const char* s2) {
-  char c;
-
-  while (1) {
-    if ((c = *s1 - *s2++) != 0 || !*s1++) break;
-  }
-
-  return c;
+int kstrcmp(const char* l, const char* r) {
+  for (; *l == *r && *l; l++, r++)
+    ;
+  return *(unsigned char*)l - *(unsigned char*)r;
 }
 
 int kstrncmp(const char* s1, const char* s2, size_t n) {
@@ -204,20 +200,18 @@ size_t kstrspn(const char* s1, const char* s2) {
   return len1;
 }
 
-char* kstrstr(const char* s1, const char* s2) {
-  int len1;
-  int len2;
-  int i;
-
-  len2 = kstrlen(s2);
-  if (len2 == 0) return (char*)s1;
-  len1 = kstrlen(s1);
-
-  for (i = 0; i < len1; i++) {
-    if (kstrcmp(s1 + i, s2) == 0) return (char*)(s1 + i);
+char* kstrstr(const char* haystack, const char* needle) {
+  const char *a = haystack, *b = needle;
+  for (;;) {
+    if (!*b) {
+      return (char*)haystack;
+    } else if (!*a) {
+      return NULL;
+    } else if (*a++ != *b++) {
+      a = ++haystack;
+      b = needle;
+    }
   }
-
-  return NULL;
 }
 
 void* kmemset(void* s, int c, size_t n) {
@@ -256,4 +250,55 @@ char* kstrtok(char* restrict s, const char* restrict sep) {
   else
     p = 0;
   return s;
+}
+
+int ktolower(int c) {
+  if ((c >= 'A') && (c <= 'Z')) return (c - 'A' + 'a');
+  return c;
+}
+
+int ktoupper(int c) {
+  if ((c >= 'a') && (c <= 'z')) return (c - 'a' + 'A');
+  return c;
+}
+
+int kstrcasecmp(const char* s1, const char* s2) {
+  while (1) {
+    int a = ktolower(*s1++);
+    int b = ktolower(*s2++);
+    if ((a == b)) {
+      if (a == 0) break;
+      continue;
+    }
+    if (a < b) return -1;
+    return 1;
+  }
+  return 0;
+}
+
+int kstrncasecmp(const char* s1, const char* s2, size_t n) {
+  while (n-- > 0) {
+    int a = ktolower(*s1++);
+    int b = ktolower(*s2++);
+    if ((a == b)) {
+      if (a == 0) break;
+      continue;
+    }
+
+    if (a < b) return -1;
+    return 1;
+  }
+
+  return 0;
+}
+
+char* kstrrstr(const char* haystack, const char* needle) {
+  char* r = NULL;
+  if (!needle[0]) return (char*)haystack + kstrlen(haystack);
+  while (1) {
+    char* p = kstrstr(haystack, needle);
+    if (!p) return r;
+    r = p;
+    haystack = p + 1;
+  }
 }

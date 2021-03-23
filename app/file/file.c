@@ -2,29 +2,41 @@
 
 char* buf = "hello,file\n";
 
-int main(int argc, char* argv[]) {
-  printf(buf);
+void test_read() {
   char* buffer = malloc(512);
   memset(buffer, 0, 512);
   FILE* fp;
-  fp = fopen("/dev/sda/DUCK.JPG", "r+");
-  printf("fd=%d\n", fp->fd);
-  u32 offset = 0;
+  fp = fopen("/dev/sda/duck.jpg", "r+");
+  printf("fd=%d\n", *fp);
+  int offset = 0;
   for (;;) {
     fseek(fp, offset, SEEK_SET);
-    u32 ret = fread(buffer, 512, 1, fp);
+    int ret = fread(buffer, 512, 1, fp);
     if (ret <= 0) {
       break;
     }
-    printf("ret=>%d\n",ret);
+    printf("ret=>%d\n", ret);
     for (int i = 0; i < 512; i++) {
-      if(i%24==0) printf("\n %x   ",offset);
+      if (i % 24 == 0) printf("\n %x   ", offset);
       printf("%x ", 0xff & buffer[i]);
       offset++;
     }
   }
   printf("\n");
-  fclose(fp);
+  if (fp != NULL) {
+    fclose(fp);
+  }
+}
 
+void test_write() {
+  FILE* fp= fopen("/dev/sda/duck.jpg", "w+");
+  fseek(fp, 0, SEEK_SET);
+  fwrite("ABCDEF",strlen("ABCDEF"),1,fp);
+  fclose(fp);
+}
+
+int main(int argc, char* argv[]) {
+  printf(buf);
+  test_write();
   return 0;
 }

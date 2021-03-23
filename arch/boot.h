@@ -82,7 +82,6 @@ typedef struct idt_ptr {
 } __attribute__((packed)) idt_ptr_t;
 
 typedef struct disk_info{
-  i32 heads;
   i32 hpc;
   i32 spt;
   i32 type;

@@ -24,12 +24,12 @@ enum {
     SYS_EXEC,
     SYS_TEST,
     SYS_EXIT,
-    SYS_ALLOC,
-    SYS_FREE,
+    SYS_MAP,
+    SYS_UMAP,
     SYS_SEEK,
     SYS_VALLOC,
     SYS_VFREE,
-    SYS_HEAP
+    SYS_VHEAP
 };
 
 void* syscall0(u32 num);

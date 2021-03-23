@@ -19,12 +19,12 @@ static void* syscall_table[SYSCALL_NUMBER] = {&sys_read,
                                               &sys_exec,
                                               &sys_test,
                                               &sys_exit,
-                                              &sys_vmalloc,
-                                              &sys_vmfree,
+                                              &sys_vmap,
+                                              &sys_vumap,
                                               &sys_seek,
                                               &sys_valloc,
                                               &sys_vfree,
-                                              &sys_vmheap
+                                              &sys_vheap
                                               };
 
 INTERRUPT_SERVICE

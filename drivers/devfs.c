@@ -103,6 +103,13 @@ int devfs_init(void) {
   mouse->read=device_read;
   mouse->ioctl=device_ioctl;
 
+  //time
+  vnode_t *time = vfs_create("time", V_FILE);
+  vfs_mount(NULL, "/dev", time);
+  time->device=device_find(DEVICE_RTC);
+  time->read=device_read;
+  time->ioctl=device_ioctl;
+
   return 0;
 }
 

@@ -83,7 +83,7 @@ pci_device_t* pci_find_vendor_device(u32 vendor, u32 device) {
       return pci_device[i];
     }
   }
-  kprintf("not fond pci device vendor id: %d device id:%d\n", vendor,device);
+  kprintf("not fond pci device vendor id: 0x%x device id:0x%x\n", vendor,device);
   return NULL;
 }
 
@@ -93,7 +93,7 @@ pci_device_t* pci_find_class(u32 class) {
       return pci_device[i];
     }
   }
-  kprintf("not fond pci device class id:%d\n", class);
+  kprintf("not fond pci device class id:0x%x\n", class);
   return NULL;
 }
 

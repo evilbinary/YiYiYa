@@ -277,7 +277,7 @@ bitmap_t* load_jpeg(const char* filename) {
     i = 0;
     while (cinfo.output_scanline < cinfo.output_height) {
       jpeg_read_scanlines(&cinfo, buffer, 1);
-      put_scanline_to_bitmap(bitmap, (char*)buffer, i, cinfo.output_width);
+      put_scanline_to_bitmap(bitmap, (char*)buffer[0], i, cinfo.output_width);
       i += 4;
     }
 

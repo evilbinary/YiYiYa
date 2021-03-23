@@ -78,7 +78,8 @@ void qemu_init_mode(pci_device_t* pdev, vga_device_t* vga, int mode) {
   qemu_write_reg(VBE_DISPI_INDEX_Y_OFFSET, 0);
   qemu_write_reg(VBE_DISPI_INDEX_ENABLE,
                  VBE_DISPI_ENABLED | VBE_DISPI_LFB_ENABLED);
-  qemu_write_reg(0, 0x20);
+  //qemu_write_reg(0, 0x20);
+  //qemu_write_reg(VBE_DISPI_INDEX_ID,VBE_DISPI_ID5);
 
   qemu_clear_screen(vga);
 }

@@ -33,10 +33,10 @@ void do_shell_thread(void) {
   char buf[2] = {0};
 
   int fd = syscall2(SYS_OPEN, "/dev/stdin", 0);
-  // syscall2(SYS_EXEC,"/dev/sda/HELLO.ELF",NULL);
-  // syscall2(SYS_EXEC,"/dev/sda/GUI.ELF",NULL);
-  // syscall2(SYS_EXEC,"/dev/sda/FILE.ELF",NULL);
-  syscall2(SYS_EXEC,"/dev/sda/MICROUI.ELF",NULL);
+  // syscall2(SYS_EXEC,"/dev/sda/hello.elf",NULL);
+  // syscall2(SYS_EXEC,"/dev/sda/gui.elf",NULL);
+  syscall2(SYS_EXEC,"/dev/sda/file.elf",NULL);
+  // syscall2(SYS_EXEC,"/dev/sda/microui.elf",NULL);
   // kprintf("fd=>%d\n",fd);
   for (;;) {
 

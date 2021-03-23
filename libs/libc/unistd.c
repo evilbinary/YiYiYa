@@ -44,7 +44,7 @@ int close(int fd) {
   // Exist?
   int rc;
   // Can close?
-  rc=syscall1(SYS_CLOSE,fd);
+  rc=ya_close(fd);
 
   if (rc != 0) return -1;
 //   support_remove_file(fd);
