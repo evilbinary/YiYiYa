@@ -19,6 +19,9 @@ nasm_env.StaticObject('boot', ['boot.s'],ASFLAGS='-f bin')
 Import('env')               
 
 env.GenerateKernelSize('config.h',['../../app/kernel'])
-env.Program('init', ['init.c','config.h','init.h'],LINKFLAGS= '$LINKFLAGS -Ttext 0x0500')
+env.Program('init.elf', 
+    ['init.c',],
+    CFLAGS='-I. -Iinclude  -Iarch -std=c99 -std=gnu99 -w ',
+    LINKFLAGS= '$LINKFLAGS -Ttext 0x0500')
 
-env.Objcopy('init.bin','init',OBJCOPYFLAGS='-O binary -S')
+env.Objcopy('init.bin','init.elf',OBJCOPYFLAGS='-O binary -S')

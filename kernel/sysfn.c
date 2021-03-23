@@ -58,20 +58,14 @@ u32 sys_open(char* name, int attr) {
     kprintf("open %s failed \n", name);
     return -1;
   }
-  char dup_name[256] = {0};
-  kstrcpy(dup_name, name);
-  char* token = kstrtok(dup_name, node->name);
-  char* last;
-  while (token != NULL) {
-    last = token;
-    token = kstrtok(NULL, node->name);
-  }
-  if (last[0] == '/') {
-    last++;
+  char* last = kstrrstr(name, node->name);
+  if (last != NULL) {
+    last += kstrlen(node->name);
+    if (last[0] == '/') last++;
   }
   vnode_t* file = vfind(node, last);
   if (file == NULL) {
-    kprintf("find %s failed\n", token);
+    kprintf("find %s failed\n", last);
     return -1;
   }
   // u32 ret = vopen(file);
@@ -125,11 +119,10 @@ size_t sys_yeild() { thread_yield(); }
 void sys_exit(int status) {
   thread_t* current = thread_current();
   current->state = THREAD_STOPPED;
-  schedule();
   thread_remove(current);
 }
 
-void* sys_vmalloc(size_t size) {
+void* sys_vmap(void* addr, size_t size) {
   thread_t* current = thread_current();
   vmemory_area_t* area = vmemory_area_create(
       current->vmm->vaddr + current->vmm->size, size, MEMORY_HEAP);
@@ -137,12 +130,7 @@ void* sys_vmalloc(size_t size) {
   return area->vaddr;
 }
 
-void* sys_vmheap() {
-  thread_t* current = thread_current();
-  return current->vmm->vaddr;
-}
-
-void sys_vmfree(void* ptr, size_t size) {
+void sys_vumap(void* ptr, size_t size) {
   thread_t* current = thread_current();
   vmemory_area_t* area = vmemory_area_find(current->vmm, ptr, size);
   if (area == NULL) return;
@@ -151,15 +139,20 @@ void sys_vmfree(void* ptr, size_t size) {
 
 void* sys_valloc(void* addr, size_t size) { return valloc(addr, size); }
 
-void sys_vfree(void* addr) { 
-  //todo
-  //vfree(addr);
- }
+void* sys_vheap() {
+  thread_t* current = thread_current();
+  return current->vmm->vaddr;
+}
+
+void sys_vfree(void* addr) {
+  // todo
+  vfree(addr);
+}
 
 void* load_elf(Elf32_Ehdr* elf_header, u32 fd, page_dir_t* page) {
   // printf("e_phnum:%d\n\r", elf_header->e_phnum);
   u32 offset = elf_header->e_phoff;
-  Elf32_Phdr* phdr = syscall0(SYS_HEAP);
+  Elf32_Phdr* phdr = syscall0(SYS_VHEAP);
   syscall2(SYS_SEEK, fd, offset);
   u32 nbytes =
       syscall3(SYS_READ, fd, phdr, sizeof(Elf32_Phdr) * elf_header->e_phnum);
@@ -249,7 +242,7 @@ void* load_elf(Elf32_Ehdr* elf_header, u32 fd, page_dir_t* page) {
   }
   // data
   offset = elf_header->e_shoff;
-  Elf32_Shdr* shdr = syscall0(SYS_HEAP);
+  Elf32_Shdr* shdr = syscall0(SYS_VHEAP);
   syscall2(SYS_SEEK, fd, offset);
   nbytes =
       syscall3(SYS_READ, fd, shdr, sizeof(Elf32_Shdr) * elf_header->e_shnum);
@@ -305,7 +298,7 @@ u32 sys_exec(char* filename, char* const argv[]) {
 
   page_clone_user(t->context.kernel_page_dir, page_dir_ptr_tab);
   // init 2GB
-  map_2gb(page_dir_ptr_tab, PAGE_P | PAGE_USU | PAGE_RWW);
+  // map_2gb(page_dir_ptr_tab, PAGE_P | PAGE_USU | PAGE_RWW);
   context->page_dir = page_dir_ptr_tab;
 
   // init vmm
@@ -316,6 +309,9 @@ u32 sys_exec(char* filename, char* const argv[]) {
   vmemory_area_t* vmdata =
       vmemory_area_create(DATA_ADDR, PAGE_SIZE, MEMORY_DATA);
   vmemory_area_add(t->vmm, vmdata);
+  vmemory_area_t* stack =
+      vmemory_area_create(DATA_ADDR, PAGE_SIZE, MEMORY_DATA);
+  vmemory_area_add(t->vmm, stack);
 
   // init data
   void* paddr = kmalloc_alignment(sizeof(exec_t), PAGE_SIZE);
@@ -326,9 +322,9 @@ u32 sys_exec(char* filename, char* const argv[]) {
   data->argv = argv;
   t->data = vmdata->vaddr;
 
-  // init stack
+  //init stack
   kfree(t->stack3);
-  t->stack3 = t->vmm->vaddr;
+  t->stack3 = stack->vaddr;
 
   thread_run(t);
   return 0;

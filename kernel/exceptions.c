@@ -202,9 +202,10 @@ void do_page_fault(interrupt_context_t *context) {
       valloc(fault_addr, PAGE_SIZE);
     } else {
       map_page(fault_addr, fault_addr, PAGE_P | PAGE_USU | PAGE_RWW);
+      kprintf("\n");
     }
   }
-  kprintf("\n");
+  
 }
 
 void exception_init() {

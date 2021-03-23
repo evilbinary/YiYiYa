@@ -3,7 +3,7 @@
 
 /* Standard ELF types.  */
 
-#include <types.h>
+// #include "types.h"
 
 /* Type for a 16-bit quantity.  */
 typedef uint16_t Elf32_Half;

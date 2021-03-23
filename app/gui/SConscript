@@ -21,10 +21,16 @@ env.Library('gui', [
     '../../libs/libc/libc.a',
 ],CFLAGS='$CFLAGS -Ilibs/include/c/')
 
+env.Library('image', [
+    'jpeg_decoder.c',
+    '../../libs/libc/libc.a',
+    '../jpeg/libjpeg.a',
+],CFLAGS='$CFLAGS -Ilibs/include/c/')
+
 env.Program('gui.elf', [
     'main.c',
-    'jpeg_decoder.c',
     'libgui.a',
+    'libimage.a',
     '../jpeg/libjpeg.a',
     '../../libs/libc/libc.a',
     ],

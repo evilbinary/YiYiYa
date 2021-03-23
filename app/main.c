@@ -14,6 +14,7 @@ extern module_t serial_module;
 extern module_t ahci_module;
 extern module_t devfs_module;
 extern module_t fat32_module;
+extern module_t rtc_module;
 
 extern void serial_write(char a);
 extern void do_shell_thread(void);
@@ -35,7 +36,8 @@ int kmain(int argc, char* argv[]) {
   module_regist(&serial_module);
   module_regist(&keyboard_module);
   io_add_write_channel(serial_write);
-
+  module_regist(&rtc_module);
+  
   // module_regist(&vga_module);
   module_regist(&qemu_module);
   module_regist(&mouse_module);

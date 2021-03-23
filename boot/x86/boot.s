@@ -17,7 +17,7 @@ bits 16
     call print_string
 
     mov bx,init_base
-    call disk_load
+    call load_init
 
     ; mov ax,0x0000
     ; mov es,ax
@@ -30,7 +30,7 @@ bits 16
     jmp $
 
 ;;磁盘读取到内存 es:bx 地址
-disk_load:
+load_init:
     mov ah,0x02 ;读取功能
     mov al,0x0b ;读取几个扇区
     mov cl,0x02 ;0x01 boot sector, 0x02 is first sector

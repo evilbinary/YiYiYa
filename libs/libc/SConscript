@@ -22,5 +22,9 @@ env.Library('c', [
     'fcntl.c',
     'setjmp.c',
     'liballoc.c',
-    'yiyiya.c'
+    'yiyiya.c',
+    'time.c',
+    'signal.c',
+    'timeb.c',
+    'strings.c'
 ],CFLAGS='$CFLAGS -Ilibs/include/c/')

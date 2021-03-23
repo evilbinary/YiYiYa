@@ -17,7 +17,7 @@ int setjmp(jmp_buf env) {
       : "p"(&(env[0].regs))
       : "eax", "ebx", "ecx");
 #else
-  os_freakout("setjmp not implemented for anything besides x86");
+  printf("setjmp not implemented for anything besides x86");
 #endif
 
   return 0;
@@ -45,6 +45,6 @@ void longjmp(jmp_buf env, int val) {
       : "p"(&(env[0].regs)), "g"(val)
       : "eax", "ecx", "esp");
 #else
-  os_freakout("longjmp not implemented for anything besides x86");
+  printf("longjmp not implemented for anything besides x86");
 #endif
 }

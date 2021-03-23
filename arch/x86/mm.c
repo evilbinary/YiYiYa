@@ -111,7 +111,7 @@ void map_mem_block(u32 addr) {
       u32 address = p->addr;
       for (int i = 0; i < p->size / 0x1000; i++) {
         map_page(address, address, PAGE_P | PAGE_USU | PAGE_RWW);
-        kprintf("map addr %x %x\n", address, address);
+        //kprintf("map addr %x %x\n", address, address);
         address += 0x1000;
       }
     }

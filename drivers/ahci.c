@@ -26,14 +26,14 @@ int ahci_dev_port_write(ahci_device_t* ahci_dev, int no, u32 startl, u32 starth,
   hba_port_t* port = &hab_memory->ports[no];
 
   port->is = (u32)-1;  // Clear pending interrupt bits
-                      // int spin = 0;           // Spin lock timeout counter
+                       // int spin = 0;           // Spin lock timeout counter
   int slot = find_cmdslot(ahci_dev, no);
   if (slot == -1) return 0;
   uint64_t addr = 0;
   //   print("\n clb %x clbu %x", port->clb, port->clbu);
   addr = (((addr | port->clbu) << 32) | port->clb);
 
-  hba_cmd_header_t* cmdheader = (hba_cmd_header_t*) addr;
+  hba_cmd_header_t* cmdheader = (hba_cmd_header_t*)addr;
 
   // hba_cmd_header_t *cmdheader = (hba_cmd_header_t*)(port->clb);
   cmdheader += slot;
@@ -56,7 +56,7 @@ int ahci_dev_port_write(ahci_device_t* ahci_dev, int no, u32 startl, u32 starth,
   for (i = 0; i < cmdheader->prdtl - 1; i++) {
     cmdtbl->prdt_entry[i].dba = (u32)(buf & 0xFFFFFFFF);
     // cmdtbl->prdt_entry[i].dbau = (u32)((buf >> 32) & 0xFFFFFFFF);
-    cmdtbl->prdt_entry[i].dbau=0;
+    cmdtbl->prdt_entry[i].dbau = 0;
     cmdtbl->prdt_entry[i].dbc = 8 * 1024 - 1;  // 8K bytes
     cmdtbl->prdt_entry[i].i = 0;
     buf += 4 * 1024;  // 4K words
@@ -75,8 +75,8 @@ table, ignoring any additional padding.**/
 
   cmdtbl->prdt_entry[i].dba = (u32)(buf & 0xFFFFFFFF);
   // cmdtbl->prdt_entry[i].dbau = (u32)((buf >> 32) & 0xFFFFFFFF);
-  cmdtbl->prdt_entry[i].dbau=0;
-  cmdtbl->prdt_entry[i].dbc = (count << 9) -1;  // 512 bytes per sector
+  cmdtbl->prdt_entry[i].dbau = 0;
+  cmdtbl->prdt_entry[i].dbc = (count << 9) - 1;  // 512 bytes per sector
   cmdtbl->prdt_entry[i].i = 0;
 
   // Setup command
@@ -96,7 +96,7 @@ table, ignoring any additional padding.**/
   cmdfis->lba5 = (u8)(starth >> 8);
 
   cmdfis->countl = count & 0xff;
-  cmdfis->counth = (count >> 8)& 0xff;
+  cmdfis->counth = (count >> 8) & 0xff;
 
   //    print("[slot]{%d}", slot);
   port->ci = 1;  // Issue command
@@ -112,7 +112,7 @@ table, ignoring any additional padding.**/
     if ((port->ci & (1 << slot)) == 0) break;
     if (port->is & HBA_PxIS_TFES)  // Task file error
     {
-      kprintf("write disk error startl:%x\n",startl);
+      kprintf("write disk error startl:%x\n", startl);
       return 0;
     }
   }
@@ -120,7 +120,7 @@ table, ignoring any additional padding.**/
   //   print("\nafter issue : %d" , port->tfd);
   // Check again
   if (port->is & HBA_PxIS_TFES) {
-    kprintf("write disk error startl:%x\n",startl);
+    kprintf("write disk error startl:%x\n", startl);
     return 0;
   }
 
@@ -161,7 +161,7 @@ int ahci_dev_port_read(ahci_device_t* ahci_dev, int no, u32 startl, u32 starth,
   for (i = 0; i < cmdheader->prdtl - 1; i++) {
     cmdtbl->prdt_entry[i].dba = (u32)(buf & 0xFFFFFFFF);
     // cmdtbl->prdt_entry[i].dbau = (u32)(((buf) >> 32) & 0xFFFFFFFF);
-    cmdtbl->prdt_entry[i].dbau=0;
+    cmdtbl->prdt_entry[i].dbau = 0;
     cmdtbl->prdt_entry[i].dbc =
         8 * 1024 - 1;  // 8K bytes (this value should always be set to 1 less
                        // than the actual value)
@@ -171,8 +171,8 @@ int ahci_dev_port_read(ahci_device_t* ahci_dev, int no, u32 startl, u32 starth,
   }
   // Last entry
   cmdtbl->prdt_entry[i].dba = (u32)(buf & 0xFFFFFFFF);
-  cmdtbl->prdt_entry[i].dbau=0;
-  //cmdtbl->prdt_entry[i].dbau = (u32)(((buf) >> 32) & 0xFFFFFFFF);
+  cmdtbl->prdt_entry[i].dbau = 0;
+  // cmdtbl->prdt_entry[i].dbau = (u32)(((buf) >> 32) & 0xFFFFFFFF);
   cmdtbl->prdt_entry[i].dbc = (count << 9) - 1;  // 512 bytes per sector
   cmdtbl->prdt_entry[i].i = 1;
 
@@ -214,14 +214,14 @@ int ahci_dev_port_read(ahci_device_t* ahci_dev, int no, u32 startl, u32 starth,
     if ((port->ci & (1 << slot)) == 0) break;
     if (port->is & HBA_PxIS_TFES)  // Task file error
     {
-      kprintf("read disk error startl:%x\n",startl);
+      kprintf("read disk error startl:%x\n", startl);
       return 0;
     }
   }
 
   // Check again
   if (port->is & HBA_PxIS_TFES) {
-    kprintf("read disk error startl:%x\n",startl);
+    kprintf("read disk error startl:%x\n", startl);
     return 0;
   }
 
@@ -266,7 +266,7 @@ void ahci_dev_port_init(ahci_device_t* ahci_dev, int no) {
   // Command list entry maxim count = 32
   // Command list maxim size = 32*32 = 1K per port
   // void* ahci_base = kmalloc(40 * 1024 + 8 * 1024 * 32);
-  void* ahci_base=mm_alloc_zero_align(40 * 1024 + 8 * 1024 * 32,1024);
+  void* ahci_base = mm_alloc_zero_align(40 * 1024 + 8 * 1024 * 32, 1024);
   // u32 addr=ahci_base;
   // for (int i = 0; i < (40 * 1024 + 8 * 1024 * 32) / 0x1000; i++) {
   //   map_page(addr, addr, PAGE_P | PAGE_USU | PAGE_RWW);
@@ -321,7 +321,7 @@ i32 ahci_get_port_type(hba_port_t* port) {
 
 void ahci_dev_prob(ahci_device_t* ahci_dev) {
   hba_memory_t* hab_memory = ahci_dev->abar;
-  u32 addr=hab_memory;
+  u32 addr = hab_memory;
   map_page(addr, addr, PAGE_P | PAGE_USU | PAGE_RWW);
   u32 pi = hab_memory->pi;
   for (int i = 0; i < 32; i++, pi >>= 1) {
@@ -341,52 +341,39 @@ void ahci_dev_prob(ahci_device_t* ahci_dev) {
 static size_t ahci_read(device_t* dev, void* buf, size_t len) {
   ahci_device_t* ahci_dev = dev->data;
   int no = dev->id - DEVICE_SATA;
-  u32 startl = ahci_dev->offsetl/BYTE_PER_SECTOR;
-  u32 starth = ahci_dev->offseth/BYTE_PER_SECTOR;
-  u32 count = len/BYTE_PER_SECTOR;
-  u32 rest =len%BYTE_PER_SECTOR;
-  u32 start_rest = (ahci_dev->offsetl) % BYTE_PER_SECTOR;
-  u8 small_buf[BYTE_PER_SECTOR];
-  u32 ret=0;
-
- 
-  if(count>0){
-    ret = ahci_dev_port_read(ahci_dev, no, startl, starth, count, buf);
+  u32 startl = ahci_dev->offsetl / BYTE_PER_SECTOR;
+  u32 starth = ahci_dev->offseth / BYTE_PER_SECTOR;
+  u32 count = len / BYTE_PER_SECTOR;
+  u32 rest = len % BYTE_PER_SECTOR;
+  if (rest > 0) {
+    kprintf("ahci read is more, may have error\n");
+    count++;
   }
-  if(rest>0){
-    startl=startl+len-rest;
-    ret =ahci_dev_port_read(ahci_dev, no, startl, starth, 1, small_buf);
-    kmemmove(buf+count*BYTE_PER_SECTOR,small_buf,rest);
-  }
-  if(start_rest>0){
-    kmemmove(buf,buf+start_rest,len);
-  }
-  if(ret==0){
+  u32 ret = 0;
+  ret = ahci_dev_port_read(ahci_dev, no, startl, starth, count, buf);
+  if (ret == 0) {
     return -1;
   }
-  return len;
+  return count * BYTE_PER_SECTOR;
 }
 
 static size_t ahci_write(device_t* dev, void* buf, size_t len) {
   ahci_device_t* ahci_dev = dev->data;
   int no = dev->id - DEVICE_SATA;
-  u32 startl = ahci_dev->offsetl/BYTE_PER_SECTOR;
-  u32 starth = ahci_dev->offseth/BYTE_PER_SECTOR;
-  u32 count = len/BYTE_PER_SECTOR;
-  u32 rest =len%BYTE_PER_SECTOR;
-  u8 small_buf[BYTE_PER_SECTOR];
-  int ret=0;
-  if(count>0){
-    ret = ahci_dev_port_write(ahci_dev, no, startl, starth, count, buf);
+  u32 startl = ahci_dev->offsetl / BYTE_PER_SECTOR;
+  u32 starth = ahci_dev->offseth / BYTE_PER_SECTOR;
+  u32 count = len / BYTE_PER_SECTOR;
+  u32 rest = len % BYTE_PER_SECTOR;
+  if (rest > 0) {
+    kprintf("ahci write is more, may have error\n");
+    count++;
   }
-  if(rest>0){
-    startl=startl+len-rest;
-    memset(small_buf,0,BYTE_PER_SECTOR);
-    kmemcpy(buf+count*BYTE_PER_SECTOR,small_buf,rest);
-    ret =ahci_dev_port_write(ahci_dev, no, startl, starth, 1, small_buf);
+  u32 ret = 0;
+  ret = ahci_dev_port_write(ahci_dev, no, startl, starth, count, buf);
+  if (ret == 0) {
+    return -1;
   }
-  if(ret==0) return 0;
-  return 0;
+  return count * BYTE_PER_SECTOR;
 }
 
 static size_t ahci_ioctl(device_t* dev, u32 cmd, ...) {
@@ -399,12 +386,11 @@ static size_t ahci_ioctl(device_t* dev, u32 cmd, ...) {
   }
   va_list ap;
   va_start(ap, cmd);
-  u32 offset=va_arg(ap,u32);
+  u32 offset = va_arg(ap, u32);
   if (cmd == IOC_READ_OFFSET) {
-    ret = ahci_dev->offsetl|ahci_dev->offseth<<32;
-  }else if(cmd==IOC_WRITE_OFFSET){
-    ahci_dev->offsetl=offset;
-    ahci_dev->offseth=0;
+    ret = ahci_dev->offsetl | ahci_dev->offseth << 32;
+  } else if (cmd == IOC_WRITE_OFFSET) {
+    ahci_dev->offsetl = offset;
     // ahci_dev->offseth=(u32*)va_arg(ap,u32);
   }
   va_end(ap);
