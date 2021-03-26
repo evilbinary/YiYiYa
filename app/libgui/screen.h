@@ -9,6 +9,8 @@
 #include "ioctl.h"
 #include "stdint.h"
 #include "stdlib.h"
+#include "types.h"
+#include "event.h"
 
 #define ASC_WIDTH 8
 #define CHS_WIDTH 16
@@ -22,16 +24,10 @@
 #define BUTTON_RIGHT 2
 #define BUTTON_MIDDLE 4
 
-struct point_t {
+struct screen_point_t {
   i32 x;
   i32 y;
 };
-
-typedef struct mouse_data {
-  u32 sate;
-  i32 x;
-  i32 y;
-} mouse_data_t;
 
 typedef struct framebuffer_info {
   u32 width;
@@ -52,12 +48,10 @@ typedef struct screen_info {
   int height;
   int bpp;
   u32 *buffer;
-  struct point_t cur;
+  struct screen_point_t cur;
   u8 *ASC;
-  mouse_data_t mouse;
-  int fd;
-  int mouse_fd;
   framebuffer_info_t fb;
+  int fd;
 } screen_info_t;
 
 
@@ -81,7 +75,6 @@ typedef struct bitmap {
 
 void screen_init();
 screen_info_t *screen_info();
-void screen_read_mouse(mouse_data_t* mouse);
 void screen_put_pixel(u32 x, u32 y, u32 c);
 void screen_draw_poi32(i32 x, i32 y, i32 color);
 i32 screen_get_poi32_color(i32 x, i32 y);

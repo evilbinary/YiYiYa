@@ -29,9 +29,9 @@ void* kmalloc(size_t size) {
 }
 
 void kfree(void* ptr) {
-  use_kernel_page();
-  mm_free(ptr);
-  use_user_page();
+  // use_kernel_page();
+  //mm_free(ptr);
+  // use_user_page();
 }
 
 void* kmalloc_alignment(size_t size, int alignment) {

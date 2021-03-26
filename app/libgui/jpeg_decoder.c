@@ -1,4 +1,4 @@
-#include "../jpeg/jpeglib.h"
+#include "jpeglib.h"
 #include "setjmp.h"
 #include "stdio.h"
 #include "stdlib.h"
@@ -10,7 +10,7 @@ typedef struct bitmap {
   void* bits;
 } bitmap_t;
 
-#define INPUT_BUF_SIZE 4096 /* choose an efficiently fread'able size */
+#define INPUT_BUF_SIZE 4096*5 /* choose an efficiently fread'able size */
 
 struct my_error_mgr {
   struct jpeg_error_mgr pub; /* "public" fields */

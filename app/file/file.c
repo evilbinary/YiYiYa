@@ -37,6 +37,7 @@ void test_write() {
 
 int main(int argc, char* argv[]) {
   printf(buf);
-  test_write();
+  // test_write();
+  test_read();
   return 0;
 }

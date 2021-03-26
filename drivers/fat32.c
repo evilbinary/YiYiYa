@@ -247,10 +247,10 @@ void fat32_write_file_attr(vnode_t *node) {
   file_info_t *file_info = node->data;
   char buf[512];
   u32 offset = fat32_info->data + sizeof(dir_entry_t) * file_info->entry_index;
-  fat32_read_bytes(node, offset, 512, buf);
+  fat32_read_bytes(node, offset, sizeof(dir_entry_t), buf);
   dir_entry_t *p = buf;
   *p = *file_info->entry;
-  fat32_write_bytes(node, offset, 512, buf);
+  fat32_write_bytes(node, offset, sizeof(dir_entry_t), buf);
 }
 
 u32 fat32_write(vnode_t *node, u32 offset, size_t nbytes, u8 *buffer) {

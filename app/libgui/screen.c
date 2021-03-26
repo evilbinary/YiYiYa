@@ -4,14 +4,14 @@
  * 邮箱: rootdebug@163.com
  ********************************************************************/
 #include "screen.h"
-
 #include "bmp.h"
 #include "stdarg.h"
 #include "syscall.h"
+#include "event.h"
 
 screen_info_t gscreen;
 
-u8 ASCII[] = {
+u8 SCREEN_ASCII[] = {
 
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, /*" ",32*/
@@ -381,7 +381,7 @@ void screen_draw_char_witdh_color(i32 x, i32 y, u16 ch, u32 frcolor,
   if (code < 0x7f) {
     if (x > (gscreen.width - 1)) return;
     code = code - 0x20;
-    lp = ASCII + code * 16;
+    lp = SCREEN_ASCII + code * 16;
     for (i = 0; i < 16; i++) {
       z = *lp++;
       pp = (u8 *)(gscreen.buffer + (y + i) * gscreen.width + x);
@@ -546,13 +546,10 @@ void screen_init() {
   gscreen.width = gscreen.fb.width;
   gscreen.height = gscreen.fb.height;
   gscreen.bpp = gscreen.fb.bpp;
-  gscreen.mouse_fd = syscall2(SYS_OPEN, "/dev/mouse", 0);
-  // printf("gscreen.buffer=%x\n", gscreen.buffer);
-}
 
-void screen_read_mouse(mouse_data_t *mouse) {
-  syscall3(SYS_READ, gscreen.mouse_fd, &gscreen.mouse, sizeof(mouse_data_t));
-  *mouse = gscreen.mouse;
+  event_init();
+
+  // printf("gscreen.buffer=%x\n", gscreen.buffer);
 }
 
 screen_info_t *screen_info() { return &gscreen; }

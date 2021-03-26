@@ -62,6 +62,9 @@ u32 sys_open(char* name, int attr) {
   if (last != NULL) {
     last += kstrlen(node->name);
     if (last[0] == '/') last++;
+  }else{
+    kprintf("open %s failed path is empty\n", name);
+    return -1;
   }
   vnode_t* file = vfind(node, last);
   if (file == NULL) {

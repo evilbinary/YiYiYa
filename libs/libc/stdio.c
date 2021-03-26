@@ -87,7 +87,16 @@ FILE* fopen(const char* filename, const char* mode) {
   unsigned int flags = support_fmodes2flags(mode);
   fd = open(filename, flags);
   if (fd < 0) return NULL;
-  return fd;
+  void *data=NULL;
+  FILE* file = (FILE *)malloc(sizeof(FILE));
+  file->data = data;
+  file->fd = fd;
+  file->eof = 0;
+  file->error = 0;
+  file->offset = 0;
+  file->mode = flags;
+
+  return file;
 }
 
 int fseek(FILE* stream, long int offset, int origin) {

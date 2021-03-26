@@ -6,7 +6,6 @@
 #include "syscall.h"
 
 int open(const char *filename, int flags, ...) {
-  void *data;
   FILE *file;
   int fd;
   va_list vargs;
@@ -19,17 +18,7 @@ int open(const char *filename, int flags, ...) {
   fd = ya_open(filename, flags);
 
   if (fd < 0) return -1;
-
-  file = (FILE *)malloc(sizeof(FILE));
-  file->data = data;
-  file->fd = fd;
-  file->eof = 0;
-  file->error = 0;
-  file->offset = 0;
-  file->mode = flags;
- 
-
-  return file;
+  return fd;
 }
 
 int creat(const char *filename, u32 mode) {

@@ -3,6 +3,7 @@
 #include "stdio.h"
 #include "syscall.h"
 #include "time.h"
+#include "event.h"
 
 char* buf = "hello,gui\n";
 
@@ -46,12 +47,12 @@ int main(int argc, char* argv[]) {
   bitmap_t* jpeg = load_jpeg("/dev/sda/home.jpg");
   // void* bmp = load_bmp("/dev/sda/duck.bmp");
 
-  
+  mouse_data_t mouse;
 
   for (;;) {
     screen_show_bitmap(0, 0, 1024, 768, jpeg);
     screen_printf(500, 10, "YiYiYa OS");
-    syscall3(SYS_READ, fd, &screen->mouse, sizeof(mouse_data_t));
+    event_read_mouse(&mouse, sizeof(mouse_data_t));
     // for (u32 y = 0; y < screen->height; y++) {
     //   screen_put_pixel((screen->width - screen->height) / 2 + y, y,
     //   0x0000ff); screen_put_pixel((screen->height + screen->width) / 2 - y,
@@ -60,8 +61,8 @@ int main(int argc, char* argv[]) {
     // screen_draw_line(0, 0, 140, 140, 0xff0000);
     // screen_fill_rect(10, 20, 30, 30, 0xff0000);
 
-    screen_printf(10, 100, "mouse=%d,%d", screen->mouse.x, screen->mouse.y);
-    screen_fill_rect(screen->mouse.x, screen->height - screen->mouse.y, 4, 4,
+    screen_printf(10, 100, "mouse=%d,%d", mouse.x, mouse.y);
+    screen_fill_rect(mouse.x, screen->height - mouse.y, 4, 4,
                      0x00ff00);
 
     display_time();
