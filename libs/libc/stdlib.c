@@ -4,10 +4,9 @@
 #include "stdint.h"
 #include "stdio.h"
 #include "syscall.h"
+#include "stdlib.h"
 
-void exit(int status) {
-	
-}
+void exit(int status) {}
 
 void itoa(char *buf, int base, int d) {
   char *p = buf;
@@ -176,4 +175,128 @@ double strtod(const char *str, char **endptr) {
   if (endptr) *endptr = p;
 
   return number;
+}
+
+int abs(int n) {
+  if (n < 0) return (-n);
+  return n;
+}
+
+long labs(long n) {
+  if (n < 0) return (-n);
+  return n;
+}
+
+div_t div(int num, int denom) {
+  div_t result;
+  int tmp;
+  int a_num;
+  int a_denom;
+  int sign;
+
+  a_num = abs(num);
+  a_denom = abs(denom);
+
+  sign = -1;
+  if ((num < 0) && (denom < 0)) sign = 1;
+  if ((num > 0) && (denom > 0)) sign = 1;
+
+  result.quot = 0;
+  result.rem = 0;
+
+  tmp = a_num;
+  while (tmp >= a_denom) {
+    result.quot++;
+    tmp = tmp - a_denom;
+  }
+
+  result.rem = tmp;
+
+  if (sign == -1) {
+    result.quot = (-result.quot);
+    result.rem = (-result.rem);
+  }
+
+  return result;
+}
+
+ldiv_t ldiv(long num, long denom) {
+  ldiv_t result;
+  long tmp;
+  long a_num;
+  long a_denom;
+  long sign;
+
+  a_num = labs(num);
+  a_denom = labs(denom);
+
+  sign = -1;
+  if ((num < 0) && (denom < 0)) sign = 1;
+  if ((num > 0) && (denom > 0)) sign = 1;
+
+  result.quot = 0;
+  result.rem = 0;
+
+  tmp = a_num;
+  while (tmp >= a_denom) {
+    result.quot++;
+    tmp = tmp - a_denom;
+  }
+
+  result.rem = tmp;
+
+  if (sign == -1) {
+    result.quot = (-result.quot);
+    result.rem = (-result.rem);
+  }
+
+  return result;
+}
+
+double atof(const char *str) { return strtod(str, NULL); }
+
+void *bsearch(const void *key, const void *base, size_t n, size_t size,
+              int (*cmp)(const void *keyval, const void *datum)) {
+  unsigned int pos = (unsigned int)base;
+  void *a;
+  int val;
+
+  int middle;
+  int top = 0;
+  int bottom = (n - 1);
+
+  while (top < bottom) {
+    middle = (bottom + top) / 2;
+
+    if ((middle == top) || (middle == bottom)) {
+      a = (void *)(pos + top * size);
+      if (cmp(key, a) == 0) return a;
+      a = (void *)(pos + bottom * size);
+      if (cmp(key, a) == 0) return a;
+
+      return NULL;
+    }
+
+    a = (void *)(pos + middle * size);
+
+    val = cmp(key, a);
+
+    if (val == 0) return a;
+
+    if (val < 0)
+      bottom = middle;  // key is less than. move bottom up.
+    else
+      top = middle;  // key is more than. move top down.
+  }
+
+  return NULL;
+}
+
+static uint64_t seed;
+
+void srand(unsigned s) { seed = s - 1; }
+
+int rand(void) {
+  seed = 6364136223846793005ULL * seed + 1;
+  return seed >> 33;
 }

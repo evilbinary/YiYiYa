@@ -58,7 +58,7 @@ void* liballoc_alloc(int pages) {
   }
   last_heap_addr += PAGE_SIZE * pages;
   char* addr = last_heap_addr;
-  memset(addr, 0, PAGE_SIZE);
+  memset(addr,0,PAGE_SIZE);
   return addr;
 }
 

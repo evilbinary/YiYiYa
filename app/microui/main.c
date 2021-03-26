@@ -224,23 +224,23 @@ int main(int argc, char *argv[]) {
     screen_printf(200, 10, "hello,YiYiYa OS");
     screen_printf(0, 600, "%d", i++);
 
-    screen_read_mouse(&mouse);
+    event_read_mouse(&mouse);
     if (mouse.sate) {
-      mu_input_mousemove(ctx, mouse.x, screen->height - screen->mouse.y);
+      mu_input_mousemove(ctx, mouse.x, screen->height - mouse.y);
     }
     u8 button = mouse.sate & BUTTON_MASK;
     
     if (button == BUTTON_LEFT) {
       screen_printf(0, 620, "%x", button);
-      mu_input_mousedown(ctx, mouse.x, screen->height - screen->mouse.y, MU_MOUSE_LEFT);
+      mu_input_mousedown(ctx, mouse.x, screen->height - mouse.y, MU_MOUSE_LEFT);
     } else if (button == BUTTON_RIGHT) {
-      mu_input_mousedown(ctx, mouse.x, screen->height - screen->mouse.y, MU_MOUSE_RIGHT);
+      mu_input_mousedown(ctx, mouse.x, screen->height - mouse.y, MU_MOUSE_RIGHT);
     } else if (button == BUTTON_MIDDLE) {
-      mu_input_mousedown(ctx, mouse.x, screen->height - screen->mouse.y, MU_MOUSE_MIDDLE);
+      mu_input_mousedown(ctx, mouse.x, screen->height - mouse.y, MU_MOUSE_MIDDLE);
     }else if(button==0){
-      mu_input_mouseup(ctx, mouse.x, screen->height - screen->mouse.y, MU_MOUSE_LEFT);
-      mu_input_mouseup(ctx, mouse.x, screen->height - screen->mouse.y, MU_MOUSE_RIGHT);
-      mu_input_mouseup(ctx, mouse.x, screen->height - screen->mouse.y, MU_MOUSE_MIDDLE);
+      mu_input_mouseup(ctx, mouse.x, screen->height - mouse.y, MU_MOUSE_LEFT);
+      mu_input_mouseup(ctx, mouse.x, screen->height - mouse.y, MU_MOUSE_RIGHT);
+      mu_input_mouseup(ctx, mouse.x, screen->height - mouse.y, MU_MOUSE_MIDDLE);
     }
 
    process_frame(ctx);
@@ -264,7 +264,7 @@ int main(int argc, char *argv[]) {
       }
     }
 
-    screen_fill_rect(mouse.x, screen->height - screen->mouse.y, 4, 4,
+    screen_fill_rect(mouse.x, screen->height - mouse.y, 4, 4,
                        0x00ff00);
     r_present();
   }

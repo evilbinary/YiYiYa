@@ -20,11 +20,11 @@ env.Program('microui.elf', [
     'main.c',
     'microui.c',
     'renderer.c',
-    '../../app/gui/libgui.a',
+    '../libgui/libgui.a',
     '../../libs/libc/libc.a',
 
     ],
-    CFLAGS='$CFLAGS -Ilibs/include/c/ -Iapp/gui/',
+    CFLAGS='$CFLAGS -Ilibs/include/c/ -Iapp/libgui/',
     LINKFLAGS= '$LINKFLAGS --entry main -Tuser.ld')
 
 # env.Objcopy('microui.elf','microui',OBJCOPYFLAGS='-S')

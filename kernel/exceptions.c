@@ -197,6 +197,10 @@ void do_page_fault(interrupt_context_t *context) {
 
   if (present == 0) {
     thread_t *current = thread_current();
+    if(fault_addr==NULL){
+      kprintf(" warning null pointer error\n");
+      return;
+    }
     if (current != NULL) {
       kprintf(" tid: %x ", current->id);
       valloc(fault_addr, PAGE_SIZE);

@@ -3,16 +3,13 @@
 #include <stdlib.h>
 #include <support.h>
 #include <unistd.h>
-#include "syscall.h"
-#include "limits.h"
 
+#include "limits.h"
+#include "syscall.h"
 
 char **environ = NULL;  ///< Global environment information
 
-int access(const char *filename, int mode) {
-  
-  return 0;
-}
+int access(const char *filename, int mode) { return 0; }
 
 int chdir(const char *path) {
   int fd;
@@ -44,11 +41,11 @@ int close(int fd) {
   // Exist?
   int rc;
   // Can close?
-  rc=ya_close(fd);
+  rc = ya_close(fd);
 
   if (rc != 0) return -1;
-//   support_remove_file(fd);
-  //free(file);
+  //   support_remove_file(fd);
+  // free(file);
   return 0;
 }
 
@@ -62,14 +59,12 @@ int fchown(int fd, uid_t uid, gid_t gid) {
 
 int fchdir(int fd) {
   int rc;
-   
 
   return rc;
 }
 
 int ftruncate(int fd, off_t offset) {
   int rc;
-   
 
   return rc;
 }
@@ -77,14 +72,13 @@ int ftruncate(int fd, off_t offset) {
 char *getcwd(char *buf, size_t size) {
   int rc;
 
-   
   errno = rc;
   return NULL;
 }
 
 pid_t getpid(void) {
   int pid, rc;
- 
+
   return (pid_t)pid;
 }
 
@@ -93,7 +87,6 @@ gid_t getgid(void) {
   gid_t gid;
   int rc;
 
-   
   return gid;
 }
 
@@ -102,7 +95,6 @@ uid_t getuid(void) {
   gid_t gid;
   int rc;
 
-   
   return uid;
 }
 
@@ -111,10 +103,7 @@ char *getwd(char *buf) {
   return getcwd(buf, PATH_MAX);
 }
 
-int isatty(int desc) {
-  
-  return 1;
-}
+int isatty(int desc) { return 1; }
 
 off_t lseek(int fd, off_t position, int whence) {
   FILE *file = fd;
@@ -128,25 +117,18 @@ off_t lseek(int fd, off_t position, int whence) {
 }
 
 ssize_t read(int fd, void *buffer, size_t num) {
-  FILE *file = fd;
-  if (file == NULL) {
-    errno = EBADF;
-    return -1;
-  }
-
-  return fread(buffer, 1, num, file);
+  return ya_read(fd, buffer, num);
 }
 
 int rmdir(const char *directory) {
   int rc;
-  
+
   return rc;
 }
 
 unsigned int sleep(unsigned int seconds) {
   unsigned int rc;
 
-   
   return rc;
 }
 
@@ -164,15 +146,11 @@ int truncate(const char *filename, off_t offset) {
 }
 
 ssize_t write(int fd, const void *buffer, size_t num) {
-  FILE *file = fd;
-  if (file == NULL) return -1;
-
-  return fwrite(buffer, 1, num, file);
+  return ya_write(fd, buffer, num);
 }
 
 int unlink(const char *pathname) {
   int rc;
- 
 
   return rc;
 }

@@ -1,7 +1,7 @@
 #ifndef JPEG_DECODER_H
 #define JPEG_DECODER_H
 
-#include "../jpeg/jpeglib.h"
+#include "jpeglib.h"
 #include "screen.h"
 #include "setjmp.h"
 #include "stdio.h"

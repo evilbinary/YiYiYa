@@ -10,11 +10,6 @@ plt = platform.system()
 
 Import('env')
 
-env = env.Clone(
-  w=GetOption('w'),
-  ENV = os.environ,
-  PATH= [os.environ['PATH'],'/opt/local/bin' ],
-  )
 
 env.Library('jpeg', [
     "jdinput.c",

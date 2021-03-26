@@ -18,6 +18,7 @@ typedef struct {
   long rem;
 } ldiv_t;
 
+
 long a64l(const char *);
 void abort(void);
 int abs(int);

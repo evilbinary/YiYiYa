@@ -28,17 +28,24 @@ env.Objcopy('kernel','kernel.elf',OBJCOPYFLAGS='-S')
 env.Objcopy('kernel.dbg','kernel.elf',OBJCOPYFLAGS='--only-keep-debug')
 # env.Objcopy('kernel.bin','kernel',OBJCOPYFLAGS='-O binary')
 
+
+SConscript(dirs=['libjpeg'], exports='env')
+SConscript(dirs=['libgui'], exports='env')
+SConscript(dirs=['libetk'], exports='env')
+
+
 SConscript(dirs=['hello'], exports='env')
 SConscript(dirs=['gui'], exports='env')
 SConscript(dirs=['microui'], exports='env')
 SConscript(dirs=['jpeg'], exports='env')
 SConscript(dirs=['file'], exports='env')
+SConscript(dirs=['etk'], exports='env')
 
 
 
 if plt=='Darwin':
     env.Command('copyhello', 
-        ['hello/hello.elf','gui/gui.elf','microui/microui.elf','file/file.elf' ],
+        ['hello/hello.elf','gui/gui.elf','microui/microui.elf','file/file.elf','etk/etk.elf' ],
         ['hdid  image/disk.img &&  cp ${SOURCES} /Volumes/NO\ NAME/ && hdiutil eject /Volumes/NO\ NAME/'
     ])
     pass
