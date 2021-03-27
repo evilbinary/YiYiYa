@@ -19,6 +19,13 @@ scons
 ```
 scons --run=qemu
 ```
+
+### 截图
+<img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/demo/etk.png?raw=true" width="400px" /><img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/demo/microui.jpg?raw=true" width="400px" />
+
+<img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/demo/yiyiya.png?raw=true" width="400px" />
+
+
 ## 开发
 
 qq群 26893532 可以加入一起讨论学习
