@@ -24,7 +24,7 @@ typedef struct cqueue {
 
 typedef void (*cqueue_loop_fn)(void*);
 
-cqueue_t* cqueue_create(u32 size,u32 type);
+extern cqueue_t* cqueue_create(u32 size,u32 type);
 void cqueue_destroy(cqueue_t* queue);
 int cqueue_put(cqueue_t* queue, void* element);
 void* cqueue_poll(cqueue_t* queue);

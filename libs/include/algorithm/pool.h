@@ -16,7 +16,7 @@ typedef struct pool {
 
 pool_t *pool_create(u32 size);
 
-void *pool_alloc(pool_t *p, size_t size);
+void *pool_alloc(pool_t *p, size_t size, u32 align);
 
 void pool_destroy(pool_t *p);
 

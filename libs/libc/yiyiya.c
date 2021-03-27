@@ -25,52 +25,60 @@
 #endif
 #endif
 
+typedef struct free_block {
+  size_t size;
+  struct free_block* next;
+} free_block_t;
+
 // static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 static int page_size = -1;
 void* last_heap_addr = NULL;
 u32 time_fd;
 
-int liballoc_lock() {
-  // pthread_mutex_lock( &mutex );
-  return 0;
-}
+static free_block_t free_block_list_head = {0, 0};
+static const size_t align_to = 16;
 
-int liballoc_unlock() {
-  // pthread_mutex_unlock( &mutex );
-  return 0;
-}
-
-void* liballoc_alloc(int pages) {
-  // if ( page_size < 0 ) page_size = getpagesize();
-  // unsigned int size = pages * page_size;
-
-  // char *p2 = (char*)mmap(0, size, PROT_NONE,
-  // MAP_PRIVATE|MAP_NORESERVE|MAP_ANONYMOUS, -1, 0); if ( p2 == MAP_FAILED)
-  // return NULL;
-
-  // if(mprotect(p2, size, PROT_READ|PROT_WRITE) != 0)
-  // {
-  // 	munmap(p2, size);
-  // 	return NULL;
-  // }
+void* ya_sbrk(size_t size) {
   if (last_heap_addr == NULL) {
     last_heap_addr = syscall0(SYS_VHEAP);
   }
-  last_heap_addr += PAGE_SIZE * pages;
-  char* addr = last_heap_addr;
-  memset(addr,0,PAGE_SIZE);
+  void* addr = last_heap_addr;
+  last_heap_addr += size;
   return addr;
 }
 
-int liballoc_free(void* ptr, int pages) {
-  // return munmap( ptr, pages * page_size );
-  for (int i = 0; i < pages; i++) {
-    syscall1(SYS_VFREE, ptr);
-    ptr += PAGE_SIZE;
+void* ya_alloc(size_t size) {
+  size_t s=size;
+  size = (size + sizeof(free_block_t) + (align_to - 1)) & ~(align_to - 1);
+  free_block_t* block = free_block_list_head.next;
+  free_block_t** head = &(free_block_list_head.next);
+  while (block != 0) {
+    if (block->size >= size) {
+      *head = block->next;
+      return ((char*)block) + sizeof(free_block_t);
+    }
+    head = &(block->next);
+    block = block->next;
   }
 
-  return 1;
+  block = (free_block_t*)ya_sbrk(size);
+  block->size = size;
+
+  void* addr = ((char*)block) + sizeof(free_block_t);
+  return addr;
 }
+
+void ya_free(void* ptr) {
+  free_block_t* block = (free_block_t*)(((char*)ptr) - sizeof(free_block_t));
+  block->next = free_block_list_head.next;
+  free_block_list_head.next = block;
+}
+
+void* ya_valloc(void* addr, size_t size) {
+  return syscall2(SYS_VALLOC, addr, size);
+}
+
+void ya_vfree(void* addr) { syscall1(SYS_VFREE, addr); }
 
 u32 ya_open(const char* filename, int flags) {
   return syscall2(SYS_OPEN, filename, flags);
@@ -149,10 +157,9 @@ u32 ya_time(time_t* current) {
   rtc_time_t time;
   int ret = ya_read(time_fd, &time, sizeof(rtc_time_t));
   uint32_t seconds = secs_of_years(time.year - 1) +
-                  secs_of_month(time.month - 1, time.year) +
-                  (time.day - 1) * 86400 +
-                  time.hour * 3600 + time.minute * 60 +
-                  time.second + 0;
+                     secs_of_month(time.month - 1, time.year) +
+                     (time.day - 1) * 86400 + time.hour * 3600 +
+                     time.minute * 60 + time.second + 0;
   *current = seconds;
   return ret;
 }

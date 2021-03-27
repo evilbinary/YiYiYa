@@ -22,7 +22,6 @@ env.Program('microui.elf', [
     'renderer.c',
     '../libgui/libgui.a',
     '../../libs/libc/libc.a',
-
     ],
     CFLAGS='$CFLAGS -Ilibs/include/c/ -Iapp/libgui/',
     LINKFLAGS= '$LINKFLAGS --entry main -Tuser.ld')

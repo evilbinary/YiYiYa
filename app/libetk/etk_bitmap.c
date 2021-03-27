@@ -7,7 +7,7 @@ EtkBitmap* etk_bitmap_create(e32 w,e32 h,e32 bitperpixel,EtkColor color){
 	u32 i;
 	u32 *p32=NULL;
 	u16 *p16=NULL;
-	u32 length=w*(h+5);
+	u32 length=w*(h);
 	EtkBitmap *bitmap=(EtkBitmap*)ETK_MALLOC(sizeof(EtkBitmap));
 	bitmap->bits=(void*)ETK_EX_MALLOC(length * (bitperpixel>>3));
 	bitmap->w=w;

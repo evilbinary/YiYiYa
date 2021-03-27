@@ -4,10 +4,11 @@
  * 邮箱: rootdebug@163.com
  ********************************************************************/
 #include "screen.h"
+
 #include "bmp.h"
+#include "event.h"
 #include "stdarg.h"
 #include "syscall.h"
-#include "event.h"
 
 screen_info_t gscreen;
 
@@ -390,9 +391,9 @@ void screen_draw_char_witdh_color(i32 x, i32 y, u16 ch, u32 frcolor,
         // if(z & 0x80)
         {
           *pp++ = frcolor;
-        } else if(bgcolor==0) {
+        } else if (bgcolor == 0) {
           pp++;
-        }else{
+        } else {
           *pp++ = bgcolor;
         }
         // z = z <<1;
@@ -412,9 +413,9 @@ void screen_draw_char_witdh_color(i32 x, i32 y, u16 ch, u32 frcolor,
       for (j = 0; j < 16; j++) {
         if (z & 0x8000) {
           *pp++ = frcolor;
-        } else if(bgcolor==0) {
+        } else if (bgcolor == 0) {
           pp++;
-        }else{
+        } else {
           *pp++ = bgcolor;
         }
         z = z << 1;
@@ -559,12 +560,12 @@ void screen_flush() {
     printf("init screen has some error\n");
     return;
   }
-  syscall3(SYS_IOCTL, gscreen.fd, IOC_FLUSH_FRAMBUFFER,
-           gscreen.fb.framebuffer_index);
+  u32 current_index = gscreen.fb.framebuffer_index;
   gscreen.fb.framebuffer_index =
       (++gscreen.fb.framebuffer_index) % gscreen.fb.framebuffer_count;
   gscreen.buffer = gscreen.fb.frambuffer + gscreen.width * gscreen.height *
                                                gscreen.fb.framebuffer_index;
+  syscall3(SYS_IOCTL, gscreen.fd, IOC_FLUSH_FRAMBUFFER, current_index);
 }
 
 void do_screen_thread(void) {

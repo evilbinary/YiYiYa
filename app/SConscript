@@ -32,6 +32,8 @@ env.Objcopy('kernel.dbg','kernel.elf',OBJCOPYFLAGS='--only-keep-debug')
 SConscript(dirs=['libjpeg'], exports='env')
 SConscript(dirs=['libgui'], exports='env')
 SConscript(dirs=['libetk'], exports='env')
+SConscript(dirs=['libzlib'], exports='env')
+SConscript(dirs=['libpng'], exports='env')
 
 
 SConscript(dirs=['hello'], exports='env')
