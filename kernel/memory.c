@@ -9,12 +9,12 @@
 #include "thread.h"
 
 queue_pool_t* kernel_pool;
+queue_pool_t* user_pool;
 extern context_t* current_context;
 
 void memory_init() { kpool_init(); }
 
 void* kmalloc(size_t size) {
-  use_kernel_page();
   void* addr = NULL;
   size = ((size + PAGE_SIZE) / PAGE_SIZE) * PAGE_SIZE;
   // size=((size+1024)/1024)*1024;
@@ -24,14 +24,13 @@ void* kmalloc(size_t size) {
     return addr;
   }
   memset(addr, 0, size);
-  use_user_page();
+  // void* addr=kmalloc_alignment(size,PAGE_SIZE);
   return addr;
 }
 
 void kfree(void* ptr) {
-  // use_kernel_page();
-  //mm_free(ptr);
-  // use_user_page();
+  mm_free(ptr);
+  // kfree_alignment(ptr);
 }
 
 void* kmalloc_alignment(size_t size, int alignment) {
@@ -54,8 +53,18 @@ void* valloc(void* addr, size_t size) {
   if (size < PAGE_SIZE) {
     size = PAGE_SIZE;
   }
+  if ((size % PAGE_SIZE) > 0) {
+    size += PAGE_SIZE;
+  }
   void* vaddr = addr;
-  void* phy_addr = kmalloc_alignment(size,PAGE_SIZE);
+#ifdef USE_POOL
+  void* phy_addr = queue_pool_poll(user_pool);
+  if (phy_addr == NULL) {
+    phy_addr = kmalloc_alignment(size, PAGE_SIZE);
+  }
+#else
+  void* phy_addr = kmalloc_alignment(size, PAGE_SIZE);
+#endif
   void* paddr = phy_addr;
   for (int i = 0; i < size / PAGE_SIZE; i++) {
     if (current != NULL) {
@@ -76,9 +85,17 @@ void vfree(void* addr) {
   if (addr == NULL) return;
   thread_t* current = thread_current();
   void* phy = virtual_to_physic(current->context.page_dir, addr);
-  //unmap_page_on(current->context.page_dir, addr);
-  if(phy!=NULL){
+  // kprintf("vfree vaddr:%x paddr:%x\n");
+  // unmap_page_on(current->context.page_dir, addr);
+  if (phy != NULL) {
+#ifdef USE_POOL
+    int ret = queue_pool_put(user_pool,phy);
+    if (ret == 0) {
+      kfree(phy);
+    }
+#else
     kfree(phy);
+#endif
   }
 }
 
@@ -106,7 +123,7 @@ void map_alignment(void* page, void* vaddr, void* buf, u32 size) {
 void page_clone_user(u64* page, u64* page_dir_ptr_tab) {
   use_kernel_page();
   page_clone(page, page_dir_ptr_tab);
-  //unmap_mem_block(page_dir_ptr_tab, 0x200000);
+  // unmap_mem_block(page_dir_ptr_tab, 0x200000);
   use_user_page();
 }
 
@@ -153,14 +170,17 @@ void* virtual_to_physic(u64* page_dir_ptr_tab, void* vaddr) {
   }
   u64* page_tab_ptr = (u64)page_dir_ptr[pde_index] & ~0xFFF;
   if (page_tab_ptr == NULL) {
-    //kprintf("page tab find errro\n");
+    // kprintf("page tab find errro\n");
     return NULL;
   }
   void* phyaddr = page_tab_ptr[pte_index] & ~0xFFF;
   return phyaddr;
 }
 
-void kpool_init() { kernel_pool = queue_pool_create(PAGE_SIZE, 256); }
+void kpool_init() {
+  kernel_pool = queue_pool_create(10, PAGE_SIZE);
+  user_pool = queue_pool_create_align(1, PAGE_SIZE, PAGE_SIZE);
+}
 
 int kpool_put(void* e) { return queue_pool_put(kernel_pool, e); }
 
@@ -191,7 +211,7 @@ void vmemory_area_free(vmemory_area_t* area) {
   u32 vaddr = area->vaddr;
   for (int i = 0; i < area->size / PAGE_SIZE; i++) {
     u32 phyaddr = virtual_to_physic(current_context->page_dir, vaddr);
-    kfree(phyaddr);
+    kfree_alignment(phyaddr);
     map_page_on(current_context->page_dir, vaddr, vaddr, 0);
     vaddr += PAGE_SIZE;
   }

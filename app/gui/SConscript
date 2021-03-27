@@ -16,6 +16,8 @@ env.Program('gui.elf', [
     '../libgui/libimage.a',
     '../libjpeg/libjpeg.a',
     '../../libs/libc/libc.a',
+    '../../libs/libalgorithm/libalgorithm.a',
+
     ],
     CFLAGS='$CFLAGS -Ilibs/include/c/ -Iapp/libgui/ -Iapp/libjpeg',
     LINKFLAGS= '$LINKFLAGS --entry main -Tuser.ld')

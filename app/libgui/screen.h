@@ -18,12 +18,6 @@
 #define CHAR_HEIGHT 16
 #define ASC_NUM 256
 
-#define BUTTON_MASK 0x7
-
-#define BUTTON_LEFT 1
-#define BUTTON_RIGHT 2
-#define BUTTON_MIDDLE 4
-
 struct screen_point_t {
   i32 x;
   i32 y;

@@ -500,7 +500,6 @@ __inline Ret etk_wnd_manager_default_dispatch_event(EtkWndManager* thiz, EtkEven
 				rm.y=event->u.mouse.y-select->rect.y;
 				rm.width=2;
 				rm.height=2;
-				//draw_rect(select->rect,RED);
 				inter=etk_rect_intersect(etk_window_get_head_rect(select),rm);
 				if(inter.width>0){
 					priv->pressed_event=*event;	
@@ -533,7 +532,7 @@ __inline Ret etk_wnd_manager_default_dispatch_event(EtkWndManager* thiz, EtkEven
 	}
 	case ETK_EVENT_MOUSE_UP:{
 		EtkWidget *select;
-		priv->pressed=0;
+		// priv->pressed=0;
 		if(event->widget==NULL){
 			select=etk_wnd_manager_get_select_widget(etk_default_wnd_manager(),event->u.mouse.x,event->u.mouse.y);
 			etk_widget_event(select, event);

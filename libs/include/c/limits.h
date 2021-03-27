@@ -1,10 +1,6 @@
 #ifndef _LIMITS_H
 #define _LIMITS_H		1
 
-
-
-
-
 #ifndef __GNUC__
 
 #ifndef __i386__
@@ -25,21 +21,31 @@
 
 #else
 
-#define		SCHAR_MIN		__SCHAR_MIN__
-#define		SCHAR_MAX		__SCHAR_MAX__
-#define		CHAR_MIN		__CHAR_MIN__
-#define		SHRT_MAX		__SHRT_MAX__
-#define		USHRT_MAX		__USHRT_MAX__
-#define		INT_MAX			__INT_MAX__
-#define		INT32_MAX		INT_MAX
-#define		LONG_MAX		__LONG_MAX__
-#define		LLONG_MIN		__LLONG_MIN__
-#define		LLONG_MAX		__LLONG_MAX__
-#define		ULLONG_MAX		__ULLONG_MAX__
+// #define		SCHAR_MIN		__SCHAR_MIN__
+// #define		SCHAR_MAX		__SCHAR_MAX__
+// #define		CHAR_MIN		__CHAR_MIN__
+// #define		SHRT_MAX		__SHRT_MAX__
+// #define		USHRT_MAX		__USHRT_MAX__
+// #define		INT_MAX			__INT_MAX__
+// #define		INT32_MAX		INT_MAX
+// #define		LONG_MAX		__LONG_MAX__
+// #define		LLONG_MIN		__LLONG_MIN__
+// #define		LLONG_MAX		__LLONG_MAX__
+// #define		ULLONG_MAX		__ULLONG_MAX__
+
+#define		CHAR_MIN 			(-128)
+#define		SCHAR_MAX 			127
+#define		SCHAR_MIN			(-128) 
+#define		SHRT_MAX 			32767
+#define		USHRT_MAX 			65535
+#define		INT_MAX 			2147483647
+#define		INT32_MAX 			2147483647
+#define		LONG_MAX 			2147483647L
+#define		LLONG_MAX			9223372036854775807LL
+#define		LLONG_MIN			(-LLONG_MAX - 1)
+#define		ULLONG_MAX			18446744073709551615ULL
 
 #endif
-
-
 
 #define		CHAR_BIT			8 
 #define		UCHAR_MAX			255 

@@ -20,6 +20,8 @@ typedef struct queue_pool {
 
 queue_pool_t* queue_pool_create(u32 size, u32 bytes);
 
+queue_pool_t* queue_pool_create_align(u32 size, u32 bytes,u32 align);
+
 int queue_pool_put(queue_pool_t* q, void* e);
 
 void* queue_pool_poll(queue_pool_t* q);

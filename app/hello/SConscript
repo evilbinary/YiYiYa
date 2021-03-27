@@ -30,6 +30,7 @@ env = env.Clone(
 env.Program('hello.elf', [
     'hello.c',
     '../../libs/libc/libc.a',
+    '../../libs/libalgorithm/libalgorithm.a',
     ],
     CFLAGS='$CFLAGS -Ilibs/include/c/ ',
     LINKFLAGS= '$LINKFLAGS --entry main -Tuser.ld')

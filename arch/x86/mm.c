@@ -306,6 +306,7 @@ void mm_free(void* addr) {
   mem_block_t* block = (mem_block_t*)((u32)addr);
   if (block->addr == 0) {
     kprintf("mm free error %x\n", addr);
+    return;
   }
   block->next = NULL;
   block->type = MEM_FREE;

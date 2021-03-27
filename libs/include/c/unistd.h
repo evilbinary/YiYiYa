@@ -5,6 +5,7 @@
 #include <inttypes.h>
 #include <sys/types.h>
 #include "stdio.h"
+#include "fcntl.h"
 
 #define STDIN_FILENO		0
 #define	STDOUT_FILENO		1

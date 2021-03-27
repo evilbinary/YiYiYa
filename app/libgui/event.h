@@ -16,6 +16,12 @@ enum {
   MOUSE_BUTTON_UP,
 };
 
+#define BUTTON_MASK 0x7
+
+#define BUTTON_LEFT 1
+#define BUTTON_RIGHT 2
+#define BUTTON_MIDDLE 4
+
 typedef struct mouse_data {
   u32 sate;
   i32 x;

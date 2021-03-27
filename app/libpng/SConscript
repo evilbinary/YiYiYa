@@ -1,0 +1,39 @@
+# coding:utf-8
+# *******************************************************************
+# * Copyright 2021-2080 evilbinary
+# * 作者: evilbinary on 01/01/20
+# * 邮箱: rootdebug@163.c",om
+# ********************************************************************
+import os
+import platform 
+plt = platform.system()
+
+Import('env')
+
+
+env.Library('png', [
+    "png.c",
+    "pngerror.c",
+    "pngget.c",
+    "pngmem.c",
+    "pngpread.c",
+    "pngread.c",
+    "pngrio.c",
+    "pngrtran.c",
+    "pngrutil.c",
+    "pngset.c",
+    "pngtrans.c",
+    "pngwio.c",
+    "pngwrite.c",
+    "pngwtran.c",
+    "pngwutil.c",
+    '../../libs/libc/libc.a',
+],CFLAGS='$CFLAGS -Ilibs/include/c/ -Iapp/libzlib/ -I.')
+
+
+# env.Program('jpeg.elf', [
+#     'libjpeg.a',
+#     '../../libs/libc/libc.a',
+#     ],
+#     CFLAGS='$CFLAGS -Ilibs/include/c/ ',
+#     LINKFLAGS= '$LINKFLAGS --entry main -Tuser.ld')
