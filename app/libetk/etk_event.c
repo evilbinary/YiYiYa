@@ -12,9 +12,11 @@ Ret etk_event_init(EtkEvent* event, EtkEventType type) {
 
 Ret etk_event_dispatch() {
   EtkEvent event;
-  etk_platform_event_poll(&event);
-  etk_wnd_manager_queue_event(etk_default_wnd_manager(), &event);
-  // etkglobal.wndManager->dispatch_event(etkglobal.wndManager,&event);
+  memset(&event,0,sizeof(EtkEvent));
+  u32 ret=etk_platform_event_poll(&event);
+  if(ret==RET_OK){
+    etk_wnd_manager_queue_event(etk_default_wnd_manager(), &event);
+  }
   return RET_OK;
 }
 

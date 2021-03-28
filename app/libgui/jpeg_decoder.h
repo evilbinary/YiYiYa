@@ -6,6 +6,7 @@
 #include "setjmp.h"
 #include "stdio.h"
 #include "stdlib.h"
+#include "image.h"
 
 #define INPUT_BUF_SIZE 4096 /* choose an efficiently fread'able size */
 

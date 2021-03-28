@@ -13,6 +13,8 @@ Import('env')
 env.Program('etk.elf', [
     'main.c',
     'etk_app.c',
+    'sinclock.c',
+    'mine.c',
     '../libetk/libetk.a',
     '../libjpeg/libjpeg.a',
     '../libgui/libgui.a',

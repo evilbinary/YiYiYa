@@ -9,6 +9,7 @@
 #include "event.h"
 #include "stdarg.h"
 #include "syscall.h"
+#include "image.h"
 
 screen_info_t gscreen;
 

@@ -415,7 +415,7 @@ int fat32_init(void) {
   fat32_info->root_dir = root_dir;
   fat32_info->data = data;
 
-  fat32_info->entries_number = 80;
+  fat32_info->entries_number = 100;
   dir_entry_t *entries =
       kmalloc(sizeof(dir_entry_t) * fat32_info->entries_number);
   fat32_read_bytes(node, data, sizeof(dir_entry_t) * fat32_info->entries_number,

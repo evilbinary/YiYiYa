@@ -96,12 +96,12 @@ int event_poll(event_t* event) {
     e.type = KEY_DOWN;
     e.key = key;
     aqueue_push(&queue, e);
+    count++;
   }
 
-  e = aqueue_pop(&queue);
-  if (e.type != 0) {
-    *event = e;
-    return 1;
+  if(aqueue_is_empty(&queue)){
+    return 0;
   }
-  return 0;
+  *event = aqueue_pop(&queue);
+  return count;
 }

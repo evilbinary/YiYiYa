@@ -7,7 +7,8 @@
 Ret etk_init(int argc, char* argv[]) {
   etk_platform_init(argc, argv);
   // main loop init
-  etkglobal.main_loop = etk_main_loop_create();
+  etkglobal.sources_manager=etk_sources_manager_create();
+  etkglobal.main_loop = etk_main_loop_create(etk_default_sources_manager());
   // win manager init
   etkglobal.wndManager = etk_default_wnd_manager_create(etkglobal.main_loop);
 

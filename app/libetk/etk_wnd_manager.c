@@ -8,6 +8,7 @@
 #include "etk_stack.h"
 #include "queue.h"
 #include "etk_window.h"
+#include "etk_theme.h"
 
 SLIST_HEAD(EtkLink_t,EtkLink);
 STACK_TEMPLATE(EtkStack,void*);
@@ -164,7 +165,7 @@ Ret etk_wnd_manager_set_active_widget(EtkWndManager* thiz,EtkWidget* active){
 	
 	if(active->type&ETK_WIDGET_WINDOW){
 		if(etk_window_has_head(active)==1){
-			etk_window_on_paint_head_with_color(priv->active_widget,WHITE,BLUE);
+			etk_window_on_paint_head_with_color(priv->active_widget,WHITE,WINDOW_HEAD_ACTIVE_COLOR);
 			//etk_default_wnd_manager_update_widget_rect(etk_default_wnd_manager(),priv->active_widget,&t);
 		}
 	}
@@ -500,6 +501,7 @@ __inline Ret etk_wnd_manager_default_dispatch_event(EtkWndManager* thiz, EtkEven
 				rm.y=event->u.mouse.y-select->rect.y;
 				rm.width=2;
 				rm.height=2;
+				//draw_rect(select->rect,RED);
 				inter=etk_rect_intersect(etk_window_get_head_rect(select),rm);
 				if(inter.width>0){
 					priv->pressed_event=*event;	
@@ -532,7 +534,7 @@ __inline Ret etk_wnd_manager_default_dispatch_event(EtkWndManager* thiz, EtkEven
 	}
 	case ETK_EVENT_MOUSE_UP:{
 		EtkWidget *select;
-		// priv->pressed=0;
+		priv->pressed=0;
 		if(event->widget==NULL){
 			select=etk_wnd_manager_get_select_widget(etk_default_wnd_manager(),event->u.mouse.x,event->u.mouse.y);
 			etk_widget_event(select, event);

@@ -49,13 +49,6 @@ typedef struct screen_info {
 } screen_info_t;
 
 
-typedef struct bitmap {
-  i32 w, h;
-  i32 length;
-  i32 bitperpixel;
-  void* bits;
-} bitmap_t;
-
 #define IOC_MAGIC 'v'
 #define IOC_INIT _IO(IOC_MAGIC, 0)
 #define IOC_READ_REG _IOW(IOC_MAGIC, 1, int)
