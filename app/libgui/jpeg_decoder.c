@@ -2,13 +2,7 @@
 #include "setjmp.h"
 #include "stdio.h"
 #include "stdlib.h"
-
-typedef struct bitmap {
-  i32 w, h;
-  i32 length;
-  i32 bitperpixel;
-  void* bits;
-} bitmap_t;
+#include "image.h"
 
 #define INPUT_BUF_SIZE 4096*5 /* choose an efficiently fread'able size */
 

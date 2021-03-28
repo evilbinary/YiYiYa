@@ -87,8 +87,8 @@ FILE* fopen(const char* filename, const char* mode) {
   unsigned int flags = support_fmodes2flags(mode);
   fd = open(filename, flags);
   if (fd < 0) return NULL;
-  void *data=NULL;
-  FILE* file = (FILE *)malloc(sizeof(FILE));
+  void* data = NULL;
+  FILE* file = (FILE*)malloc(sizeof(FILE));
   file->data = data;
   file->fd = fd;
   file->eof = 0;
@@ -208,4 +208,15 @@ int ferror(FILE* stream) {
 
 void perror(const char* s) {
   fprintf(stderr, "%s: %s\n", (s != NULL ? s : ""), strerror(errno));
+}
+
+int fflush(FILE* f) {
+  if (!f) return EINVAL;
+  // if (!f->write) return EINVAL;
+  return (f);
+}
+
+int	 remove(const char * file){
+
+  return -1;
 }

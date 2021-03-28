@@ -38,7 +38,11 @@ static __huge_val_t __huge_val = { __HUGE_VAL_bytes };
 #ifdef __cplusplus
 extern "C" {
 #endif
-									  
+
+typedef float	float_t;
+typedef double	double_t;
+
+
 double acos(double);
 double asin(double);
 double atan(double);
@@ -86,6 +90,7 @@ double remainder(double, double);
 double rint(double);
 double scalb(double, double);
 
+double scalbn(double, int);
 
 extern int signgam;
 

@@ -18,9 +18,11 @@ env.Library('gui', [
 
 env.Library('image', [
     'jpeg_decoder.c',
+    'png_decoder.c',
     '../../libs/libc/libc.a',
     '../libjpeg/libjpeg.a',
-],CFLAGS='$CFLAGS -Ilibs/include/c/ -Iapp/libjpeg')
+    '../libpng/libpng.a',
+],CFLAGS='$CFLAGS -Ilibs/include/c/ -Iapp/libjpeg -Iapp/libpng')
 
 # env.Objcopy('gui.elf','gui',OBJCOPYFLAGS='-S --strip-all')
 #env.Objcopy('gui.dbg','gui.elf',OBJCOPYFLAGS='--only-keep-debug')

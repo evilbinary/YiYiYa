@@ -146,18 +146,18 @@ int etk_app_main(int argc, char* argv[]) {
   i++;
 
   {
-    // EtkSource *timer;
-    wins[0] = etk_create_window(20, 20, 200, 150, ETK_WIDGET_WINDOW);
-    // timer=etk_source_timer_create(100,timer2_listener,wins[0]);
-    // etk_sources_manager_add(etk_default_sources_manager(),timer);
+    EtkSource *timer;
+    wins[0] = etk_create_window(20, 120, 200, 150, ETK_WIDGET_WINDOW);
+    timer=etk_source_timer_create(100,timer2_listener,wins[0]);
+    etk_sources_manager_add(etk_default_sources_manager(),timer);
   }
 
   // clock
-  // etk_app_clock(100, 100, 300, 300);
+  etk_app_clock(840, 40, 180, 180);
 
   // //mine
   // etk_game_mine(10, 30, 8, 8, 10);
-  // etk_game_mine(160, 30, 10, 10, 14);
+  etk_game_mine(160, 30, 10, 10, 14);
   // etk_game_mine(340, 30, 16, 16, 20);
   //��ʾ���д���
   etk_widget_show_all(desktop);
@@ -206,9 +206,9 @@ Ret button0_listener(void* user_data, void* obj) {
                               ETK_WIDGET_WINDOW);
   etk_widget_show(timewin, 1);
   {
-    // EtkSource *timer;
-    // timer=etk_source_timer_create(1000,win_update_time_listener,timewin);
-    // etk_sources_manager_add(etk_default_sources_manager(),timer);
+    EtkSource *timer;
+    timer=etk_source_timer_create(1000,win_update_time_listener,timewin);
+    etk_sources_manager_add(etk_default_sources_manager(),timer);
   }
   return RET_OK;
 }

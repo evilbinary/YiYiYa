@@ -44,13 +44,14 @@ int main(int argc, char* argv[]) {
   screen_init();
   screen_info_t* screen = screen_info();
 
-  bitmap_t* jpeg = load_jpeg("/dev/sda/home.jpg");
+  bitmap_t* bitmap = load_jpeg("/dev/sda/home.jpg");
+  // bitmap_t* bitmap = load_png("/dev/sda/normal.png");
   // void* bmp = load_bmp("/dev/sda/duck.bmp");
 
   mouse_data_t mouse;
 
   for (;;) {
-    screen_show_bitmap(0, 0, 1024, 768, jpeg);
+    screen_show_bitmap(0, 0, 1024, 768, bitmap);
     screen_printf(500, 10, "YiYiYa OS");
     event_read_mouse(&mouse, sizeof(mouse_data_t));
     // for (u32 y = 0; y < screen->height; y++) {

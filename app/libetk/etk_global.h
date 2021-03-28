@@ -10,6 +10,8 @@
 #include "etk_wnd_manager.h"
 #include "etk_event.h"
 #include "etk_input_method_manager.h"
+#include "etk_source.h"
+#include "etk_sources_manager.h"
 
 
 struct EtkGlobal_t;
@@ -19,7 +21,9 @@ struct EtkGlobal_t{
 	EtkFont *font;
 	EtkDisplay *display;
 	EtkWndManager *wndManager;
+	EtkSource* default_source;
 	EtkMainLoop* main_loop;
+	EtkSourcesManager* sources_manager;
 	EtkInputMethodManager *input_method_manager;
 };
 

@@ -5,40 +5,14 @@
 #include "etk_key.h"
 #include "etk_stack.h"
 #include "etk_rect.h"
+#include "etk_theme.h"
 
 //SLIST_HEAD(EtkLink_t,EtkLink);
 STACK_TEMPLATE(EtkStack,void*);
 
 
 EtkWidget* etk_create_window(e32 x,e32 y,e32 width,e32 height,e32 type){
-	EtkWidget *thiz=(EtkWidget*)ETK_MALLOC(sizeof(EtkWidget));
-	EtkWindowClass *priv;
-	thiz->subclass=ETK_MALLOC(sizeof(EtkWindowClass));
-
-	etk_widget_init(thiz,x,y,width,height,type,0);
-	thiz->event=etk_window_on_event;
-	thiz->paint=etk_window_on_paint;
-	thiz->destroy=etk_window_destroy;
-
-	priv=(EtkWindowClass*)thiz->subclass;
-	priv->close_rect.x=4;
-	priv->close_rect.y=4;
-	priv->close_rect.width=15;
-	priv->close_rect.height=14;
-	priv->head_rect.x=3;
-	priv->head_rect.y=3;
-	priv->head_rect.width=width-7;
-	priv->head_rect.height=20;
-	priv->has_head=1;
-	priv->inner_child=NULL;
-	priv->data[0]=NULL;
-	priv->data[1]=NULL;
-	priv->modal=NULL;
-	if(thiz->type&ETK_WIDGET_DESKTOP!=0){
-		priv->has_head=0;
-	}
-
-	return thiz;
+	return etk_window_create(x,y,width,height,type);
 }
 EtkWidget* etk_window_create(e32 x,e32 y,e32 width,e32 height,e32 type){
 	EtkWidget *thiz=(EtkWidget*)ETK_MALLOC(sizeof(EtkWidget));
@@ -46,12 +20,12 @@ EtkWidget* etk_window_create(e32 x,e32 y,e32 width,e32 height,e32 type){
 	thiz->subclass=ETK_MALLOC(sizeof(EtkWindowClass));
 	priv=(EtkWindowClass*)thiz->subclass;
 	priv->close_rect.x=4;
-	priv->close_rect.y=4;
-	priv->close_rect.width=15;
-	priv->close_rect.height=14;
-	priv->head_rect.x=3;
-	priv->head_rect.y=3;
-	priv->head_rect.width=width-7;
+	priv->close_rect.y=6;
+	priv->close_rect.width=8;
+	priv->close_rect.height=8;
+	priv->head_rect.x=0;
+	priv->head_rect.y=0;
+	priv->head_rect.width=width;
 	priv->head_rect.height=20;
 	priv->has_head=1;
 	priv->inner_child=NULL;
@@ -93,30 +67,30 @@ Ret etk_window_on_paint_head(EtkWidget* thiz){
 	e32 j;
 	EtkRect r=priv->close_rect;
 	EtkRect t=priv->head_rect;
-	etk_color_init(&color,RGB24_2_RGB555(0x33,0x33,0x33),ETK_PIXEL_RGB555);
+	etk_color_init(&color,WINDOW_HEAD_COLOR,ETK_PIXEL_BGR24);
 	h=thiz->canvas->bitmap;
 	for(j=t.y;j<t.height;j++){
 		etk_bitmap_hline(h,t.x,j,t.width,color.color);
 	}
 	
 	
-	etk_bitmap_draw_line(h,r.x,r.y,r.x+r.width,r.y+r.height);
-	etk_bitmap_draw_line(h,r.x,r.y+r.width,r.x+r.height,r.y);
+	etk_bitmap_draw_line_color(h,r.x,r.y,r.x+r.width,r.y+r.height,WINDOW_CLOSE_COLOR);
+	etk_bitmap_draw_line_color(h,r.x,r.y+r.width,r.x+r.height,r.y,WINDOW_CLOSE_COLOR);
 
-	etk_bitmap_draw_rect(h,r.x-1,r.y-1,r.width+2,r.height+2,BLACK);
-	etk_bitmap_draw_rect(h,r.x+1,r.y+1,r.width-2,r.height-2,GRAY);
+	// etk_bitmap_draw_rect(h,r.x-1,r.y-1,r.width+2,r.height+2,BLACK);
+	// etk_bitmap_draw_rect(h,r.x+1,r.y+1,r.width-2,r.height-2,GRAY);
 	
 
-	etk_bitmap_hline(h,r.x,r.y,r.width-1,WHITESMOKE);
-	etk_bitmap_vline(h,r.x,r.y,r.height,WHITESMOKE);
-	etk_bitmap_hline(h,r.x,r.y+r.height,r.width,GRAY);
-	etk_bitmap_vline(h,r.x+r.width,r.y,r.height,GRAY);
+	// etk_bitmap_hline(h,r.x,r.y,r.width-1,WHITESMOKE);
+	// etk_bitmap_vline(h,r.x,r.y,r.height,WHITESMOKE);
+	// etk_bitmap_hline(h,r.x,r.y+r.height,r.width,GRAY);
+	// etk_bitmap_vline(h,r.x+r.width,r.y,r.height,GRAY);
 	
 
-	etk_canvas_hline(thiz->canvas,2,t.y+t.height-3,thiz->rect.width-5,GRAY);
+	// etk_canvas_hline(thiz->canvas,2,t.y+t.height-3,thiz->rect.width-5,GRAY);
 	text=etk_widget_get_text(thiz);
 	if(text!=NULL){
-		etk_canvas_draw_string_with_color(thiz->canvas,25,3,text,WHITE,color.color);
+		etk_canvas_draw_string_with_color(thiz->canvas,25,3,text,WINDOW_TEXT_COLOR,color.color);
 	}
 
 	return RET_OK;
@@ -133,21 +107,23 @@ Ret etk_window_on_paint_head_with_color(EtkWidget* thiz,u32 fgcolor,u32 bgcolor)
 		etk_bitmap_hline(h,t.x,j,t.width,bgcolor);
 	}
 	
+	etk_bitmap_draw_line_color(h,r.x,r.y,r.x+r.width,r.y+r.height,WINDOW_CLOSE_COLOR);
+	etk_bitmap_draw_line_color(h,r.x,r.y+r.width,r.x+r.height,r.y,WINDOW_CLOSE_COLOR);
 	
-	etk_bitmap_draw_line(h,r.x,r.y,r.x+r.width,r.y+r.height);
-	etk_bitmap_draw_line(h,r.x,r.y+r.width,r.x+r.height,r.y);
+	// etk_bitmap_draw_line(h,r.x,r.y,r.x+r.width,r.y+r.height);
+	// etk_bitmap_draw_line(h,r.x,r.y+r.width,r.x+r.height,r.y);
 
-	etk_bitmap_draw_rect(h,r.x-1,r.y-1,r.width+2,r.height+2,BLACK);
-	etk_bitmap_draw_rect(h,r.x+1,r.y+1,r.width-2,r.height-2,GRAY);
-	
-
-	etk_bitmap_hline(h,r.x,r.y,r.width-1,WHITESMOKE);
-	etk_bitmap_vline(h,r.x,r.y,r.height,WHITESMOKE);
-	etk_bitmap_hline(h,r.x,r.y+r.height,r.width,GRAY);
-	etk_bitmap_vline(h,r.x+r.width,r.y,r.height,GRAY);
+	// etk_bitmap_draw_rect(h,r.x-1,r.y-1,r.width+2,r.height+2,BLACK);
+	// etk_bitmap_draw_rect(h,r.x+1,r.y+1,r.width-2,r.height-2,GRAY);
 	
 
-	etk_canvas_hline(thiz->canvas,2,t.y+t.height-3,thiz->rect.width-5,GRAY);
+	// etk_bitmap_hline(h,r.x,r.y,r.width-1,WHITESMOKE);
+	// etk_bitmap_vline(h,r.x,r.y,r.height,WHITESMOKE);
+	// etk_bitmap_hline(h,r.x,r.y+r.height,r.width,GRAY);
+	// etk_bitmap_vline(h,r.x+r.width,r.y,r.height,GRAY);
+	
+
+	// etk_canvas_hline(thiz->canvas,2,t.y+t.height-3,thiz->rect.width-5,GRAY);
 	text=etk_widget_get_text(thiz);
 	if(text!=NULL){
 		etk_canvas_draw_string_with_color(thiz->canvas,25,3,text,fgcolor,bgcolor);
@@ -161,14 +137,14 @@ Ret etk_window_on_paint(EtkWidget* thiz){
 	if((thiz->type&ETK_WIDGET_WINDOW)){
 		if(priv->has_head==1){
 			etk_window_on_paint_head(thiz);
-			etk_canvas_draw_rect(thiz->canvas,0,0,thiz->rect.width-1,thiz->rect.height-1,BLACK);
-			etk_canvas_draw_rect(thiz->canvas,2,2,thiz->rect.width-5,thiz->rect.height-5,GRAY);
+			// etk_canvas_draw_rect(thiz->canvas,0,0,thiz->rect.width-1,thiz->rect.height-1,DIMGRAY);
+			// etk_canvas_draw_rect(thiz->canvas,2,2,thiz->rect.width-5,thiz->rect.height-5,GRAY);
 
-			etk_canvas_hline(thiz->canvas,1,1,thiz->rect.width-3,WHITESMOKE);
-			etk_canvas_vline(thiz->canvas,1,1,thiz->rect.height-3,WHITESMOKE);
+			// etk_canvas_hline(thiz->canvas,1,1,thiz->rect.width-3,WHITESMOKE);
+			// etk_canvas_vline(thiz->canvas,1,1,thiz->rect.height-3,WHITESMOKE);
 
-			etk_canvas_hline(thiz->canvas,1,thiz->rect.height-2,thiz->rect.width-3,DIMGRAY);
-			etk_canvas_vline(thiz->canvas,thiz->rect.width-2,1,thiz->rect.height-3,DIMGRAY);
+			// etk_canvas_hline(thiz->canvas,1,thiz->rect.height-2,thiz->rect.width-3,DIMGRAY);
+			// etk_canvas_vline(thiz->canvas,thiz->rect.width-2,1,thiz->rect.height-3,DIMGRAY);
 		}
 	}
 	
@@ -251,14 +227,15 @@ Ret etk_window_on_event(EtkWidget* thiz, EtkEvent* event){
 			
 		}else{
 			//beep(1);
-			etk_window_on_paint_head_with_color(priv->modal,BLACK,WHITE);
+			etk_window_on_paint_head_with_color(priv->modal,BLACK,WINDOW_HEAD_ACTIVE_COLOR);
 			etk_default_wnd_manager_update_rect(etk_default_wnd_manager(),&priv->modal->rect);
-			etk_window_on_paint_head_with_color(priv->modal,WHITE,BLUE);
-			etk_default_wnd_manager_update_rect(etk_default_wnd_manager(),&priv->modal->rect);
-			etk_window_on_paint_head_with_color(priv->modal,BLACK,WHITE);
-			etk_default_wnd_manager_update_rect(etk_default_wnd_manager(),&priv->modal->rect);
-			etk_window_on_paint_head_with_color(priv->modal,WHITE,BLUE);
-			etk_default_wnd_manager_update_rect(etk_default_wnd_manager(),&priv->modal->rect);
+			
+			// etk_window_on_paint_head_with_color(priv->modal,WHITE,BLUE);
+			// etk_default_wnd_manager_update_rect(etk_default_wnd_manager(),&priv->modal->rect);
+			// etk_window_on_paint_head_with_color(priv->modal,BLACK,WHITE);
+			// etk_default_wnd_manager_update_rect(etk_default_wnd_manager(),&priv->modal->rect);
+			// etk_window_on_paint_head_with_color(priv->modal,WHITE,BLUE);
+			// etk_default_wnd_manager_update_rect(etk_default_wnd_manager(),&priv->modal->rect);
 			/*etk_window_on_paint_head_with_color(priv->modal,BLACK,WHITE);
 			etk_default_wnd_manager_update_rect(etk_default_wnd_manager(),&priv->modal->rect);
 			etk_window_on_paint_head_with_color(priv->modal,WHITE,BLUE);
