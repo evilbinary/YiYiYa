@@ -3,8 +3,8 @@
  * 作者: evilbinary on 01/01/20
  * 邮箱: rootdebug@163.com
  ********************************************************************/
-#ifndef CIRCLE_QUEUE_H
-#define CIRCLE_QUEUE_H
+#ifndef ARRAY_QUEUE_H
+#define ARRAY_QUEUE_H
 
 #include "types.h"
 

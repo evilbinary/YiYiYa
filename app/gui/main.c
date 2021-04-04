@@ -1,9 +1,9 @@
+#include "event.h"
 #include "jpeg_decoder.h"
 #include "screen.h"
 #include "stdio.h"
 #include "syscall.h"
 #include "time.h"
-#include "event.h"
 
 char* buf = "hello,gui\n";
 
@@ -27,19 +27,18 @@ void* load_bmp(char* name) {
   return buffer;
 }
 
-void display_time(){
+void display_time() {
   char buffer[80];
   struct tm* timeinfo;
   time_t lt;
   time(&lt);
   timeinfo = localtime(&lt);
   strftime(buffer, 80, "%Y-%m-%d %I:%M:%S", timeinfo);
-  screen_printf(840,10,"%s\n", buffer);
+  screen_printf(840, 10, "%s\n", buffer);
 }
 
-int main(int argc, char* argv[]) {
-  printf(buf);
-  int fd = syscall2(SYS_OPEN, "/dev/mouse", 0);
+void yiyiya_gui() {
+  int fd = open("/dev/mouse", 0);
   printf("mouse fd %d\n", fd);
   screen_init();
   screen_info_t* screen = screen_info();
@@ -63,13 +62,35 @@ int main(int argc, char* argv[]) {
     // screen_fill_rect(10, 20, 30, 30, 0xff0000);
 
     screen_printf(10, 100, "mouse=%d,%d", mouse.x, mouse.y);
-    screen_fill_rect(mouse.x, screen->height - mouse.y, 4, 4,
-                     0x00ff00);
+    screen_fill_rect(mouse.x, screen->height - mouse.y, 4, 4, 0x00ff00);
 
     display_time();
 
     // screen_show_bmp_picture(200, 200, bmp, 0, 0);
     screen_flush();
   }
+}
+
+void yiyiya_display() {
+  screen_init();
+  for (;;) {
+    screen_printf(0, 0, "hello dispaly\n");
+    screen_flush();
+  }
+}
+
+void yiyiya_bitmap(){
+  bitmap_t* bitmap = load_jpeg("/dev/sda/home.jpg");
+  for(;;){
+
+  }
+}
+
+int main(int argc, char* argv[]) {
+  printf(buf);
+  yiyiya_gui();
+  // yiyiya_display();
+  // yiyiya_bitmap();
+
   return 0;
 }

@@ -37,6 +37,7 @@ void do_shell_thread(void) {
   // syscall2(SYS_EXEC,"/dev/sda/gui.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/file.elf",NULL);
   syscall2(SYS_EXEC,"/dev/sda/etk.elf",NULL);
+  // syscall2(SYS_EXEC,"/dev/sda/test.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/microui.elf",NULL);
   // kprintf("fd=>%d\n",fd);
   for (;;) {

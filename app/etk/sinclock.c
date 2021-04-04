@@ -170,6 +170,7 @@ EtkWidget* etk_app_clock(e32 x,e32 y,e32 width,e32 height)
 	thiz=etk_create_window(x, y, width, height, ETK_WIDGET_WINDOW);
 	priv=(EtkWindowClass*)thiz->subclass;
 	priv->has_head=1;
+	etk_widget_set_text(thiz,"clock");
 	thiz->event = etk_clock_event;
 	priv->data[1] = etk_source_timer_create(500,etk_clock_update_time_listener,thiz);
 	etk_sources_manager_add(	etk_default_sources_manager(), 

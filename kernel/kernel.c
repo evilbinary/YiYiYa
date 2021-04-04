@@ -17,6 +17,7 @@ void kernel_init() {
   schedule_init();
   module_init();
   memory_init();
+  vfs_init();
 }
 
 void kernel_run(){

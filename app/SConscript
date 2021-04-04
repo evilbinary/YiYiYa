@@ -42,12 +42,12 @@ SConscript(dirs=['microui'], exports='env')
 SConscript(dirs=['jpeg'], exports='env')
 SConscript(dirs=['file'], exports='env')
 SConscript(dirs=['etk'], exports='env')
-
+SConscript(dirs=['test'], exports='env')
 
 
 if plt=='Darwin':
     env.Command('copyhello', 
-        ['hello/hello.elf','gui/gui.elf','microui/microui.elf','file/file.elf','etk/etk.elf' ],
+        ['hello/hello.elf','gui/gui.elf','microui/microui.elf','file/file.elf','etk/etk.elf','test/test.elf' ],
         ['hdid  image/disk.img &&  cp ${SOURCES} /Volumes/NO\ NAME/ && hdiutil eject /Volumes/NO\ NAME/'
     ])
     pass

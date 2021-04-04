@@ -77,9 +77,7 @@ char *getcwd(char *buf, size_t size) {
 }
 
 pid_t getpid(void) {
-  int pid, rc;
-
-  return (pid_t)pid;
+  return ya_getpid();
 }
 
 gid_t getgid(void) {
@@ -153,4 +151,15 @@ int unlink(const char *pathname) {
   int rc;
 
   return rc;
+}
+
+
+pid_t fork(){
+  return ya_fork();
+}
+
+ 
+
+pid_t	getppid(void){
+  return ya_getppid();
 }

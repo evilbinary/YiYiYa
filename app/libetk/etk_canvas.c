@@ -285,7 +285,7 @@ Ret etk_canvas_draw_char_with_color(EtkCanvas* thiz,e32 x,e32 y,u32 ch,u32 fg,u3
 			}
 		}
 	}else if(code>0xa1a1){
-		code = code - 0xa0a0;
+		code = code - 0xa1a1;
 		if(code>0x0f00) code = code - 0x600;
 		lp = ((u8 *)thiz->gc.font->data + ((code>>8)*94 + (code&0xff)) * 32);
 		for(i=0; i<16; i++){
@@ -332,7 +332,7 @@ Ret etk_canvas_draw_char(EtkCanvas* thiz,e32 x,e32 y,u32 ch){
 			}
 		}
 	}else if(code>0xa1a1){
-		code = code - 0xa0a0;
+		code = code - 0xa1a1;
 		if(code>0x0f00) code = code - 0x600;
 		lp = ((u8 *)thiz->gc.font->data + ((code>>8)*94 + (code&0xff)) * 32);
 		for(i=0; i<16; i++){

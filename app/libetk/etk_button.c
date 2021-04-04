@@ -91,7 +91,7 @@ Ret etk_button_draw(EtkWidget* thiz,u32 fgcolor,u32 bgcolor){
 		etk_canvas_fill_rect(thiz->canvas,r.x,r.y,r.width,r.height,bgcolor);//thiz->canvas->gc.bgcolor.color
 	
 		if(text!=NULL){
-			etk_canvas_draw_string_with_color(thiz->canvas,r.x+(thiz->rect.width>>2),r.y+(thiz->rect.height>>2)-4,text,fgcolor,bgcolor);
+			etk_canvas_draw_string_with_color(thiz->canvas,r.x+(thiz->rect.width>>2),r.y+(thiz->rect.height>>2),text,fgcolor,bgcolor);
 		}
 		etk_canvas_draw_rect(thiz->canvas,r.x,r.y,r.width-1,r.height-1,GRAY);
 		etk_default_wnd_manager_update_rect(etk_default_wnd_manager(),&thiz->rect);

@@ -38,6 +38,8 @@ size_t   strxfrm(char *, const char *, size_t);
 char*	strndup(const char *s, size_t n);	// This is not in the standard.
 char*	strdup(const char *s);				// This is not in the standard.
 
+char * strchrnul(const char *s, int c);
+
 #ifdef __cplusplus
 }
 #endif

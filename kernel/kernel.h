@@ -15,6 +15,7 @@
 #include "kernel/exceptions.h"
 #include "kernel/stdarg.h"
 #include "kernel/ioctl.h"
+#include "kernel/vfs.h"
 
 #define fn_malloc kmalloc
 #define fn_free kfree

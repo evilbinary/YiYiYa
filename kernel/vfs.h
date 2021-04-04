@@ -79,6 +79,6 @@ void vfs_mount(vnode_t *root, u8 *path, vnode_t *node);
 vnode_t *vfs_create(u8 *name, u32 flags);
 void vfs_add_child(vnode_t *parent, vnode_t *child);
 void vfs_exten_child(vnode_t *node);
-
+int vfs_init();
 
 #endif

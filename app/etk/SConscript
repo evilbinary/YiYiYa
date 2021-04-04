@@ -15,6 +15,7 @@ env.Program('etk.elf', [
     'etk_app.c',
     'sinclock.c',
     'mine.c',
+    'terminal.c',
     '../libetk/libetk.a',
     '../libjpeg/libjpeg.a',
     '../libgui/libgui.a',

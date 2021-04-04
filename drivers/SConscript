@@ -23,6 +23,7 @@ env.Library('driver', [
     'fat32.c',
     'dma.c',
     'rtc.c',
+    'pty.c',
     '../kernel/libyiyiya.a',
     '../arch/libarch.a',
     '../libs/libalgorithm/libalgorithm.a',
