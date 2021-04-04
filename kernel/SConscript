@@ -21,6 +21,8 @@ env.Library('yiyiya', [
     'vfs.c',
     'sysfn.c',
     'devfn.c',
+    'fd.c',
+    'loader.c',
     '../arch/libarch.a',
     '../libs/libalgorithm/libalgorithm.a',
     '../libs/libkernel/libkernel.a',

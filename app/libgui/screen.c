@@ -7,9 +7,9 @@
 
 #include "bmp.h"
 #include "event.h"
+#include "image.h"
 #include "stdarg.h"
 #include "syscall.h"
-#include "image.h"
 
 screen_info_t gscreen;
 
@@ -540,10 +540,10 @@ void screen_show_bmp_picture(i32 x, i32 y, void *bmp_addr, i32 mask_color,
 }
 
 void screen_init() {
-  int fd = syscall2(SYS_OPEN, "/dev/fb", 0);
+  int fd = open("/dev/fb", 0);
   gscreen.fd = fd;
-  syscall4(SYS_IOCTL, fd, IOC_READ_FRAMBUFFER_INFO, &(gscreen.fb),
-           sizeof(framebuffer_info_t));
+  ioctl(fd, IOC_READ_FRAMBUFFER_INFO, &(gscreen.fb),
+        sizeof(framebuffer_info_t));
   gscreen.buffer = gscreen.fb.frambuffer;
   gscreen.width = gscreen.fb.width;
   gscreen.height = gscreen.fb.height;
@@ -566,7 +566,7 @@ void screen_flush() {
       (++gscreen.fb.framebuffer_index) % gscreen.fb.framebuffer_count;
   gscreen.buffer = gscreen.fb.frambuffer + gscreen.width * gscreen.height *
                                                gscreen.fb.framebuffer_index;
-  syscall3(SYS_IOCTL, gscreen.fd, IOC_FLUSH_FRAMBUFFER, current_index);
+  ioctl(gscreen.fd, IOC_FLUSH_FRAMBUFFER, current_index);
 }
 
 void do_screen_thread(void) {
@@ -576,7 +576,7 @@ void do_screen_thread(void) {
   char wheel[] = {'\\', '|', '/', '-'};
 
   mouse_data_t mouse_data;
-  int fd = syscall2(SYS_OPEN, "/dev/mouse", 0);
+  int fd = open("/dev/mouse", 0);
   for (;;) {
     buf[0] = wheel[i++];
     // continue;

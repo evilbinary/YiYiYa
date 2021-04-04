@@ -5,6 +5,7 @@
  ********************************************************************/
 
 #include "vfs.h"
+#include "fd.h"
 
 vnode_t *root_node = NULL;
 
@@ -13,7 +14,7 @@ size_t vioctl(vnode_t *node, u32 cmd, va_list args) {
     u32 ret = 0;
     // va_list args;
     // va_start(args, cmd);
-    ret = node->ioctl(node, cmd,args);
+    ret = node->ioctl(node, cmd, args);
     // va_end(args);
     return ret;
   } else {
@@ -163,4 +164,33 @@ vnode_t *vfs_create(u8 *name, u32 flags) {
   node->find = vfs_find;
   node->mount = vfs_mount;
   return node;
+}
+
+vnode_t *vfs_open(vnode_t *root, u8 *name) {
+  vnode_t *node = vfind(root, name);
+  if (node == NULL) {
+    kprintf("open %s failed \n", name);
+    return -1;
+  }
+  char *last = kstrrstr(name, node->name);
+  if (last != NULL) {
+    last += kstrlen(node->name);
+    if (last[0] == '/') last++;
+  } else {
+    kprintf("open %s failed path is empty\n", name);
+    return -1;
+  }
+  vnode_t *file = vfind(node, last);
+  if (file == NULL) {
+    kprintf("find %s failed\n", last);
+    return -1;
+  }
+  u32 ret = vopen(file);
+  return file;
+}
+
+
+int vfs_init(){
+
+  return 1;
 }

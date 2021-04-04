@@ -75,6 +75,27 @@ size_t fat32_write_bytes(vnode_t *node, u32 offset, size_t nbytes, u8 *buf) {
   return nbytes;
 };
 
+int fat32_get_long_file_name(lfn_entry_t *lfn, char *lnf_name) {
+  u32 max_fn = (lfn->seq) - 0x40;
+  lfn = lfn + max_fn - 1;
+  int j = 0, k;
+  memset(lnf_name, 0, 256);
+  for (int i = max_fn; i > 0; i--) {
+    for (k = 0; k < 5; k++) {
+      lnf_name[j++] = ((u16 *)lfn->name1)[k];
+    }
+    for (k = 0; k < 6; k++) {
+      lnf_name[j++] = ((u16 *)lfn->name2)[k];
+    }
+    for (k = 0; k < 2; k++) {
+      lnf_name[j++] = ((u16 *)lfn->name3)[k];
+    }
+    lfn--;
+  }
+  lnf_name[j++] = '\x00';
+  return j;
+}
+
 dir_entry_t *fat32_find_file_entry(fat32_info_t *fat32, char *name,
                                    u32 *index) {
   if (fat32 == NULL) {
@@ -82,17 +103,28 @@ dir_entry_t *fat32_find_file_entry(fat32_info_t *fat32, char *name,
     return NULL;
   }
   char pre_name[10];
-  memset(pre_name, 32, 10);
-  u32 len = kstrlen(name);
-  char *s = name + len - 3;
-  kstrncpy(pre_name, name, len - 4);
+  char lnf_name[256];
   for (int i = 0; i < fat32->entries_number; i++) {
     dir_entry_t *e = &fat32->entries[i];
-    // kprintf("%s==%s\n", pre_name, e->name);
-    if (kstrncasecmp(pre_name, e->name, 8) == 0 &&
-        kstrncasecmp(s, e->ext, 3) == 0) {
-      *index = i;
-      return e;
+    lfn_entry_t *lfn = e;
+    if (e->attr != FAT32_ATTR_LONG_FILE_NAME) {
+        u32 len = kstrlen(name);
+        char *s = name + len - 3;
+        memset(pre_name, 32, 8);
+        kstrncpy(pre_name, name, len - 4);
+      // kprintf("%s==%s\n", pre_name, e->name);
+      if (kstrncasecmp(pre_name, e->name, 8) == 0 &&
+          kstrncasecmp(s, e->ext, 3) == 0) {
+        *index = i;
+        return e;
+      }
+    } else if ((lfn->seq & 0xc0) == 0x40) {
+      int j = fat32_get_long_file_name(lfn, lnf_name);
+      //kprintf("lfn %s==%s\n", name, lnf_name);
+      if (kstrncasecmp(name, lnf_name, j) == 0) {
+        *index = (lfn->seq) - 0x40 +i;
+        return lfn + (lfn->seq) - 0x40  ;
+      }
     }
   }
   return NULL;
@@ -341,11 +373,11 @@ u32 fat32_open(vnode_t *node) {
   char *name = node->name;
   fat32_info_t *fat32 = node->data;
   u32 index = 0;
-  dir_entry_t *e = fat32_find_file_entry(fat32, name, &index);
-  if (e == NULL) {
-    kprintf("open file %s error\n", name);
-    return 0;
-  }
+  // dir_entry_t *e = fat32_find_file_entry(fat32, name, &index);
+  // if (e == NULL) {
+  //   kprintf("open file %s error\n", name);
+  //   return 0;
+  // }
   return 1;
 }
 
@@ -415,7 +447,7 @@ int fat32_init(void) {
   fat32_info->root_dir = root_dir;
   fat32_info->data = data;
 
-  fat32_info->entries_number = 100;
+  fat32_info->entries_number = 120;
   dir_entry_t *entries =
       kmalloc(sizeof(dir_entry_t) * fat32_info->entries_number);
   fat32_read_bytes(node, data, sizeof(dir_entry_t) * fat32_info->entries_number,

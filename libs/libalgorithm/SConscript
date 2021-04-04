@@ -13,4 +13,5 @@ env.Library('algorithm',
     'circle_queue.c',
     'pool.c',
     'queue_pool.c',
+    'buffer.c',
     ],CFLAGS='$CFLAGS -I. -Ilibs/include/algorithm -Ilibs/include/kernel')

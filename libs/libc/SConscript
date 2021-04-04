@@ -29,4 +29,5 @@ env.Library('c', [
     'gettimeofday.c',
     'math.c',
     'getopt.c',
+    'ioctl.c',
 ],CFLAGS='$CFLAGS -Ilibs/include/c/')

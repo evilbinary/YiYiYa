@@ -28,7 +28,11 @@ enum {
     SYS_SEEK,
     SYS_VALLOC,
     SYS_VFREE,
-    SYS_VHEAP
+    SYS_VHEAP,
+    SYS_FORK,
+    SYS_PIPE,
+    SYS_GETPID,
+    SYS_GETPPID
 };
 
 typedef struct exec{
@@ -39,7 +43,8 @@ typedef struct exec{
 typedef int (*entry_fn)(int, char**);
 
 u32 sys_open(char* name, int attr);
-size_t sys_ioctl(u32 fd, u32 cmd,...);
+// size_t sys_ioctl(u32 fd, u32 cmd, ...);
+size_t sys_ioctl(u32 fd, u32 cmd, va_list args);
 void sys_close(u32 fd);
 size_t sys_write(u32 fd, void* buf, size_t nbytes);
 size_t sys_read(u32 fd, void* buf, size_t nbytes);
@@ -64,5 +69,12 @@ void* sys_valloc(void* addr,size_t size);
 void sys_vfree(void* addr);
 
 void* sys_vheap();
+
+int sys_fork();
+int sys_pipe(int fd[2]);
+
+int sys_getpid();
+
+int sys_getppid();
 
 #endif

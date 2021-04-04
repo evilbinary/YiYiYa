@@ -48,7 +48,7 @@ void* ya_sbrk(size_t size) {
 }
 
 void* ya_alloc(size_t size) {
-  size_t s=size;
+  size_t s = size;
   size = (size + sizeof(free_block_t) + (align_to - 1)) & ~(align_to - 1);
   free_block_t* block = free_block_list_head.next;
   free_block_t** head = &(free_block_list_head.next);
@@ -162,4 +162,20 @@ u32 ya_time(time_t* current) {
                      time.minute * 60 + time.second + 0;
   *current = seconds;
   return ret;
+}
+
+int ya_ioctl(int fd, int cmd, va_list args) {
+  return syscall3(SYS_IOCTL, fd, cmd, args);
+}
+
+int ya_fork(){
+  return syscall0(SYS_FORK);
+}
+
+int ya_getpid(){
+  return syscall0(SYS_GETPID);
+}
+
+int ya_getppid(){
+  return syscall0(SYS_GETPPID);
 }

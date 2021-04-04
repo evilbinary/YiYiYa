@@ -1,7 +1,7 @@
 #include "etk_app.h"
-#include "etk_global.h"
 
 #include "etk.h"
+#include "etk_global.h"
 #include "stdlib.h"
 #include "time.h"
 
@@ -32,7 +32,8 @@ int etk_app_main(int argc, char* argv[]) {
   //��������
   /*desktop=(EtkWidget*)etk_create_window(0,0,640,480,ETK_WIDGET_DESKTOP);
   etk_default_wnd_manager_set_desktop(manager,desktop);*/
-  desktop = etk_create_window(0, 0, etkglobal.display->width, etkglobal.display->height,
+  desktop = etk_create_window(0, 0, etkglobal.display->width,
+                              etkglobal.display->height,
                               ETK_WIDGET_DESKTOP | ETK_WIDGET_NO_BITMAP);
 
   // b=etk_image_jpeg_decoder_decode(jpeg_decoder,"duck.jpg");
@@ -146,10 +147,10 @@ int etk_app_main(int argc, char* argv[]) {
   i++;
 
   {
-    EtkSource *timer;
+    EtkSource* timer;
     wins[0] = etk_create_window(20, 120, 200, 150, ETK_WIDGET_WINDOW);
-    timer=etk_source_timer_create(100,timer2_listener,wins[0]);
-    etk_sources_manager_add(etk_default_sources_manager(),timer);
+    timer = etk_source_timer_create(100, timer2_listener, wins[0]);
+    etk_sources_manager_add(etk_default_sources_manager(), timer);
   }
 
   // clock
@@ -157,9 +158,11 @@ int etk_app_main(int argc, char* argv[]) {
 
   // //mine
   // etk_game_mine(10, 30, 8, 8, 10);
-  etk_game_mine(160, 30, 10, 10, 14);
+  etk_game_mine(160, 230, 10, 10, 14);
   // etk_game_mine(340, 30, 16, 16, 20);
   //��ʾ���д���
+  etk_terminal(240, 140, 420, 340);
+
   etk_widget_show_all(desktop);
 
   return 0;
@@ -202,13 +205,14 @@ Ret button0_listener(void* user_data, void* obj) {
     t.width = 240;
     t.height = 140;
   }
-  timewin = etk_create_window(rand() %etkglobal.display->width, rand() %  etkglobal.display->height, t.width, t.height,
-                              ETK_WIDGET_WINDOW);
+  timewin = etk_create_window(rand() % etkglobal.display->width,
+                              rand() % etkglobal.display->height, t.width,
+                              t.height, ETK_WIDGET_WINDOW);
   etk_widget_show(timewin, 1);
   {
-    EtkSource *timer;
-    timer=etk_source_timer_create(1000,win_update_time_listener,timewin);
-    etk_sources_manager_add(etk_default_sources_manager(),timer);
+    EtkSource* timer;
+    timer = etk_source_timer_create(1000, win_update_time_listener, timewin);
+    etk_sources_manager_add(etk_default_sources_manager(), timer);
   }
   return RET_OK;
 }
@@ -230,7 +234,8 @@ Ret button1_listener(void* user_data, void* obj) {
     t.width = 240;
     t.height = 140;
   }
-  pic = etk_create_window(rand() %  etkglobal.display->width, rand() %  etkglobal.display->height, t.width, t.height,
+  pic = etk_create_window(rand() % etkglobal.display->width,
+                          rand() % etkglobal.display->height, t.width, t.height,
                           ETK_WIDGET_WINDOW);
   etk_canvas_draw_bitmap(pic->canvas, b, &t, &t, 0x00);
   if (b != NULL) etk_bitmap_destroy(b);
@@ -244,8 +249,9 @@ Ret button3_listener(void* user_data, void* obj) { return RET_OK; }
 Ret button4_listener(void* user_data, void* obj) { return RET_OK; }
 Ret button5_listener(void* user_data, void* obj) {
   EtkWidget* win;
-  win =
-      etk_create_window(rand() %  etkglobal.display->width, rand() %  etkglobal.display->height, 140, 60, ETK_WIDGET_WINDOW);
+  win = etk_create_window(rand() % etkglobal.display->width,
+                          rand() % etkglobal.display->height, 140, 60,
+                          ETK_WIDGET_WINDOW);
   etk_canvas_draw_string(win->canvas, 6, 30, "About etk gui");
   etk_widget_show(win, 1);
   return RET_OK;
@@ -305,7 +311,8 @@ Ret button8_listener(void* user_data, void* obj) {
     t.width = 240;
     t.height = 140;
   }
-  pic = etk_create_window(rand() %  etkglobal.display->width, rand() % etkglobal.display->height, t.width, t.height,
+  pic = etk_create_window(rand() % etkglobal.display->width,
+                          rand() % etkglobal.display->height, t.width, t.height,
                           ETK_WIDGET_WINDOW);
   etk_canvas_draw_bitmap(pic->canvas, b, &t, &t, 0x00);
   etk_canvas_draw_string(pic->canvas, 50, 50, "picture");
@@ -423,8 +430,8 @@ Ret timer2_listener(void* data) {
   if (f1 == 0) {
     f1 = 1;
     f2 = 1;
-    posx = rand() %  etkglobal.display->width;
-    posy = 50 + rand() %  etkglobal.display->height;
+    posx = rand() % etkglobal.display->width;
+    posy = 50 + rand() % etkglobal.display->height;
   }
   if (posx + 100 > wii->rect.width) {
     f1 = -1;

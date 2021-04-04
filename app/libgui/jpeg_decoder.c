@@ -201,7 +201,8 @@ void* bitmap_create(i32 w, i32 h, i32 bitperpixel, u32 color) {
   bitmap->h = h;
   bitmap->length = length;
   bitmap->bitperpixel = bitperpixel;
-  // printf("size:%d length:%d\n",length*bitperpixel,length);
+  printf("size:%d length:%d\n",length*(bitperpixel>>3),length);
+  if(color==0) return bitmap;
   switch (bitperpixel) {
     case 16:
       p16 = (u16*)bitmap->bits;

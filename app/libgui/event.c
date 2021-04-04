@@ -12,7 +12,14 @@ event_t null_event;
 aqueue_t queue;
 event_info_t event_info;
 mouse_data_t current_mouse;
-u32 button_press=0;
+u32 button_press = 0;
+
+u8 scan_code;
+u8 shf_p = 0;
+u8 ctl_p = 0;
+u8 alt_p = 0;
+u32 col = 0;
+u32 row = 0;
 
 static const char key_map[0x3a][2] = {
     /*00*/ {0x0, 0x0},   {0x0, 0x0}, {'1', '!'},   {'2', '@'},
@@ -41,7 +48,7 @@ int event_init() {
   return 1;
 }
 
-u32 scan_code_to_key(u32 scan_code) { return key_map[scan_code]; }
+u32 scan_code_to_key(u32 scan_code) { return key_map[scan_code & 0x7f][shf_p]; }
 
 int event_read_mouse(mouse_data_t* mouse_data) {
   read(event_info.mouse_fd, &event_info.mouse, sizeof(mouse_data_t));
@@ -64,18 +71,18 @@ int event_poll(event_t* event) {
       u8 button = mouse.sate & BUTTON_MASK;
       if (button == BUTTON_LEFT || button == BUTTON_RIGHT ||
           button == BUTTON_MIDDLE) {
-        if(button_press==0){
+        if (button_press == 0) {
           e.type = MOUSE_BUTTON_DOWN;
           e.mouse = mouse;
           aqueue_push(&queue, e);
-          button_press=1;
+          button_press = 1;
         }
       } else {
-        if(button_press==1){
+        if (button_press == 1) {
           e.type = MOUSE_BUTTON_UP;
           e.mouse = mouse;
           aqueue_push(&queue, e);
-          button_press=0;
+          button_press = 0;
         }
       }
       count++;
@@ -88,7 +95,6 @@ int event_poll(event_t* event) {
       count++;
       current_mouse = mouse;
     }
-    
   }
 
   u32 key;
@@ -99,7 +105,7 @@ int event_poll(event_t* event) {
     count++;
   }
 
-  if(aqueue_is_empty(&queue)){
+  if (aqueue_is_empty(&queue)) {
     return 0;
   }
   *event = aqueue_pop(&queue);

@@ -179,7 +179,7 @@ void do_page_fault(interrupt_context_t *context) {
   int reserved = context->code & 0x8;
   int id = context->code & 0x10;
 
-  kprintf("eip:%x cs:%x ds:%x [",context->eip,context->cs,context->ds);
+  kprintf("eip:%x cs:%x ds:%x ss:%x esp:%x ebp:%x [",context->eip,context->cs,context->ds,context->ss,context->esp,context->ebp);
   if (present == 1) {
     kprintf("present ");
   }
@@ -198,12 +198,17 @@ void do_page_fault(interrupt_context_t *context) {
   if (present == 0) {
     thread_t *current = thread_current();
     if(fault_addr==NULL){
-      kprintf(" warning null pointer error\n");
+      kprintf(" tid: %x warning null pointer\n",current->id);
       return;
     }
     if (current != NULL) {
+      void* phy = virtual_to_physic(current->context.page_dir, fault_addr);
       kprintf(" tid: %x ", current->id);
-      valloc(fault_addr, PAGE_SIZE);
+      if(phy==NULL){
+        valloc(fault_addr, PAGE_SIZE);
+      }else{
+        kprintf("paddr: %x ",phy);
+      }
     } else {
       map_page(fault_addr, fault_addr, PAGE_P | PAGE_USU | PAGE_RWW);
       kprintf("\n");

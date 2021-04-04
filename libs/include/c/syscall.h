@@ -29,7 +29,11 @@ enum {
     SYS_SEEK,
     SYS_VALLOC,
     SYS_VFREE,
-    SYS_VHEAP
+    SYS_VHEAP,
+    SYS_FORK,
+    SYS_PIPE,
+    SYS_GETPID,
+    SYS_GETPPID
 };
 
 void* syscall0(u32 num);

@@ -20,6 +20,18 @@
 #define FAT32_ENTRY_MASK  0x0FFFFFFF
 #define FAT32_CLUSTER_FREE 0
 
+#define FAT32_ATTR_READ_ONLY_FILE 0x01
+#define FAT32_ATTR_HIDDENT_FILE 0x02
+#define FAT32_ATTR_SYSTEM_FILE 0x04
+#define FAT32_ATTR_VOLUME_LABEL 0x08
+#define FAT32_ATTR_LONG_FILE_NAME 0x0f
+#define FAT32_ATTR_DIRECTORY 0x10
+#define FAT32_ATTR_ARCHIVE 0x20
+
+#define FAT32_ATTR_MASK		0x3F
+
+
+
 typedef struct vbr {
   u8 jmp[3];
   u8 oem_name[8];
@@ -80,6 +92,17 @@ typedef struct dir_entry {
   u16 start_file_cluster_low;    //文件起始簇号的地16位 0x0003
   u32 file_size;             //文件的长度bytes
 } __attribute__((packed)) dir_entry_t;
+
+typedef struct lfn_entry{
+  u8 seq;
+  u8 name1[10];
+  u8 attr;
+  u8 reserved;
+  u8 checksum;
+  u8 name2[12];
+  u16 reserved1;
+  u8 name3[4];
+}__attribute__((packed)) lfn_entry_t;
 
 
 typedef struct fat32_info{

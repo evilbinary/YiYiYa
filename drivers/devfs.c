@@ -6,43 +6,45 @@
 #include "kernel/device.h"
 #include "kernel/module.h"
 #include "kernel/vfs.h"
+#include "pty.h"
+#include "kernel/fd.h"
 
 vnode_t *devfs_create_device(device_t *dev) {
   vnode_t *t = kmalloc(sizeof(vnode_t));
   t->flags = V_BLOCKDEVICE;
   t->write = NULL;
   t->read = NULL;
-  t->device=dev;
+  t->device = dev;
   return t;
 }
 
-u32 device_write(vnode_t *node, u32 offset, size_t nbytes, u8 *buf){
+u32 device_write(vnode_t *node, u32 offset, size_t nbytes, u8 *buf) {
   u32 ret = 0;
-  device_t* dev = node->device;
+  device_t *dev = node->device;
   if (dev == NULL) {
     return ret;
   }
   ret = dev->write(dev, buf, nbytes);
 }
 
-void device_read(vnode_t *node, u32 offset, size_t nbytes, u8 *buf){
+void device_read(vnode_t *node, u32 offset, size_t nbytes, u8 *buf) {
   u32 ret = 0;
-  device_t* dev = node->device;
+  device_t *dev = node->device;
   if (dev == NULL) {
     return ret;
   }
   ret = dev->read(dev, buf, nbytes);
 }
 
-size_t device_ioctl(vnode_t* node,u32 cmd,va_list args){
+size_t device_ioctl(vnode_t *node, u32 cmd, va_list args) {
   u32 ret = 0;
-  device_t* dev = node->device;
+  device_t *dev = node->device;
   if (dev == NULL) {
     return ret;
   }
   // va_list args;
   // va_start(args, cmd);
-  ret = dev->ioctl(dev, cmd,args);
+  ret = dev->ioctl(dev, cmd, args);
   // va_end(args);
   return ret;
 }
@@ -67,48 +69,56 @@ int devfs_init(void) {
     vfs_mount(NULL, "/dev", node_sda);
   }
 
-
-  //SYS_READ,SYS_WRITE
+  // SYS_READ,SYS_WRITE
   vnode_t *stdin = vfs_create("stdin", V_FILE);
   vnode_t *stdout = vfs_create("stdout", V_FILE);
   vfs_mount(NULL, "/dev", stdin);
   vfs_mount(NULL, "/dev", stdout);
 
-  stdin->device=device_find(DEVICE_KEYBOARD);
-  stdout->device=device_find(DEVICE_VGA);
-  if(stdin->device==NULL){
-    stdin->device=device_find(DEVICE_SERIAL);
+  stdin->device = device_find(DEVICE_KEYBOARD);
+  stdout->device = device_find(DEVICE_VGA);
+  if (stdin->device == NULL) {
+    stdin->device = device_find(DEVICE_SERIAL);
   }
-  if(stdout->device==NULL){
-    stdout->device=device_find(DEVICE_SERIAL);
+  if (stdout->device == NULL) {
+    stdout->device = device_find(DEVICE_SERIAL);
   }
 
-  stdin->read=device_read;
-  stdout->write=device_write;
+  stdin->read = device_read;
+  stdout->write = device_write;
 
-  //frambuffer
+  // frambuffer
   vnode_t *frambuffer = vfs_create("fb", V_FILE);
   vfs_mount(NULL, "/dev", frambuffer);
-  frambuffer->device=device_find(DEVICE_VGA);
-  if(frambuffer->device==NULL){
-    frambuffer->device=device_find(DEVICE_VGA_QEMU);
+  frambuffer->device = device_find(DEVICE_VGA);
+  if (frambuffer->device == NULL) {
+    frambuffer->device = device_find(DEVICE_VGA_QEMU);
   }
-  frambuffer->write=device_write;
-  frambuffer->ioctl=device_ioctl;
+  frambuffer->write = device_write;
+  frambuffer->ioctl = device_ioctl;
 
-  //mouse
+  // mouse
   vnode_t *mouse = vfs_create("mouse", V_FILE);
   vfs_mount(NULL, "/dev", mouse);
-  mouse->device=device_find(DEVICE_MOUSE);
-  mouse->read=device_read;
-  mouse->ioctl=device_ioctl;
+  mouse->device = device_find(DEVICE_MOUSE);
+  mouse->read = device_read;
+  mouse->ioctl = device_ioctl;
 
-  //time
+  // time
   vnode_t *time = vfs_create("time", V_FILE);
   vfs_mount(NULL, "/dev", time);
-  time->device=device_find(DEVICE_RTC);
-  time->read=device_read;
-  time->ioctl=device_ioctl;
+  time->device = device_find(DEVICE_RTC);
+  time->read = device_read;
+  time->ioctl = device_ioctl;
+
+  // pty
+  vnode_t *pts = NULL;
+  vnode_t *ptm = NULL;
+  pty_create(&ptm, &pts);
+  vfs_mount(NULL, "/dev", ptm);
+  vfs_mount(NULL, "/dev", pts);
+
+  fd_std_init();
 
   return 0;
 }

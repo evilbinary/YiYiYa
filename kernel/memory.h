@@ -16,14 +16,15 @@
 #define MEMORY_HEAP 4
 #define MEMORY_EXEC 8
 #define MEMORY_DATA 7
+#define MEMORY_STACK 9
 
 #define MEMORY_CREATE_SIZE 4096*10 //40k
 #define MEMORY_EXEC_SIZE 4096*100*1024 //400m
 
-#define DATA_ADDR 0x8000000
-#define STACK_ADDR 0x801000
-#define HEAP_ADDR 0x8200000
-#define EXEC_ADDR 0x200000
+#define DATA_ADDR  0x8000000
+#define STACK_ADDR 0x8000000
+#define HEAP_ADDR  0x8200000
+#define EXEC_ADDR  0x200000
 
 typedef struct vmemory_area{
     void* vaddr;

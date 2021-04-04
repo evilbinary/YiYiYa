@@ -130,7 +130,7 @@ void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
   tss_t* tss = &boot_info->tss[0];
   context->tss = tss;
   context->eip = entry;
-  context->level=level;
+  context->level = level;
   u32 cs, ds;
   if (level == 0) {
     cs = GDT_ENTRY_32BIT_CS * GDT_SIZE;
@@ -172,7 +172,7 @@ void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
 
   ulong addr = (ulong)boot_info->pdt_base;
   context->page_dir = addr;
-  context->kernel_page_dir=addr;
+  context->kernel_page_dir = addr;
 
   if (tss->eip == 0 && tss->cr3 == 0) {
     tss->ss0 = context->ss0;
@@ -194,6 +194,26 @@ void backtrace(stack_frame_t* fp, void** buf, int size) {
   }
 }
 
+void context_clone(context_t* context, context_t* src, u32* stack0, u32* stack3,
+                   u32* old0, u32* old3) {
+  *context = *src;
+  interrupt_context_t* c0 = stack0;
+  interrupt_context_t* s0 = src->esp0;
+  if (stack0 != NULL) {
+    *c0 = *s0;    
+    c0->eflags= 0x0200;
+  }
+  if (stack3 != NULL) {
+    // c0->esp = stack3 - ((u32)old3 - s0->esp);
+    // c0->ebp = stack3 - ((u32)old3- s0->ebp);
+    // c0->esp=stack3;
+    // c0->ebp=stack3;
+    context->esp = c0->esp;
+  }
+  context->esp0 = (u32)c0;
+  
+}
+
 void context_switch(interrupt_context_t* context, context_t** current,
                     context_t* next_context) {
   context_t* current_context = *current;
@@ -208,7 +228,7 @@ void context_switch(interrupt_context_t* context, context_t** current,
   tss->ss0 = next_context->ss0;
   tss->cr3 = next_context->page_dir;
 
-  //asm volatile("mov %%cr3, %0" : "=r" (current_context->page_dir));
+  // asm volatile("mov %%cr3, %0" : "=r" (current_context->page_dir));
   // tss->esp= next_context->esp;
   // tss->ss = next_context->ss;
   /*tss->esp = next_context->esp;

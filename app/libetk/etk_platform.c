@@ -127,10 +127,10 @@ void etk_platform_display_init() {
   etkglobal.display = (EtkDisplay *)ETK_MALLOC(sizeof(EtkDisplay));
   etkglobal.display->update = etk_platform_update;
   etkglobal.display->format = ETK_PIXEL_BGRA32;
-  etkglobal.display->height = DISAPLAY_HEIGHT;
-  etkglobal.display->width = DISAPLAY_WIDTH;
   screen_init();
   screen = screen_info();
+  etkglobal.display->height = screen->height;
+  etkglobal.display->width = screen->width;
   //   curssor= load_png("/dev/sda/normal.png");
 }
 
