@@ -24,6 +24,7 @@ typedef struct fd {
 
 fd_t* fd_new(u32* file, u32 type, char* name);
 fd_t* fd_find(u32 fd);
+void fd_close(fd_t* fd);
 int fd_init();
 int fd_std_init();
 

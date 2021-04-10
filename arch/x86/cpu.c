@@ -218,8 +218,13 @@ void context_switch(interrupt_context_t* context, context_t** current,
                     context_t* next_context) {
   context_t* current_context = *current;
 
-  current_context->esp0 = context;
-  current_context->esp = context->esp;
+  if(context==NULL){
+    context=current_context->esp0;
+    context->esp=current_context->esp;
+  }else{
+    current_context->esp0 = context;
+    current_context->esp = context->esp;
+  }
 
   interrupt_context_t* c = next_context->esp0;
 

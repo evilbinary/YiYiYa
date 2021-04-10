@@ -5,6 +5,12 @@
  ********************************************************************/
 #include "vga.h"
 
+#define QEMU_VENDOR_ID 0x1234
+#define QEMU_DEVICE_ID 0x1111
+
+#define VBOX_VENDOR_ID 0x80EE
+#define VBOX_DEVICE_ID 0xCAFE
+
 #define VBE_DISPI_IOPORT_INDEX 0x01CE
 #define VBE_DISPI_IOPORT_DATA 0x01CF
 
@@ -84,12 +90,11 @@ void qemu_init_mode(pci_device_t* pdev, vga_device_t* vga, int mode) {
   qemu_clear_screen(vga);
 }
 
-void qemu_init_device(device_t* dev) {
-  // pci_device_t* pdev = pci_find_class(0x300);
-  pci_device_t* pdev = pci_find_vendor_device(0x1234, 0x1111);
+int qemu_init_device(device_t* dev,u32 vendor_id,u32 device_id) {
+  pci_device_t* pdev = pci_find_vendor_device(vendor_id, device_id);
   if (pdev == NULL) {
     kprintf("can not find pci device\n");
-    return;
+    return -1;
   }
   u32 bar0 = pci_dev_read32(pdev, PCI_BASE_ADDR0) & 0xFFFFFFF0;
 
@@ -126,6 +131,7 @@ void qemu_init_device(device_t* dev) {
   // #else
   //   vga->frambuffer = bar0;
   // #endif
+  return 1;
 }
 
 int qemu_init(void) {
@@ -138,7 +144,11 @@ int qemu_init(void) {
   dev->type = DEVICE_TYPE_VGA;
   device_add(dev);
 
-  qemu_init_device(dev);
+  u32 ret=qemu_init_device(dev,QEMU_VENDOR_ID,QEMU_DEVICE_ID);
+  if(ret<0){
+    ret=qemu_init_device(dev,VBOX_VENDOR_ID,VBOX_DEVICE_ID);
+  }
+
   return 0;
 }
 

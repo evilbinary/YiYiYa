@@ -7,6 +7,7 @@
 
 FILE STDIN;
 FILE STDOUT;
+FILE STDERROR;
 
 FILE* stdin = NULL;
 FILE* stdout = NULL;
@@ -14,9 +15,12 @@ FILE* stderr = NULL;
 
 int putchar(int ch) {
   if (stdout == NULL) {
-    STDIN.fd = ya_open("/dev/stdout", 0);
-    stdout = &STDIN;
-    stderr = stdout;
+    STDIN.fd = 0;
+    STDOUT.fd = 1;
+    STDERROR.fd=2;
+    stdout = &STDOUT;
+    stderr = &STDERROR;
+    stdin = &STDIN;
   }
   int ret = ya_write((u32)stdout->fd, &ch, 1);
 
@@ -64,9 +68,9 @@ int printf(const char* format, ...) {
 
 int vfprintf(FILE* stream, const char* format, va_list arg) {
   char buf[1024];
-  int i;
-  vsprintf(stream->fd, format, arg);
-  return 10;
+  int i = vsprintf(buf, format, arg);
+  i = (fputs(buf, stream) < 0) ? 0 : i;
+  return i;
 }
 
 int vprintf(const char* format, va_list arg) {
@@ -216,7 +220,26 @@ int fflush(FILE* f) {
   return (f);
 }
 
-int	 remove(const char * file){
+int remove(const char* file) { return -1; }
 
-  return -1;
+int fileno(FILE* stream) { return stream->fd; }
+
+int fputs(const char* str, FILE* stream) {
+  int rc = fwrite(str, strlen(str), 1, stream);
+  // int  rc = ya_write(stream->fd, str, strlen(str));
+  return rc;
+}
+
+FILE* fdopen(int fd, const char* mode) {
+  unsigned int flags = support_fmodes2flags(mode);
+  if (fd < 0) return NULL;
+  void* data = NULL;
+  FILE* file = (FILE*)malloc(sizeof(FILE));
+  file->data = data;
+  file->fd = fd;
+  file->eof = 0;
+  file->error = 0;
+  file->offset = 0;
+  file->mode = flags;
+  return file;
 }

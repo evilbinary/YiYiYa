@@ -13,6 +13,7 @@ enum {
   DEVICE_PCI,
   DEVICE_VGA,
   DEVICE_VGA_QEMU,
+  DEVICE_VGA_VBOX,
   DEVICE_MOUSE,
   DEVICE_SERIAL,
   DEVICE_RTC,
@@ -61,10 +62,13 @@ typedef struct device {
   void* data;  // data
 } device_t;
 
+
 void device_add(device_t* device);
 
 void device_remove();
 
 device_t* device_find(u32 id);
+
+device_t* device_create(u8* name, u32 id, u32 type);
 
 #endif

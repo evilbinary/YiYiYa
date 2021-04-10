@@ -32,7 +32,9 @@ enum {
     SYS_FORK,
     SYS_PIPE,
     SYS_GETPID,
-    SYS_GETPPID
+    SYS_GETPPID,
+    SYS_DUP,
+    SYS_DUP2
 };
 
 typedef struct exec{
@@ -52,7 +54,7 @@ size_t sys_yeild();
 
 int sys_print(char* s);
 int sys_print_at(char* s, u32 x, u32 y);
-u32 sys_exec(char* filename,char *const argv[]);
+u32 sys_exec(char* filename, char* const argv[],char *const envp[]);
 void sys_test();
 void sys_exit(int status);
 
@@ -76,5 +78,10 @@ int sys_pipe(int fd[2]);
 int sys_getpid();
 
 int sys_getppid();
+
+int sys_dup(int oldfd);
+
+int sys_dup2(int oldfd, int newfd);
+
 
 #endif

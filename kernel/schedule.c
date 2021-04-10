@@ -14,17 +14,20 @@ u32 schedule_lock = 0;
 
 context_t* current_context;
 
-thread_t* schedule_next() {
+thread_t* schedule_get_next() {
   thread_t* next = NULL;
   thread_t* v = head_thread;
   // find next priority
   // if(current_thread->counter<0){
   //   current_thread->counter=0;
   // }
-  next = current_thread;
   for (; v != NULL; v = v->next) {
+    //kprintf("v %d %d\n",v->id,v->state);
     if(v==current_thread) continue;
-    if ((v->state == THREAD_RUNNING) && ( v->counter <= next->counter )) {
+    if (v->state != THREAD_RUNNING) continue;
+    if(next==NULL){
+      next=v;
+    }else if( v->counter <= next->counter ) {
       next = v;
     }
   }
@@ -32,10 +35,21 @@ thread_t* schedule_next() {
   return next;
 }
 
+void schedule_next(){
+  cpu_cli();
+  thread_t* current=current_thread;
+  // interrupt_context_t* interrupt_context=current_thread->context.esp0;
+  // schedule(interrupt_context);
+  for(;current!=current_thread;){
+      cpu_sti();
+  }
+}
+
 void schedule(interrupt_context_t* interrupt_context) {
   thread_t* next_thread = NULL;
   thread_t* prev_thread = NULL;
-  next_thread = schedule_next();
+  next_thread = schedule_get_next();
+  //kprintf("schedule next %d\n",next_thread->id);
   if (next_thread == NULL) {
     kprintf("schedule error next\n");
   }

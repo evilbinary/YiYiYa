@@ -1,12 +1,17 @@
+#include "stdlib.h"
+
 #include "errno.h"
 #include "float.h"
 #include "math.h"
 #include "stdint.h"
 #include "stdio.h"
 #include "syscall.h"
-#include "stdlib.h"
 
-void exit(int status) {}
+extern char **environ;
+
+void exit(int status) {
+  ya_exit(status);
+}
 
 void itoa(char *buf, int base, int d) {
   char *p = buf;
@@ -299,4 +304,14 @@ void srand(unsigned s) { seed = s - 1; }
 int rand(void) {
   seed = 6364136223846793005ULL * seed + 1;
   return seed >> 33;
+}
+
+
+char *getenv(const char *name) {
+  char* p=strchrnul(name, '=');
+  size_t l =p  - name;
+  if (l && !name[l] && environ)
+    for (char **e = environ; *e; e++)
+      if (!strncmp(name, *e, l) && l[*e] == '=') return *e + l + 1;
+  return 0;
 }

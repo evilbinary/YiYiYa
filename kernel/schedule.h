@@ -10,6 +10,7 @@
 
 
 void schedule_init();
-void schedule();
+void schedule(interrupt_context_t* interrupt_context);
+void schedule_next();
 
 #endif

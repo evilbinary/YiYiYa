@@ -23,6 +23,8 @@ env.Library('yiyiya', [
     'devfn.c',
     'fd.c',
     'loader.c',
+    'rw_queue.c',
+    'pipe.c',
     '../arch/libarch.a',
     '../libs/libalgorithm/libalgorithm.a',
     '../libs/libkernel/libkernel.a',

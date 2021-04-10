@@ -33,7 +33,9 @@ enum {
     SYS_FORK,
     SYS_PIPE,
     SYS_GETPID,
-    SYS_GETPPID
+    SYS_GETPPID,
+    SYS_DUP,
+    SYS_DUP2
 };
 
 void* syscall0(u32 num);

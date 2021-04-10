@@ -189,6 +189,13 @@ vnode_t *vfs_open(vnode_t *root, u8 *name) {
   return file;
 }
 
+void vfs_close(vnode_t *node){
+  if(node==NULL){
+    kprintf("close node is nul\n");
+    return;
+  }
+  vclose(node);
+}
 
 int vfs_init(){
 
