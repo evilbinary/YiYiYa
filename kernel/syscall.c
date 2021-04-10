@@ -28,7 +28,9 @@ static void* syscall_table[SYSCALL_NUMBER] = {&sys_read,
                                               &sys_fork,
                                               &sys_pipe,
                                               &sys_getpid,
-                                              &sys_getppid
+                                              &sys_getppid,
+                                              &sys_dup,
+                                              &sys_dup2
                                               };
 
 INTERRUPT_SERVICE

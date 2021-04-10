@@ -168,14 +168,21 @@ int ya_ioctl(int fd, int cmd, va_list args) {
   return syscall3(SYS_IOCTL, fd, cmd, args);
 }
 
-int ya_fork(){
-  return syscall0(SYS_FORK);
+int ya_fork() { return syscall0(SYS_FORK); }
+
+int ya_getpid() { return syscall0(SYS_GETPID); }
+
+int ya_getppid() { return syscall0(SYS_GETPPID); }
+
+int ya_pipe(int fds[2]) { return syscall1(SYS_PIPE, fds); }
+
+int ya_dup(int fd) { return syscall1(SYS_DUP, fd); }
+int ya_dup2(int oldfd, int newfd) { return syscall2(SYS_DUP2, oldfd, newfd); }
+
+int ya_exec(const char* pathname, char* const argv[], char* const envp[]) {
+  return syscall3(SYS_EXEC, pathname, argv, envp);
 }
 
-int ya_getpid(){
-  return syscall0(SYS_GETPID);
-}
-
-int ya_getppid(){
-  return syscall0(SYS_GETPPID);
+void ya_exit(u32 ret){
+  syscall1(SYS_EXIT, ret);
 }

@@ -9,14 +9,14 @@
 #include "kernel/kernel.h"
 #include "algorithm/buffer.h"
 
-#define PTY_BUFFER 128
+#define PTY_BUFFER 256
 
 #define IOC_PTY_MAGIC 'p'
 
 #define IOC_SLAVE _IOW(IOC_PTY_MAGIC, 1, int)
 #define IOC_READ_OFFSET _IOW(IOC_PTY_MAGIC, 3, int)
 #define IOC_WRITE_OFFSET _IOW(IOC_PTY_MAGIC, 4, int)
-
+#define IOC_MASTER_READ_NOBLOCK _IOW(IOC_PTY_MAGIC, 5, int)
 typedef struct pty{
     buffer_t *in;
     buffer_t* out;
@@ -24,6 +24,8 @@ typedef struct pty{
     vnode_t* master;
     vnode_t* slave;
 
+    u32 master_read_block;
 }pty_t;
+
 
 #endif

@@ -4,12 +4,12 @@
  * 邮箱: rootdebug@163.com
  ********************************************************************/
 #include "loader.h"
+
 #include "fd.h"
 #include "kernel.h"
 #include "kernel/elf.h"
 #include "thread.h"
 #include "vfs.h"
-
 
 void* load_elf(Elf32_Ehdr* elf_header, u32 fd, page_dir_t* page) {
   // printf("e_phnum:%d\n\r", elf_header->e_phnum);
@@ -141,19 +141,23 @@ void run_elf_thread() {
   u32 nbytes = syscall3(SYS_READ, fd, &elf, sizeof(Elf32_Ehdr));
   Elf32_Ehdr* elf_header = (Elf32_Ehdr*)&elf;
   u32* kentry = 0;
+  entry_fn entry = NULL;
   if (elf_header->e_ident[0] == ELFMAG0 || elf_header->e_ident[1] == ELFMAG1) {
     kentry = load_elf(elf_header, fd, current->context.page_dir);
+    entry = elf_header->e_entry;
   } else {
-    kprintf("load faild not elf\n");
+    kprintf("load faild not elf %s\n",exec->filename);
   }
   // map_page_on(current->context.page_dir,current->context.esp,current->context.esp,PAGE_P
   // | PAGE_USU | PAGE_RWW);
-  entry_fn entry = elf_header->e_entry;
-  u32 ret = entry(0, exec->argv);
+   u32 ret=-1;
+  if (entry != NULL) {
+    ret = entry(0, exec->argv);
+  }
   thread_stop(current);
-  syscall1(SYS_EXIT, ret);
+  // syscall1(SYS_EXIT, ret);
   // kprintf("wait stop tid:%d state:%d\n",current->id,current->state);
-  for(;;){
-      //kprintf(".");
+  for (;;) {
+    // kprintf(".");
   }
 }

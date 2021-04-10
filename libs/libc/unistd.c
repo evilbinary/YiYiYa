@@ -5,6 +5,7 @@
 #include <unistd.h>
 
 #include "limits.h"
+#include "stdarg.h"
 #include "syscall.h"
 
 char **environ = NULL;  ///< Global environment information
@@ -76,9 +77,7 @@ char *getcwd(char *buf, size_t size) {
   return NULL;
 }
 
-pid_t getpid(void) {
-  return ya_getpid();
-}
+pid_t getpid(void) { return ya_getpid(); }
 
 gid_t getgid(void) {
   uid_t uid;
@@ -153,13 +152,124 @@ int unlink(const char *pathname) {
   return rc;
 }
 
+pid_t fork() { return ya_fork(); }
 
-pid_t fork(){
-  return ya_fork();
+pid_t getppid(void) { return ya_getppid(); }
+
+int pipe(int fds[2]) { return ya_pipe(fds); }
+
+int dup(int fd) { return ya_dup(fd); }
+int dup2(int oldfd, int newfd) { return ya_dup2(oldfd, newfd); }
+
+int execve(const char *pathname, char *const argv[], char *const envp[]) {
+  return ya_exec(pathname, argv, envp);
 }
 
- 
+int execle(const char *path, const char *argv0, ...) {
+  int argc;
+  va_list ap;
+  va_start(ap, argv0);
+  for (argc = 1; va_arg(ap, const char *); argc++)
+    ;
+  va_end(ap);
+  {
+    int i;
+    char *argv[argc + 1];
+    char **envp;
+    va_start(ap, argv0);
+    argv[0] = (char *)argv0;
+    for (i = 1; i <= argc; i++) argv[i] = va_arg(ap, char *);
+    envp = va_arg(ap, char **);
+    va_end(ap);
+    return execve(path, argv, envp);
+  }
+}
 
-pid_t	getppid(void){
-  return ya_getppid();
+int execv(const char *pathname, char *const argv[]) {
+  return execve(pathname, argv, environ);
+}
+
+int execl(const char *path, const char *argv0, ...) {
+  int argc;
+  va_list ap;
+  va_start(ap, argv0);
+  for (argc = 1; va_arg(ap, const char *); argc++)
+    ;
+  va_end(ap);
+  {
+    int i;
+    char *argv[argc + 1];
+    va_start(ap, argv0);
+    argv[0] = (char *)argv0;
+    for (i = 1; i < argc; i++) argv[i] = va_arg(ap, char *);
+    argv[i] = NULL;
+    va_end(ap);
+    return execv(path, argv);
+  }
+}
+
+int execvp(const char *file, char *const argv[]) {
+  char *const envp=environ;
+  const char *p, *z, *path = getenv("PATH");
+  size_t l, k;
+  int seen_eacces = 0;
+
+  errno = ENOENT;
+  if (!*file) return -1;
+
+  if (strchr(file, '/')) return execve(file, argv, envp);
+
+  if (!path) path = "/usr/local/bin:/bin:/usr/bin";
+  k = strnlen(file, NAME_MAX + 1);
+  if (k > NAME_MAX) {
+    errno = ENAMETOOLONG;
+    return -1;
+  }
+  l = strnlen(path, PATH_MAX - 1) + 1;
+
+  for (p = path;; p = z) {
+    char b[l + k + 1];
+    z = strchrnul(p, ':');
+    if (z - p >= l) {
+      if (!*z++) break;
+      continue;
+    }
+    memcpy(b, p, z - p);
+    b[z - p] = '/';
+    memcpy(b + (z - p) + (z > p), file, k + 1);
+    execve(b, argv, envp);
+    switch (errno) {
+      case EACCES:
+        seen_eacces = 1;
+      case ENOENT:
+      case ENOTDIR:
+        break;
+      default:
+        return -1;
+    }
+    if (!*z++) break;
+  }
+  if (seen_eacces) errno = EACCES;
+  return -1;
+  // return execv(filename, argv);
+}
+
+int execlp(const char *file, const char *argv0, ...)
+{
+	int argc;
+	va_list ap;
+	va_start(ap, argv0);
+	for (argc=1; va_arg(ap, const char *); argc++);
+	va_end(ap);
+	{
+		int i;
+		char *argv[argc+1];
+		va_start(ap, argv0);
+		argv[0] = (char *)argv0;
+		for (i=1; i<argc; i++)
+			argv[i] = va_arg(ap, char *);
+		argv[i] = NULL;
+		va_end(ap);
+		return execvp(file, argv);
+	}
 }

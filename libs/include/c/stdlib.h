@@ -78,4 +78,6 @@ int unlockpt(int);
 size_t wcstombs(char *, const wchar_t *, size_t);
 int wctomb(char *, wchar_t);
 
+char *getenv (const char *);
+
 #endif

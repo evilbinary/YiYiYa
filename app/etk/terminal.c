@@ -1,4 +1,5 @@
 #include "terminal.h"
+
 #include "ioctl.h"
 
 #define IOC_PTY_MAGIC 'p'
@@ -6,11 +7,11 @@
 #define IOC_SLAVE _IOW(IOC_PTY_MAGIC, 1, int)
 #define IOC_READ_OFFSET _IOW(IOC_PTY_MAGIC, 3, int)
 #define IOC_WRITE_OFFSET _IOW(IOC_PTY_MAGIC, 4, int)
-
+#define IOC_MASTER_READ_NOBLOCK _IOW(IOC_PTY_MAGIC, 5, int)
 typedef struct {
   char* buf;
-  uint32_t buf_len;
-  uint32_t len;
+  u32 buf_len;
+  u32 len;
 } str_t;
 
 const char* prompt = "yiyiya$ ";
@@ -19,21 +20,27 @@ bool cursor = true;
 bool focused = true;
 str_t* text_buf;
 str_t* input_buf;
-uint32_t last_time = 0;
+u32 last_time = 0;
 
 u32 fd_ptm;
 u32 fd_pts;
+u32 fd_out;
+FILE* file_out;
 
-const uint32_t twidth = 550;
-const uint32_t theight = 342;
-const uint32_t char_width = 8;
-const uint32_t char_height = 16;
-const uint32_t max_col = twidth / char_width - 1;
-const uint32_t max_line = theight / char_height - 1;
+const u32 twidth = 550;
+const u32 theight = 342;
+const u32 char_width = 8;
+const u32 char_height = 16;
+const u32 max_col = twidth / char_width - 1;
+const u32 max_line = theight / char_height - 1;
 
-const uint32_t margin = 1;
-const uint32_t text_color = 0xE0E0E0;
+const u32 margin = 1;
+const u32 text_color = WHITE;  // 0xE0E0E0;
+u32 bg_color = 0x00353535;
 const float cursor_blink_time = 1;
+
+const u32 ret_buf_size = 128;
+char ret_buf[128];
 
 void str_free(str_t* str) {
   free(str->buf);
@@ -42,7 +49,7 @@ void str_free(str_t* str) {
 
 str_t* str_new(const char* str) {
   str_t* s = malloc(sizeof(str_t));
-  uint32_t size = strlen(str) + 1;
+  u32 size = strlen(str) + 1;
   s->buf = malloc(size);
   s->buf_len = size;
   s->len = size - 1;
@@ -51,9 +58,8 @@ str_t* str_new(const char* str) {
 }
 
 void str_append(str_t* str, const char* text) {
-  uint32_t prev_len = str->len;
-  uint32_t needed = strlen(text) + prev_len + 1;
-
+  u32 prev_len = str->len;
+  u32 needed = strlen(text) + prev_len + 1;
   if (needed > str->buf_len) {
     char* new_buf = malloc(2 * needed);
 
@@ -68,28 +74,32 @@ void str_append(str_t* str, const char* text) {
   str->len = needed - 1;
 }
 
-void interpret_cmd(str_t* text_buf, str_t* input_buf) {
-  if (!strcmp(input_buf->buf, "exit")) {
+void send_input(str_t* input_buf) {
+  char* cmd = input_buf->buf;
+  printf("send ptm command %s\n", cmd);
+  int len = strlen(cmd);
+  write(fd_ptm, cmd, len);
+}
+
+void interpret_cmd(char* cmd) {
+  fprintf(file_out, "interpret cmd: %s\n", cmd);
+  if (!strcmp(cmd, "exit")) {
     running = false;
     return;
   }
-
-  char* cmd = input_buf->buf;
-  uint32_t n_args = 0;
+  u32 n_args = 0;
   char** args = NULL;
   char* next = cmd;
 
   while (*next) {
     args = realloc(args, (++n_args + 1) * sizeof(char*));
-
     while (isspace(*next)) {
       next++;
     }
-
-    uint32_t n = strchrnul(next, ' ') - next;
+    u32 n = strchrnul(next, ' ') - next;
     args[n_args - 1] = strndup(next, n);
     args[n_args] = NULL;
-
+    fprintf(file_out, "arg[%d]: %s", n_args - 1, args[n_args - 1]);
     next = strchrnul(next, ' ');
   }
 
@@ -97,25 +107,19 @@ void interpret_cmd(str_t* text_buf, str_t* input_buf) {
     return;
   }
   int32_t ret = 0;
-  //   int32_t ret = syscall2(SYS_EXEC, (uintptr_t)args[0], (uintptr_t)args);
-
+  // ret = execl((uintptr_t)args[0], (uintptr_t)args);
+  ret = execl("/dev/sda/hello.elf", args);
   while (args && *args) {
     free(*args);
     args++;
   }
 
   free(args);
-
-  if (ret != 0) {
-    str_append(text_buf, "invalid command: ");
-    str_append(text_buf, cmd);
-    str_append(text_buf, "\n");
-  }
 }
 
 char* scroll_view(char* str) {
   char* lf = strchrnul(str, '\n');
-  uint32_t line_len = (uint32_t)(lf - str);
+  u32 line_len = (u32)(lf - str);
 
   if (line_len <= max_col) {
     return lf + 1;
@@ -124,13 +128,13 @@ char* scroll_view(char* str) {
   return str + max_col;
 }
 
-uint32_t count_lines(str_t* str) {
+u32 count_lines(str_t* str) {
   char* text_view = str->buf;
-  uint32_t n_lines = 0;
+  u32 n_lines = 0;
 
   while (text_view < &str->buf[str->len]) {
     char* lf = strchrnul(text_view, '\n');
-    uint32_t line_len = (uint32_t)(lf - text_view);
+    u32 line_len = (u32)(lf - text_view);
 
     if (line_len <= max_col) {
       text_view += line_len + 1;  // Discard the line feed
@@ -144,36 +148,26 @@ uint32_t count_lines(str_t* str) {
   return n_lines;
 }
 
-void redraw(EtkCanvas* can, str_t* text_buf, const str_t* input_buf) {
-  /* Window decorations */
+void redraw(EtkWidget* thiz, str_t* text_buf, const str_t* input_buf) {
+  EtkWindowClass* priv = (EtkWindowClass*)thiz->subclass;
+  EtkRect t = priv->head_rect;
+  EtkCanvas* can = thiz->canvas;
+  EtkRect r = thiz->rect;
+  etk_canvas_fill_rect(thiz->canvas, 0, t.height, r.width, r.height, bg_color);
 
-  // background
-  //   snow_draw_rect(win->fb, 0, 0, win->width, win->height, 0x00353535);
-  // title bar
-  //   snow_draw_rect(win->fb, 0, 0, win->width, 20, 0x00222221);
-  //   snow_draw_border(win->fb, 0, 0, win->width, 20, 0x00000000);
-  //   snow_draw_string(win->fb, win->title, 4, 3, 0x00FFFFFF);
-  // border of the whole window
-  //   snow_draw_border(win->fb, 0, 0, win->width, win->height, 0x00555555);
-
-  /* Text content */
-
-  uint32_t y = 22;  // below title bar
-
-  // Temporarily concatenate the input and a cursor
+  u32 y = 20;
   str_append(text_buf, input_buf->buf);
-
   if (cursor) {
     str_append(text_buf, "_");
   }
 
   char line_buf[max_col + 1];
   char* text_view = text_buf->buf;
-  uint32_t n_lines = count_lines(text_buf);
+  u32 n_lines = count_lines(text_buf);
 
   // Scroll the buffer as needed
   if (n_lines > max_line) {
-    for (uint32_t i = 0; i < n_lines - max_line; i++) {
+    for (u32 i = 0; i < n_lines - max_line; i++) {
       text_view = scroll_view(text_view);
     }
   }
@@ -181,7 +175,7 @@ void redraw(EtkCanvas* can, str_t* text_buf, const str_t* input_buf) {
   // Draw line by line, wrapping text
   while (text_view < &text_buf->buf[text_buf->len]) {
     char* lf = strchrnul(text_view, '\n');
-    uint32_t line_len = (uint32_t)(lf - text_view);
+    u32 line_len = (u32)(lf - text_view);
 
     if (line_len <= max_col) {
       strncpy(line_buf, text_view, line_len);
@@ -194,7 +188,8 @@ void redraw(EtkCanvas* can, str_t* text_buf, const str_t* input_buf) {
     }
 
     // snow_draw_string(win->fb, line_buf, margin, y, text_color);
-    etk_canvas_draw_string_with_color(can, margin, y, line_buf, text_color, 0);
+    etk_canvas_draw_string_with_color(can, margin, y, line_buf, text_color,
+                                      bg_color);
 
     y += char_height;
   }
@@ -212,49 +207,88 @@ void redraw(EtkCanvas* can, str_t* text_buf, const str_t* input_buf) {
   //   snow_render_window(win);
 }
 
+Ret etk_terminal_paint(EtkWidget* thiz) {
+  thiz->canvas->draw_rect(thiz->canvas, 0, 0, thiz->rect.width,
+                          thiz->rect.height, 0x00353535);
+  redraw(thiz, text_buf, input_buf);
+}
+
+int etk_terminal_get_cmd_result() {
+  u32 nread;
+  u8 anything_read = false;
+  memset(ret_buf, 0, ret_buf_size);
+  for(;;){
+    nread = read(fd_ptm, ret_buf, ret_buf_size - 1);
+    if (nread > 0) {
+      ret_buf[nread] = '\0';
+      printf("read from ptm size:%d %s", nread, ret_buf);
+      str_append(text_buf,"\n");
+      str_append(text_buf, ret_buf);
+      anything_read = true;
+      break;
+    }
+  }
+  if (anything_read) {
+    str_append(text_buf, prompt);
+  }
+  return anything_read;
+}
+
+void etk_terminal_do_cmd() {
+  printf("fork child\n");
+  u32 pts = ioctl(fd_ptm, IOC_SLAVE);
+  char buf[256];
+  u32 len = 256;
+  sprintf(buf, "/dev/pts/%d", pts);
+  fd_pts = open(buf, "r");
+  if (fd_pts < 0) {
+    printf("error get pts \n");
+  }
+  printf("ptm %d pts %d\n", fd_ptm, fd_pts);
+  fd_out = dup(STDOUT_FILENO);
+  file_out = fdopen(fd_out, "w");
+  printf("fd out=%d\n", fd_out);
+  dup2(fd_pts, STDIN_FILENO);
+  dup2(fd_pts, STDOUT_FILENO);
+  dup2(fd_pts, STDERR_FILENO);
+
+  for (;;) {
+    memset(buf, 0, len);
+    int ret = read(fd_pts, buf, len);
+    if (ret > 0) {
+      interpret_cmd(buf);
+    }
+  }
+}
+
 static Ret etk_terminal_event(EtkWidget* thiz, EtkEvent* event) {
   EtkWindowClass* priv = NULL;
-  //printf("%d\n", (int)event->type);
- 
-  bool needs_redrawing = false;
   switch (event->type) {
     case ETK_EVENT_KEY_DOWN: {
-      const uint32_t buf_size = 256;
-      char buf[buf_size];
-      uint32_t read;
-      bool anything_read = false;
-
-      while ((read = fread(buf, 1, buf_size - 1, fd_pts))) {
-        buf[read] = '\0';
-        str_append(text_buf, buf);
-        needs_redrawing = true;
-        anything_read = true;
-      }
-
-      if (anything_read) {
-        str_append(text_buf, prompt);
-      }
-
       u16 key = event->u.key.code;
-      //printf("key down %x\n", key);
-
+      printf("key down key:%x\n", key);
       switch (key) {
-        case 0x1c:
-        // case 0x02:
+        case 0x0a:  // enter
+        case 0x0d:
           str_append(text_buf, input_buf->buf);
-          interpret_cmd(text_buf, input_buf);
-          printf("\n");
+          send_input(input_buf);
           input_buf->buf[0] = '\0';
           input_buf->len = 0;
+
+          u32 cmdret = etk_terminal_get_cmd_result();
+          if (cmdret > 0) {
+            printf("cmd ret:%d text:%s\n", cmdret, text_buf->buf);
+          }
+
           break;
-        // case 0x01:
-        //   if (input_buf->len) {
-        //     input_buf->buf[input_buf->len - 1] = '\0';
-        //     input_buf->len -= 1;
-        //   }
-        //   break;
+        case 0x08:  // delete
+          if (input_buf->len) {
+            input_buf->buf[input_buf->len - 1] = '\0';
+            input_buf->len -= 1;
+          }
+          break;
         default:
-          if (key < 0x1c) {
+          if (key < 0xf0) {
             char str[2] = "\0\0";
             str[0] = key;
             str_append(input_buf, str);
@@ -262,24 +296,14 @@ static Ret etk_terminal_event(EtkWidget* thiz, EtkEvent* event) {
           break;
       }
     } break;
-
-    case ETK_EVENT_WND_DESTROY:
-    //   printf("destroy!\n");
-    //   priv = (EtkWindowClass*)thiz->subclass;
-    //   etk_sources_manager_remove(etk_default_sources_manager(),
-    //                              (EtkSource*)priv->data[1]);
-      break;
     default:
       break;
   }
 
-  return etk_window_on_event(thiz, event);
-}
-
-Ret etk_terminal_paint(EtkWidget* thiz) {
-  thiz->canvas->draw_rect(thiz->canvas, 0, 0, thiz->rect.width,
-                          thiz->rect.height, 0x00353535);
-  redraw(thiz->canvas, text_buf, input_buf);
+  etk_terminal_paint(thiz);
+  etk_widget_update_rect(thiz, &thiz->rect);
+  u32 ret = etk_window_on_event(thiz, event);
+  return ret;
 }
 
 EtkWidget* etk_terminal(e32 x, e32 y, e32 width, e32 height) {
@@ -288,7 +312,7 @@ EtkWidget* etk_terminal(e32 x, e32 y, e32 width, e32 height) {
   thiz = etk_create_window(x, y, width, height, ETK_WIDGET_WINDOW);
   etk_widget_set_text(thiz, "terminal");
   priv = (EtkWindowClass*)thiz->subclass;
-  // priv->has_head = 1;
+  priv->has_head = 1;
   thiz->event = etk_terminal_event;
   thiz->paint = etk_terminal_paint;
 
@@ -296,24 +320,18 @@ EtkWidget* etk_terminal(e32 x, e32 y, e32 width, e32 height) {
   input_buf = str_new("");
   cursor = true;
 
-  fd_ptm=open("/dev/ptm","r");
-  if(fd_ptm<0){
+  fd_ptm = open("/dev/ptm", "r");
+  if (fd_ptm < 0) {
     printf("error get ptm \n");
   }
-  u32 pts=ioctl(fd_ptm,IOC_SLAVE);
-  char buf[20];
-  sprintf(buf,"/dev/pts/%d",pts);
-  fd_pts=open(buf,"r");
-  if(fd_pts<0){
-    printf("error get pts \n");
-  }
-  printf("ptm %d pts %d\n",fd_ptm,fd_pts);
 
-  char* buf2="hello";
-  int len=strlen(buf2);
-  write(fd_ptm,buf2,len);
-  memset(buf2,0,len);
-  read(fd_pts,buf2,len);
-  printf("read from ptm: %s\n",buf2);
+  pid_t pid;
+  pid = fork();
+  if (pid != 0) {  // parent
+    printf("fork parent\n");
+    // ioctl(fd_ptm, IOC_MASTER_READ_NOBLOCK);
+  } else {  //  child
+    etk_terminal_do_cmd();
+  }
   return thiz;
 }

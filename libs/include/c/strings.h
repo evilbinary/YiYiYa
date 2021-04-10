@@ -18,6 +18,7 @@ char   *rindex(const char *, int);
 int    strcasecmp(const char *, const char *);
 int    strncasecmp(const char *, const char *, size_t);
 
+size_t strnlen(const char *s, size_t n);
 
 #ifdef __cplusplus
 }

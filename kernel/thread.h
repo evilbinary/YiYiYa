@@ -38,6 +38,7 @@ typedef struct thread_s{
     u32** fds;
     u32 fd_size;
     u32 fd_number;
+    u32 lock;
 }thread_t;
 
 
@@ -61,5 +62,6 @@ thread_t* thread_clone(thread_t* thread, u32* vstack3, u32 size);
 int thread_add_fd(thread_t* thread,fd_t* fd);
 fd_t* thread_find_fd_id(thread_t* thread,u32 fd);
 int thread_find_fd_name(thread_t* thread, u8* name);
+fd_t* thread_set_fd(thread_t* thread, u32 fd,fd_t* nfd);
 
 #endif

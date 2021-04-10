@@ -161,7 +161,8 @@ int etk_app_main(int argc, char* argv[]) {
   etk_game_mine(160, 230, 10, 10, 14);
   // etk_game_mine(340, 30, 16, 16, 20);
   //��ʾ���д���
-  etk_terminal(240, 140, 420, 340);
+  EtkWidget* terminal=etk_terminal(240, 140, 420, 340);
+  etk_wnd_manager_set_active_widget(etk_get_wnd_manager(),terminal);
 
   etk_widget_show_all(desktop);
 

@@ -44,22 +44,22 @@ void do_shell_thread(void) {
 
     int ret = 0;
     // read key
-    ret = syscall3(SYS_READ,fd, &scan_code, 1);
-    if (ret >= 1) {
-      // kprintf("ret=%d %x", ret,scan_code);
-      if (scan_code & 0x80) continue;
-      buf[0] = key_map[scan_code & 0x7f][shf_p];
-      // set_cursor(col, row);
-      // kprintf("%x",key_map[scan_code & 0x7f][shf_p]);
-      syscall3(SYS_PRINT_AT, buf, col, row);
-      if (scan_code == 0x1c) {
-        row++;
-        col = 0;
-        syscall1(SYS_PRINT, "#");
-      }
-      move_cursor();
-      scan_code = 0;
-      col++;
-    }
+    // ret = syscall3(SYS_READ,fd, &scan_code, 1);
+    // if (ret >= 1) {
+    //   // kprintf("ret=%d %x", ret,scan_code);
+    //   if (scan_code & 0x80) continue;
+    //   buf[0] = key_map[scan_code & 0x7f][shf_p];
+    //   // set_cursor(col, row);
+    //   // kprintf("%x",key_map[scan_code & 0x7f][shf_p]);
+    //   syscall3(SYS_PRINT_AT, buf, col, row);
+    //   if (scan_code == 0x1c) {
+    //     row++;
+    //     col = 0;
+    //     syscall1(SYS_PRINT, "#");
+    //   }
+    //   move_cursor();
+    //   scan_code = 0;
+    //   col++;
+    // }
   }
 }

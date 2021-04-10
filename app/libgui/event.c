@@ -58,7 +58,13 @@ int event_read_mouse(mouse_data_t* mouse_data) {
 
 int event_read_key(u32* key) {
   int ret = read(event_info.input_fd, &event_info.scan_code, 1);
+  if(ret<=0) return 0;
   *key = scan_code_to_key(event_info.scan_code);
+  if(event_info.scan_code&0x80){
+    return 1;
+  }else{
+    return 2;
+  }
   return ret;
 }
 
@@ -98,8 +104,13 @@ int event_poll(event_t* event) {
   }
 
   u32 key;
-  if (event_read_key(&key) > 0) {
-    e.type = KEY_DOWN;
+  u32 press=event_read_key(&key);
+  if ( press> 0) {
+    if(press==1){
+      e.type = KEY_DOWN;
+    }else if(press==2){
+      e.type = KEY_UP;
+    }
     e.key = key;
     aqueue_push(&queue, e);
     count++;

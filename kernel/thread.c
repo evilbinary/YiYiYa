@@ -25,6 +25,7 @@ thread_t* thread_create(void* entry, void* data) {
 thread_t* thread_create_ex(void* entry, u32* stack0, u32* stack3, u32 size,
                            void* data) {
   thread_t* thread = kmalloc(sizeof(thread_t));
+  thread->lock=0;
   thread->data = data;
   thread->fd_size = 100;
   thread->fd_number = 0;
@@ -41,9 +42,30 @@ thread_t* thread_create_ex(void* entry, u32* stack0, u32* stack3, u32 size,
   return thread;
 }
 
-void thread_sleep(thread_t* thread) { thread->state == THREAD_SLEEP; }
+void thread_sleep(thread_t* thread) {
+  thread->state = THREAD_SLEEP;
+  schedule_next();
+}
 
-void thread_wake(thread_t* thread) { thread->state == THREAD_RUNNING; }
+void thread_wait(thread_t* thread) {
+#ifdef DEBUG_THREAD
+  kprintf("thread %d wait==============> %d\n",current_thread->id,thread->id);
+#endif
+  acquire(&thread->lock);
+  thread->state = THREAD_WAITING;
+  release(&thread->lock);
+  schedule_next();
+}
+
+void thread_wake(thread_t* thread) {
+#ifdef DEBUG_THREAD
+  kprintf("thread %d wake==============> %d\n",current_thread->id,thread->id);
+#endif
+  acquire(&thread->lock);
+  thread->state = THREAD_RUNNING;
+  release(&thread->lock);
+  schedule_next();
+}
 
 void thread_init(thread_t* thread, void* entry, u32* stack0, u32* stack3,
                  u32 size) {
@@ -66,6 +88,7 @@ void thread_init(thread_t* thread, void* entry, u32* stack0, u32* stack3,
 }
 
 void thread_add(thread_t* thread) {
+  cpu_cli();
   if (head_thread == NULL) {
     head_thread = thread;
     tail_thread = thread;
@@ -147,7 +170,7 @@ void thread_yield() {
   }
   if (current->state == THREAD_RUNNING) {
     current->counter++;
-    schedule();
+    schedule_next();
   }
 }
 
@@ -237,4 +260,31 @@ fd_t* thread_find_fd_id(thread_t* thread, u32 fd) {
     return NULL;
   }
   return thread->fds[fd];
+}
+
+fd_t* thread_set_fd(thread_t* thread, u32 fd, fd_t* nfd) {
+  if (thread->fd_number > thread->fd_size) {
+    kprintf("thread set number limit %d\n", fd);
+    return NULL;
+  }
+  if (fd > thread->fd_number) {
+    kprintf("thread set fd limit %d\n", fd);
+    return NULL;
+  }
+  return thread->fds[fd] = nfd;
+}
+
+void thread_dump_fd(thread_t* thread){
+   for (int i = 0; i < thread->fd_number; i++) {
+    fd_t* fd = thread->fds[i];
+    kprintf("tid:%d fd:%d id:%d ptr:%x name:%s\n",thread->id,i,fd->id,fd,fd->name);
+  }
+}
+
+void thread_dumps(){
+  cpu_cli();
+  kprintf("tid state counter\n");
+  for(thread_t* p=head_thread;p!=NULL;p=p->next){
+    kprintf("%d  %d %d\n",p->id,p->state,p->counter);
+  }
 }

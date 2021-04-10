@@ -55,7 +55,7 @@ size_t sys_ioctl(u32 fd, u32 cmd, va_list args) {
   ret = vioctl(node, cmd, args);
 
 #ifdef SYS_DEBUG
-  kprintf("sys ioctl fd %d %s cmd %x ret %x\n",fd,f->name,cmd,ret);
+  kprintf("sys ioctl fd %d %s cmd %x ret %x\n", fd, f->name, cmd, ret);
 #endif
   return ret;
 }
@@ -67,7 +67,7 @@ u32 sys_open(char* name, int attr) {
     kprintf(" cannot find current thread\n");
     return -1;
   }
-  int f = thread_find_fd_name(current,name);
+  int f = thread_find_fd_name(current, name);
   if (f >= 0) {
     kprintf("sys open name return : %s fd: %d\n", name, f);
     return f;
@@ -83,31 +83,40 @@ u32 sys_open(char* name, int attr) {
   if (f < 0) {
     kprintf("sys open %s error\n", name);
   }
-  kprintf("sys open new name: %s fd: %d\n", name, f);
+  kprintf("sys open new name: %s fd:%d id:%d ptr:%x\n", name, f,fd->id,fd);
   return f;
 }
 
 void sys_close(u32 fd) {}
 
 size_t sys_write(u32 fd, void* buf, size_t nbytes) {
-  fd_t* f = thread_find_fd_id(thread_current(), fd);
+  thread_t* current=thread_current();
+  fd_t* f = thread_find_fd_id(current, fd);
   if (f == NULL) {
-    kprintf("write not found fd %d\n", fd);
-    return 0;
-  }
-  vnode_t* node = f->data;
-  u32 ret = vwrite(node, f->offset, nbytes, buf);
-  return ret;
-}
-size_t sys_read(u32 fd, void* buf, size_t nbytes) {
-  fd_t* f = thread_find_fd_id(thread_current(), fd);
-  if (f == NULL) {
-    kprintf("read not found fd %d\n", fd);
+    kprintf("write not found fd %d tid %d\n", fd,current->id);
+    thread_dump_fd(current);
     return 0;
   }
   vnode_t* node = f->data;
   if (node == NULL) {
-    kprintf(" node is null\n");
+    kprintf("sys write node is null tid %d \n",current->id);
+    return -1;
+  }
+  //kprintf("sys write %d %s fd:%s\n",current->id,buf,f->name);
+  u32 ret = vwrite(node, f->offset, nbytes, buf);
+  return ret;
+}
+size_t sys_read(u32 fd, void* buf, size_t nbytes) {
+  thread_t* current=thread_current();
+  fd_t* f = thread_find_fd_id(current, fd);
+  if (f == NULL) {
+    kprintf("read not found fd %d tid %d\n", fd,current->id);
+    return 0;
+  }
+  vnode_t* node = f->data;
+  if (node == NULL) {
+    kprintf("sys read node is null\n");
+    return -1;
   }
   u32 ret = vread(node, f->offset, nbytes, buf);
   return ret;
@@ -116,7 +125,7 @@ size_t sys_read(u32 fd, void* buf, size_t nbytes) {
 size_t sys_seek(u32 fd, ulong offset) {
   fd_t* f = thread_find_fd_id(thread_current(), fd);
   if (f == NULL) {
-    kprintf("read not found fd %d\n", fd);
+    kprintf("seek not found fd %d\n", fd);
     return 0;
   }
   f->offset = offset;
@@ -129,7 +138,7 @@ void sys_exit(int status) {
   thread_t* current = thread_current();
   thread_stop(current);
   thread_remove(current);
-  kprintf("sys exit %d\n",status);
+  kprintf("sys exit %d\n", status);
 }
 
 void* sys_vmap(void* addr, size_t size) {
@@ -159,12 +168,12 @@ void sys_vfree(void* addr) {
   vfree(addr);
 }
 
-u32 sys_exec(char* filename, char* const argv[]) {
+u32 sys_exec(char* filename, char* const argv[],char *const envp[]) {
+  thread_t* current = thread_current();
   u8* stack0 = kmalloc(THREAD_STACK_SIZE);
   thread_t* t = thread_create_ex((u32*)&run_elf_thread, stack0, STACK_ADDR,
                                  THREAD_STACK_SIZE, NULL);
   context_t* context = &t->context;
-
   // init 2GB
   // map_2gb(page_dir_ptr_tab, PAGE_P | PAGE_USU | PAGE_RWW);
   context->page_dir = page_alloc_clone(t->context.kernel_page_dir);
@@ -195,6 +204,11 @@ u32 sys_exec(char* filename, char* const argv[]) {
   data->argv = argv;
   t->data = vmdata->vaddr;
 
+  //init fds
+  for(int i=0;i<3;i++){
+    t->fds[i]=current->fds[i];
+  }
+  //thread_dump_fd(t);
   thread_run(t);
   return 0;
 }
@@ -217,20 +231,56 @@ int sys_fork() {
   return copy_thread->id;
 }
 
-int sys_pipe(int fd[2]) { return 0; }
+int sys_pipe(int fds[2]) {
+  thread_t* current = thread_current();
+  vnode_t* node = pipe_make(PAGE_SIZE);
+  fd_t* fd0 = fd_new(node, DEVICE_TYPE_VIRTUAL, "pipe0");
+  fd_t* fd1 = fd_new(node, DEVICE_TYPE_VIRTUAL, "pipe1");
+  fds[0]=thread_add_fd(current,fd0);;
+  fds[1]=thread_add_fd(current,fd1);;
+  return 0;
+}
 
 int sys_getpid() {
   thread_t* current = thread_current();
-  if (current->id == 3) {
-    int i = 0;
-  }
-  // if(current->id==2){
-  //   current->state=THREAD_RUNABLE;
-  // }
+#ifdef SYS_DEBUG
+  kprintf("sys get pid %d\n",current->id);
+#endif
   return current->id;
 }
 
 int sys_getppid() {
   thread_t* current = thread_current();
   return current->pid;
+}
+
+int sys_dup(int oldfd) {
+  thread_t* current = thread_current();
+  fd_t* fd = thread_find_fd_id(current, oldfd);
+  if (fd == NULL) {
+    kprintf("dup not found fd %d\n", oldfd);
+    return 0;
+  }
+  int newfd = thread_add_fd(current, fd);
+#ifdef DEBUG_SYS_FN
+  kprintf("sys dup %d %s\n",newfd,fd->name);
+#endif
+  return newfd;
+}
+
+int sys_dup2(int oldfd, int newfd) {
+  thread_t* current = thread_current();
+  fd_t* fd = thread_find_fd_id(current, oldfd);
+  if (fd == NULL) {
+    kprintf("dup not found fd %d\n", fd);
+    return 0;
+  }
+  fd_t* nfd = thread_find_fd_id(current, newfd);
+  if (nfd == NULL) {
+    kprintf("dup not found nfd %d\n", nfd);
+    return 0;
+  }
+  fd_close(fd);
+  thread_set_fd(current, newfd, fd);
+  return newfd;
 }

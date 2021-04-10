@@ -45,6 +45,7 @@ int keyboard_init(void) {
   dev->id = DEVICE_KEYBOARD;
   dev->type=DEVICE_TYPE_CHAR;
   dev->data=scan_code_buffer;
+  memset(scan_code_buffer,0,MAX_CHARCODE_BUFFER);
   device_add(dev);
   scan_code_index=0;
 
@@ -65,10 +66,11 @@ void do_keyboard(interrupt_context_t* context) {
     kprintf("key buffer is full\n");
   }
   scan_code_buffer[scan_code_index++]=scan_code;
-  // io_write8((com = io_read8(0x61)) | 0x80, 0x61);
-  // io_write8(com & 0x7f, 0x61);
+  io_write8((com = io_read8(0x61)) | 0x80, 0x61);
+  io_write8(com & 0x7f, 0x61);
+  io_write8(0x20,0x20);
 
-  pic_eof(ISR_KEYBOARD);
+  // pic_eof(ISR_KEYBOARD);
 }
 
 module_t keyboard_module = {

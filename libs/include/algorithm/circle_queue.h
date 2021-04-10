@@ -39,5 +39,6 @@ u32 cqueue_is_full(cqueue_t* queue);
 u8* cqueue_poll_byte(cqueue_t* queue);
 u8* cqueue_peek_byte(cqueue_t* queue);
 int cqueue_put_byte(cqueue_t* queue, u8* element);
+void cqueue_for_each_byte(cqueue_t* queue, cqueue_loop_fn fun);
 
 #endif

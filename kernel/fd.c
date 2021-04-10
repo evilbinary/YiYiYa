@@ -26,6 +26,10 @@ fd_t* fd_new(u32* file, u32 type, char* name) {
     kprintf("new fd limit \n");
     return NULL;
   }
+  if(file==NULL){
+    kprintf("fd new file is null\n");
+    return NULL;
+  }
   fd_list[fd_number].id = fd_number;
   fd_list[fd_number].type = type;
   fd_list[fd_number].data = file;
@@ -60,4 +64,20 @@ int fd_std_init() {
 }
 int fd_init(){
   return 1;
+}
+
+void fd_close(fd_t* fd){
+  if(fd==NULL){
+    kprintf("fd close is null\n");
+    return;
+  }
+  vnode_t* file=fd->data;
+  vfs_close(file);
+}
+
+void fd_dumps(){
+  for (int i = 0; i < fd_number; i++) {
+    fd_t*fd=&fd_list[i];
+    kprintf("fd %d name %s id %d %x\n",i,fd->name,fd->id,fd);
+  }
 }

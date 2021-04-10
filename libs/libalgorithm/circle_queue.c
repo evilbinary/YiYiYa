@@ -4,7 +4,7 @@ cqueue_t* cqueue_create(u32 size, u32 type) {
   cqueue_t* queue = fn_malloc(sizeof(cqueue_t));
   if (queue) {
     queue->type = type;
-    queue->elements = fn_malloc(size * sizeof(void*));
+    queue->elements = fn_malloc(size * sizeof(void*)+1);
     if (queue->elements) {
       queue->size = size;
       queue->head = 0;
@@ -164,11 +164,23 @@ u32 cqueue_count(cqueue_t* queue) {
   return count;
 }
 
-void queue_for_each(cqueue_t* queue, cqueue_loop_fn fun) {
+void cqueue_for_each(cqueue_t* queue, cqueue_loop_fn fun) {
   if (!cqueue_is_empty(queue)) {
     u32 h = queue->head;
     do {
       fun(queue->elements[h++]);
+      if (h == queue->size) {
+        h = 0;
+      }
+    } while (h != queue->tail);
+  }
+}
+
+void cqueue_for_each_byte(cqueue_t* queue, cqueue_loop_fn fun) {
+  if (!cqueue_is_empty(queue)) {
+    u32 h = queue->head;
+    do {
+      fun(((u8*)queue->elements)[h++]);
       if (h == queue->size) {
         h = 0;
       }
