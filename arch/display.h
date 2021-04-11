@@ -6,7 +6,9 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
+#include "libs/include/types.h"
 
 void display_init();
+void putch(u8 c);
 
 #endif

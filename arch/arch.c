@@ -8,6 +8,7 @@
 boot_info_t* boot_info;
 
 void arch_init(boot_info_t* boot){
+    io_add_write_channel(putch);
     boot_info = boot;
     display_init();
     mm_init();

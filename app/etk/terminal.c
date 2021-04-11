@@ -53,7 +53,7 @@ str_t* str_new(const char* str) {
   s->buf = malloc(size);
   s->buf_len = size;
   s->len = size - 1;
-  strcpy(s->buf, str);
+  strncpy(s->buf, str,strlen(str));
   return s;
 }
 
@@ -63,14 +63,15 @@ void str_append(str_t* str, const char* text) {
   if (needed > str->buf_len) {
     char* new_buf = malloc(2 * needed);
 
-    strcpy(new_buf, str->buf);
+    strncpy(new_buf, str->buf,str->buf_len);
+    new_buf[str->buf_len]=0;
     free(str->buf);
 
     str->buf = new_buf;
     str->buf_len = 2 * needed;
   }
 
-  strcpy(&str->buf[prev_len], text);
+  strncpy(&str->buf[prev_len], text,strlen(text)+1);
   str->len = needed - 1;
 }
 
@@ -272,13 +273,14 @@ static Ret etk_terminal_event(EtkWidget* thiz, EtkEvent* event) {
         case 0x0d:
           str_append(text_buf, input_buf->buf);
           send_input(input_buf);
+          if(input_buf->len>0){
+            u32 cmdret = etk_terminal_get_cmd_result();
+            if (cmdret > 0) {
+              printf("cmd ret:%d text:%s\n", cmdret, text_buf->buf);
+            }
+          }
           input_buf->buf[0] = '\0';
           input_buf->len = 0;
-
-          u32 cmdret = etk_terminal_get_cmd_result();
-          if (cmdret > 0) {
-            printf("cmd ret:%d text:%s\n", cmdret, text_buf->buf);
-          }
 
           break;
         case 0x08:  // delete

@@ -11,7 +11,7 @@ typedef struct bitmap {
   i32 alpha_flag;
 } bitmap_t;
 
-void* bitmap_create(i32 w, i32 h, i32 bitperpixel, u32 color);
+void* bitmap_create(i32 w, i32 h, u32 bitperpixel, u32 color);
 
 
 #endif

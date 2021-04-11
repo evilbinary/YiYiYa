@@ -107,11 +107,11 @@ void map_mem_block(u32 addr) {
   mem_block_t* p = block_available;
   for (; p != NULL; p = p->next) {
     if (p->addr > addr) {
-      // map_page(p->addr,p->addr,PAGE_P | PAGE_USU | PAGE_RWW);
+      // map_page(p->addr, p->addr, PAGE_P | PAGE_USU | PAGE_RWW);
       u32 address = p->addr;
       for (int i = 0; i < p->size / 0x1000; i++) {
         map_page(address, address, PAGE_P | PAGE_USU | PAGE_RWW);
-        //kprintf("map addr %x %x\n", address, address);
+        // kprintf("map addr %x %x\n", address, address);
         address += 0x1000;
       }
     }
@@ -135,7 +135,17 @@ void unmap_mem_block(u32* page, u32 addr) {
   }
 }
 
+void mm_dump_phy() {
+  for (int i = 0; i < boot_info->memory_number; i++) {
+    memory_sinfo_t* m = (memory_sinfo_t*)&boot_info->memory[i];
+    kprintf("base:%x %x lenght:%x %x type:%d\n", m->baseh, m->basel, m->lengthh,
+            m->lengthl, m->type);
+  }
+  kprintf("total memory %dm\n", boot_info->total_memory / 1024 / 1024);
+}
+
 void mm_init() {
+  mm_dump_phy();
   boot_info->pdt_base = (ulong)page_dir_ptr_tab;
   boot_info->page_type = 1;  // pae mode
 
@@ -159,7 +169,6 @@ void mm_init() {
   mm_alloc_init();
   // map > 4GB addr
   map_mem_block(address);
-
   // move to new addr
   // boot_info_t *new_boot=kmalloc(sizeof(boot_info_t));
   // *new_boot=*boot_info;
@@ -178,7 +187,7 @@ void mm_alloc_init() {
     // skip
     u32 addr = mem->base;
     u32 len = mem->length;
-    u32 boot_end = 0x10000;  //((u32)boot_info+1024*4);
+    u32 boot_end = 0x11000;  //((u32)boot_info+1024*4);
     u32 kernel_start = boot_info->kernel_base;
     u32 kernel_end = kernel_start + boot_info->kernel_size;
     if (boot_info >= mem->base && mem->base < boot_end) {
@@ -203,13 +212,68 @@ void mm_alloc_init() {
   }
 }
 
+void* mm_alloc(size_t size) {
+  mem_block_t* p = block_available;
+  u32 static count = 0;
+  u32 pre_alloc_size = size + sizeof(mem_block_t);
+  for (; p != NULL; p = p->next) {
+    // kprintf("p:%x type:%d size:%x\n", p, p->type, p->size);
+    if ((p->type != MEM_FREE)) {
+      continue;
+    }
+    if ((pre_alloc_size) <= p->size) {
+      // kprintf("p:%x pre_alloc_size:%d size:%d
+      // type:%d\n",p,pre_alloc_size,p->size,p->type);
+      mem_block_t* new_block = (mem_block_t*)p->addr;
+      if (new_block == NULL) continue;
+      p->addr += pre_alloc_size;
+      p->size -= pre_alloc_size;
+
+      new_block->addr = (u32)new_block + sizeof(mem_block_t);
+      new_block->size = size;
+      new_block->next = NULL;
+      new_block->type = MEM_USED;
+
+      if (block_alloc_head == NULL) {
+        block_alloc_head = new_block;
+        block_alloc_tail = new_block;
+      } else {
+        block_alloc_tail->next = new_block;
+        block_alloc_tail = new_block;
+      }
+      count++;
+      // kprintf("alloc count:%d: addr:%x size:%d\n", count, new_block->addr,
+      //         new_block->size);
+      // mm_dump();
+      // mm_dump_print(block_available);
+      return (void*)new_block->addr;
+    }
+  }
+  kprintf("erro alloc size %d kb\n", size / 1024);
+  // mm_dump();
+  for (;;)
+    ;
+
+  return NULL;
+}
+
 void* mm_alloc_zero_align(size_t size, int alignment) {
-  int offset = alignment - 1 + sizeof(void*);
-  void* addr = mm_alloc(size + offset);
-  memset(addr, 0, size + offset);
-  void** align = (void**)(((size_t)addr + offset) & ~(alignment - 1));
-  align[-1] = addr;
-  return align;
+  void *p1, *p2;
+  if ((p1 = (void*)mm_alloc(size + alignment + sizeof(size_t))) == NULL) {
+    return NULL;
+  }
+  size_t addr = (size_t)p1 + alignment + sizeof(size_t);
+  p2 = (void*)(addr - (addr % alignment));
+  *((size_t*)p2 - 1) = (size_t)p1;
+  return p2;
+
+  // int offset = alignment + sizeof(void*);
+  // void* addr = mm_alloc(size + offset);
+  // addr+=1;
+  // memset(addr, 0, size + offset);
+  // void** align = (void**)(((size_t)addr + offset-1) & ~(alignment - 1));
+  // align[-1] = addr;
+  // return align;
 
   // size_t request_size = size + alignment;
   // char* buf = (char*)mm_alloc(request_size);
@@ -222,8 +286,10 @@ void* mm_alloc_zero_align(size_t size, int alignment) {
 }
 
 void mm_free_align(void* addr) {
-  void* real = ((void**)addr)[-1];
-  mm_free(real);
+  if (addr) {
+    void* real = ((void**)addr)[-1];
+    mm_free(real);
+  }
   // int offset = *(((char*)addr) - 1);
   // mm_free(((char*)addr) - offset);
 }
@@ -257,48 +323,6 @@ void mm_dump() {
   kprintf("------------\n");
   mm_dump_print(block_available);
   kprintf("dump end\n\n");
-}
-
-void* mm_alloc(size_t size) {
-  mem_block_t* p = block_available;
-  u32 static count = 0;
-  u32 pre_alloc_size = size + sizeof(mem_block_t);
-  for (; p != NULL; p = p->next) {
-    // kprintf("p->type:%d\n",p->type);
-    if ((p->type != MEM_FREE)) {
-      continue;
-    }
-    // kprintf("pre_alloc_size:%d p->size:%d\n",pre_alloc_size,p->size);
-    if ((pre_alloc_size) <= p->size) {
-      mem_block_t* new_block = (mem_block_t*)p->addr;
-      if (new_block == NULL) continue;
-      p->addr += pre_alloc_size;
-      p->size -= pre_alloc_size;
-
-      new_block->addr = new_block + sizeof(mem_block_t);
-      new_block->size = size;
-      new_block->next = NULL;
-      new_block->type = MEM_USED;
-
-      if (block_alloc_head == NULL) {
-        block_alloc_head = new_block;
-        block_alloc_tail = new_block;
-      } else {
-        block_alloc_tail->next = new_block;
-        block_alloc_tail = new_block;
-      }
-      count++;
-      // kprintf("alloc %d: %x %d\n",count,new_block->addr,new_block->size);
-      // mm_dump();
-      // mm_dump_print(block_available);
-      return (void*)new_block->addr;
-    }
-  }
-  kprintf("erro alloc size %d kb\n", size / 1024);
-  for (;;)
-    ;
-  mm_dump();
-  return NULL;
 }
 
 void mm_free(void* addr) {
