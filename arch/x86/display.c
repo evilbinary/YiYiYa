@@ -120,12 +120,6 @@ void puts(char* text) {
 void test_display() {
   cls();
   puts("hello,YiYiYa\n");
-  for (int i = 0; i < boot_info->memory_number; i++) {
-    memory_sinfo_t* m = (memory_sinfo_t*)&boot_info->memory[i];
-    kprintf("base:%x %x lenght:%d %d \n", m->baseh, m->basel, m->lengthh,
-            m->lengthl);
-  }
-  kprintf("total memory %dm\n", boot_info->total_memory / 1024 / 1024);
 }
 
 void display_init() {

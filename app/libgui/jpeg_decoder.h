@@ -27,7 +27,6 @@ typedef my_source_mgr* my_src_ptr;
 
 void put_scanline_to_bitmap(bitmap_t* bitmap, char* scanline, int y,
                             int width);
-void* bitmap_create(i32 w, i32 h, i32 bitperpixel, u32 color);
 bitmap_t* load_jpeg(const char* filename);
 
 

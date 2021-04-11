@@ -17,6 +17,7 @@ env.Library('gui', [
 ],CFLAGS='$CFLAGS -Ilibs/include/c/')
 
 env.Library('image', [
+    'image.c',
     'jpeg_decoder.c',
     'png_decoder.c',
     '../../libs/libc/libc.a',

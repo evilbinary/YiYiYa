@@ -266,7 +266,7 @@ void ahci_dev_port_init(ahci_device_t* ahci_dev, int no) {
   // Command list entry maxim count = 32
   // Command list maxim size = 32*32 = 1K per port
   // void* ahci_base = kmalloc(40 * 1024 + 8 * 1024 * 32);
-  void* ahci_base = mm_alloc_zero_align(40 * 1024 + 8 * 1024 * 32, 1024);
+  void* ahci_base = kmalloc_alignment(40 * 1024 + 8 * 1024 * 32, 1024);
   // u32 addr=ahci_base;
   // for (int i = 0; i < (40 * 1024 + 8 * 1024 * 32) / 0x1000; i++) {
   //   map_page(addr, addr, PAGE_P | PAGE_USU | PAGE_RWW);

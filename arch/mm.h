@@ -25,10 +25,10 @@
 
 typedef struct mem_block{
     u32 addr;
-	u32 size;
 	u32 type;
+	u32 size;
 	struct mem_block * next;
-} mem_block_t;
+}__attribute__ ((packed)) mem_block_t ;
 
 
 typedef u64* page_dir_t;

@@ -7,6 +7,10 @@ org 7c00h
 _start:
 %define init_base 0x0500
 bits 16
+	mov ax, cs
+	mov ds, ax
+	mov ss, ax
+	; mov sp, 0
     cli
     call cls
 

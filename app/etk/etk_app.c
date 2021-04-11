@@ -21,7 +21,7 @@ int etk_app_main(int argc, char* argv[]) {
   e32 i;
   e32 xsize, ysize, xspan, yspan, startx, starty, x, y;
 
-  e8 button_name[9][10] = {"Clock", "Vedio", "Temp",  "Note", "Shut",
+  e8 button_name[9][10] = {"Clock", "Vdieo", "Temp",  "Note", "Shut",
                            "Help",  "Mine",  "Block", "Photo"};
   //ȡ�ô��ڹ���
   manager = etk_get_wnd_manager();
