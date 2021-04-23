@@ -9,6 +9,12 @@ import math
 import platform 
 plt = platform.system()
 
+# arch support x86 arm
+# arch='arm'
+arch='x86' 
+
+DefaultEnvironment(tools=[])
+env = Environment(ENV = {}, tools=['gcc'])
 
 env = Environment(
         CC = '/opt/local/bin/i386-elf-gcc',
@@ -18,11 +24,12 @@ env = Environment(
         STRIP="/opt/local/bin/i386-elf-strip",
         RANLIB='/opt/local/bin/i386-elf-ranlib',
         OBJCOPY='/opt/local/bin/i386-elf-objcopy',
-        CFLAGS=' -march=i486 -I. -I./include -Ilibs/include -g -nostdlib -nostdinc -fno-builtin -m32 -c -std=c99 -std=gnu99 -w',
+        CFLAGS='-DX86 -march=i486 -I. -I./include -Ilibs/include -g -nostdlib -nostdinc -fno-builtin -m32 -c -std=c99 -std=gnu99 -w',
         #PATH= os.environ['PATH'],
         LIBPATH=['.','../arch/','../driver','../libs/'],
         LINKFLAGS='-nostdlib -nostartfiles -e start  -g ',
-        OBJCOPYFLAGS='-S -g'
+        OBJCOPYFLAGS='-S -g',
+        ARCH=arch
         )
 
 if plt=='Linux':
@@ -32,8 +39,24 @@ if plt=='Linux':
     env['AR']='/usr/bin/ar'
     env['STRIP']='/usr/bin/strip'
     env['RANLIB']='/usr/bin/ranlib'
-    env['OBJCOPY']='/usr/bin/objcopy',
+    env['OBJCOPY']='/usr/bin/objcopy'
     pass
+elif plt=='Darwin':
+    if arch =='arm':
+        env['AS']='/opt/local/bin/arm-none-eabi-as'
+        env['CC']='/opt/local/bin/arm-none-eabi-gcc'
+        env['LD']='/opt/local/bin/arm-none-eabi-ld'
+        env['CXX']='/opt/local/bin/arm-none-eabi-g++'
+        env['AR']='/opt/local/bin/arm-none-eabi-ar'
+        env['STRIP']='/opt/local/bin/arm-none-eabi-strip'
+        env['RANLIB']='/opt/local/bin/arm-none-eabi-ranlib'
+        env['OBJCOPY']='/opt/local/bin/arm-none-eabi-objcopy'
+        env['CFLAGS']='-mcpu=cortex-a7  -DARM -I. -I./include -Ilibs/include -g -nostdlib -nostdinc -fno-builtin -c -std=c99 -std=gnu99 -w'
+        pass
+else:
+    print('no support ^_^!')
+
+
 
 def generate_bin(source, target, env, for_signature):
     return '$OBJCOPY %s %s %s'%(env['OBJCOPYFLAGS'],source[0], target[0])
@@ -92,7 +115,7 @@ SConscript(dirs=['drivers'], exports='env')
 kernel=SConscript(dirs=['app'], exports='env')
 
 
-boot=SConscript(dirs=['boot/x86'], exports='env')
+boot=SConscript(dirs=['boot/'+arch], exports='env')
 Depends(boot, kernel)
 
 image=SConscript(dirs=['image'], exports='env')

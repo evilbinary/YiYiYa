@@ -69,7 +69,7 @@ void do_timer() {
   interrupt_entering_code(ISR_TIMER,0);
   interrupt_process(do_schedule);
   //interrupt_exit();
-  interrupt_exit_context(current_context->esp0);
+  interrupt_exit_context(current_context);
 }
 
 void schedule_init() {

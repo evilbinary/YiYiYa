@@ -45,7 +45,7 @@ void context_switch(interrupt_context_t* context,context_t** current,
                     context_t* next_context);
 
 
-#define context_restore(duck_context) interrupt_exit_context(duck_context->esp0)
+#define context_restore(duck_context) interrupt_exit_context(duck_context)
 
 #define sys_fn_call(duck_interrupt_context, fn)                             \
   asm volatile(                                                             \
