@@ -5,33 +5,12 @@
  ********************************************************************/
 #include "syscall.h"
 extern context_t* current_context;
-static void* syscall_table[SYSCALL_NUMBER] = {&sys_read,
-                                              &sys_write,
-                                              &sys_yeild,
-                                              &sys_print,
-                                              &sys_print_at,
-                                              &sys_ioctl,
-                                              &sys_open,
-                                              &sys_close,
-                                              &dev_read,
-                                              &dev_write,
-                                              &dev_ioctl,
-                                              &sys_exec,
-                                              &sys_test,
-                                              &sys_exit,
-                                              &sys_vmap,
-                                              &sys_vumap,
-                                              &sys_seek,
-                                              &sys_valloc,
-                                              &sys_vfree,
-                                              &sys_vheap,
-                                              &sys_fork,
-                                              &sys_pipe,
-                                              &sys_getpid,
-                                              &sys_getppid,
-                                              &sys_dup,
-                                              &sys_dup2
-                                              };
+static void* syscall_table[SYSCALL_NUMBER] = {
+    &sys_read,  &sys_write, &sys_yeild, &sys_print, &sys_print_at, &sys_ioctl,
+    &sys_open,  &sys_close, &dev_read,  &dev_write, &dev_ioctl,    &sys_exec,
+    &sys_test,  &sys_exit,  &sys_vmap,  &sys_vumap, &sys_seek,     &sys_valloc,
+    &sys_vfree, &sys_vheap, &sys_fork,  &sys_pipe,  &sys_getpid,   &sys_getppid,
+    &sys_dup,   &sys_dup2};
 
 INTERRUPT_SERVICE
 void syscall_handler() {
@@ -46,8 +25,8 @@ void* do_syscall(interrupt_context_t* context) {
   // kprintf("syscall %x\n",context.no);
   // current_context->esp0 = context;
   // current_context->esp = context->esp;
-  if (context->eax >= 0 && context->eax < SYSCALL_NUMBER) {
-    void* fn = syscall_table[context->eax];
+  if (context_r0(context) >= 0 && context_r0(context) < SYSCALL_NUMBER) {
+    void* fn = syscall_table[context_r0(context)];
     if (fn != NULL) {
       // if (current_context != NULL) {
       //   current_context->tss->cr3 = current_context->kernel_page_dir;
@@ -58,14 +37,49 @@ void* do_syscall(interrupt_context_t* context) {
       //   current_context->tss->cr3 = current_context->page_dir;
       //   context_switch_page(current_context->page_dir);
       // }
-      return context->eax;
+      return context_r0(context);
     } else {
-      kprintf("syscall %x not found\n", context->eax);
+      kprintf("syscall %x not found\n", context_r0(context));
     }
   }
   return NULL;
 }
 
+#ifdef ARM
+void* syscall0(u32 num) {
+  int ret;
+  return ret;
+}
+
+void* syscall1(u32 num, void* arg0) {
+  int ret;
+  return ret;
+}
+void* syscall2(u32 num, void* arg0, void* arg1) {
+  int ret;
+
+  return ret;
+}
+void* syscall3(u32 num, void* arg0, void* arg1, void* arg2) {
+  u32 ret = 0;
+
+  return ret;
+}
+
+void* syscall4(u32 num, void* arg0, void* arg1, void* arg2, void* arg3) {
+  u32 ret = 0;
+
+  return ret;
+}
+
+void* syscall5(u32 num, void* arg0, void* arg1, void* arg2, void* arg3,
+               void* arg4) {
+  u32 ret = 0;
+
+  return ret;
+}
+
+#elif defined(X86)
 void* syscall0(u32 num) {
   int ret;
   asm("int %1" : "=a"(ret) : "i"(ISR_SYSCALL), "0"(num));
@@ -92,18 +106,22 @@ void* syscall3(u32 num, void* arg0, void* arg1, void* arg2) {
   return ret;
 }
 
-void* syscall4(u32 num, void* arg0, void* arg1, void* arg2,void* arg3) {
+void* syscall4(u32 num, void* arg0, void* arg1, void* arg2, void* arg3) {
   u32 ret = 0;
   asm volatile("int %1\n"
                : "=a"(ret)
-               : "i"(ISR_SYSCALL), "0"(num), "b"(arg0), "c"(arg1), "d"(arg2), "S"(arg3));
+               : "i"(ISR_SYSCALL), "0"(num), "b"(arg0), "c"(arg1), "d"(arg2),
+                 "S"(arg3));
   return ret;
 }
 
-void* syscall5(u32 num, void* arg0, void* arg1, void* arg2,void* arg3,void* arg4) {
+void* syscall5(u32 num, void* arg0, void* arg1, void* arg2, void* arg3,
+               void* arg4) {
   u32 ret = 0;
   asm volatile("int %1\n"
                : "=a"(ret)
-               : "i"(ISR_SYSCALL), "0"(num), "b"(arg0), "c"(arg1), "d"(arg2), "S"(arg3),"D"(arg4));
+               : "i"(ISR_SYSCALL), "0"(num), "b"(arg0), "c"(arg1), "d"(arg2),
+                 "S"(arg3), "D"(arg4));
   return ret;
 }
+#endif

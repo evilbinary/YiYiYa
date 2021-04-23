@@ -33,6 +33,10 @@ int kmain(int argc, char* argv[]) {
   kernel_init();
 
   kprintf("module regist\n");
+
+#ifdef ARM 
+
+#elif defined(X86)
   module_regist(&pci_module);
   module_regist(&serial_module);
   module_regist(&keyboard_module);
@@ -46,6 +50,7 @@ int kmain(int argc, char* argv[]) {
   module_regist(&devfs_module);
   module_regist(&fat32_module);
 
+#endif
 
   thread_t* t0 = thread_create((u32*)&do_serial_thread,NULL);
   thread_t* t1 = thread_create((u32*)&do_shell_thread,NULL);

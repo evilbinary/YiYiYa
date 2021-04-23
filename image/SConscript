@@ -37,18 +37,32 @@ env.KernelSize(['size'],['../app/kernel'])
 
 
 def build_duck_image():
-  env.Command('duck.img', 
-    [
-    ''
-    '../boot/x86/boot',
-    '../boot/x86/init.bin',
-    '../app/kernel' ],
-    [
-      'dd if=/dev/zero bs=512 count=2880 conv=notrunc of=$TARGET',
-      'dd if=${SOURCES[0]} bs=512 count=1 conv=notrunc of=$TARGET',
-      'dd if=${SOURCES[1]} bs=512 count=11 seek=1  conv=notrunc of=$TARGET',
-      'dd if=${SOURCES[2]} bs=512 count=%s seek=12  conv=notrunc of=$TARGET'%(env.get('KERNEL_SIZE'))
-  ])
+  if env.get('ARCH')=='x86':
+    env.Command('duck.img', 
+      [
+      ''
+      '../boot/x86/boot',
+      '../boot/x86/init.bin',
+      '../app/kernel' ],
+      [
+        'dd if=/dev/zero bs=512 count=2880 conv=notrunc of=$TARGET',
+        'dd if=${SOURCES[0]} bs=512 count=1 conv=notrunc of=$TARGET',
+        'dd if=${SOURCES[1]} bs=512 count=11 seek=1  conv=notrunc of=$TARGET',
+        'dd if=${SOURCES[2]} bs=512 count=%s seek=12  conv=notrunc of=$TARGET'%(env.get('KERNEL_SIZE'))
+    ])
+  elif env.get('ARCH')=='arm':
+    env.Command('duck.img', 
+      [
+      ''
+      '../boot/arm/init.bin',
+      '../app/kernel' 
+      ],
+      [
+        'dd if=/dev/zero bs=512 count=2880 conv=notrunc of=$TARGET',
+        'dd if=${SOURCES[0]} bs=512 count=11 seek=0 conv=notrunc of=$TARGET',
+        'dd if=${SOURCES[1]} bs=512 count=%s seek=12  conv=notrunc of=$TARGET'%(env.get('KERNEL_SIZE'))
+    ])
+
 
 if env.get('build')=='uImage':
   env.Command('uImage.img', 
@@ -71,10 +85,17 @@ if env.get('run')=='bochs' or env.get('run')=='b':
   env.Command('bochs', 'duck.img','bochs -q -f ./bochsrc')
 elif env.get('run')=='qemu' or env.get('run')=='q':
   build_duck_image()
-  env.Command('qemu', 'duck.img','qemu-system-i386 -boot a  -fda $SOURCE -serial stdio -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor  -D ./qemu.log  -drive id=disk,file=image/disk.img,format=raw,if=none -device ahci,id=ahci -device ide-hd,drive=disk,bus=ahci.0')
+  if env.get('ARCH')=='x86':
+    env.Command('qemu', 'duck.img','qemu-system-i386 -boot a  -fda $SOURCE -serial stdio -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor  -D ./qemu.log  -drive id=disk,file=image/disk.img,format=raw,if=none -device ahci,id=ahci -device ide-hd,drive=disk,bus=ahci.0')
+  elif env.get('ARCH')=='arm':
+    env.Command('qemu', 'duck.img','qemu-system-arm -M raspi2   -rtc base=utc -kernel image/duck.img  -serial stdio -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor  -D ./qemu.log ') #-d in_asm
 
 elif env.get('run')=='debug':
   build_duck_image()
-  env.Command('qemu', 'duck.img','qemu-system-i386 -rtc base=utc -boot a -S -s -fda image/duck.img -serial stdio -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor  -D ./qemu.log  -drive id=disk,file=image/disk.img,format=raw,if=none -device ahci,id=ahci -device ide-hd,drive=disk,bus=ahci.0')
+  if env.get('ARCH')=='x86':
+    env.Command('qemu', 'duck.img','qemu-system-i386 -rtc base=utc -boot a -S -s -fda image/duck.img -serial stdio -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor  -D ./qemu.log  -drive id=disk,file=image/disk.img,format=raw,if=none -device ahci,id=ahci -device ide-hd,drive=disk,bus=ahci.0')
+  elif env.get('ARCH')=='arm':
+    env.Command('qemu', 'duck.img','qemu-system-arm -M raspi2   -rtc base=utc  -S -s -kernel image/duck.img  -serial stdio -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor  -D ./qemu.log ') #-d in_asm
+    #versatilepb -machine raspi2 -device ahci,id=ahci -device ide-drive,drive=disk,bus=ahci.0  -append "console=ttyAMA0" 
 
   

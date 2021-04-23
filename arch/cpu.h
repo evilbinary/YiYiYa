@@ -10,20 +10,16 @@
 #include "libs/include/types.h"
 #include "interrupt.h"
 
+#ifdef ARM
+  #include "arm/cpu.h"
+#elif defined(X86)
+  #include "x86/cpu.h"
+#else
+
+#endif
+
 typedef uint32_t phys_address_t;
 typedef uint32_t virtual_address_t;
-
-#define debugger asm("xchg %bx,%bx\n")
-
-typedef struct context_t {
-  u32 esp0, ss0, ds0;
-  u32 esp, ss, ds;
-  u32 eip;
-  tss_t* tss;
-  u32* page_dir;
-  u32* kernel_page_dir;
-  u32 level;
-} context_t;
 
 typedef struct stack_frame {
   struct stack_frame* prev;
@@ -45,29 +41,6 @@ void context_switch(interrupt_context_t* context,context_t** current,
                     context_t* next_context);
 
 
-#define context_restore(duck_context) interrupt_exit_context(duck_context)
-
-#define sys_fn_call(duck_interrupt_context, fn)                             \
-  asm volatile(                                                             \
-      " \
-      push %1; \
-      push %2; \
-      push %3; \
-      push %4; \
-      push %5; \
-      call *%6; \
-      add $20,%%esp; \
-    "                                                                   \
-      : "=a"(duck_interrupt_context->eax)                                   \
-      : "r"(duck_interrupt_context->edi), "r"(duck_interrupt_context->esi), \
-        "r"(duck_interrupt_context->edx), "r"(duck_interrupt_context->ecx), \
-        "r"(duck_interrupt_context->ebx), "r"(fn))
-
-#define cpu_cli() asm("cli")
-#define cpu_sti() asm("sti")
-#define cpu_cpl() (cpu_get_cs()&0x3)
-
-#define context_switch_page(page_dir) asm volatile("mov %0, %%cr3" : : "r" (page_dir))
 
 #define FAA(ptr) __sync_fetch_and_add(ptr, 1)
 

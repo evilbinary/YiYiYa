@@ -58,6 +58,10 @@ void timer_init(int hz) {
   io_write8(0x21,io_read8(0x21) & 0xfe);
 }
 
+void timer_end(){
+      io_write8(0x20, 0x20);
+}
+
 static inline u16 pic_get_irr() {
   u16 val = 0;
   io_write8(0x20, 0x0e);

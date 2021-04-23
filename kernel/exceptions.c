@@ -13,6 +13,9 @@ void exception_regist(u32 vec, interrupt_handler_t handler) {
 }
 
 void exception_info(interrupt_context_t *context) {
+#ifdef ARM
+
+#elif defined(X86)
   static const char *exception_msg[] = {
       "DIVIDE ERROR",      "DEBUG EXCEPTION",
       "BREAKPOINT",        "NMI",
@@ -33,7 +36,7 @@ void exception_info(interrupt_context_t *context) {
   asm volatile("movl %%es,	%%eax" : "=a"(es));
   asm volatile("movl %%fs,	%%eax" : "=a"(fs));
   asm volatile("movl %%gs,	%%eax" : "=a"(gs));
-  if(context->no!=14){
+  if (context->no != 14) {
     thread_t *current = thread_current();
     if (context->no < sizeof exception_msg) {
       kprintf("EXCEPTION %d: %s\n=======================\n", context->no,
@@ -58,6 +61,8 @@ void exception_info(interrupt_context_t *context) {
     kprintf("ds:\t%x\tes:\t%x\n", ds, es);
     kprintf("fs:\t%x\tgs:\t%x\n", fs, gs);
   }
+#endif
+
   if (exception_handlers[context->no] != 0) {
     interrupt_handler_t handler = exception_handlers[context->no];
     handler(context);
@@ -170,6 +175,9 @@ void coprocessor_error() {
 }
 
 void do_page_fault(interrupt_context_t *context) {
+#ifdef ARM
+
+#elif defined(X86)
   u32 fault_addr;
   asm volatile("mov %%cr2, %0" : "=r"(fault_addr));
 
@@ -179,7 +187,8 @@ void do_page_fault(interrupt_context_t *context) {
   int reserved = context->code & 0x8;
   int id = context->code & 0x10;
 
-  kprintf("eip:%x cs:%x ds:%x ss:%x esp:%x ebp:%x [",context->eip,context->cs,context->ds,context->ss,context->esp,context->ebp);
+  kprintf("eip:%x cs:%x ds:%x ss:%x esp:%x ebp:%x [", context->eip, context->cs,
+          context->ds, context->ss, context->esp, context->ebp);
   if (present == 1) {
     kprintf("present ");
   }
@@ -197,27 +206,110 @@ void do_page_fault(interrupt_context_t *context) {
 
   if (present == 0) {
     thread_t *current = thread_current();
-    if(fault_addr==NULL){
-      kprintf(" tid: %x warning null pointer\n",current->id);
+    if (fault_addr == NULL) {
+      kprintf(" tid: %x warning null pointer\n", current->id);
       return;
     }
     if (current != NULL) {
-      void* phy = virtual_to_physic(current->context.page_dir, fault_addr);
+      void *phy = virtual_to_physic(current->context.page_dir, fault_addr);
       kprintf(" tid: %x ", current->id);
-      if(phy==NULL){
+      if (phy == NULL) {
         valloc(fault_addr, PAGE_SIZE);
-      }else{
-        kprintf("paddr: %x ",phy);
+      } else {
+        kprintf("paddr: %x ", phy);
       }
     } else {
       map_page(fault_addr, fault_addr, PAGE_P | PAGE_USU | PAGE_RWW);
       kprintf("\n");
     }
   }
-  
+#endif
 }
 
+INTERRUPT_SERVICE
+void reset_handler() {
+  interrupt_entering_code(0, 0);
+  interrupt_process(exception_info);
+  cpu_halt();
+}
+
+INTERRUPT_SERVICE
+void undefined_handler() {
+  interrupt_entering_code(0, 0);
+  interrupt_process(exception_info);
+  cpu_halt();
+}
+
+INTERRUPT_SERVICE
+void svc_handler() {
+  interrupt_entering_code(0, 0);
+  interrupt_process(exception_info);
+  cpu_halt();
+}
+
+INTERRUPT_SERVICE
+void pref_abort_handler() {
+  interrupt_entering_code(0, 0);
+  interrupt_process(exception_info);
+  cpu_halt();
+}
+
+
+INTERRUPT_SERVICE
+void data_abort_handler() {
+  interrupt_entering_code(0, 0);
+  interrupt_process(exception_info);
+  cpu_halt();
+}
+
+
+INTERRUPT_SERVICE
+void unuse_handler() {
+  interrupt_entering_code(0, 0);
+  interrupt_process(exception_info);
+  cpu_halt();
+}
+
+
+void do_irq(interrupt_context_t* interrupt_context) {
+  
+}
+extern context_t* current_context;
+
+INTERRUPT_SERVICE
+void irq_handler() {
+  // interrupt_entering_code(0, 0);
+  // interrupt_process(do_irq);
+  // cpu_halt();
+  interrupt_entering_code(ISR_TIMER,0);
+  interrupt_process(do_schedule);
+  //interrupt_exit();
+  interrupt_exit_context(current_context);
+}
+
+
+
+INTERRUPT_SERVICE
+void frq_handler() {
+  interrupt_entering_code(0, 0);
+  interrupt_process(exception_info);
+  cpu_halt();
+}
+
+
 void exception_init() {
+#ifdef ARM
+
+  interrutp_regist(0, reset_handler);  // reset
+  interrutp_regist(1, undefined_handler);  // undefined
+  interrutp_regist(2, svc_handler);  // svc
+  interrutp_regist(3, pref_abort_handler);  // pref abort
+  interrutp_regist(4, data_abort_handler);  // data abort
+  interrutp_regist(5, unuse_handler);  // not use
+  interrutp_regist(6, irq_handler);  // irq
+  interrutp_regist(7, frq_handler);  // fiq
+
+#elif defined(X86)
   interrutp_regist(0, divide_error);
   interrutp_regist(1, debug_exception);
   interrutp_regist(2, nmi);
@@ -240,4 +332,6 @@ void exception_init() {
 
   // exception
   exception_regist(14, do_page_fault);
+
+#endif
 }
