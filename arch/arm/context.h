@@ -42,7 +42,14 @@ typedef struct interrupt_context {
   // u32 pc;
 } __attribute__((packed)) interrupt_context_t;
 
-#define interrupt_process(X) asm volatile("bl  " #X " \n")
+#define interrupt_process(X) \
+  asm volatile(              \
+      "push {r0,r1,r2} \n"   \
+      "bl " #X               \
+      "\n"                   \
+      "pop {r0,r1,r2}\n"     \
+      :                      \
+      :)
 
 #define interrupt_entering_code(VEC, CODE) \
   asm volatile(                            \
@@ -58,55 +65,32 @@ typedef struct interrupt_context {
       :                                    \
       : "i"(VEC), "i"(CODE))
 
-#define interrupt_exit_context(context) \
-  asm volatile(                         \
-      "ldr sp,%0 \n"                    \
-      "ldmia sp!,{r0-r1}\n"             \
-      "ldmia sp!,{r4-r12}\n"            \
-      "ldmia sp!,{r0}\n"                \
+#define interrupt_exit_context(duck_context) \
+  asm volatile(                              \
+      "ldr sp,%0 \n"                         \
+      "ldmia sp!,{r0-r1}\n"                  \
+      "ldmia sp!,{r4-r12}\n"                 \
+      "ldmia sp!,{r0}\n"                     \
       "msr spsr_cxsf,r0\n"                   \
-      "ldmia sp!,{r0-r3}\n"             \
-      "ldmia sp!,{lr}\n"                \
-      "bx lr \n"                        \
-      :                                 \
-      : "m"(context->esp))
+      "ldmia sp!,{r0-r3}\n"                  \
+      "ldmia sp!,{lr}\n"                     \
+      "bx lr \n"                             \
+      :                                      \
+      : "m"(duck_context->esp))
 
-#define interrupt_entering(VEC)  \
-  asm volatile(                  \
-      "stmdb sp!, {r0-r3} \n"    \
-      "mrs r0,cpsr\n"            \
-      "stmdb sp!, {r0,pc,lr} \n" \
-      "stmdb sp!, {r4-r11} \n"   \
-      "mov r1,%0\n"              \
-      "mov r2,#0 \n"             \
-      "stmdb sp!, {r1,r2} \n"    \
-      "mov r0,sp\n"              \
-      :                          \
-      : "i"(VEC))
+#define interrupt_entering(VEC) interrupt_entering_code(VEC, 0)
 
 #define interrupt_exit()     \
   asm volatile(              \
+      "mov sp,r0 \n"         \
       "ldmia sp!,{r0-r1}\n"  \
-      "ldmia sp!,{r4-r11}\n" \
-      "ldmia sp!,{pc,lr}\n"  \
+      "ldmia sp!,{r4-r12}\n" \
       "ldmia sp!,{r0}\n"     \
-      "msr cpsr,r0\n"        \
+      "msr spsr_cxsf,r0\n"   \
       "ldmia sp!,{r0-r3}\n"  \
+      "ldmia sp!,{lr}\n"     \
       "bx lr \n"             \
       :                      \
       :)
-
-// #define interrupt_exit_context(context) \
-//   asm volatile(                         \
-//       "ldr r0,%0\n"                     \
-//       "ldmia r0!,{r4-r11}\n"            \
-//       "mrs r1,control\n"                \
-//       "orr r1,r1,#2 \n"                 \
-//       "msr control,r1 \n"               \
-//       "msr psp,r0\n"                    \
-//       "isb \n"                          \
-//       "bx lr \n"                        \
-//       :                                 \
-//       : "m"(context->esp))
 
 #endif
