@@ -21,7 +21,7 @@ Import('env')
 env.GenerateKernelSize('config.h',['../../app/kernel'])
 env.Program('init.elf', 
     ['init.c',],
-    CFLAGS='-I. -Iinclude  -Iarch -std=c99 -std=gnu99 -w ',
+    CFLAGS='$CFLAGS -I. -Iinclude  -Iarch -std=c99 -std=gnu99 -w ',
     LINKFLAGS= '$LINKFLAGS -Ttext 0x0500')
 
 env.Objcopy('init.bin','init.elf',OBJCOPYFLAGS='-O binary -S')
