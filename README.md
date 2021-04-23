@@ -29,7 +29,11 @@ scons --run=qemu
 
 ## 开发
 
-qq群 26893532 可以加入一起讨论学习
+qq群 26893532 可以加入一起讨论学习，如果找不到该群，使用扫码加入。
+<img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/demo/group.jpeg?raw=true" width="200px" />
+
+
+https://github.com/evilbinary/YiYiYa
 
 
 ## 参考资料
