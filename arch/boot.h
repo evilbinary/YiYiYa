@@ -11,6 +11,11 @@
 #define MAX_MEMORY_BLOCK 10
 #define MAX_CPU 1
 
+#ifdef ARM
+
+typedef u32 idt_entry_t;
+
+#elif defined(X86)
 #define GDT_NUMBER 10
 #define GDT_SIZE 8
 
@@ -40,6 +45,27 @@
    (((limit)&0x000f0000ULL) << (48 - 16)) | (((base)&0x00ffffffULL) << 16) | \
    (((limit)&0x0000ffffULL)))
 
+
+typedef struct gdt_ptr {
+  u16 limit;
+  u32 base;
+} __attribute__((packed)) gdt_ptr_t;
+
+typedef struct idt_entry{
+   u16 basel;
+   u16 selector;
+   u8  zero;
+   u8  attrs;
+   u16 baseh;
+} __attribute__((packed)) idt_entry_t;
+
+typedef struct idt_ptr {
+  u16 limit;
+  u32 base;
+} __attribute__((packed)) idt_ptr_t;
+
+#endif
+
 typedef struct memory_info {
   u64 base;
   u64 length;
@@ -62,24 +88,6 @@ typedef struct disply_info {
   i32 width;
   i32 height;
 } disply_info_t;
-
-typedef struct gdt_ptr {
-  u16 limit;
-  u32 base;
-} __attribute__((packed)) gdt_ptr_t;
-
-typedef struct idt_entry{
-   u16 basel;
-   u16 selector;
-   u8  zero;
-   u8  attrs;
-   u16 baseh;
-} __attribute__((packed)) idt_entry_t;
-
-typedef struct idt_ptr {
-  u16 limit;
-  u32 base;
-} __attribute__((packed)) idt_ptr_t;
 
 typedef struct disk_info{
   i32 hpc;

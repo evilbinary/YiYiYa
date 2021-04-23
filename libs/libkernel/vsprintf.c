@@ -12,10 +12,15 @@
 #define SPECIAL	32		/* 0x */
 #define SMALL	64		/* use 'abcdef' instead of 'ABCDEF' */
 
-#define do_div(n,base) ({ \
-int __res; \
-__asm__("divl %4":"=a" (n),"=d" (__res):"0" (n),"1" (0),"r" (base)); \
-__res; })
+// #define do_div(n,base) ({ \
+// int __res; \
+// __asm__("divl %4":"=a" (n),"=d" (__res):"0" (n),"1" (0),"r" (base)); \
+// __res; })
+#define do_div(n,base)  ({ \
+    int __rem = n % base;  \
+    n /= base;             \
+    __rem;                 \
+})
 
 /*------------------------------------------------------------------------
  Procedure:     skip_atoi ID:1

@@ -29,7 +29,7 @@ void do_shell_thread(void) {
   u32 col = 0;
   u32 row = 0;
   syscall1(SYS_PRINT, "#");
-  move_cursor();
+  // move_cursor();
   char buf[2] = {0};
 
   int fd = syscall2(SYS_OPEN, "/dev/stdin", 0);
@@ -40,9 +40,11 @@ void do_shell_thread(void) {
   // syscall2(SYS_EXEC,"/dev/sda/test.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/microui.elf",NULL);
   // kprintf("fd=>%d\n",fd);
+  int count=0;
   for (;;) {
 
     int ret = 0;
+    // kprintf("B%d ",count++);
     // read key
     // ret = syscall3(SYS_READ,fd, &scan_code, 1);
     // if (ret >= 1) {

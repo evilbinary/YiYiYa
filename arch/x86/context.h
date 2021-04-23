@@ -99,7 +99,7 @@ void interrutp_regist(u32 vec, interrupt_handler_t handler);
       :                  \
       :)
 
-#define interrupt_exit_context(duck_context) \
+#define interrupt_exit_context(context) \
   asm volatile(                     \
       "mov %0,%%esp\n"              \
       "pop %%gs\n"                  \
@@ -111,7 +111,7 @@ void interrutp_regist(u32 vec, interrupt_handler_t handler);
       "sti\n"                       \
       "iret\n"                      \
       :                             \
-      : "m"((duck_context->esp0)))
+      : "m"(context->esp0))
 
 
 

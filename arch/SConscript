@@ -8,11 +8,19 @@ import os
 
 Import('env')
 
-env.Library('arch', ['arch.c','lock.c',
-    'x86/io.c',
-    'x86/cpu.c',
-    'x86/mm.c',
-    'x86/display.c',
-    'x86/interrupt.c',
-    'cpu.h'
-    ])
+if env['ARCH']=='arm':
+    env.Library('arch', ['arch.c','lock.c',
+        'arm/io.c',
+        'arm/cpu.c',
+        'arm/mm.c',
+        'arm/display.c',
+        'arm/interrupt.c',
+        ])
+elif env['ARCH']=='x86':
+    env.Library('arch', ['arch.c','lock.c',
+        'x86/io.c',
+        'x86/cpu.c',
+        'x86/mm.c',
+        'x86/display.c',
+        'x86/interrupt.c',
+        ])

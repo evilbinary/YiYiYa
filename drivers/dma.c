@@ -15,7 +15,7 @@ u8 dma_addr_port[8] = {0x00, 0x02, 0x04, 0x06, 0xC0, 0xC4, 0xC8, 0xCC};
 u8 dma_count_port[8] = {0x01, 0x03, 0x05, 0x07, 0xC2, 0xC6, 0xCA, 0xCE};
 
 u32 dma_trans(u8 channel, u8 mode, void* addr, void* phyaddr, size_t size) {
-  asm("cli");
+  cpu_cli();
   mode+=channel;
   //init
   io_write8(dma_mask_reg[channel], 0x04 | channel);
@@ -33,6 +33,6 @@ u32 dma_trans(u8 channel, u8 mode, void* addr, void* phyaddr, size_t size) {
   io_write8(dma_count_port[channel], (size & 0xFF00) >> 8);
   //clear mask
   io_write8(dma_mask_reg[channel], channel);
-   asm("sti");
+  cpu_sti();
   return 1;
 }

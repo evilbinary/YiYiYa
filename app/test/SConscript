@@ -5,8 +5,6 @@
 # * 邮箱: rootdebug@163.com
 # ********************************************************************
 import os
-import platform 
-plt = platform.system()
 
 Import('env')
 

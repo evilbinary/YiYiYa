@@ -17,7 +17,6 @@
   
 #endif
 
-
 typedef void (*interrupt_handler_t)(interrupt_context_t* context);
 
 void timer_init(int hz);

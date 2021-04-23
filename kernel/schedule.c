@@ -49,7 +49,7 @@ void schedule(interrupt_context_t* interrupt_context) {
   thread_t* next_thread = NULL;
   thread_t* prev_thread = NULL;
   next_thread = schedule_get_next();
-  //kprintf("schedule next %d\n",next_thread->id);
+  // kprintf("schedule next %d\n",next_thread->id);
   if (next_thread == NULL) {
     kprintf("schedule error next\n");
   }
@@ -61,7 +61,7 @@ void schedule(interrupt_context_t* interrupt_context) {
 void do_schedule(interrupt_context_t* interrupt_context) {
   schedule(interrupt_context);
   timer_ticks++;
-  io_write8(0x20, 0x20);
+  timer_end();
 }
 
 INTERRUPT_SERVICE

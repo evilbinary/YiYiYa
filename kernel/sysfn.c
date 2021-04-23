@@ -218,14 +218,18 @@ int sys_fork() {
   thread_t* copy_thread = thread_clone(current, STACK_ADDR, THREAD_STACK_SIZE);
   copy_thread->pid = current->id;
 
+
+#ifdef ARM
+  kprintf("c eax no zero\n");
+#elif defined(X86)
   interrupt_context_t* c0 = current->context.esp0;
   interrupt_context_t* c = copy_thread->context.esp0;
-
   kprintf("# current tid %d eip:%x esp:%x ebp:%x \n", current->id, c0->eip,
           c0->esp, c0->ebp);
   kprintf("# new     tid %d eip:%x esp:%x ebp:%x \n", copy_thread->id, c->eip,
           c->esp, c->ebp);
   c->eax = 0;
+#endif
 
   thread_run(copy_thread);
   return copy_thread->id;

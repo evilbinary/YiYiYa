@@ -25,6 +25,7 @@ void do_serial_thread(void) {
     // memset(buf, 0, 512);
     // syscall3(DEV_READ, DEVICE_SATA, buf, 512);
 
+    // kprintf("A%d ",count);
     count++;
     if (i % 4 == 0) i = 0;
   }
