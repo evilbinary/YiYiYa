@@ -73,7 +73,7 @@ void* valloc(void* addr, size_t size) {
     } else {
       map_page(vaddr, paddr, PAGE_P | PAGE_USU | PAGE_RWW);
     }
-    kprintf("vmap vaddr:%x paddr:%x\n", vaddr, paddr);
+    //kprintf("vmap vaddr:%x paddr:%x\n", vaddr, paddr);
     vaddr += PAGE_SIZE;
     paddr += PAGE_SIZE;
   }
@@ -256,7 +256,7 @@ vmemory_area_t* vmemory_area_find(vmemory_area_t* areas, void* addr,
                                   size_t size) {
   vmemory_area_t* p = areas;
   for (; p != NULL; p = p->next) {
-    if ((addr >= p->vaddr) && (addr <= (p->vaddr + (p->size) * PAGE_SIZE))) {
+    if ((addr >= p->vaddr) && (addr <= (p->vaddr + p->size ))) {
       return p;
     }
   }

@@ -39,6 +39,7 @@ typedef struct thread_s{
     u32 fd_size;
     u32 fd_number;
     u32 lock;
+    u32 code;
 }thread_t;
 
 
@@ -55,6 +56,7 @@ void thread_add(thread_t* thread);
 void thread_remove(thread_t * thread);
 
 void thread_run(thread_t* thread);
+void thread_stop(thread_t* thread);
 
 void thread_yield();
 thread_t* thread_current();

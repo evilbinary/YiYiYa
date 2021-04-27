@@ -15,6 +15,7 @@ bitmap_t* load_png(const char* filename) {
   char header[8];
   fread(header, 1, 8, fp);
   if (png_sig_cmp(header, 0, 8) != 0) {
+    printf("not png file\n");
     return NULL;
   }
   png_structp png_ptr =
@@ -50,7 +51,7 @@ bitmap_t* load_png(const char* filename) {
   int size;
   int pos = 0;
   int temp;
-  bitmap = bitmap_create(w, h, nc * 8, 0xffffff);
+  bitmap = bitmap_create(w, h, bpc * 4, 0xffffff);
   if (bitmap == NULL) {
     printf("bitmap_create failed\n");
     png_destroy_read_struct(&png_ptr, &info_ptr, 0);
@@ -58,29 +59,35 @@ bitmap_t* load_png(const char* filename) {
     return NULL;
   }
   u8* p = bitmap->bits;
-  if (nc == 4 || color_type == PNG_COLOR_TYPE_RGB_ALPHA) {
-    bitmap->alpha_flag = 1;
-    temp = nc - 1;
-    for (i = 0; i < bitmap->h; i++) {
-      for (j = 0; j < bitmap->w * 4; j += 4) {
-        for (k = temp; k >= 0; k--) {
-          p[pos++] = row_pointers[i][j + k];
+  png_bytep buff = p;
+  switch (color_type) {
+    case PNG_COLOR_TYPE_RGB_ALPHA:
+      bitmap->alpha_flag = 1;
+      for (u32 y = 0; y < h; ++y) {
+        for (u32 x = 0; x < w * 4;) {
+          *p++ = row_pointers[y][x++];  // red
+          *p++ = row_pointers[y][x++];  // green
+          *p++ = row_pointers[y][x++];  // blue
+          *p++ = row_pointers[y][x++];  // alpha
         }
       }
-    }
-  } else if (nc == 3 || color_type == PNG_COLOR_TYPE_RGB) {
-    bitmap->alpha_flag = 0;
-    temp = (3 * bitmap->w);
-    for (i = 0; i < bitmap->h; i++) {
-      for (j = 0; j < temp; j += 3) {
-        p[pos++] = row_pointers[i][j + 2];
-        p[pos++] = row_pointers[i][j + 1];
-        p[pos++] = row_pointers[i][j + 0];
+      break;
+    case PNG_COLOR_TYPE_RGB:
+      bitmap->alpha_flag = 0;
+      for (u32 y = 0; y < h; y++) {
+        for (u32 x = 0; x < w; x++) {
+          buff[y * w + 3 * x + 0] = row_pointers[y][3 * x + 0];
+          buff[y * w + 3 * x + 1] = row_pointers[y][3 * x + 1];
+          buff[y * w + 3 * x + 2] = row_pointers[y][3 * x + 2];
+        }
       }
-    }
-  } else {
-    printf("error not support channel\n");
-    return NULL;
+      break;
+      /* 其它色彩类型的图像就不读了 */
+    default:
+      fclose(fp);
+      png_destroy_read_struct(&png_ptr, &info_ptr, 0);
+      printf("default color_type:close\n");
+      return 0;
   }
   png_destroy_read_struct(&png_ptr, &info_ptr, 0);
   fclose(fp);

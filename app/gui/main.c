@@ -44,13 +44,16 @@ void yiyiya_gui() {
   screen_info_t* screen = screen_info();
 
   bitmap_t* bitmap = load_jpeg("/dev/sda/home.jpg");
-  // bitmap_t* bitmap = load_png("/dev/sda/normal.png");
+  bitmap_t* bitmap2 = load_png("/dev/sda/normal.png");
   // void* bmp = load_bmp("/dev/sda/duck.bmp");
 
   mouse_data_t mouse;
 
   for (;;) {
     screen_show_bitmap(0, 0, 1024, 768, bitmap);
+
+    screen_show_bitmap(mouse.x, screen->height - mouse.y, 32, 32, bitmap2);
+
     screen_printf(500, 10, "YiYiYa OS");
     event_read_mouse(&mouse, sizeof(mouse_data_t));
     // for (u32 y = 0; y < screen->height; y++) {
@@ -62,7 +65,7 @@ void yiyiya_gui() {
     // screen_fill_rect(10, 20, 30, 30, 0xff0000);
 
     screen_printf(10, 100, "mouse=%d,%d", mouse.x, mouse.y);
-    screen_fill_rect(mouse.x, screen->height - mouse.y, 4, 4, 0x00ff00);
+    //screen_fill_rect(mouse.x, screen->height - mouse.y, 4, 4, 0x00ff00);
 
     display_time();
 

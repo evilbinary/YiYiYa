@@ -21,15 +21,12 @@ int etk_app_main(int argc, char* argv[]) {
   e32 i;
   e32 xsize, ysize, xspan, yspan, startx, starty, x, y;
 
-  e8 button_name[9][10] = {"Clock", "Vdieo", "Temp",  "Note", "Shut",
-                           "Help",  "Mine",  "Block", "Photo"};
-  //È¡ï¿½Ã´ï¿½ï¿½Ú¹ï¿½ï¿½ï¿½
+  e8 button_name[9][10] = {"ÊÓÆµ", "ÖÕ¶Ë", "ÎÂ¶È",  "¼ÇÊÂ±¾",
+                           "ÕÕÆ¬",  "É¨À×",  "Ê±ÖÓ","×´Ì¬","¹ØÓÚ" };
   manager = etk_get_wnd_manager();
-  //ï¿½ï¿½ï¿½ï¿½Í¼Æ¬ï¿½ï¿½ï¿½ï¿½
   jpeg_decoder = etk_image_jpeg_decoder_create();
   bmp_decoder = etk_image_bmp_decoder_create();
 
-  //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
   /*desktop=(EtkWidget*)etk_create_window(0,0,640,480,ETK_WIDGET_DESKTOP);
   etk_default_wnd_manager_set_desktop(manager,desktop);*/
   desktop = etk_create_window(0, 0, etkglobal.display->width,
@@ -50,15 +47,13 @@ int etk_app_main(int argc, char* argv[]) {
   t.height = b->h;
   etk_canvas_set_bitmap(desktop->canvas, b);
 
-  //ï¿½ï¿½ï¿½ï¿½×´Ì¬ï¿½ï¿½
   status = (EtkWidget*)etk_create_window(0, 0, 1024, 30, ETK_WIDGET_CHILD);
   etk_widget_append_child(desktop, status);
 
-  //ï¿½ï¿½ï¿½ï¿½ï¿½Ëµï¿½ 0
   menu[0] = (EtkWidget*)etk_create_menu(status, 0, 00, 80, 30);
   etk_widget_set_text(menu[0], "Menu");
   etk_button_set_clicked_listener(menu[0], menu0_listener, menu[0]);
-  //ï¿½ï¿½ï¿½ï¿½ï¿½Ó²Ëµï¿½
+
   menu_item[0] = (EtkWidget*)etk_create_menu_item(
       menu[0], menu[0]->rect.x, menu[0]->rect.height, menu[0]->rect.width, 20);
   etk_widget_set_text(menu_item[0], "Open");
@@ -79,12 +74,10 @@ int etk_app_main(int argc, char* argv[]) {
   etk_menu_item_set_clicked_listener(menu_item[2], menu0_item2_listener,
                                      menu_item[2]);
 
-  //ï¿½ï¿½ï¿½ï¿½ï¿½Ëµï¿½ 1
   menu[1] = (EtkWidget*)etk_create_menu(status, 80, 0, 80, 30);
   etk_widget_set_text(menu[1], "Setting");
   etk_button_set_clicked_listener(menu[1], menu1_listener, menu[1]);
 
-  //ï¿½ï¿½ï¿½ï¿½ï¿½Ó²Ëµï¿½
   menu_item[3] = (EtkWidget*)etk_create_menu_item(
       menu[1], menu[1]->rect.x, menu[1]->rect.height, menu[1]->rect.width, 20);
   etk_widget_set_text(menu_item[3], "Open F");
@@ -105,7 +98,6 @@ int etk_app_main(int argc, char* argv[]) {
   etk_menu_item_set_clicked_listener(menu_item[5], menu0_item2_listener,
                                      menu_item[5]);
 
-  //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å¥
   xsize = 52;
   ysize = 40;
   xspan = 5;
@@ -146,23 +138,35 @@ int etk_app_main(int argc, char* argv[]) {
   etk_button_set_clicked_listener(buttons[i], button8_listener, buttons[i]);
   i++;
 
-  {
+
+ {
     EtkSource* timer;
     wins[0] = etk_create_window(20, 120, 200, 150, ETK_WIDGET_WINDOW);
     timer = etk_source_timer_create(100, timer2_listener, wins[0]);
     etk_sources_manager_add(etk_default_sources_manager(), timer);
   }
 
+  // wins[1]=etk_power_create(300,200,250,200);
+	// etk_widget_append_child(desktop,wins[1]);
+  // wins[2]=etk_light_create(100,100,250,180);
+  // etk_widget_append_child(desktop,wins[2]);
+
+  wins[3]=etk_temhum_create(10,50,200,290);
+   etk_widget_append_child(desktop,wins[3]);
+	wins[4]=etk_status_create(200,100,200,150);
+   etk_widget_append_child(desktop,wins[4]);
+
   // clock
-  etk_app_clock(840, 40, 180, 180);
+  wins[6]=etk_app_clock(840, 40, 180, 180);
 
   // //mine
   // etk_game_mine(10, 30, 8, 8, 10);
-  etk_game_mine(160, 230, 10, 10, 14);
+  wins[7]=etk_game_mine(160, 230, 10, 10, 14);
   // etk_game_mine(340, 30, 16, 16, 20);
-  //ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½Ð´ï¿½ï¿½ï¿½
-  EtkWidget* terminal=etk_terminal(340, 140, 420, 340);
-  etk_wnd_manager_set_active_widget(etk_get_wnd_manager(),terminal);
+  EtkWidget* terminal = etk_terminal(340, 140, 420, 340);
+  wins[8]=terminal;
+
+  etk_wnd_manager_set_active_widget(etk_get_wnd_manager(), terminal);
 
   etk_widget_show_all(desktop);
 
@@ -285,13 +289,13 @@ Ret win_update_block_listener(void* data) {
 }
 
 Ret button7_listener(void* user_data, void* obj) {
-  /*EtkWidget *block=etk_game_block(40, 30);
-  etk_widget_show_all(block);
-  {
-          EtkSource *timer;
-          timer=etk_source_timer_create(1000,win_update_block_listener,block);
-          etk_sources_manager_add(etk_default_sources_manager(),timer);
-  }*/
+  // EtkWidget* block = etk_game_block(40, 30);
+  // etk_widget_show_all(block);
+  // {
+  //   EtkSource* timer;
+  //   timer = etk_source_timer_create(1000, win_update_block_listener, block);
+  //   etk_sources_manager_add(etk_default_sources_manager(), timer);
+  // }
   return RET_OK;
 }
 Ret button8_listener(void* user_data, void* obj) {

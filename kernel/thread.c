@@ -144,6 +144,12 @@ void thread_stop(thread_t* thread) {
   thread->state = THREAD_STOPPED;
 }
 
+void thread_exit(thread_t* thread,int code) {
+  if (thread == NULL) return;
+  thread_stop(thread);
+  thread->code=code;
+}
+
 thread_t* thread_find(thread_t* thread) {
   thread_t* v = head_thread;
   for (; v; v = v->next) {
