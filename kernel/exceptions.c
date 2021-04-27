@@ -174,20 +174,20 @@ void coprocessor_error() {
   cpu_halt();
 }
 
-void do_page_fault(interrupt_context_t *context) {
 #ifdef ARM
+void do_page_fault(interrupt_context_t *context) {
 
+}
 #elif defined(X86)
-  u32 fault_addr;
-  asm volatile("mov %%cr2, %0" : "=r"(fault_addr));
 
+void dump_fault(interrupt_context_t *context,u32 fault_addr){
   int present = context->code & 0x1;  // present
   int rw = context->code & 0x2;       // rw
   int us = context->code & 0x4;       // user mode
   int reserved = context->code & 0x8;
   int id = context->code & 0x10;
-
-  kprintf("eip:%x cs:%x ds:%x ss:%x esp:%x ebp:%x [", context->eip, context->cs,
+  kprintf("=============================\n");
+  kprintf("eip: %x \ncs: %x \nds: %x \nss: %x \nesp: %x \nebp: %x \npage: [", context->eip, context->cs,
           context->ds, context->ss, context->esp, context->ebp);
   if (present == 1) {
     kprintf("present ");
@@ -201,18 +201,36 @@ void do_page_fault(interrupt_context_t *context) {
   if (reserved) {
     kprintf("reserved ");
   }
-  kprintf("] fault_addr:");
-  kprintf("0x%x", fault_addr);
+  kprintf("]\n");
+  kprintf("fault: 0x%x \n", fault_addr);
+  kprintf("=============================\n");
+}
+void do_page_fault(interrupt_context_t *context) {
+
+  u32 fault_addr;
+  asm volatile("mov %%cr2, %0" : "=r"(fault_addr));
+  int present = context->code & 0x1;
 
   if (present == 0) {
     thread_t *current = thread_current();
     if (fault_addr == NULL) {
       kprintf(" tid: %x warning null pointer\n", current->id);
+      dump_fault(context,fault_addr);
       return;
     }
     if (current != NULL) {
+      vmemory_area_t* area = vmemory_area_find(current->vmm, fault_addr, 0);
+      if(area==NULL){
+        kprintf("tid: %d memory fault at %x\n",current->id,fault_addr);
+        dump_fault(context,fault_addr);
+        thread_exit(current,-1);
+        return;
+      }
       void *phy = virtual_to_physic(current->context.page_dir, fault_addr);
+
+#ifdef DEBUG_EXCEPTION     
       kprintf(" tid: %x ", current->id);
+#endif
       if (phy == NULL) {
         valloc(fault_addr, PAGE_SIZE);
       } else {
@@ -220,11 +238,11 @@ void do_page_fault(interrupt_context_t *context) {
       }
     } else {
       map_page(fault_addr, fault_addr, PAGE_P | PAGE_USU | PAGE_RWW);
-      kprintf("\n");
     }
   }
-#endif
 }
+#endif
+
 
 INTERRUPT_SERVICE
 void reset_handler() {

@@ -42,6 +42,7 @@ env.Library('etk', [
     'etk_sources_manager.c',
     'etk_check_button.c',
     'etk_group_box.c',
+    'etk_canvas_ex.c',
     '../libjpeg/libjpeg.a',
     '../libgui/libgui.a',
     '../../libs/libc/libc.a',

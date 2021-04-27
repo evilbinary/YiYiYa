@@ -243,3 +243,7 @@ FILE* fdopen(int fd, const char* mode) {
   file->mode = flags;
   return file;
 }
+
+void rewind(FILE * f){
+	fseek(f, 0, SEEK_SET);
+}
