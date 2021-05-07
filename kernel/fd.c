@@ -43,21 +43,21 @@ int fd_std_init() {
   vnode_t* file = vfs_open(NULL, stdin);
   fd_t* fdstdin = fd_new(file, DEVICE_TYPE_FILE, stdin);
   if (fdstdin == NULL) {
-    kprintf(" new fdstdin error\n");
+    kprintf(" new fd stdin error\n");
     return -1;
   }
   char* stdout = "/dev/stdout";
   file = vfs_open(NULL, stdout);
   fd_t* fdstdout = fd_new(file, DEVICE_TYPE_FILE, stdout);
   if (fdstdout == NULL) {
-    kprintf(" new fdstdout error\n");
+    kprintf(" new fd stdout error\n");
     return -1;
   }
 
   char* stderro = "/dev/stdout";
   fd_t* fdstderro = fd_new(file, DEVICE_TYPE_FILE, stderro);
   if (fdstderro == NULL) {
-    kprintf(" new fdstderro error\n");
+    kprintf(" new fd stderro error\n");
     return -1;
   }
   return 1;

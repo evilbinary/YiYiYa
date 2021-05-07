@@ -167,25 +167,28 @@ vnode_t *vfs_create(u8 *name, u32 flags) {
 }
 
 vnode_t *vfs_open(vnode_t *root, u8 *name) {
+  if(name==NULL){
+    return root;
+  }
+  if(root==NULL){
+    root=root_node;
+  }
   vnode_t *node = vfind(root, name);
   if (node == NULL) {
     kprintf("open %s failed \n", name);
-    return -1;
+    return NULL;
   }
   char *last = kstrrstr(name, node->name);
   if (last != NULL) {
     last += kstrlen(node->name);
     if (last[0] == '/') last++;
-  } else {
-    kprintf("open %s failed path is empty\n", name);
-    return -1;
   }
   vnode_t *file = vfind(node, last);
-  if (file == NULL) {
-    kprintf("find %s failed\n", last);
-    return -1;
+  u32 ret=vopen(file);
+  if (ret<0) {
+    kprintf("open %s failed \n", name);
+    return NULL;
   }
-  u32 ret = vopen(file);
   return file;
 }
 
