@@ -213,11 +213,6 @@ void do_page_fault(interrupt_context_t *context) {
 
   if (present == 0) {
     thread_t *current = thread_current();
-    if (fault_addr == NULL) {
-      kprintf(" tid: %x warning null pointer\n", current->id);
-      dump_fault(context,fault_addr);
-      return;
-    }
     if (current != NULL) {
       vmemory_area_t* area = vmemory_area_find(current->vmm, fault_addr, 0);
       if(area==NULL){
