@@ -109,7 +109,15 @@ void interpret_cmd(char* cmd) {
   }
   int32_t ret = 0;
   // ret = execl((uintptr_t)args[0], (uintptr_t)args);
-  ret = execl("/dev/sda/hello.elf", args);
+  char buf[128];
+  sprintf(buf,"/dev/sda/%s",args[0]);
+  FILE* fp= fopen(buf, "r");
+  if(fp!=NULL){
+    fclose(fp);
+    ret = execl(buf, args);
+  }else{
+    printf("not found cmd %s\n",args[0]);
+  }
   while (args && *args) {
     free(*args);
     args++;
