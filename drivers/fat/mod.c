@@ -188,7 +188,7 @@ u32 fat_op_open(vnode_t *node) {
     new_file_info->dd=dd;
     dd->fs=fs;
     node->data=new_file_info;
-    uint8_t res=fat_create_file(parent_file_info->dd,name,&dd->dir_entry)`;
+    uint8_t res=fat_create_file(parent_file_info->dd,name,&dd->dir_entry);
     if(!res){
       kprintf("fat_create_file faild\n");
       return -1;
