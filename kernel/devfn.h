@@ -7,6 +7,7 @@
 #define DEVCFN_H
 
 #include "arch/arch.h"
+#include "vfs.h"
 
 
 size_t dev_ioctl(int fd, u32 cmd, ...);
@@ -14,5 +15,10 @@ size_t dev_ioctl(int fd, u32 cmd, ...);
 size_t dev_read(int fd, void* buf, size_t nbytes);
 
 size_t dev_write(int fd, void* buf, size_t nbytes);
+
+
+u32 device_write(vnode_t *node, u32 offset, size_t nbytes, u8 *buf);
+u32 device_read(vnode_t *node, u32 offset, size_t nbytes, u8 *buf);
+size_t device_ioctl(vnode_t *node, u32 cmd, va_list args);
 
 #endif

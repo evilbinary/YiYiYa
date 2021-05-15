@@ -10,7 +10,7 @@ static void* syscall_table[SYSCALL_NUMBER] = {
     &sys_open,  &sys_close, &dev_read,  &dev_write, &dev_ioctl,    &sys_exec,
     &sys_test,  &sys_exit,  &sys_vmap,  &sys_vumap, &sys_seek,     &sys_valloc,
     &sys_vfree, &sys_vheap, &sys_fork,  &sys_pipe,  &sys_getpid,   &sys_getppid,
-    &sys_dup,   &sys_dup2};
+    &sys_dup,   &sys_dup2,&sys_readdir};
 
 INTERRUPT_SERVICE
 void syscall_handler() {

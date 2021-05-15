@@ -34,7 +34,8 @@ enum {
     SYS_GETPID,
     SYS_GETPPID,
     SYS_DUP,
-    SYS_DUP2
+    SYS_DUP2,
+    SYS_READDIR
 };
 
 typedef struct exec{
@@ -82,6 +83,6 @@ int sys_getppid();
 int sys_dup(int oldfd);
 
 int sys_dup2(int oldfd, int newfd);
-
+int sys_readdir(int fd,int index,void* dirent);
 
 #endif

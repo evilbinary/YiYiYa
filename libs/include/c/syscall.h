@@ -35,7 +35,8 @@ enum {
     SYS_GETPID,
     SYS_GETPPID,
     SYS_DUP,
-    SYS_DUP2
+    SYS_DUP2,
+    SYS_READDIR
 };
 
 void* syscall0(u32 num);

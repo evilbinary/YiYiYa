@@ -9,24 +9,31 @@ import os
 Import('env')
 
 env.Library('driver', [
-    'hello.c',
-    'keyboard.c',
     'pci.c',
     'pic.c',
-    'vga.c',
-    'mode.c',
-    'qemu.c',
-    'mouse.c',
-    'serial.c',
     'ahci.c',
-    'devfs.c',
-    'fat32.c',
     'dma.c',
-    'rtc.c',
-    'pty.c',
+
+    'hello/hello.c',
+    'serial/serial.c',
+    'dev/devfs.c',
+    'rtc/rtc.c',
+    'pty/pty.c',
+    'vga/vga.c',
+    'vga/mode.c',
+    'vga/qemu.c',
+    'mouse/mouse.c',
+    'keyboard/keyboard.c',
+    'fat32/fat32.c',
+    
+    'fat/fat.c',
+    'fat/byteordering.c',
+    'fat/partition.c',
+    'fat/mod.c',
+
     '../kernel/libyiyiya.a',
     '../arch/libarch.a',
     '../libs/libalgorithm/libalgorithm.a',
     '../libs/libkernel/libkernel.a'
     ],
-    CFLAGS='$CFLAGS ')
+    CFLAGS='$CFLAGS -Idrivers')

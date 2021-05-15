@@ -62,6 +62,8 @@ size_t sys_ioctl(u32 fd, u32 cmd, va_list args) {
 
 u32 sys_open(char* name, int attr) {
   // mm_dump();
+  // kprintf("open %s attr %x\n",name,attr&O_CREAT==O_CREAT);
+
   thread_t* current = thread_current();
   if (current == NULL) {
     kprintf(" cannot find current thread\n");
@@ -72,7 +74,7 @@ u32 sys_open(char* name, int attr) {
     kprintf("sys open name return : %s fd: %d\n", name, f);
     return f;
   }
-  vnode_t* file = vfs_open(NULL, name);
+  vnode_t* file = vfs_open(NULL, name,attr);  
   fd_t* fd = fd_new(file, DEVICE_TYPE_FILE, name);
   if (fd == NULL) {
     kprintf(" new fd error\n");
@@ -287,4 +289,20 @@ int sys_dup2(int oldfd, int newfd) {
   fd_close(fd);
   thread_set_fd(current, newfd, fd);
   return newfd;
+}
+
+int sys_readdir(int fd,int index,void* dirent){
+  thread_t* current = thread_current();
+  fd_t* findfd = thread_find_fd_id(current, fd);
+  if (fd == NULL) {
+    kprintf("readdir not found fd %d\n", fd);
+    return 0;
+  }
+  vdirent_t* d= vreaddir(findfd->data,index);
+  if(d==NULL){
+    return 0;
+  }
+  kmemmove(dirent,d,sizeof(vdirent_t));
+  kfree(d);
+  return 1;
 }

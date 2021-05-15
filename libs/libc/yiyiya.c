@@ -186,3 +186,7 @@ int ya_exec(const char* pathname, char* const argv[], char* const envp[]) {
 void ya_exit(u32 ret){
   syscall1(SYS_EXIT, ret);
 }
+
+int ya_readdir(int fd,int index,struct dirent* dirent){
+  return syscall3(SYS_READDIR, fd,index,dirent);
+}

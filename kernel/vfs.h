@@ -20,10 +20,11 @@
 struct vnode;
 typedef struct vnode vnode_t;
 
-struct vdirent{
-  char name[128]; // Filename.
+typedef struct vdirent{
+  char name[256]; // Filename.
   u32 ino;     // Inode number. Required by POSIX.
-};
+  u8 type;
+}vdirent_t;
 
 typedef u32 (*vread_t)(struct vnode*,u32,u32,u8*);
 typedef u32 (*vwrite_t)(struct vnode*,u32,u32,u8*);
@@ -81,6 +82,6 @@ void vfs_add_child(vnode_t *parent, vnode_t *child);
 void vfs_exten_child(vnode_t *node);
 int vfs_init();
 void vfs_close(vnode_t *node);
-vnode_t *vfs_open(vnode_t *root, u8 *name);
+vnode_t *vfs_open(vnode_t *root, u8 *name,u32 attr);
 
 #endif

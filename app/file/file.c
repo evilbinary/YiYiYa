@@ -1,4 +1,7 @@
 #include "stdio.h"
+// #include <sys/types.h>
+#include <dirent.h>
+// #include <unistd.h>
 
 char* buf = "hello,file\n";
 
@@ -29,15 +32,27 @@ void test_read() {
 }
 
 void test_write() {
-  FILE* fp= fopen("/dev/sda/duck.jpg", "w+");
+  FILE* fp= fopen("/dev/sda/kaka.txt", "w+");
   fseek(fp, 0, SEEK_SET);
   fwrite("ABCDEF",strlen("ABCDEF"),1,fp);
   fclose(fp);
 }
 
+void test_read_dir(){
+    DIR * dir;
+    struct dirent * ptr;
+    int i;
+    dir = opendir("/dev/sda/hello");
+    while((ptr = readdir(dir)) != NULL){
+        printf("name : %s type: %d\n", ptr->d_name,ptr->d_type);
+    }
+    closedir(dir);
+}
+
 int main(int argc, char* argv[]) {
   printf(buf);
-  // test_write();
-  test_read();
+  test_write();
+  // test_read();
+  // test_read_dir();
   return 0;
 }
