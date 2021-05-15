@@ -229,7 +229,9 @@ void do_page_fault(interrupt_context_t *context) {
       if (phy == NULL) {
         valloc(fault_addr, PAGE_SIZE);
       } else {
-        kprintf("paddr: %x ", phy);
+        kprintf("tid: %d phy realloc memory fault at %x\n",current->id,fault_addr);
+        dump_fault(context,fault_addr);
+        thread_exit(current,-1);
       }
     } else {
       map_page(fault_addr, fault_addr, PAGE_P | PAGE_USU | PAGE_RWW);

@@ -5,6 +5,7 @@
  ********************************************************************/
 
 #include "vfs.h"
+
 #include "fd.h"
 
 vnode_t *root_node = NULL;
@@ -166,12 +167,12 @@ vnode_t *vfs_create(u8 *name, u32 flags) {
   return node;
 }
 
-vnode_t *vfs_open(vnode_t *root, u8 *name) {
-  if(name==NULL){
+vnode_t *vfs_open(vnode_t *root, u8 *name, u32 attr) {
+  if (name == NULL) {
     return root;
   }
-  if(root==NULL){
-    root=root_node;
+  if (root == NULL) {
+    root = root_node;
   }
   vnode_t *node = vfind(root, name);
   if (node == NULL) {
@@ -184,23 +185,32 @@ vnode_t *vfs_open(vnode_t *root, u8 *name) {
     if (last[0] == '/') last++;
   }
   vnode_t *file = vfind(node, last);
-  u32 ret=vopen(file);
-  if (ret<0) {
+  if (file == NULL) {
+    if (attr & O_CREAT == O_CREAT) {
+      file = vfs_create(last, V_FILE);
+      file->device = node->device;
+      file->data=node->data;
+      file->open = node->open;
+    } else {
+      kprintf("open %s failed \n", name);
+      return NULL;
+    }
+  }
+  file->parent=node;
+  u32 ret = vopen(file);
+  if (ret < 0) {
     kprintf("open %s failed \n", name);
     return NULL;
   }
   return file;
 }
 
-void vfs_close(vnode_t *node){
-  if(node==NULL){
+void vfs_close(vnode_t *node) {
+  if (node == NULL) {
     kprintf("close node is nul\n");
     return;
   }
   vclose(node);
 }
 
-int vfs_init(){
-
-  return 1;
-}
+int vfs_init() { return 1; }

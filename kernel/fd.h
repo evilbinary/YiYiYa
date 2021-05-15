@@ -13,6 +13,10 @@
 
 #include "types.h"
 
+#define	O_CREAT			00000100
+#define	O_EXCL			00000200
+#define	O_NOCTTY		00000400
+#define	O_TRUNC			00001000
 typedef struct fd {
   u32 id;
   u32 type;  // file ,socket, pipe dir

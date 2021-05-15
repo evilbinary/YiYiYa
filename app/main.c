@@ -15,6 +15,7 @@ extern module_t ahci_module;
 extern module_t devfs_module;
 extern module_t fat32_module;
 extern module_t rtc_module;
+extern module_t fat_module;
 
 extern void serial_write(char a);
 extern void do_shell_thread(void);
@@ -48,7 +49,9 @@ int kmain(int argc, char* argv[]) {
   module_regist(&mouse_module);
   module_regist(&ahci_module);
   module_regist(&devfs_module);
-  module_regist(&fat32_module);
+  // module_regist(&fat32_module);
+    module_regist(&fat_module);
+
 
 #endif
 

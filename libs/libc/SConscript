@@ -30,4 +30,5 @@ env.Library('c', [
     'math.c',
     'getopt.c',
     'ioctl.c',
+    'dirent.c',
 ],CFLAGS='$CFLAGS -Ilibs/include/c/')

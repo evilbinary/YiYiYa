@@ -11,6 +11,8 @@
 #include "thread.h"
 #include "vfs.h"
 
+#define DEBUG
+
 void* load_elf(Elf32_Ehdr* elf_header, u32 fd, page_dir_t* page) {
   // printf("e_phnum:%d\n\r", elf_header->e_phnum);
   u32 offset = elf_header->e_phoff;
@@ -21,7 +23,9 @@ void* load_elf(Elf32_Ehdr* elf_header, u32 fd, page_dir_t* page) {
   // printf("addr %x elf=%x\n\r", phdr, elf);
   u32 entry = 0;
   for (int i = 0; i < elf_header->e_phnum; i++) {
-    // kprintf("type:%d\n\r", phdr[i].p_type);
+#ifdef DEBUG
+    kprintf("type:%d\n\r", phdr[i].p_type);
+#endif
     switch (phdr[i].p_type) {
       case PT_NULL:
         // kprintf(" %s %x %x %x %s %x %x \r\n", "NULL", phdr[i].p_offset,
@@ -29,9 +33,11 @@ void* load_elf(Elf32_Ehdr* elf_header, u32 fd, page_dir_t* page) {
         //        phdr[i].p_memsz);
         break;
       case PT_LOAD: {
-        // printf(" %s %x %x %x %s %x %x \r\n", "LOAD", phdr[i].p_offset,
-        //        phdr[i].p_vaddr, phdr[i].p_paddr, "", phdr[i].p_filesz,
-        //        phdr[i].p_memsz);
+#ifdef DEBUG
+        kprintf(" %s %x %x %x %s %x %x \r\n", "LOAD", phdr[i].p_offset,
+                phdr[i].p_vaddr, phdr[i].p_paddr, "", phdr[i].p_filesz,
+                phdr[i].p_memsz);
+#endif
         char* start = phdr[i].p_offset;
         char* vaddr = phdr[i].p_vaddr;
         syscall2(SYS_SEEK, fd, start);
@@ -117,8 +123,10 @@ void* load_elf(Elf32_Ehdr* elf_header, u32 fd, page_dir_t* page) {
                shdr[i].sh_flags & SHF_ALLOC && shdr[i].sh_flags) {
       char* start = shdr[i].sh_offset;
       char* vaddr = shdr[i].sh_addr;
-      // kprintf("load start:%x vaddr:%x size:%x \n\r", start, vaddr,
-      //        phdr[i].p_filesz);
+#ifdef DEBUG
+      kprintf("load start:%x vaddr:%x size:%x \n\r", start, vaddr,
+              phdr[i].p_filesz);
+#endif
       syscall2(SYS_SEEK, fd, start);
       u32 ret = syscall3(SYS_READ, fd, vaddr, shdr[i].sh_size);
       // map_alignment(page,vaddr,buf,shdr[i].sh_size);
@@ -146,12 +154,15 @@ void run_elf_thread() {
     kentry = load_elf(elf_header, fd, current->context.page_dir);
     entry = elf_header->e_entry;
   } else {
-    kprintf("load faild not elf %s\n",exec->filename);
+    kprintf("load faild not elf %s\n", exec->filename);
   }
   // map_page_on(current->context.page_dir,current->context.esp,current->context.esp,PAGE_P
   // | PAGE_USU | PAGE_RWW);
-   u32 ret=-1;
+  u32 ret = -1;
   if (entry != NULL) {
+#ifdef DEBUG
+    kprintf("entry %x\n", entry);
+#endif
     ret = entry(0, exec->argv);
   }
   thread_stop(current);
