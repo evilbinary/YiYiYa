@@ -75,6 +75,10 @@ u32 sys_open(char* name, int attr) {
     return f;
   }
   vnode_t* file = vfs_open(NULL, name,attr);  
+  if(file==NULL){
+    kprintf("sys open file %s error\n", name);
+    return -1;
+  }
   fd_t* fd = fd_new(file, DEVICE_TYPE_FILE, name);
   if (fd == NULL) {
     kprintf(" new fd error\n");
@@ -84,6 +88,7 @@ u32 sys_open(char* name, int attr) {
   f = thread_add_fd(current, fd);
   if (f < 0) {
     kprintf("sys open %s error\n", name);
+    return -1;
   }
   kprintf("sys open new name: %s fd:%d id:%d ptr:%x\n", name, f,fd->id,fd);
   return f;
@@ -138,8 +143,8 @@ size_t sys_yeild() { thread_yield(); }
 
 void sys_exit(int status) {
   thread_t* current = thread_current();
-  thread_stop(current);
-  thread_remove(current);
+  thread_exit(current);
+  thread_dumps();
   kprintf("sys exit %d\n", status);
 }
 
@@ -171,6 +176,14 @@ void sys_vfree(void* addr) {
 }
 
 u32 sys_exec(char* filename, char* const argv[],char *const envp[]) {
+  int fd=sys_open(filename,0);
+  if(fd<0){
+    sys_close(fd);
+    kprintf("sys exec file not found %s\n",filename);
+    return -1;
+  }
+  sys_close(fd);
+
   thread_t* current = thread_current();
   u8* stack0 = kmalloc(THREAD_STACK_SIZE);
   thread_t* t = thread_create_ex((u32*)&run_elf_thread, stack0, STACK_ADDR,

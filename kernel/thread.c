@@ -148,6 +148,8 @@ void thread_exit(thread_t* thread,int code) {
   if (thread == NULL) return;
   thread_stop(thread);
   thread->code=code;
+  // schedule_next();
+  //cpu_sti();
 }
 
 thread_t* thread_find(thread_t* thread) {
@@ -288,7 +290,7 @@ void thread_dump_fd(thread_t* thread){
 }
 
 void thread_dumps(){
-  cpu_cli();
+  //cpu_cli();
   kprintf("tid state counter\n");
   for(thread_t* p=head_thread;p!=NULL;p=p->next){
     kprintf("%d  %d %d\n",p->id,p->state,p->counter);

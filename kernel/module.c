@@ -6,7 +6,7 @@
 #include "module.h"
 
 module_t* modules[MAX_MODULES];
-u32 module_number;
+u32 module_number=0;
 
 void module_init() {
   module_number = 0;

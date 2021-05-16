@@ -36,15 +36,15 @@ void do_shell_thread(void) {
   // syscall2(SYS_EXEC,"/dev/sda/hello.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/gui.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/file.elf",NULL);
-  syscall2(SYS_EXEC,"/dev/sda/etk.elf",NULL);
+  // syscall2(SYS_EXEC,"/dev/sda/etk.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/test.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/microui.elf",NULL);
+  syscall2(SYS_EXEC,"/dev/sda/lvgl",NULL);
   // kprintf("fd=>%d\n",fd);
   int count=0;
   for (;;) {
-
     int ret = 0;
-    // kprintf("B%d ",count++);
+    // kprintf("%d ",count++);
     // read key
     // ret = syscall3(SYS_READ,fd, &scan_code, 1);
     // if (ret >= 1) {
