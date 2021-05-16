@@ -23,9 +23,6 @@ scons --run=qemu
 ### 截图
 <img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/demo/etk-gui.jpeg?raw=true" width="800px" />
 
-
-<img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/demo/etk-gui.jpeg?raw=true" width="800px" />
-
 <img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/demo/lvgl.png?raw=true" width="400px" /><img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/demo/etk.png?raw=true" width="400px" />
 
 <img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/demo/microui.jpg?raw=true" width="400px" />
