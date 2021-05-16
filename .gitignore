@@ -10,3 +10,4 @@ app/kernel*
 **/*.bmp
 **/*.vdi
 **/*.dbg
+app/gui/lvgl

@@ -43,16 +43,13 @@ int kmain(int argc, char* argv[]) {
   module_regist(&keyboard_module);
   io_add_write_channel(serial_write);
   module_regist(&rtc_module);
-
   // module_regist(&vga_module);
   module_regist(&qemu_module);
   module_regist(&mouse_module);
   module_regist(&ahci_module);
   module_regist(&devfs_module);
   // module_regist(&fat32_module);
-    module_regist(&fat_module);
-
-
+  module_regist(&fat_module);
 #endif
 
   thread_t* t0 = thread_create((u32*)&do_serial_thread,NULL);

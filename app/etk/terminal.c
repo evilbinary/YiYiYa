@@ -111,18 +111,16 @@ void interpret_cmd(char* cmd) {
   // ret = execl((uintptr_t)args[0], (uintptr_t)args);
   char buf[128];
   sprintf(buf,"/dev/sda/%s",args[0]);
-  FILE* fp= fopen(buf, "r");
-  if(fp!=NULL){
-    fclose(fp);
-    ret = execl(buf, args);
+  ret = execl(buf, args);
+  if(ret<0){
+    printf("exec error\n");
   }else{
-    printf("not found cmd %s\n",args[0]);
+    printf("\n");
   }
   while (args && *args) {
     free(*args);
     args++;
   }
-
   free(args);
 }
 
@@ -226,11 +224,11 @@ int etk_terminal_get_cmd_result() {
   u32 nread;
   u8 anything_read = false;
   memset(ret_buf, 0, ret_buf_size);
-  for(;;){
+  for(int i=0;i<1;i++){
     nread = read(fd_ptm, ret_buf, ret_buf_size - 1);
-    if (nread > 0) {
+    if (nread >= 0) {
       ret_buf[nread] = '\0';
-      printf("read from ptm size:%d %s", nread, ret_buf);
+      //printf("read from ptm size:%d %s", nread, ret_buf);
       str_append(text_buf,"\n");
       str_append(text_buf, ret_buf);
       anything_read = true;
@@ -264,8 +262,9 @@ void etk_terminal_do_cmd() {
   for (;;) {
     memset(buf, 0, len);
     int ret = read(fd_pts, buf, len);
-    if (ret > 0) {
+    if (ret >= 0) {
       interpret_cmd(buf);
+      
     }
   }
 }

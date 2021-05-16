@@ -143,9 +143,9 @@ void run_elf_thread() {
   kprintf("load elf %s fd:%d\n", exec->filename, fd);
   if (fd < 0) {
     kprintf("open elf %s error\n", exec->filename);
+    thread_exit(current,-1);
     return;
   }
-
   u32 nbytes = syscall3(SYS_READ, fd, &elf, sizeof(Elf32_Ehdr));
   Elf32_Ehdr* elf_header = (Elf32_Ehdr*)&elf;
   u32* kentry = 0;
@@ -155,6 +155,7 @@ void run_elf_thread() {
     entry = elf_header->e_entry;
   } else {
     kprintf("load faild not elf %s\n", exec->filename);
+    entry=NULL;
   }
   // map_page_on(current->context.page_dir,current->context.esp,current->context.esp,PAGE_P
   // | PAGE_USU | PAGE_RWW);
@@ -165,10 +166,5 @@ void run_elf_thread() {
 #endif
     ret = entry(0, exec->argv);
   }
-  thread_stop(current);
-  // syscall1(SYS_EXIT, ret);
-  // kprintf("wait stop tid:%d state:%d\n",current->id,current->state);
-  for (;;) {
-    // kprintf(".");
-  }
+  syscall1(SYS_EXIT,ret);
 }

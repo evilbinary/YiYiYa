@@ -43,11 +43,20 @@ if env.get('APP'):
     SConscript(dirs=['file'], exports='env')
     SConscript(dirs=['etk'], exports='env')
     SConscript(dirs=['test'], exports='env')
+    SConscript(dirs=['bin'], exports='env')
 
 
     if plt=='Darwin':
         env.Command('copyhello', 
-            ['hello/hello.elf','gui/gui.elf','microui/microui.elf','file/file.elf','etk/etk.elf','test/test.elf' ],
+            ['hello/hello.elf',
+            'gui/gui.elf',
+            'microui/microui.elf',
+            'file/file.elf',
+            'etk/etk.elf',
+            'test/test.elf',
+            'bin/ls',
+            'gui/lvgl'
+            ],
             ['hdid  image/disk.img &&  cp ${SOURCES} /Volumes/NO\ NAME/ && hdiutil eject /Volumes/NO\ NAME/'
         ])
         pass

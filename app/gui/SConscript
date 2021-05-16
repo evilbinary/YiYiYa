@@ -24,3 +24,16 @@ env.Program('gui.elf', [
 
 # env.Objcopy('gui.elf','gui',OBJCOPYFLAGS='-S --strip-all')
 #env.Objcopy('gui.dbg','gui.elf',OBJCOPYFLAGS='--only-keep-debug')
+
+env.Program('lvgl', [
+    'lvgl.c',
+    '../liblvgl/liblvgl.a',
+    '../libgui/libgui.a',
+    '../libgui/libimage.a',
+    '../libpng/libpng.a',
+    '../../libs/libc/libc.a',
+    '../../libs/libalgorithm/libalgorithm.a',
+
+    ],
+    CFLAGS='$CFLAGS -Ilibs/include/c/ -Iapp/liblvgl -Iapp/libgui/ -Iapp/libjpeg',
+    LINKFLAGS= '$LINKFLAGS --entry main -Tuser.ld')
