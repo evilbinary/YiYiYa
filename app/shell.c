@@ -39,7 +39,7 @@ void do_shell_thread(void) {
   // syscall2(SYS_EXEC,"/dev/sda/etk.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/test.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/microui.elf",NULL);
-  syscall2(SYS_EXEC,"/dev/sda/lvgl",NULL);
+  // syscall2(SYS_EXEC,"/dev/sda/lvgl",NULL);
   // kprintf("fd=>%d\n",fd);
   int count=0;
   for (;;) {

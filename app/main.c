@@ -16,6 +16,7 @@ extern module_t devfs_module;
 extern module_t fat32_module;
 extern module_t rtc_module;
 extern module_t fat_module;
+extern module_t sb16_module;
 
 extern void serial_write(char a);
 extern void do_shell_thread(void);
@@ -50,6 +51,7 @@ int kmain(int argc, char* argv[]) {
   module_regist(&devfs_module);
   // module_regist(&fat32_module);
   module_regist(&fat_module);
+  module_regist(&sb16_module);
 #endif
 
   thread_t* t0 = thread_create((u32*)&do_serial_thread,NULL);

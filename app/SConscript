@@ -44,6 +44,7 @@ if env.get('APP'):
     SConscript(dirs=['etk'], exports='env')
     SConscript(dirs=['test'], exports='env')
     SConscript(dirs=['bin'], exports='env')
+    SConscript(dirs=['lvgl'], exports='env')
 
 
     if plt=='Darwin':
@@ -55,7 +56,7 @@ if env.get('APP'):
             'etk/etk.elf',
             'test/test.elf',
             'bin/ls',
-            'gui/lvgl'
+            'lvgl/lvgl'
             ],
             ['hdid  image/disk.img &&  cp ${SOURCES} /Volumes/NO\ NAME/ && hdiutil eject /Volumes/NO\ NAME/'
         ])

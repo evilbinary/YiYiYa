@@ -8,7 +8,7 @@
 
 #include "kernel/kernel.h"
 
-#define MAX_PCI_NUMBER 40
+#define MAX_PCI_NUMBER 240
 
 //内存地址空间、IO地址空间和配置空间
 

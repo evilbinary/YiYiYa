@@ -93,7 +93,7 @@ void qemu_init_mode(pci_device_t* pdev, vga_device_t* vga, int mode) {
 int qemu_init_device(device_t* dev,u32 vendor_id,u32 device_id) {
   pci_device_t* pdev = pci_find_vendor_device(vendor_id, device_id);
   if (pdev == NULL) {
-    kprintf("can not find pci device\n");
+    kprintf("can not find pci qemu device\n");
     return -1;
   }
   u32 bar0 = pci_dev_read32(pdev, PCI_BASE_ADDR0) & 0xFFFFFFF0;
@@ -144,12 +144,12 @@ int qemu_init(void) {
   dev->type = DEVICE_TYPE_VGA;
   device_add(dev);
 
-  u32 ret=qemu_init_device(dev,QEMU_VENDOR_ID,QEMU_DEVICE_ID);
+  i32 ret=qemu_init_device(dev,QEMU_VENDOR_ID,QEMU_DEVICE_ID);
   if(ret<0){
     ret=qemu_init_device(dev,VBOX_VENDOR_ID,VBOX_DEVICE_ID);
   }
 
-  return 0;
+  return ret;
 }
 
 void qemu_exit(void) { kprintf("vga exit\n"); }

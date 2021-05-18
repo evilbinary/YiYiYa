@@ -31,6 +31,8 @@ env.Library('driver', [
     'fat/partition.c',
     'fat/mod.c',
 
+    'sound/sb16.c',
+
     '../kernel/libyiyiya.a',
     '../arch/libarch.a',
     '../libs/libalgorithm/libalgorithm.a',

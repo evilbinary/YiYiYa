@@ -8,19 +8,23 @@ import os
 
 Import('env')
 
-env.Program('gui.elf', [
-    'main.c',
+
+env.Program('lvgl', [
+    'lvgl.c',
+    'lv_demo_widgets.c',
+    'assets/img_lvgl_logo.c',
+    'assets/img_demo_widgets_avatar.c',
+    'assets/img_clothes.c',
+    
+
+
+    '../liblvgl/liblvgl.a',
     '../libgui/libgui.a',
     '../libgui/libimage.a',
-    '../libjpeg/libjpeg.a',
     '../libpng/libpng.a',
-    '../libzlib/libzlib.a',
     '../../libs/libc/libc.a',
     '../../libs/libalgorithm/libalgorithm.a',
 
     ],
-    CFLAGS='$CFLAGS -Ilibs/include/c/ -Iapp/libgui/ -Iapp/libjpeg',
+    CFLAGS='$CFLAGS -Ilibs/include/c/ -Iapp/liblvgl -Iapp/libgui/ -Iapp/libjpeg -DLV_LVGL_H_INCLUDE_SIMPLE=1',
     LINKFLAGS= '$LINKFLAGS --entry main -Tuser.ld')
-
-# env.Objcopy('gui.elf','gui',OBJCOPYFLAGS='-S --strip-all')
-#env.Objcopy('gui.dbg','gui.elf',OBJCOPYFLAGS='--only-keep-debug')

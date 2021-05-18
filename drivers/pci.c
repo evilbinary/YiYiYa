@@ -41,7 +41,7 @@ void pci_add_device(pci_device_t* pdev) {
   if (pci_number < MAX_PCI_NUMBER) {
     pci_device[pci_number++] = pdev;
   } else {
-    kprintf("max pci limit\n");
+    kprintf("max pci limit %d\n",pci_number);
   }
 }
 
@@ -102,6 +102,7 @@ int pci_init(void) {
   dev->name = "pci";
   dev->read = read;
   dev->id = DEVICE_PCI;
+  pci_number=0;
   device_add(dev);
 
   pci_probe();
