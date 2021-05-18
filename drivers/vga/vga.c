@@ -55,7 +55,7 @@ size_t vga_ioctl(device_t* dev, u32 cmd, va_list args) {
 void vga_init_device(device_t* dev) {
   pci_device_t* pdev = pci_find_class(0x300);
   if (pdev == NULL) {
-    kprintf("can not find pci device\n");
+    kprintf("can not find pci vga device\n");
     return;
   }
   u32 bar0 = pci_dev_read32(pdev, PCI_BASE_ADDR0) & 0xFFFFFFF0;

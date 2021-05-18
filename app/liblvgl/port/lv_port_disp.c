@@ -11,6 +11,7 @@
  *********************/
 #include "lv_port_disp.h"
 #include "screen.h"
+#include "time.h"
 
 /*********************
  *      DEFINES
@@ -77,8 +78,8 @@ void lv_port_disp_init(void)
 
     /* Example for 1) */
     static lv_disp_draw_buf_t draw_buf_dsc_1;
-    static lv_color_t buf_1[LV_HOR_RES_MAX * 80];                          /*A buffer for 10 rows*/
-    lv_disp_draw_buf_init(&draw_buf_dsc_1, buf_1, NULL, LV_HOR_RES_MAX * 80);   /*Initialize the display buffer*/
+    static lv_color_t buf_1[LV_HOR_RES_MAX * 100];                          /*A buffer for 10 rows*/
+    lv_disp_draw_buf_init(&draw_buf_dsc_1, buf_1, NULL, LV_HOR_RES_MAX * 100);   /*Initialize the display buffer*/
 
     // /* Example for 2) */
     // static lv_disp_draw_buf_t draw_buf_dsc_1;
@@ -158,6 +159,8 @@ static void disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_colo
     /*IMPORTANT!!!
      *Inform the graphics library that you are ready with the flushing*/
     lv_disp_flush_ready(disp_drv);
+
+    // display_time();
     // screen_flush();
 }
 

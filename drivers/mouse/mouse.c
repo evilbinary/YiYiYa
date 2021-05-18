@@ -10,9 +10,14 @@
 
 mouse_device_t mouse_device;
 mouse_event_t event;
+u32 has_data=0;
 
 static size_t read(device_t* dev, void* buf, size_t len) {
   u32 ret = len;
+  if(has_data<0){
+    return 0;
+  }
+  has_data--;
   // mouse_event_t* e = cqueue_peek(mouse_device.events);
   // if (e == NULL) {
   //   return 0;
@@ -130,6 +135,7 @@ void do_mouse(interrupt_context_t* context) {
     }
     read_count = (read_count + 1) % 3;
   }
+  has_data++;
 
   pic_eof(ISR_MOUSE);
 }

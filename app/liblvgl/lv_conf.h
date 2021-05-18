@@ -42,7 +42,7 @@
 #define LV_MEM_CUSTOM      0
 #if LV_MEM_CUSTOM == 0
 /*Size of the memory available for `lv_mem_alloc()` in bytes (>= 2kB)*/
-#  define LV_MEM_SIZE    (2*32U * 1024U)          /*[bytes]*/
+#  define LV_MEM_SIZE    (10*32U * 1024U)          /*[bytes]*/
 
 /*Set an address for the memory pool instead of allocating it as a normal array. Can be in external SRAM too.*/
 #  define LV_MEM_ADR          0     /*0: unused*/
@@ -61,10 +61,10 @@
  *====================*/
 
 /*Default display refresh period. LVG will redraw changed ares with this period time*/
-#define LV_DISP_DEF_REFR_PERIOD     30      /*[ms]*/
+#define LV_DISP_DEF_REFR_PERIOD     40      /*[ms]*/
 
 /*Input device read period in milliseconds*/
-#define LV_INDEV_DEF_READ_PERIOD    30      /*[ms]*/
+#define LV_INDEV_DEF_READ_PERIOD    90      /*[ms]*/
 
 /*Use a custom tick source that tells the elapsed time in milliseconds.
  *It removes the need to manually update the tick with `lv_tick_inc()`)*/
@@ -147,11 +147,11 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
  *LV_LOG_LEVEL_ERROR       Only critical issue, when the system may fail
  *LV_LOG_LEVEL_USER        Only logs added by the user
  *LV_LOG_LEVEL_NONE        Do not log anything*/
-#  define LV_LOG_LEVEL    LV_LOG_LEVEL_WARN
+#  define LV_LOG_LEVEL    LV_LOG_LEVEL_ERROR
 
 /*1: Print the log with 'printf';
  *0: User need to register a callback with `lv_log_register_print_cb()`*/
-#  define LV_LOG_PRINTF   0
+#  define LV_LOG_PRINTF   1
 
 /*Enable/disable LV_LOG_TRACE in modules that produces a huge number of logs*/
 #  define LV_LOG_TRACE_MEM            1
@@ -186,11 +186,11 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
  *-----------*/
 
 /*1: Show CPU usage and FPS count in the right bottom corner*/
-#define LV_USE_PERF_MONITOR     0
+#define LV_USE_PERF_MONITOR     1
 
 /*1: Show the used memory and the memory fragmentation  in the left bottom corner
  * Requires LV_MEM_CUSTOM = 0*/
-#define LV_USE_MEM_MONITOR      0
+#define LV_USE_MEM_MONITOR      1
 
 /*1: Draw random colored rectangles over the redrawn areas*/
 #define LV_USE_REFR_DEBUG       0

@@ -51,7 +51,8 @@ int event_init() {
 u32 scan_code_to_key(u32 scan_code) { return key_map[scan_code & 0x7f][shf_p]; }
 
 int event_read_mouse(mouse_data_t* mouse_data) {
-  read(event_info.mouse_fd, &event_info.mouse, sizeof(mouse_data_t));
+  int ret=read(event_info.mouse_fd, &event_info.mouse, sizeof(mouse_data_t));
+  if(ret<=0) return 0;
   *mouse_data = event_info.mouse;
   return 1;
 }
