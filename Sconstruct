@@ -17,6 +17,7 @@ DefaultEnvironment(tools=[])
 env = Environment(ENV = {}, tools=['gcc'])
 
 env = Environment(
+        APP=True,
         CC = '/opt/local/bin/i386-elf-gcc',
         LD='/opt/local/bin/i386-elf-ld',
         CXX='/opt/local/bin/i386-elf-g++',
@@ -40,9 +41,11 @@ if plt=='Linux':
     env['STRIP']='/usr/bin/strip'
     env['RANLIB']='/usr/bin/ranlib'
     env['OBJCOPY']='/usr/bin/objcopy'
+    env['LINKFLAGS']= env['LINKFLAGS']+' -m32'
     pass
 elif plt=='Darwin':
     if arch =='arm':
+        env['APP']=False
         env['AS']='/opt/local/bin/arm-none-eabi-as'
         env['CC']='/opt/local/bin/arm-none-eabi-gcc'
         env['LD']='/opt/local/bin/arm-none-eabi-ld'

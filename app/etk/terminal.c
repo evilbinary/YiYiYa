@@ -31,8 +31,8 @@ const u32 twidth = 550;
 const u32 theight = 342;
 const u32 char_width = 8;
 const u32 char_height = 16;
-const u32 max_col = twidth / char_width - 1;
-const u32 max_line = theight / char_height - 1;
+u32 max_col;
+u32 max_line;
 
 const u32 margin = 1;
 const u32 text_color = WHITE;  // 0xE0E0E0;
@@ -328,6 +328,9 @@ EtkWidget* etk_terminal(e32 x, e32 y, e32 width, e32 height) {
   text_buf = str_new(prompt);
   input_buf = str_new("");
   cursor = true;
+
+  max_col = twidth / char_width - 1;
+  max_line = theight / char_height - 1;
 
   fd_ptm = open("/dev/ptm", "r");
   if (fd_ptm < 0) {
