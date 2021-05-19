@@ -72,7 +72,7 @@ if env.get('APP'):
             'bin/ls',
             'lvgl/lvgl'
             ],
-            ['umount disk/ &&  losetup -d /dev/loop7 &&  losetup /dev/loop7 image/disk.img &&  cp ${SOURCES} disk && umount disk && losetup -d /dev/loop7'
+            ['sudo losetup /dev/loop7 image/disk.img && sudo mount /dev/loop7 /mnt && sudo cp ${SOURCES} /mnt && sudo umount /media/evil && sudo losetup -d /dev/loop7'
         ])
 else:
     pass

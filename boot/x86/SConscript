@@ -6,7 +6,7 @@
 # ********************************************************************
 import os
 nasm_env = Environment(tools = ['nasm'],
-                  AS='/opt/local/bin/nasm',
+                  AS='`which nasm`',
                   ASFLAGS='',
                   OBJSUFFIX=''
                   )
