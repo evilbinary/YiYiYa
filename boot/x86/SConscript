@@ -25,4 +25,4 @@ env.Program('init.elf',
     CFLAGS='$CFLAGS -I. -Iinclude  -Iarch -std=c99 -std=gnu99 -w ',
     LINKFLAGS= '$LINKFLAGS -Ttext 0x0500')
 
-env.Objcopy('init.bin','init.elf',OBJCOPYFLAGS='-O binary -S')
+env.Objcopy('init.bin','init.elf',OBJCOPYFLAGS='-j .text -O binary -S')
