@@ -34,7 +34,7 @@ if env.get('APP'):
     SConscript(dirs=['libetk'], exports='env')
     SConscript(dirs=['libzlib'], exports='env')
     SConscript(dirs=['libpng'], exports='env')
-
+    SConscript(dirs=['liblvgl'], exports='env')
 
     SConscript(dirs=['hello'], exports='env')
     SConscript(dirs=['gui'], exports='env')
