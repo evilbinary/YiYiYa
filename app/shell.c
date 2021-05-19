@@ -32,14 +32,14 @@ void do_shell_thread(void) {
   // move_cursor();
   char buf[2] = {0};
 
-  int fd = syscall2(SYS_OPEN, "/dev/stdin", 0);
+  // int fd = syscall2(SYS_OPEN, "/dev/stdin", 0);
   // syscall2(SYS_EXEC,"/dev/sda/hello.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/gui.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/file.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/etk.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/test.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/microui.elf",NULL);
-  // syscall2(SYS_EXEC,"/dev/sda/lvgl",NULL);
+  syscall2(SYS_EXEC,"/dev/sda/lvgl",NULL);
   // kprintf("fd=>%d\n",fd);
   int count=0;
   for (;;) {
