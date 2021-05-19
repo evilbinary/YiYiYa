@@ -61,6 +61,19 @@ if env.get('APP'):
             ['hdid  image/disk.img &&  cp ${SOURCES} /Volumes/NO\ NAME/ && hdiutil eject /Volumes/NO\ NAME/'
         ])
         pass
+    elif plt=='Linux':
+        env.Command('copyhello', 
+            ['hello/hello.elf',
+            'gui/gui.elf',
+            'microui/microui.elf',
+            'file/file.elf',
+            'etk/etk.elf',
+            'test/test.elf',
+            'bin/ls',
+            'lvgl/lvgl'
+            ],
+            ['umount disk/ &&  losetup -d /dev/loop7 &&  losetup /dev/loop7 image/disk.img &&  cp ${SOURCES} disk && umount disk && losetup -d /dev/loop7'
+        ])
 else:
     pass
 
