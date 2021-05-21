@@ -34,7 +34,7 @@ env = Environment(
         )
 
 if plt=='Linux':
-    env['CC']='/usr/bin/gcc-9'
+    env['CC']='/usr/bin/gcc'
     env['LD']='/usr/bin/ld'
     env['CXX']='/usr/bin/g++'
     env['AR']='/usr/bin/ar'
