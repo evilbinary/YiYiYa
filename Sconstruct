@@ -42,6 +42,7 @@ if plt=='Linux':
     env['RANLIB']='/usr/bin/ranlib'
     env['OBJCOPY']='/usr/bin/objcopy'
     env['LINKFLAGS']= env['LINKFLAGS']+' -m32'
+    env['CFLAGS']= env['CFLAGS']+' -no-pie -fno-pic '
     pass
 elif plt=='Darwin':
     if arch =='arm':
