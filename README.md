@@ -20,20 +20,20 @@ scons
 scons --run=qemu
 ```
 
+
+
+
+
 ### 截图
 <img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/demo/etk-gui.jpeg?raw=true" width="800px" />
 
+https://user-images.githubusercontent.com/5143386/121841338-acf76f80-cd10-11eb-98fe-f96cb78ba221.mp4
+
 <img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/demo/lvgl-gui.png?raw=true" width="800px" />
-
-<video id="video" controls="" preload="none" poster="http://media.w3.org/2010/05/sintel/poster.png">
-<source id="mp4" src="https://github.com/evilbinary/YiYiYa/blob/main/docs/demo/lvgl.mp4?raw=true" type="video/mp4">
-</video>
       
-<img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/demo/lvgl2.png?raw=true" width="400px" />
-<img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/demo/etk.png?raw=true" width="400px" />
+<img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/demo/lvgl2.png?raw=true" width="800px" />
 
-<img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/demo/microui.jpg?raw=true" width="400px" />
-<img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/demo/yiyiya.png?raw=true" width="400px" />
+<img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/demo/etk.png?raw=true" width="400px" /><img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/demo/microui.jpg?raw=true" width="400px" /><img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/demo/yiyiya.png?raw=true" width="400px" />
 
 
 ## 开发
