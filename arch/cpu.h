@@ -18,6 +18,7 @@
 
 #endif
 
+
 typedef uint32_t phys_address_t;
 typedef uint32_t virtual_address_t;
 

@@ -8,15 +8,10 @@
 #include "../boot.h"
 #include "../io.h"
 #include "../lock.h"
-#include "arch/arm/gpio.h"
+#include "gpio.h"
 
 extern boot_info_t* boot_info;
 
-
-void uart_send(unsigned int c) {
-    do{}while(*UART0_FR&0x20);
-    *UART0_DR=c;
-}
 
 void set_cursor(int x, int y) {
   
@@ -36,10 +31,12 @@ void puts(char* text) {
 
 void test_display() {
   cls();
-  puts("hello,YiYiYa\n");
+  puts("test display hello,YiYiYa\n\r");
 }
 
 void display_init() {
+  puts("Hello,YiYiYa OS\n\r");
+  puts("display init\n\r");
   if (boot_info->disply.mode == 1) {
     
   }

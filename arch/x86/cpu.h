@@ -9,6 +9,7 @@
 #include "libs/include/types.h"
 #include "arch/boot.h"
 
+typedef u64* page_dir_t;
 
 #define debugger asm("xchg %bx,%bx\n")
 

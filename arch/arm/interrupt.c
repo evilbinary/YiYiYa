@@ -9,9 +9,6 @@
 #include "context.h"
 #include "cpu.h"
 
-#define CORE0_TIMER_IRQCNTL 0x40000040
-#define CORE0_IRQ_SOURCE 0x40000060
-
 extern boot_info_t* boot_info;
 
 interrupt_handler_t* interrutp_handlers[IDT_NUMBER];
@@ -97,7 +94,7 @@ void interrutp_regist(u32 vec, interrupt_handler_t handler) {
 
 void interrutp_set(int i) {
   idt[i] = 0xe59ff000 +
-           (IDT_NUMBER / 2 - 1) * 4;  // ldr	pc, [pc, #24] 0x24=36=4*8=32+4
+           (IDT_NUMBER-2) * 4;  // ldr	pc, [pc, #24] 0x24=36=4*8=32+4
   u32 base = (u32)interrutp_handlers[i];
-  idt[i + IDT_NUMBER / 2 + 1] = base;
+  idt[i + IDT_NUMBER] = base;
 }

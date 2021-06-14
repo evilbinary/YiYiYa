@@ -6,7 +6,13 @@
 #ifndef ARM_CPU_H
 #define ARM_CPU_H
 
+#include "arch/boot.h"
 #include "libs/include/types.h"
+
+#define CORE0_TIMER_IRQCNTL 0x40000040
+#define CORE0_IRQ_SOURCE 0x40000060
+
+typedef u32* page_dir_t;
 
 #define debugger
 
@@ -71,5 +77,8 @@ typedef struct cpsr {
 #define context_r0(context) context->r0
 
 #define context_restore(duck_context) cpu_sti();interrupt_exit_context(duck_context);
+
+#define isb() asm volatile("isb")
+#define dsb() asm volatile("dsb")
 
 #endif

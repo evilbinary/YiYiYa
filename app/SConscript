@@ -19,10 +19,12 @@ env.Program('kernel.elf', [
     '../drivers/libdriver.a',
     '../kernel/libyiyiya.a',
     '../arch/libarch.a',
+    '../platform/libplatform.a',
     '../libs/libalgorithm/libalgorithm.a',
     '../libs/libkernel/libkernel.a',
+    env.get('MYLIB')
     ]
-    ,LINKFLAGS= '$LINKFLAGS -Tlink.ld')
+    ,LINKFLAGS= '$LINKFLAGS -T'+env.get('LINKLD'))
 
 env.Objcopy('kernel','kernel.elf',OBJCOPYFLAGS='-S')
 env.Objcopy('kernel.dbg','kernel.elf',OBJCOPYFLAGS='--only-keep-debug')
