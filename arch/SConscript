@@ -9,12 +9,15 @@ import os
 Import('env')
 
 if env['ARCH']=='arm':
+    plt=env['PLATFORM']
     env.Library('arch', ['arch.c','lock.c',
         'arm/io.c',
         'arm/cpu.c',
         'arm/mm.c',
+        'arm/mmu_dump.c',
         'arm/display.c',
         'arm/interrupt.c',
+        '../platform/libplatform.a'
         ])
 elif env['ARCH']=='x86':
     env.Library('arch', ['arch.c','lock.c',
@@ -23,4 +26,5 @@ elif env['ARCH']=='x86':
         'x86/mm.c',
         'x86/display.c',
         'x86/interrupt.c',
+        '../platform/libplatform.a'
         ])

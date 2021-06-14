@@ -116,7 +116,7 @@ typedef struct boot_info {
   i32 version;
   u32* kernel_origin_base;
   u32* kernel_base;
-  u32* kernel_size;
+  u32 kernel_size;
   u32* kernel_entry;
   u32* gdt_base;
   i32 gdt_number;

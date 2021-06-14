@@ -45,7 +45,7 @@ static inline void invlpg(void* virt) {
   asm volatile("invlpg %0\n\t" : : "m"(*(uint8_t*)virt));
 }
 
-static inline void cpu_enable_paging_pae(ulong cr3) {
+void cpu_enable_paging_pae(ulong cr3) {
   asm volatile("cli");
   asm __volatile__(
       "movl	%0, %%cr3\n"
@@ -113,11 +113,6 @@ static inline void set_ldt(u16 tss) {
 void cpu_init() {
   unsigned long cr0 = read_cr0();
   kprintf("cpu init cr0=%x\n", cr0);
-  if (boot_info->pdt_base != NULL) {
-    ulong addr = (ulong)boot_info->pdt_base;
-    cpu_enable_paging_pae(addr);
-    kprintf("paging pae scucess\n");
-  }
 }
 
 void cpu_halt() { asm("hlt\n"); }

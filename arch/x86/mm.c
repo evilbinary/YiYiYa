@@ -3,9 +3,9 @@
  * 作者: evilbinary on 01/01/20
  * 邮箱: rootdebug@163.com
  ********************************************************************/
+#include "cpu.h"
 #include "../mm.h"
 
-#include "../cpu.h"
 
 static mem_block_t* block_alloc_head = NULL;
 static mem_block_t* block_alloc_tail = NULL;
@@ -173,6 +173,13 @@ void mm_init() {
   // boot_info_t *new_boot=kmalloc(sizeof(boot_info_t));
   // *new_boot=*boot_info;
   // boot_info=new_boot;
+
+  if (boot_info->pdt_base != NULL) {
+    ulong addr = (ulong)boot_info->pdt_base;
+    cpu_enable_paging_pae(addr);
+    kprintf("paging pae scucess\n");
+  }
+
 }
 
 void mm_alloc_init() {

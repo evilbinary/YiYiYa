@@ -6,12 +6,15 @@
 #include "arch.h"
 
 boot_info_t* boot_info;
+extern u32 write_channel_number;
 
 void arch_init(boot_info_t* boot){
+    write_channel_number=0;
+    platform_init();
     io_add_write_channel(putch);
     boot_info = boot;
     display_init();
     mm_init();
-    cpu_init();
     interrupt_init();
+    cpu_init();
 }

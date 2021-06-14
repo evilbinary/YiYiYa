@@ -4,11 +4,171 @@
  * 邮箱: rootdebug@163.com
  ********************************************************************/
 #include "../cpu.h"
-
 #include "context.h"
 #include "cpu.h"
 
-void cpu_init() {}
+extern boot_info_t* boot_info;
+
+// 31:14-N -> va[29:20] va[19:12] 
+#define TTBCRN_4K 0b010
+#define TTBCRN_16K 0b000
+#define TTBCR_LPAE 1<<31
+
+
+/* data cache clean by MVA to PoC */
+void dccmvac(unsigned long mva)
+{
+	asm volatile ("mcr p15, 0, %0, c7, c10, 1" : : "r" (mva) : "memory");
+}
+
+void cpu_icache_disable(){
+  asm("mcr  p15, #0, r0, c7, c7, 0\n" );
+}
+
+void cpu_invalid_tlb(){
+	asm volatile ("mcr p15, 0, %0, c8, c7, 0" : : "r" (0));
+	asm volatile ("mcr p15, 0, %0, c8, c6, 0" : : "r" (0));
+	asm volatile ("mcr p15, 0, %0, c8, c5, 0" : : "r" (0));
+  asm volatile("isb\n"
+    "dsb\n"
+  );
+}
+
+void cp15_invalidate_icache(void)
+{
+  asm volatile(
+      "mov r0, #0\n"
+      "mcr p15, 0, r0, c7, c5, 0\n"
+      "dsb\n"
+      :
+      :
+      : "r0", "memory"
+    );
+}
+
+
+u32 read_dfar(){
+  u32 val = 0;
+    asm volatile("mrc p15, 0, %0, c6, c0, 0"
+                 : "=r"(val));
+    return val;
+}
+
+u32 read_dfsr(){
+  u32 val = 0;
+    asm volatile("mrc p15, 0, %0, c5, c0, 0"
+                 : "=r"(val));
+    return val;
+}
+
+
+static inline u32 read_ttbcr(void) {
+    u32 val = 0;
+    asm volatile("mrc p15, 0, %0, c2, c0, 2"
+                 : "=r"(val));
+    return val;
+}
+
+static inline void write_ttbcr(u32 val) {
+    asm volatile("mcr p15, 0, %0, c2, c0, 2"
+                 :
+                 : "r"(val)
+                 : "memory");
+}
+
+static inline void write_ttbr0(u32 val) {
+    asm volatile("mcr p15, 0, %0, c2, c0, 0"
+                 :
+                 : "r"(val)
+                 : "memory");
+}
+
+static inline u32 read_ttbr0() {
+    u32 val = 0;
+    asm volatile("mrc p15, 0, %0, c2, c0, 0"
+                 : "=r"(val));
+    return val;
+}
+
+static inline void write_ttbr1(u32 val) {
+    asm volatile("mcr p15, 0, %0, c2, c0, 1"
+                 :
+                 : "r"(val)
+                 : "memory");
+}
+
+static inline u32 read_ttbr1() {
+    u32 val = 0;
+    asm volatile("mrc p15, 0, %0, c2, c0, 1"
+                 : "=r"(val));
+    return val;
+}
+
+u32 cpu_set_domain(u32 val){
+    u32 old;
+    asm volatile ("mrc p15, 0, %0, c3, c0,0\n" : "=r" (old));
+    asm volatile ("mcr p15, 0, %0, c3, c0,0\n" : :"r" (val) : "memory");
+    return old;
+}
+
+
+/* invalidate unified TLB by MVA and ASID */
+void tlbimva(unsigned long mva)
+{
+	asm volatile ("mcr p15, 0, %0, c8, c7, 1" : : "r" (mva) : "memory");
+}
+
+
+void cpu_set_page(u32 page_table){
+  //set ttbcr0
+   write_ttbr0(page_table);
+   isb();
+   write_ttbr1(page_table);
+   isb();
+   write_ttbcr(TTBCRN_4K);
+   isb();
+  //set all permission
+  //cpu_set_domain(~0);
+}
+
+void cpu_disable_page(){
+  u32 reg;
+  // read mmu 
+  asm("mrc p15, 0, %0, c1, c0, 0" : "=r" (reg) : : "cc");
+  reg&=~0x1;
+  asm volatile("mcr p15, 0, %0, c1, c0, #0" : : "r" (reg) : "cc");
+}
+
+void cpu_enable_page(){
+  u32 reg;
+  // read mmu 
+  asm("mrc p15, 0, %0, c1, c0, 0" : "=r" (reg) : : "cc");//SCTLR 
+  reg|=0x1; //M enable mmu
+  //reg|=1<<29;//AFE
+  reg|=1<<12; //Instruction cache enable:
+  reg|=1<<2;//Cache enable.
+  reg|=1<<1;//Alignment check enable.
+  asm volatile("mcr p15, 0, %0, c1, c0, #0" : : "r" (reg) : "cc");//SCTLR
+  //asm("b 0");
+
+  dsb();
+  isb();
+}
+
+inline void cpu_invalidate_tlbs(void){
+  asm (
+      "mcr p15, 0, r0, c8, c7, 0\n"
+      "mcr p15,0,0,c7,c10,4\n"
+      :
+      :
+      : "r0", "memory"
+    );
+}
+
+
+void cpu_init() {
+  
+}
 
 void cpu_halt() { asm("wfi"); }
 

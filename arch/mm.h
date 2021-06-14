@@ -31,7 +31,6 @@ typedef struct mem_block{
 }__attribute__ ((packed)) mem_block_t ;
 
 
-typedef u64* page_dir_t;
 
 void mm_init();
 void* mm_alloc(size_t size);

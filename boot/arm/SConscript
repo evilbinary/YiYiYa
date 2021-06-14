@@ -23,7 +23,7 @@ env.Program(target ='init.elf', source = [
     'init.c',
     # 'test.o',
     # 'kernel.c',
-
+    env.get('MYLIB')
     ],
     CFLAGS='$CFLAGS -I. -Iinclude',
     LINKFLAGS= '-nostdlib -nostartfiles -T boot/arm/link.ld')
