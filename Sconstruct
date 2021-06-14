@@ -13,6 +13,11 @@ plt = platform.system()
 # arch='arm'
 arch='x86' 
 
+# board select platform
+platform='intel'
+# platform='v3s'
+# platform='raspi2'
+
 DefaultEnvironment(tools=[])
 env = Environment(ENV = {}, tools=['gcc'])
 
@@ -25,12 +30,15 @@ env = Environment(
         STRIP="/opt/local/bin/i386-elf-strip",
         RANLIB='/opt/local/bin/i386-elf-ranlib',
         OBJCOPY='/opt/local/bin/i386-elf-objcopy',
-        CFLAGS='-DX86 -march=i486 -I. -I./include -Ilibs/include -g -nostdlib -nostdinc -fno-builtin -m32 -c -std=c99 -std=gnu99 -w',
+        CFLAGS='-DX86 -march=i486 -I. -I./include -Ilibs/include -g -nostdlib -nostdinc -fno-builtin -m32 -c -std=c99 -std=gnu99 -w -D'+platform.upper(),
         #PATH= os.environ['PATH'],
         LIBPATH=['.','../arch/','../driver','../libs/'],
         LINKFLAGS='-nostdlib -nostartfiles -e start  -g ',
         OBJCOPYFLAGS='-S -g',
-        ARCH=arch
+        ARCH=arch,
+        PLATFORM=platform,
+        LINKLD='link.ld',
+        MYLIB=' '
         )
 
 if plt=='Linux':
@@ -55,7 +63,10 @@ elif plt=='Darwin':
         env['STRIP']='/opt/local/bin/arm-none-eabi-strip'
         env['RANLIB']='/opt/local/bin/arm-none-eabi-ranlib'
         env['OBJCOPY']='/opt/local/bin/arm-none-eabi-objcopy'
-        env['CFLAGS']='-mcpu=cortex-a7  -DARM -I. -I./include -Ilibs/include -g -nostdlib -nostdinc -fno-builtin -c -std=c99 -std=gnu99 -w'
+        env['MYLIB']= '/opt/local/lib/gcc/arm-none-eabi/9.2.0/libgcc.a'
+        env['CFLAGS']='-march=armv7-a  -DARM -I. -I./include  -Ilibs/include -g -nostdlib -nostdinc -fno-builtin -c -std=c99 -std=gnu99 -w -D'+platform.upper() #-mcpu=cortex-a7 
+        if platform=='v3s':
+            env['LINKLD']='link-v3s.ld'
         pass
 else:
     print('no support ^_^!')
@@ -111,6 +122,7 @@ env.Append(BUILDERS={
 Export('env')
 
 SConscript(dirs=['libs/libalgorithm'], exports='env')
+SConscript(dirs=['platform'], exports='env')
 SConscript(dirs=['arch'], exports='env')
 SConscript(dirs=['kernel'], exports='env')
 SConscript(dirs=['libs/libkernel'], exports='env')
