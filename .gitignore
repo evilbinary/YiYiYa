@@ -22,7 +22,7 @@ app/etk/etk
 image/disk.vdi
 app/gui/gui.elf
 image/disk.vmdk
-
+image/duck.fit
 image/disk.vmdk.lck**
 
 app/lvgl/lvgl
