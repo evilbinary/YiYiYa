@@ -42,49 +42,18 @@ u32 read_cntfrq(void) {
   return val;
 }
 
-void enable_cntv(void) {
-  u32 cntv_ctl;
-  cntv_ctl = 1;
+void enable_cntv(u32 cntv_ctl) {
   asm volatile("mcr p15, 0, %0, c14, c3, 1" ::"r"(cntv_ctl));  // write CNTV_CTL
 }
 
-void disable_cntv(void) {
-  u32 cntv_ctl;
-  cntv_ctl = 0;
+void disable_cntv(u32 cntv_ctl) {
   asm volatile("mcr p15, 0, %0, c14, c3, 1" ::"r"(cntv_ctl));  // write CNTV_CTL
-}
-
-u32 read_core0timer_pending(void) {
-  u32 tmp;
-  tmp = io_read32(CORE0_IRQ_SOURCE);
-  return tmp;
-}
-static u32 cntfrq = 0;
-
-void timer_init(int hz) {
-  kprintf("timer init\n");
-  cntfrq = read_cntfrq();
-  kprintf("cntfrq %d\n", cntfrq);
-  write_cntv_tval(cntfrq);
-
-  u32 val = read_cntv_tval();
-  kprintf("val %d\n", val);
-  io_write32(CORE0_TIMER_IRQCNTL, 0x08);
-  enable_cntv();
 }
 
 uint64_t read_cntvct(void) {
   uint64_t val;
   asm volatile("mrrc p15, 1, %Q0, %R0, c14" : "=r"(val));
   return (val);
-}
-
-void timer_end() {
-  if (read_core0timer_pending() & 0x08) {
-    write_cntv_tval(cntfrq);
-    kprintf("cntfrq:%x cnt val:%x\n", read_cntvct(),read_cntv_tval());
-    cpu_sti();
-  }
 }
 
 void interrutp_regist(u32 vec, interrupt_handler_t handler) {

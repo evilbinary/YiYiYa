@@ -264,7 +264,7 @@ void* mm_alloc(size_t size) {
   return NULL;
 }
 
-void* mm_alloc_zero_align(size_t size, int alignment) {
+void* mm_alloc_zero_align(size_t size, u32 alignment) {
   void *p1, *p2;
   if ((p1 = (void*)mm_alloc(size + alignment + sizeof(size_t))) == NULL) {
     return NULL;
@@ -350,6 +350,57 @@ u32 mm_get_size(void* addr) {
   for (; p != NULL; p = p->next) {
     if (p->addr == addr) {
       return p->size;
+    }
+  }
+}
+
+
+void* virtual_to_physic(u64* page_dir_ptr_tab, void* vaddr) {
+  u32 pdpte_index = (u32)vaddr >> 30 & 0x03;
+  u32 pde_index = (u32)vaddr >> 21 & 0x01FF;
+  u32 pte_index = (u32)vaddr >> 12 & 0x01FF;
+  u32 offset = (u32)vaddr & 0x0FFF;
+  u64* page_dir_ptr = (u64)page_dir_ptr_tab[pdpte_index] & ~0xFFF;
+  if (page_dir_ptr == NULL) {
+    kprintf("page dir find errro\n");
+    return NULL;
+  }
+  u64* page_tab_ptr = (u64)page_dir_ptr[pde_index] & ~0xFFF;
+  if (page_tab_ptr == NULL) {
+    // kprintf("page tab find errro\n");
+    return NULL;
+  }
+  void* phyaddr = page_tab_ptr[pte_index] & ~0xFFF;
+  return phyaddr;
+}
+
+void page_clone(u64* page, u64* page_dir_ptr_tab) {
+  for (int pdpte_index = 0; pdpte_index < 4; pdpte_index++) {
+    u64* page_dir_ptr = page[pdpte_index] & ~0xFFF;
+    if (page_dir_ptr != NULL) {
+      u64* new_page_dir_ptr = kmalloc_alignment(sizeof(u64) * 512, PAGE_SIZE);
+      page_dir_ptr_tab[pdpte_index] =
+          ((u64)new_page_dir_ptr) | PAGE_P | PAGE_USU | PAGE_RWW;
+      for (int pde_index = 0; pde_index < 512; pde_index++) {
+        u64* page_tab_ptr = (u64)page_dir_ptr[pde_index] & ~0xFFF;
+        if (page_tab_ptr != NULL) {
+          u64* new_page_tab_ptr =
+              kmalloc_alignment(sizeof(u64) * 512, PAGE_SIZE);
+          new_page_dir_ptr[pde_index] =
+              ((u64)new_page_tab_ptr) | PAGE_P | PAGE_USU | PAGE_RWW;
+          for (int pte_index = 0; pte_index < 512; pte_index++) {
+            u64* page_tab_item = page_tab_ptr[pte_index] & ~0xFFF;
+            if (page_tab_item != NULL) {
+              new_page_tab_ptr[pte_index] = page_tab_ptr[pte_index];
+              u32 virtualaddr = (pdpte_index & 0x03) << 30 |
+                                (pde_index & 0x01FF) << 21 |
+                                (pte_index & 0x01FF) << 12;
+              // kprintf("map vir:%x phy:%x \n", virtualaddr,
+              // new_page_tab_ptr[pte_index]& ~0xFFF);
+            }
+          }
+        }
+      }
     }
   }
 }

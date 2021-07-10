@@ -4,6 +4,12 @@
  * 邮箱: rootdebug@163.com
  ********************************************************************/
 #include "main.h"
+
+#ifdef ARM 
+
+extern module_t gpu_module;
+
+#elif defined(X86)
 extern module_t keyboard_module;
 extern module_t hello_module;
 extern module_t pci_module;
@@ -17,6 +23,7 @@ extern module_t fat32_module;
 extern module_t rtc_module;
 extern module_t fat_module;
 extern module_t sb16_module;
+#endif
 
 extern void serial_write(char a);
 extern void do_shell_thread(void);
@@ -37,6 +44,7 @@ int kmain(int argc, char* argv[]) {
   kprintf("module regist\n");
 
 #ifdef ARM 
+  // module_regist(&gpu_module);
 
 #elif defined(X86)
   module_regist(&pci_module);
@@ -57,8 +65,10 @@ int kmain(int argc, char* argv[]) {
   thread_t* t0 = thread_create((u32*)&do_serial_thread,NULL);
   thread_t* t1 = thread_create((u32*)&do_shell_thread,NULL);
 
+  kprintf("thread run\n");
   thread_run(t0);
   thread_run(t1);
+  kprintf("kernel run\n");
   kernel_run();
 
   return 0;

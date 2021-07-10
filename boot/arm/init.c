@@ -386,6 +386,7 @@ void load_elf(Elf32_Ehdr* elf_header) {
   for (int i = 0; i < elf_header->e_shnum; i++) {
     if (SHT_NOBITS == shdr[i].sh_type) {
       char* vaddr = shdr[i].sh_addr;
+      memset(vaddr,0,shdr[i].sh_size);
       // map_alignment(page,vaddr,buf,shdr[i].sh_size);
     } else if (elf_header->e_entry != shdr[i].sh_addr &&
                SHT_PROGBITS == shdr[i].sh_type &&
@@ -420,16 +421,16 @@ void* load_kernel() {
   printf("\n\r");
   Elf32_Ehdr* elf_header = (Elf32_Ehdr*)elf;
   if (elf_header->e_ident[0] == ELFMAG0 || elf_header->e_ident[1] == ELFMAG1) {
-    printf("header: ");
+    // printf("header: ");
    
 
-    printf("type:%d\n\r", elf_header->e_type);
-    printf("e_machine:%d\n\r", elf_header->e_machine);
-    printf("e_entry:%d\n\r", elf_header->e_entry);
-    printf("e_phoff:%d\n\r", elf_header->e_phoff);
-    printf("e_shoff:%d\n\r", elf_header->e_shoff);
-    printf("e_ehsize:%d\n\r", elf_header->e_ehsize);
-    printf("e_phentsize:%d\n\r", elf_header->e_phentsize);
+    // printf("type:%d\n\r", elf_header->e_type);
+    // printf("e_machine:%d\n\r", elf_header->e_machine);
+    // printf("e_entry:%d\n\r", elf_header->e_entry);
+    // printf("e_phoff:%d\n\r", elf_header->e_phoff);
+    // printf("e_shoff:%d\n\r", elf_header->e_shoff);
+    // printf("e_ehsize:%d\n\r", elf_header->e_ehsize);
+    // printf("e_phentsize:%d\n\r", elf_header->e_phentsize);
     load_elf(elf_header);
     return elf_header->e_entry;
   } else {
@@ -445,7 +446,7 @@ void start_kernel() {
   boot_info->kernel_entry = load_kernel();
   entry start = boot_info->kernel_entry;
   printf("kernel entry %x\n\r",boot_info->kernel_entry);
-  print_hex(boot_info->kernel_entry);
+  // print_hex(boot_info->kernel_entry);
   
   int argc = 0;
   char** argv = 0;

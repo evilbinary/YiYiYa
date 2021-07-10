@@ -4,42 +4,37 @@
  * 邮箱: rootdebug@163.com
  ********************************************************************/
 #include "syscall.h"
+
 extern context_t* current_context;
 static void* syscall_table[SYSCALL_NUMBER] = {
-    &sys_read,  &sys_write, &sys_yeild, &sys_print, &sys_print_at, &sys_ioctl,
-    &sys_open,  &sys_close, &dev_read,  &dev_write, &dev_ioctl,    &sys_exec,
-    &sys_test,  &sys_exit,  &sys_vmap,  &sys_vumap, &sys_seek,     &sys_valloc,
-    &sys_vfree, &sys_vheap, &sys_fork,  &sys_pipe,  &sys_getpid,   &sys_getppid,
-    &sys_dup,   &sys_dup2,&sys_readdir};
+    &sys_read,  &sys_write,  &sys_yeild,  &sys_print,   &sys_print_at,
+    &sys_ioctl, &sys_open,   &sys_close,  &dev_read,    &dev_write,
+    &dev_ioctl, &sys_exec,   &sys_test,   &sys_exit,    &sys_vmap,
+    &sys_vumap, &sys_seek,   &sys_valloc, &sys_vfree,   &sys_vheap,
+    &sys_fork,  &sys_pipe,   &sys_getpid, &sys_getppid, &sys_dup,
+    &sys_dup2,  &sys_readdir};
 
 INTERRUPT_SERVICE
 void syscall_handler() {
   interrupt_entering_code(ISR_SYSCALL, 0);
   interrupt_process(do_syscall);
   interrupt_exit();
+  // interrupt_exit_context(current_context);
 }
 
 void syscall_init() { interrutp_regist(ISR_SYSCALL, syscall_handler); }
 
 void* do_syscall(interrupt_context_t* context) {
-  // kprintf("syscall %x\n",context.no);
+  // kprintf("syscall %x\n",context->no);
   // current_context->esp0 = context;
   // current_context->esp = context->esp;
-  if (context_r0(context) >= 0 && context_r0(context) < SYSCALL_NUMBER) {
-    void* fn = syscall_table[context_r0(context)];
+  if (context_fn(context) >= 0 && context_fn(context) < SYSCALL_NUMBER) {
+    void* fn = syscall_table[context_fn(context)];
     if (fn != NULL) {
-      // if (current_context != NULL) {
-      //   current_context->tss->cr3 = current_context->kernel_page_dir;
-      //   context_switch_page(current_context->kernel_page_dir);
-      // }
       sys_fn_call((context), fn);
-      // if (current_context != NULL) {
-      //   current_context->tss->cr3 = current_context->page_dir;
-      //   context_switch_page(current_context->page_dir);
-      // }
-      return context_r0(context);
+      return context_ret(context);
     } else {
-      kprintf("syscall %x not found\n", context_r0(context));
+      kprintf("syscall %x not found\n", context_fn(context));
     }
   }
   return NULL;
@@ -48,34 +43,99 @@ void* do_syscall(interrupt_context_t* context) {
 #ifdef ARM
 void* syscall0(u32 num) {
   int ret;
+  asm volatile(
+      "push {r7,lr}\n\t"
+      "mov r7,%1 \n\t"
+      "svc 0x0\n\t"
+      "mov %0,r0\n\t"
+      "pop {r7,lr}\n\t"
+      : "=r"(ret)
+      : "r"(num)
+      :);
   return ret;
 }
 
 void* syscall1(u32 num, void* arg0) {
   int ret;
+  asm volatile(
+      "push {r7,lr}\n\t"
+      "mov r7,%1 \n\t"
+      "mov r0,%2 \n\t"
+      "svc 0x0\n\t"
+      "mov %0,r0\n\t"
+      "pop {r7,lr}\n\t"
+      : "=r"(ret)
+      : "r"(num), "r"(arg0)
+      :);
   return ret;
 }
 void* syscall2(u32 num, void* arg0, void* arg1) {
   int ret;
-
+  asm volatile(
+      "push {r7,lr}\n\t"
+      "mov r7,%1 \n\t"
+      "mov r0,%2 \n\t"
+      "mov r1,%3 \n\t"
+      "swi 0x0\n\t"
+      "mov %0,r0\n\t"
+      "pop {r7,lr}\n\t"
+      : "=r"(ret)
+      : "r"(num), "r"(arg0), "r"(arg1)
+      :);
   return ret;
 }
 void* syscall3(u32 num, void* arg0, void* arg1, void* arg2) {
   u32 ret = 0;
-
+  asm volatile(
+      "push {r7,lr}\n\t"
+      "mov r7,%1 \n\t"
+      "mov r0,%2 \n\t"
+      "mov r1,%3 \n\t"
+      "mov r2,%4 \n\t"
+      "svc 0x0\n\t"
+      "mov %0,r0\n\t"
+      "pop {r7,lr}\n\t"
+      : "=r"(ret)
+      : "r"(num), "r"(arg0), "r"(arg1), "r"(arg2)
+      :);
   return ret;
 }
 
 void* syscall4(u32 num, void* arg0, void* arg1, void* arg2, void* arg3) {
   u32 ret = 0;
-
+  asm volatile(
+      "push {r7,lr}\n\t"
+      "mov r7,%1 \n\t"
+      "mov r0,%2 \n\t"
+      "mov r1,%3 \n\t"
+      "mov r2,%4 \n\t"
+      "mov r3,%5 \n\t"
+      "svc 0x0\n\t"
+      "mov %0,r0\n\t"
+      "pop {r7,lr}\n\t"
+      : "=r"(ret)
+      : "r"(num), "r"(arg0), "r"(arg1), "r"(arg2), "r"(arg3)
+      :);
   return ret;
 }
 
 void* syscall5(u32 num, void* arg0, void* arg1, void* arg2, void* arg3,
                void* arg4) {
   u32 ret = 0;
-
+  asm volatile(
+      "push {r7,lr}\n\t"
+      "mov r7,%1 \n\t"
+      "mov r0,%2 \n\t"
+      "mov r1,%3 \n\t"
+      "mov r2,%4 \n\t"
+      "mov r3,%5 \n\t"
+      "mov r4,%6 \n\t"
+      "svc 0x0\n\t"
+      "mov %0,r0\n\t"
+      "pop {r7,lr}\n\t"
+      : "=r"(ret)
+      : "r"(num), "r"(arg0), "r"(arg1), "r"(arg2), "r"(arg3), "r"(arg4)
+      :);
   return ret;
 }
 

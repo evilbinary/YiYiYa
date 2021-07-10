@@ -18,7 +18,10 @@ int sys_print(char* s) {
   return 0;
 }
 
-void sys_test() { kprintf("sys test\n"); }
+void sys_test() {
+   thread_t* current = thread_current();
+   kprintf("sys test %d\n",current->id);
+}
 
 int sys_print_at(char* s, u32 x, u32 y) {
   set_cursor(x, y);

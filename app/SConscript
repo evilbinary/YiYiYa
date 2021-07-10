@@ -10,7 +10,7 @@ plt = platform.system()
 
 Import('env')
 
-
+linkflags=' $LINKFLAGS -T'+env.get('LINKLD')
 
 env.Program('kernel.elf', [
     'main.c',
@@ -23,8 +23,8 @@ env.Program('kernel.elf', [
     '../libs/libalgorithm/libalgorithm.a',
     '../libs/libkernel/libkernel.a',
     env.get('MYLIB')
-    ]
-    ,LINKFLAGS= '$LINKFLAGS -T'+env.get('LINKLD'))
+    ],
+    LINKFLAGS = linkflags)
 
 env.Objcopy('kernel','kernel.elf',OBJCOPYFLAGS='-S')
 env.Objcopy('kernel.dbg','kernel.elf',OBJCOPYFLAGS='--only-keep-debug')
@@ -41,7 +41,7 @@ if env.get('APP'):
     SConscript(dirs=['hello'], exports='env')
     SConscript(dirs=['gui'], exports='env')
     SConscript(dirs=['microui'], exports='env')
-    SConscript(dirs=['jpeg'], exports='env')
+    #SConscript(dirs=['jpeg'], exports='env')
     SConscript(dirs=['file'], exports='env')
     SConscript(dirs=['etk'], exports='env')
     SConscript(dirs=['test'], exports='env')

@@ -20,14 +20,16 @@ SECTIONS
         /* Read-write data (initialized) */
         .data BLOCK(4K) : ALIGN(4K)
         {
+                *(COMMON)
                 *(.data)
         }
 
         /* Read-write data (uninitialized) and stack */
+        __bss_start = .;
         .bss BLOCK(4K) : ALIGN(4K)
         {
-                *(COMMON)
                 *(.bss)
         }
+        __bss_end = .;
        _end = .;
 }
