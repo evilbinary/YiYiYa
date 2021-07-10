@@ -23,6 +23,8 @@
 #define PAGE_USS   0 //系统级
 #define PAGE_USU   4 //用户级
 
+#define PAGE_SIZE 0x1000
+
 typedef struct mem_block{
     u32 addr;
 	u32 type;
@@ -35,7 +37,7 @@ typedef struct mem_block{
 void mm_init();
 void* mm_alloc(size_t size);
 void mm_free(void* p);
-void* mm_alloc_zero_align(size_t size,int alignment);
+void* mm_alloc_zero_align(size_t size,u32 alignment);
 void map_page_on(page_dir_t* page,u32 virtualaddr, u32 physaddr, u32 flags);
 
 #endif

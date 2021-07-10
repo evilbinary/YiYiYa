@@ -13,4 +13,8 @@ if plt:
     env['CFLAGS']= """%s -Iplatform/%s  """%(env['CFLAGS'],plt)
     env.Library('platform', [
         plt+'/init.c',
+        # plt+'/gic.c',
+        # plt+'/timer.c',
+        # plt+'/sys-dram.c',
+        # plt+'/sys-clock.c'
         ],)

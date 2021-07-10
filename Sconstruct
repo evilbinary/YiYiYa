@@ -64,7 +64,7 @@ elif plt=='Darwin':
         env['RANLIB']='/opt/local/bin/arm-none-eabi-ranlib'
         env['OBJCOPY']='/opt/local/bin/arm-none-eabi-objcopy'
         env['MYLIB']= '/opt/local/lib/gcc/arm-none-eabi/9.2.0/libgcc.a'
-        env['CFLAGS']='-march=armv7-a  -DARM -I. -I./include  -Ilibs/include -g -nostdlib -nostdinc -fno-builtin -c -std=c99 -std=gnu99 -w -D'+platform.upper() #-mcpu=cortex-a7 
+        env['CFLAGS']='-march=armv7-a -DARM -I. -I./include  -Ilibs/include -g -nostdlib -nostdinc -fno-builtin -c -std=c99 -std=gnu99 -w -D'+platform.upper() #-mcpu=cortex-a7 
         if platform=='v3s':
             env['LINKLD']='link-v3s.ld'
         pass

@@ -42,29 +42,26 @@ extern boot_info_t* boot_info;
 static u32 count = 0;
 
 
-u32 page_dir[4096] __attribute__((aligned(0x10000)));
-u32 page_tab[256] __attribute__((aligned(0x10000)));
-u32 page_tab1[256] __attribute__((aligned(0x10000)));
+static u32 page_dir[4096] __attribute__((aligned(0x4000)));
 
 void map_page_on(page_dir_t* l1, u32 virtualaddr, u32 physaddr, u32 flags) {
   u32 l1_index=virtualaddr>>20;
   u32 l2_index=virtualaddr>>12 & 0xFF;
-  u32* l2=(u32)l1[l1_index] & ~0xFFFF;
-  // u32* l2=(u32*)( ((u32*)l1)[l1_index]);
+  u32* l2=((u32)l1[l1_index])&0xFFFFFC00;
   if (l2 == NULL) {
-    l2 = mm_alloc_zero_align(sizeof(u32) * 256, 0x10000);
-    l1[l1_index] = L1_DESC| (((u32)l2)>>10)<<10;
+    l2 = mm_alloc_zero_align(0x1000, 0x1000);
+    memset(l2,0,0x1000);
+    l1[l1_index] = (((u32)l2)&0xFFFFFC00) | L1_DESC;
   }
-  l2[l2_index] = L2_DESC| (physaddr<<12)>>12| flags;
+  l2[l2_index] = (physaddr>>12)<<12| flags| L2_DESC;
 }
 
 void map_page(u32 virtualaddr, u32 physaddr, u32 flags) {
   map_page_on(boot_info->pdt_base,virtualaddr,physaddr,flags);
 }
 
-
 void mm_init() {
-  kprintf("mm init\n\r");
+  kprintf("mm init\n");
   block_available=NULL;
   block_alloc_head=NULL;
   block_alloc_tail=NULL;
@@ -73,65 +70,60 @@ void mm_init() {
   // mm init
   mm_alloc_init();
   mm_test();
-  boot_info->pdt_base = page_dir;
+  boot_info->pdt_base = page_dir;  
+  memset(page_dir,0,4096*4);
+
   u32 address=0;
-  
-  memset(page_dir,0,4096);
-  memset(page_tab,0,256);
-  memset(page_tab1,0,256);
-
-
-  page_dir[0]= ((u32)page_tab>>10)<<10 | L1_DESC;
-  page_dir[1]= ((u32)page_tab1>>10)<<10 | L1_DESC;
-
-  kprintf("start 0x%x ", address);
-  for(int j =0; j < 256 ; j++){
-      page_tab[j] = address | L2_DESC;
-      address+=0x1000;
-  }
-  kprintf("- 0x%x\n\r", address);  // 0x200000 2GB
-  for(int j =0; j < 256 ; j++){
-      page_tab1[j] = address | L2_DESC;
-      address+=0x1000;
-  }
-
-  // for(int j =0; j < 512 ; j++){
-  //   map_page(address,address,0);
-  //   address+=0x1000;
-  // }
-  kprintf("map gpio\n\r");
-  //map gpio
-#ifdef V3S
-  address=boot_info->kernel_entry;
-  int i;
-  for(i=0;i< (boot_info->kernel_size/4096)+1;i++){
+  for(int j =0; j < 512 ; j++){
     map_page(address,address,0);
     address+=0x1000;
   }
-#endif
+  kprintf("map gpio\n");
+  //map gpio
+  address=boot_info->kernel_entry;
+  int i;
+  for(i=0;i< (boot_info->kernel_size/0x1000+2);i++){
+    map_page(address,address,0);
+    address+=0x1000;
+  }
   map_page(MMIO_BASE,MMIO_BASE,0);
   map_page(UART0_DR,UART0_DR,0);
   map_page(CORE0_TIMER_IRQCNTL,CORE0_TIMER_IRQCNTL,0);
-  map_page(0x40010000,0x40010000,0);
-  map_page(0x4010a000,0x4010a000,0);
-  map_page(0x4010b000,0x4010b000,0);
 
-  kprintf("map page end\n\r");
+  
+#ifdef V3S
+  //memory
+  address=0x40000000;
+  for(int i=0;i<0x100000/0x1000 ;i++){
+    map_page(address,address,0);
+    address+=0x1000;
+  }
+  map_page(0x01c20000,0x01c20000,0);
+  map_page(0x01c28000,0x01c28000,0);
+  map_page(0x01C20C00,0x01C20C00,0);
+  //gic
+  map_page(0x1c81000,0x1c81000,0);
+  map_page(0x1c82000,0x1c82000,0);
+  
+#endif
+
+  kprintf("map page end\n");
   
   // cpu_disable_page();
   // cpu_icache_disable();
   cp15_invalidate_icache();
   cpu_invalid_tlb();
+
+  cpu_set_domain(0x07070707);
+  // cpu_set_domain(0xffffffff);
+  // cpu_set_domain(0x55555555);
   cpu_set_page(page_dir);
 
   // start_dump();
-
-  cpu_set_domain(0xFFFFFFFF);
-  kprintf("enable page\n\r");
-
-  cpu_enable_page();  
-
-  kprintf("paging pae scucess\n\r");
+  kprintf("enable page\n");
+  
+  cpu_enable_page();
+  kprintf("paging pae scucess\n");
 }
 
 void mm_alloc_init() {
@@ -174,20 +166,20 @@ void mm_alloc_init() {
 
 void* mm_alloc(size_t size) {
   mem_block_t* p = block_available;
-  //debug("malloc count %d size %d\n",count,size);
+  // debug("malloc count %d size %d\n",count,size);
   u32 pre_alloc_size = size + sizeof(mem_block_t);
   for (; p != NULL; p = p->next) {
-    //debug("p=>:%x type:%d size:%x\n", p, p->type, p->size);
+    // debug("p=>:%x type:%d size:%x\n", p, p->type, p->size);
     if ((p->type != MEM_FREE)) {
       continue;
     }
+    // debug("p2=>:%x type:%d size:%x\n", p, p->type, p->size);
     if ((pre_alloc_size) <= p->size) {
-      //debug("p:%x pre_alloc_size:%d size:%d type:%d\n",p,pre_alloc_size,p->size,p->type);
+      // debug("p:%x pre_alloc_size:%d size:%d type:%d\n",p,pre_alloc_size,p->size,p->type);
       mem_block_t* new_block = (mem_block_t*)p->addr;
       if (new_block == NULL) continue;
       p->addr += pre_alloc_size;
       p->size -= pre_alloc_size;
-
       new_block->addr = (u32)new_block + sizeof(mem_block_t);
       new_block->size = size;
       new_block->next = NULL;
@@ -201,7 +193,7 @@ void* mm_alloc(size_t size) {
         block_alloc_tail = new_block;
       }
       count++;
-      //kprintf("alloc count:%d: addr:%x size:%d\n", count, new_block->addr,new_block->size);
+      kprintf("alloc count:%d: addr:%x size:%d\n", count, new_block->addr,new_block->size);
       // mm_dump();
       // mm_dump_print(block_available);
       return (void*)new_block->addr;
@@ -215,7 +207,8 @@ void* mm_alloc(size_t size) {
   return NULL;
 }
 
-void* mm_alloc_zero_align(size_t size, int alignment) {
+void* mm_alloc_zero_align(size_t size, u32 alignment) {
+  // kprintf("mm_alloc_zero_align size %x %x\n",size,alignment);
   void *p1, *p2;
   if ((p1 = (void*)mm_alloc(size + alignment + sizeof(size_t))) == NULL) {
     return NULL;
@@ -253,4 +246,14 @@ void mm_test() {
   // map_page(0x90000,0x600000,3);
   // u32* addr=mm_alloc(256);
   // *addr=0x123456;
+}
+
+
+void* virtual_to_physic(u64* page_dir_ptr_tab, void* vaddr) {
+  
+  return NULL;
+}
+
+void page_clone(u64* page, u64* page_dir_ptr_tab) {
+  
 }

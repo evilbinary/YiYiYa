@@ -118,14 +118,14 @@ elif env.get('run')=='qemu' or env.get('run')=='q':
   if env.get('ARCH')=='x86':
     env.Command('qemu', 'duck.img','qemu-system-i386 -rtc base=localtime,clock=host -boot a  -fda $SOURCE -serial stdio -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor  -D ./qemu.log  -drive id=disk,file=image/disk.img,format=raw,if=none -device ahci,id=ahci -device ide-hd,drive=disk,bus=ahci.0 -soundhw sb16')
   elif env.get('ARCH')=='arm':
-    env.Command('qemu', 'duck.img','qemu-system-arm -M raspi2   -rtc base=localtime -kernel image/duck.img  -serial stdio -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor  -D ./qemu.log -d in_asm,int,mmu') #-d in_asm -d cpu_reset
+    env.Command('qemu', 'duck.img','qemu-system-arm -M raspi2   -rtc base=localtime -kernel image/duck.img  -serial stdio -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor  -D ./qemu.log ') #-d in_asm -d cpu_reset -d in_asm,int,mmu
 
 elif env.get('run')=='debug':
   build_duck_image()
   if env.get('ARCH')=='x86':
     env.Command('qemu', 'duck.img','qemu-system-i386 -rtc base=localtime -boot a -S -s -fda image/duck.img -serial stdio -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor  -D ./qemu.log  -drive id=disk,file=image/disk.img,format=raw,if=none -device ahci,id=ahci -device ide-hd,drive=disk,bus=ahci.0 -soundhw sb16')
   elif env.get('ARCH')=='arm':
-    env.Command('qemu', 'duck.img','qemu-system-arm -M raspi2   -rtc base=localtime   -S -s -kernel image/duck.img  -serial stdio -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor  -D ./qemu.log -d in_asm,int,mmu') #-d in_asm
+    env.Command('qemu', 'duck.img','qemu-system-arm -M raspi2   -rtc base=localtime   -S -s -kernel image/duck.img  -serial stdio -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor  -D ./qemu.log ') #-d in_asm -d in_asm,int,mmu
     #versatilepb -machine raspi2 -device ahci,id=ahci -device ide-drive,drive=disk,bus=ahci.0  -append "console=ttyAMA0" 
 elif env.get('run')=='v3s':
   build_duck_fit()

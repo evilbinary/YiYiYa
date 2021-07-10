@@ -1,7 +1,13 @@
 #ifndef GPIO_H
 #define GPIO_H
 
-#define MMIO_BASE       0x3F000000
+#ifdef MODEL_1
+#define MMIO_BASE 0x20000000
+#else
+#define MMIO_BASE 0x3F000000
+#endif
+
+#define MMIO_LENGTH 0x01000000
 
 #define GPFSEL0         ((volatile unsigned int*)(MMIO_BASE+0x00200000))
 #define GPFSEL1         ((volatile unsigned int*)(MMIO_BASE+0x00200004))
@@ -31,5 +37,9 @@
 #define UART0_CR        ((volatile unsigned int*)(MMIO_BASE+0x00201030))
 #define UART0_IMSC      ((volatile unsigned int*)(MMIO_BASE+0x00201038))
 #define UART0_ICR       ((volatile unsigned int*)(MMIO_BASE+0x00201044))
+
+
+#define CORE0_TIMER_IRQCNTL 0x40000040
+#define CORE0_IRQ_SOURCE 0x40000060
 
 #endif

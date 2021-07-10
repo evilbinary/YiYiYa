@@ -9,9 +9,6 @@
 #include "arch/boot.h"
 #include "libs/include/types.h"
 
-#define CORE0_TIMER_IRQCNTL 0x40000040
-#define CORE0_IRQ_SOURCE 0x40000060
-
 typedef u32* page_dir_t;
 
 #define debugger
@@ -50,22 +47,14 @@ typedef struct cpsr {
   };
 } __attribute__((packed)) cpsr_t;
 
-#define sys_fn_call(duck_interrupt_context, fn)
-// \
-  // asm volatile(                                                             \
-  //     " \
-  //     push %1; \
-  //     push %2; \
-  //     push %3; \
-  //     push %4; \
-  //     push %5; \
-  //     call *%6; \
-  //     add $20,%%esp; \
-  //   "                                                                   \
-  //     : "=a"(duck_interrupt_context->eax)                                   \
-  //     : "r"(duck_interrupt_context->edi), "r"(duck_interrupt_context->esi), \
-  //       "r"(duck_interrupt_context->edx), "r"(duck_interrupt_context->ecx), \
-  //       "r"(duck_interrupt_context->ebx), "r"(fn))
+typedef u32 (*sys_call_fn)(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5,
+                           u32 arg6);
+
+#define sys_fn_call(duck_interrupt_context, fn)                               \
+  duck_interrupt_context->r0 = ((                                             \
+      sys_call_fn)fn)(duck_interrupt_context->r0, duck_interrupt_context->r1, \
+                      duck_interrupt_context->r2, duck_interrupt_context->r3, \
+                      duck_interrupt_context->r4, duck_interrupt_context->r5);
 
 #define cpu_cli() asm("cpsid i" : : : "memory", "cc")
 #define cpu_sti() asm("cpsie i" : : : "memory", "cc")
@@ -74,9 +63,12 @@ typedef struct cpsr {
 #define context_switch_page( \
     page_dir)  // asm volatile("mov %0, %%cr3" : : "r" (page_dir))
 
-#define context_r0(context) context->r0
+#define context_fn(context) context->r7
+#define context_ret(context) context->r0
 
-#define context_restore(duck_context) cpu_sti();interrupt_exit_context(duck_context);
+#define context_restore(duck_context) \
+  cpu_sti();                          \
+  interrupt_exit_context(duck_context);
 
 #define isb() asm volatile("isb")
 #define dsb() asm volatile("dsb")

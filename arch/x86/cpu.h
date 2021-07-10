@@ -44,7 +44,9 @@ typedef struct context_t {
 #define cpu_cpl() (cpu_get_cs()&0x3)
 
 #define context_switch_page(page_dir) asm volatile("mov %0, %%cr3" : : "r" (page_dir))
-#define context_r0(context) context->eax
+
+#define context_fn(context) context->eax
+#define context_ret(context) context->eax
 
 #define context_restore(duck_context) interrupt_exit_context(duck_context)
 
