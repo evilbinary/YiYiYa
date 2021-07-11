@@ -12,7 +12,7 @@ Import('env')
 
 linkflags=' $LINKFLAGS -T'+env.get('LINKLD')
 
-env.Program('kernel.elf', [
+kernel=[
     'main.c',
     'shell.c',
     'serial.c',
@@ -22,9 +22,13 @@ env.Program('kernel.elf', [
     '../platform/libplatform.a',
     '../libs/libalgorithm/libalgorithm.a',
     '../libs/libkernel/libkernel.a',
-    env.get('MYLIB')
-    ],
-    LINKFLAGS = linkflags)
+    
+    ]
+
+if env.get('MYLIB'):
+    kernel=kernel+env.get('MYLIB')
+
+env.Program('kernel.elf',kernel,LINKFLAGS = linkflags)
 
 env.Objcopy('kernel','kernel.elf',OBJCOPYFLAGS='-S')
 env.Objcopy('kernel.dbg','kernel.elf',OBJCOPYFLAGS='--only-keep-debug')
