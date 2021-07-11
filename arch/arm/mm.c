@@ -82,7 +82,7 @@ void mm_init() {
   //map gpio
   address=boot_info->kernel_entry;
   int i;
-  for(i=0;i< (boot_info->kernel_size/0x1000+2);i++){
+  for(i=0;i< (((u32)boot_info->kernel_size)/0x1000+2);i++){
     map_page(address,address,0);
     address+=0x1000;
   }
