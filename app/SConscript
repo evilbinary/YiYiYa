@@ -21,12 +21,11 @@ kernel=[
     '../arch/libarch.a',
     '../platform/libplatform.a',
     '../libs/libalgorithm/libalgorithm.a',
-    '../libs/libkernel/libkernel.a',
-    
+    '../libs/libkernel/libkernel.a'
     ]
 
 if env.get('MYLIB'):
-    kernel=kernel+env.get('MYLIB')
+    kernel.append(env.get('MYLIB'))
 
 env.Program('kernel.elf',kernel,LINKFLAGS = linkflags)
 
