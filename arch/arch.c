@@ -1,15 +1,16 @@
 /*******************************************************************
-* Copyright 2021-2080 evilbinary
-* 作者: evilbinary on 01/01/20
-* 邮箱: rootdebug@163.com
-********************************************************************/
+ * Copyright 2021-2080 evilbinary
+ * 作者: evilbinary on 01/01/20
+ * 邮箱: rootdebug@163.com
+ ********************************************************************/
 #include "arch.h"
 
-boot_info_t* boot_info;
+boot_info_t* boot_info = NULL;
 extern u32 write_channel_number;
 
-void arch_init(boot_info_t* boot){
-    write_channel_number=0;
+void arch_init(boot_info_t* boot) {
+  if (boot_info == NULL) {
+    write_channel_number = 0;
     platform_init();
     io_add_write_channel(putch);
     boot_info = boot;
@@ -17,4 +18,7 @@ void arch_init(boot_info_t* boot){
     mm_init();
     interrupt_init();
     cpu_init();
+  } else {
+    for (;;){}
+  }
 }

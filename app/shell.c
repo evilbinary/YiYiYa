@@ -28,7 +28,7 @@ void do_shell_thread(void) {
   u8 alt_p = 0;
   u32 col = 0;
   u32 row = 0;
-  // syscall1(SYS_PRINT, "#");
+  syscall1(SYS_PRINT, "#");
   // syscall1(SYS_PRINT, "#1");
 
   // move_cursor();
@@ -38,7 +38,7 @@ void do_shell_thread(void) {
   // syscall2(SYS_EXEC,"/dev/sda/hello.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/gui.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/file.elf",NULL);
-  // syscall2(SYS_EXEC,"/dev/sda/etk.elf",NULL);
+  syscall2(SYS_EXEC,"/dev/sda/etk.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/test.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/microui.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/lvgl",NULL);
@@ -47,7 +47,7 @@ void do_shell_thread(void) {
   for (;;) {
     int ret = 0;
     // kprintf("A%d ",count++);
-    syscall1(SYS_PRINT, "1");
+    // syscall1(SYS_PRINT, "1");
     // read key
     // ret = syscall3(SYS_READ,fd, &scan_code, 1);
     // if (ret >= 1) {
