@@ -98,12 +98,13 @@ void mm_init() {
     map_page(address,address,0);
     address+=0x1000;
   }
-  map_page(0x01c20000,0x01c20000,0);
-  map_page(0x01c28000,0x01c28000,0);
+  map_page(0x01C20000,0x01C20000,0);
+  map_page(0x01C28000,0x01C28000,0);
+  //timer
   map_page(0x01C20C00,0x01C20C00,0);
   //gic
-  map_page(0x1c81000,0x1c81000,0);
-  map_page(0x1c82000,0x1c82000,0);
+  map_page(0x01C81000,0x01C81000,0);
+  map_page(0x01C82000,0x01C82000,0);
   
 #endif
 

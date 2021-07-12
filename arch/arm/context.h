@@ -8,11 +8,7 @@
 
 #include "arch/boot.h"
 #include "libs/include/types.h"
-
-#define ISR_TIMER 0x0f
-#define ISR_KEYBOARD 0x21
-#define ISR_SYSCALL 2
-#define ISR_MOUSE 0x2c
+#include "platform/platform.h"
 
 #define IDT_NUMBER 256
 
