@@ -9,12 +9,23 @@ import os
 Import('env')
 
 plt=env['PLATFORM']
+
+src=[]
+
 if plt:
     env['CFLAGS']= """%s -Iplatform/%s  """%(env['CFLAGS'],plt)
-    env.Library('platform', [
-        plt+'/init.c',
-        # plt+'/gic.c',
-        # plt+'/timer.c',
-        # plt+'/sys-dram.c',
-        # plt+'/sys-clock.c'
-        ],)
+    if plt=='v3s':
+        src=[
+            plt+'/init.c',
+            plt+'/gic.c',
+            plt+'/timer.c',
+        ]
+        env.Library('platform', src)
+    else:
+        env.Library('platform', [
+            plt+'/init.c',
+            # plt+'/gic.c',
+            # plt+'/timer.c',
+            # plt+'/sys-dram.c',
+            # plt+'/sys-clock.c'
+            ],)

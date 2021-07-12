@@ -38,7 +38,7 @@ env = Environment(
         ARCH=arch,
         PLATFORM=platform,
         LINKLD='link.ld',
-        MYLIB=' '
+        MYLIB=None
         )
 
 if plt=='Linux':
