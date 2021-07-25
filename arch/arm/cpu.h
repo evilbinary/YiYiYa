@@ -67,7 +67,6 @@ typedef u32 (*sys_call_fn)(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5,
 #define context_ret(context) context->r0
 
 #define context_restore(duck_context) \
-  cpu_sti();                          \
   interrupt_exit_context(duck_context);
 
 #define isb() asm volatile("isb")

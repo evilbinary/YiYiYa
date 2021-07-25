@@ -8,6 +8,7 @@
 #ifdef ARM 
 
 extern module_t gpu_module;
+extern module_t devfs_module;
 
 #elif defined(X86)
 extern module_t keyboard_module;
@@ -44,7 +45,8 @@ int kmain(int argc, char* argv[]) {
   kprintf("module regist\n");
 
 #ifdef ARM 
-  // module_regist(&gpu_module);
+  module_regist(&gpu_module);
+  module_regist(&devfs_module);
 
 #elif defined(X86)
   module_regist(&pci_module);

@@ -12,22 +12,29 @@ Import('env')
 
 linkflags=' $LINKFLAGS -T'+env.get('LINKLD')
 
-kernel=[
-    'main.c',
-    'shell.c',
-    'serial.c',
-    '../drivers/libdriver.a',
+libs=[
+     '../drivers/libdriver.a',
     '../kernel/libyiyiya.a',
     '../arch/libarch.a',
     '../platform/libplatform.a',
     '../libs/libalgorithm/libalgorithm.a',
     '../libs/libkernel/libkernel.a'
+]
+
+kernel=[
+    'main.c',
+    'shell.c',
+    'serial.c',
     ]
 
-if env.get('MYLIB'):
-    kernel.append(env.get('MYLIB'))
+if env.get('PLATFORM')=='v3s':
+    libs.append('../app/libgui/libgui.a')
+    libs.append('../libs/libc/libc.a')
 
-env.Program('kernel.elf',kernel,LINKFLAGS = linkflags)
+if env.get('MYLIB'):
+    libs.append(env.get('MYLIB'))
+
+env.Program('kernel.elf',kernel+libs,LINKFLAGS = linkflags)
 
 env.Objcopy('kernel','kernel.elf',OBJCOPYFLAGS='-S')
 env.Objcopy('kernel.dbg','kernel.elf',OBJCOPYFLAGS='--only-keep-debug')

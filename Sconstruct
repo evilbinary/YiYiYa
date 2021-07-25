@@ -54,7 +54,7 @@ if plt=='Linux':
     pass
 elif plt=='Darwin':
     if arch =='arm':
-        env['APP']=False
+        env['APP']=True
         env['AS']='/opt/local/bin/arm-none-eabi-as'
         env['CC']='/opt/local/bin/arm-none-eabi-gcc'
         env['LD']='/opt/local/bin/arm-none-eabi-ld'

@@ -5,7 +5,7 @@
 
 int timer_count;
 
-struct h3_timer {
+struct v3s_timer {
   volatile unsigned int irq_ena;    /* 00 */
   volatile unsigned int irq_status; /* 04 */
   int __pad1[2];
@@ -18,7 +18,7 @@ struct h3_timer {
   volatile unsigned int t1_cval; /* 28 */
 };
 
-#define TIMER_BASE ((struct h3_timer *)0x01c20c00)
+#define TIMER_BASE ((struct v3s_timer *)0x01c20c00)
 
 #define CTL_ENABLE 0x01
 #define CTL_RELOAD 0x02 /* reload ival */
@@ -131,10 +131,9 @@ void ms_delay(int ms) {
 }
 
 void timer_init2(int hz) {
-  struct h3_timer *hp = TIMER_BASE;
-
-  // hp->t0_ival = 0x00100000;
-  // hp->t0_ival = 0x80000000;
+  struct v3s_timer *hp = TIMER_BASE;
+  // hp->t0_ival = 0x000010;
+  // hp->t0_ival = 0x800000000;
   hp->t0_ival = CLOCK_24M / hz;
 
   hp->t0_ctrl = 0; /* stop the timer */
@@ -155,7 +154,7 @@ void timer_init2(int hz) {
 
 /* One shot, delay in milliseconds */
 void timer_one(int delay) {
-  struct h3_timer *hp = TIMER_BASE;
+  struct v3s_timer *hp = TIMER_BASE;
 
   hp->t0_ival = CLOCK_24M_MS * delay;
 
@@ -170,8 +169,7 @@ void timer_one(int delay) {
 }
 
 void timer_ack(void) {
-  struct h3_timer *hp = TIMER_BASE;
-
+  struct v3s_timer *hp = TIMER_BASE;
   hp->irq_status = IE_T0;
 }
 
@@ -179,10 +177,11 @@ void timer_ack(void) {
 void timer_handler(int junk) {
   timer_count++;
   timer_ack();
+  // kprintf("timer_handler %d\n",timer_count);
 }
 
 void timer_watch(void) {
-  struct h3_timer *hp = TIMER_BASE;
+  struct v3s_timer *hp = TIMER_BASE;
   int val;
   int last;
   int del;

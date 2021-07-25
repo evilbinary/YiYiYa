@@ -45,7 +45,7 @@ int keyboard_init(void) {
   dev->id = DEVICE_KEYBOARD;
   dev->type=DEVICE_TYPE_CHAR;
   dev->data=scan_code_buffer;
-  memset(scan_code_buffer,0,MAX_CHARCODE_BUFFER);
+  kmemset(scan_code_buffer,0,MAX_CHARCODE_BUFFER);
   device_add(dev);
   scan_code_index=0;
 

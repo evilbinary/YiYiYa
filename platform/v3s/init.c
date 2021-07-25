@@ -26,23 +26,21 @@ void uart_send(unsigned int c) {
 extern int timer_count;
 
 void timer_init(int hz) {
-  kprintf("timer init\n");
-  // ccnt_enable(0);
-  // ccnt_reset();
-  gic_init();
-  timer_init2(hz);
+  kprintf("timer init %d\n",hz);
   timer_count = 0;
-  asm("cpsid i" : : : "memory", "cc");
-  // asm("mrs	r0, cpsr\n"
-  //     "bic	r0, r0, #0x80\n"
-  //     "msr	cpsr, r0\n");
+  ccnt_enable(0);
+  ccnt_reset();
+  timer_init2(hz);
+  gic_init();
+
   // timer_watch();
-  gic_watch();
+  // gic_watch();
+  // gic_poll();
 }
 
 void timer_end() {
-  kprintf("timer end\n");
-  timer_handler();
+  // kprintf("timer end %d\n",timer_count);
+  gic_handler();
 }
 
 void platform_init() {

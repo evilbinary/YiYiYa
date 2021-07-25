@@ -79,9 +79,9 @@ void scroll(void) {
   blank = 0x20 | (attrib << 8);
   if (screen_y >= screen_height) {
     temp = screen_y - screen_height + 1;
-    memcpy(video_addr, video_addr + temp * screen_width,
+    kmemcpy(video_addr, video_addr + temp * screen_width,
            (screen_height - temp) * screen_width * 2);
-    memset(video_addr + (screen_height - temp) * screen_width, blank,
+    kmemset(video_addr + (screen_height - temp) * screen_width, blank,
            screen_width);
     screen_y = screen_height - 1;
   }

@@ -1,10 +1,14 @@
 #ifndef GPIO_H
 #define GPIO_H
 
-#ifdef MODEL_1
+#if defined(RASPI_Z_W)
 #define MMIO_BASE 0x20000000
-#else
+#elif defined(RASPI2)
 #define MMIO_BASE 0x3F000000
+#elif defined(RASPI3)
+#define MMIO_BASE 0x3F000000
+#elif defined(RASPI4)
+#define MMIO_BASE 0xFE000000
 #endif
 
 #define MMIO_LENGTH 0x01000000

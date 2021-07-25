@@ -8,7 +8,7 @@ import os
 
 Import('env')
 
-env.Program('gui.elf', [
+source=[
     'main.c',
     '../libgui/libgui.a',
     '../libgui/libimage.a',
@@ -18,7 +18,12 @@ env.Program('gui.elf', [
     '../../libs/libc/libc.a',
     '../../libs/libalgorithm/libalgorithm.a',
 
-    ],
+    ]
+
+if env.get('MYLIB'):
+    source.append(env.get('MYLIB'))
+
+env.Program('gui.elf', source,
     CFLAGS='$CFLAGS -Ilibs/include/c/ -Iapp/libgui/ -Iapp/libjpeg',
     LINKFLAGS= '$LINKFLAGS --entry main -Tuser.ld')
 

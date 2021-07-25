@@ -5,43 +5,99 @@
  *
  * Tom Trebisky  1-4-2017
  */
-
-/* The H3 defines 157 interrupts (0-156)
- * We treat this as 160, more or less
- */
-#define NUM_IRQ 157
+#include "libs/include/types.h"
 
 #define IRQ_UART0 32
 #define IRQ_TIMER0 50
 #define IRQ_ETHER 114
 
-#define NUM_CONFIG 64
-#define NUM_TARGET 255 * sizeof(int)
-#define NUM_PRIO 255 * sizeof(int)
+#define NUM_CONFIG 32
+#define NUM_TARGET 512
+#define NUM_PRIO 512
 #define NUM_MASK 32
 
+#ifdef __cplusplus
+#define __I volatile  ///< defines 'read only' permissions
+#else
+#define __I volatile const  ///< defines 'read only' permissions
+#endif
+#define __O volatile   ///< defines 'write only' permissions
+#define __IO volatile  ///< defines 'read / write' permissions
+
 struct v3s_gic_dist {
-  volatile unsigned int ctl;         // 0x000
-  volatile const unsigned int type;  // 0x004
-  volatile const unsigned int iid;   // 0x008
-  volatile unsigned int _res0[29];
-  volatile unsigned int igroup[32];  // 0x080
-  volatile unsigned int isenable[32];
-  volatile unsigned int icenable[32];
-  volatile unsigned int ispend[32];
-  volatile unsigned int icpend[32];
-  volatile unsigned int isactive[32];
-  volatile unsigned int icactive[32];
-  volatile unsigned char ipriority[256 * sizeof(int)];
-  volatile unsigned char istargets[256 * sizeof(int)];
-  volatile unsigned int icfg[64];
-  volatile const unsigned int ppis;
-  volatile unsigned int spis[127];
-  volatile unsigned int sgi;
-  volatile unsigned int cpendsgi[4];
-  volatile unsigned int spendsgi[4];
-  volatile const unsigned int pid[8];
-  volatile const unsigned int cid[4];
+  __IO uint32_t ctl;  ///< 0x000 Distributor Control Register
+  __I uint32_t type;  ///< 0x004 Interrupt Controller Type Register
+  __I uint32_t iid;   ///< 0x008 Distributor Implementer Identification Register
+  __IO uint32_t RES1[5];       ///< 0x00C-0x01C Reserved
+  __IO uint32_t IMP1[8];       ///< 0x020-0x03C IMPLEMENTATION DEFINED registers
+  __IO uint32_t RES2[16];      ///< 0x040-0x07C Reserved
+  __IO uint32_t igroup[16];    ///< 0x080 Interrupt Group Registers
+  __IO uint32_t RES3[16];      ///< 0x080-0x0FC Reserved
+  __IO uint32_t isenable[16];  ///< 0x100 Interrupt Set-Enable Registers
+  __IO uint32_t RES4[16];      ///< Reserved
+  __IO uint32_t icenable[16];  ///< 0x180 Interrupt Clear-Enable Registers
+  __IO uint32_t RES5[16];      ///< Reserved
+  __IO uint32_t ispend[16];    ///< 0x200 Interrupt Set-Pending Registers
+  __IO uint32_t RES6[16];      ///< Reserved
+  __IO uint32_t icpend[16];    ///< 0x280 Interrupt Clear-Pending Registers
+  __IO uint32_t RES7[16];      ///< Reserved
+  __IO uint32_t isactive[16];  ///< 0x300 GICv2 Interrupt Set-Active Registers
+  __IO uint32_t RES8[16];      ///< Reserved
+  __IO uint32_t icactive[16];  ///< 0x380 Interrupt Clear-Active Registers
+  __IO uint32_t RES9[16];      ///< Reserved
+  __IO uint32_t ipriority[128];  ///< 0x400 Interrupt Priority Registers
+  __IO uint32_t RES10[128];      ///< Reserved
+  __IO uint32_t itargets[128];  ///< 0x800 Interrupt Processor Targets Registers
+  __IO uint32_t RES11[128];     ///< Reserved
+  __IO uint32_t icfg[32];       ///< 0xC00 Interrupt Configuration Registers
+  __IO uint32_t RES12[96];      ///< Reserved
+  __IO uint32_t
+      nsac[64];      ///< 0xE00 Non-secure Access Control Registers, optional
+  __O uint32_t sgi;  ///< 0xF00 Software Generated Interrupt Register
+  __IO uint32_t RES13[3];     ///< Reserved
+  __IO uint32_t cpendsgi[4];  ///< 0xF10 SGI Clear-Pending Registers
+  __IO uint32_t spendsgi[4];  ///< 0xF20 SGI Set-Pending Registers
+  __IO uint32_t RES14[40];    ///< Reserved
+  __I uint32_t PID4;          ///< Peripheral ID 4 Register
+  __I uint32_t PID5;          ///< Peripheral ID 5 Register
+  __I uint32_t PID6;          ///< Peripheral ID 6 Register
+  __I uint32_t PID7;          ///< Peripheral ID 7 Register
+  __I uint32_t PID0;          ///< Peripheral ID 0 Register
+  __I uint32_t PID1;          ///< Peripheral ID 1 Register
+  __I uint32_t PID2;          ///< Peripheral ID 2 Register [7:4] 0x2 for GICv2
+  __I uint32_t PID3;          ///< Peripheral ID 3 Register
+  __I uint32_t
+      iccid[4];  ///< 0xFF0 Component ID Registers -> 0x00, 0xF0, 0x05, 0xB1
+  __I uint32_t
+      icpid[2];  ///< 0xFF0 Peripheral ID Registers -> 0x90, 0xB4 -> ARM GICv2
+
+  // volatile unsigned int ctl;         // 0x000
+  // volatile const unsigned int type;  // 0x004
+  // volatile const unsigned int iid;   // 0x008
+  // volatile unsigned int _res0[29];
+  // volatile unsigned int igroup[32];  // 0x080
+  // volatile unsigned int isenable[32];
+  // volatile unsigned int icenable[32];
+  // volatile unsigned int ispend[32];
+  // volatile unsigned int icpend[32];
+  // volatile unsigned int isactive[32];
+  // volatile unsigned int icactive[32];
+  // volatile unsigned char ipriority[512];
+  // volatile unsigned int _res1[128];
+  // volatile unsigned char itargets[512];
+  // volatile unsigned int _res2[128];
+  // volatile unsigned int icfg[32];
+  // volatile unsigned int _res3[32];
+  // volatile const unsigned int ppis;
+  // volatile unsigned int spis[15];
+  // volatile unsigned int _res4[112];
+  // volatile unsigned int sgi;
+  // volatile unsigned int _res5[3];
+  // volatile unsigned char cpendsgi[16];
+  // volatile unsigned char spendsgi[16];
+  // volatile unsigned int _res6[40];
+  // volatile const unsigned int pid[8];
+  // volatile const unsigned int cid[4];
 };
 
 struct v3s_gic_cpu {
@@ -56,13 +112,13 @@ struct v3s_gic_cpu {
   volatile const unsigned int aia;
   volatile unsigned int aeoi;
   volatile const unsigned int ahppi;
-  volatile unsigned int _res0[(0xD0 - 0x2C) / sizeof(unsigned int)];
+  volatile unsigned int _res1[41];
   volatile unsigned int ap;
-  volatile unsigned int _res1[(0xE0 - 0xD4) / sizeof(unsigned int)];
+  volatile unsigned int _res2[3];
   volatile unsigned int nasp;
-  volatile unsigned int _res2[(0xFC - 0xE4) / sizeof(unsigned int)];
+  volatile unsigned int _res3[6];
   volatile const unsigned int iid;
-  volatile unsigned int _res3[(0x1000 - 0x100) / sizeof(unsigned int)];
+  volatile unsigned int _res4[960];
   volatile unsigned int dir;
 };
 
@@ -109,33 +165,29 @@ void gic_unpend(int irq) {
   struct v3s_gic_dist *gp = GIC_DIST_BASE;
   int x = irq / 32;
   unsigned long mask = 1 << (irq % 32);
-
   gp->icpend[x] = mask;
 }
 
 void gic_handler(void) {
+  struct v3s_gic_dist *gp = GIC_DIST_BASE;
   struct v3s_gic_cpu *cp = GIC_CPU_BASE;
   int irq;
-
   irq = cp->ia;
-
-  /* Do we need to EOI the spurious ? */
   if (irq == 1023) {
     uart_send('X');
-    uart_send('\n');
-    // return;
+    return;
+  }
+  if (gp->ispend[1] & TIMER_MASK) {
+    // kprintf("GIC iack = %x\n", irq);
+
+    if (irq == IRQ_TIMER0) {
+      timer_handler(0);
+    }
+    cp->eoi = irq;
+    gic_unpend(IRQ_TIMER0);
   }
 
-  if (irq == IRQ_TIMER0) timer_handler(0);
-
-  cp->eoi = irq;
-  gic_unpend(IRQ_TIMER0);
-
-  // uart_putc ( '.' );
-  // uart_putc ( '\n' );
-
-  kprintf("GIC iack = %08x\n", irq);
-  // ms_delay ( 200 );
+  // ms_delay ( 5 );
 }
 
 int gic_irqwho(void) {
@@ -157,7 +209,7 @@ void gic_init(void) {
   unsigned long *p;
   int i;
 
-  p = (unsigned long *)&gp->istargets;
+  p = (unsigned long *)&gp->itargets;
   // targets=0x1c81800
   kprintf("GIC target = %x\n", p);
   p = (unsigned long *)&gp->icfg;
@@ -168,79 +220,65 @@ void gic_init(void) {
   kprintf("GIC soft = %x\n", p);
 
   // iid=0x1c81008
-  kprintf("GIC iid = %x\n", &gp->iid);
+  kprintf("GIC iid = %x %x\n", &gp->iid, gp->iid);
 
-  // int irq_id = IRQ_TIMER0;
-  // int cpu_id = 0;
+  // kprintf("GIC ipriority = %x\n", &gp->ipriority);
 
-  // unsigned int reg = irq_id / 32;
-  // unsigned int mask = 1 << (irq_id & 0x1f);
+  // kprintf("GIC itargets = %x\n", &gp->itargets);
 
-  // // init
-  // gp->ctl = 0;
+  // kprintf("GIC icfg = %x\n", &gp->icfg);
 
-  // //clear
-  // for (i = 0; i < 32; ++i) {
-  //   gp->icpend[i] = 0xffffffff;
-  // }
+  // kprintf("GIC ppis = %x\n", &gp->ppis);
+  // kprintf("GIC spis = %x\n", &gp->spis);
 
-  // for (i = 0; i < 8; ++i) {
-  //   gp->igroup[i] = 0;
-  // }
+  // kprintf("GIC cpendsgi = %x\n", &gp->cpendsgi);
+  // kprintf("GIC spendsgi = %x\n", &gp->spendsgi);
+  // kprintf("GIC pid = %x\n", &gp->pid);
 
-  // // set priority
-  // gp->ipriority[irq_id] = 0;
+  // kprintf("GIC cid = %x\n", &gp->cid);
 
-  // // set security
-  // unsigned int value = gp->igroup[reg];
+  // kprintf("GIC ap = %x\n", &cp->ap);
+  // kprintf("GIC nasp = %x\n", &cp->nasp);
+  // kprintf("GIC iid = %x\n", &cp->iid);
+  // kprintf("GIC dir = %x\n", &cp->dir);
 
-  // value &= ~mask;
-  // gp->igroup[reg] = value;
+  int irq_id = IRQ_TIMER0;
+  int cpu_id = 0;
 
-  // // set cpu target
-  // gp->istargets[irq_id] |= (1 << cpu_id) & 0xff;
+  unsigned int reg = irq_id / 32;
+  unsigned int mask = 1 << (irq_id & 0x1f);
 
-  // // enable irq
-  // gic_enable(IRQ_TIMER0);
-
-  // gp->ctl |= G0_ENABLE|G1_ENABLE;
-
-  // cp->pm=0xff;
-  // cp->bp=7;
-  // cp->ctl|= G0_ENABLE|G1_ENABLE;
-
-  // /* Initialize the distributor */
+  // init
   gp->ctl = 0;
 
-  /* make all SPI level triggered */
-  for (i = 2; i < NUM_CONFIG; i++) gp->icfg[i] = 0;
+  // clear
+  for (i = 0; i < 32; ++i) {
+    gp->icpend[i] = 0xffffffff;
+  }
 
-  for (i = 8; i < NUM_TARGET; i++) gp->istargets[i] = 0x01010101;
+  for (i = 0; i < 8; ++i) {
+    gp->igroup[i] = 0;
+  }
 
-  for (i = 8; i < NUM_PRIO; i++) gp->ipriority[i] = 0xa0a0a0a0;
+  // set priority
+  gp->ipriority[irq_id] = 0;
 
-  for (i = 1; i < NUM_MASK; i++) gp->icenable[i] = 0xffffffff;
+  // set security
+  unsigned int value = gp->igroup[reg];
 
-  for (i = 0; i < NUM_MASK; i++) gp->icpend[i] = 0xffffffff;
+  value &= ~mask;
+  gp->igroup[reg] = value;
 
+  // set cpu target
+  gp->itargets[irq_id] |= (1 << cpu_id) & 0xff;
+
+  // enable irq
   gic_enable(IRQ_TIMER0);
-
-  gp->ctl = G0_ENABLE | G1_ENABLE;
-
-  /* ** now initialize the per CPU stuff.
-   *  XXX - the following will need to be done by each CPU
-   *  when we get multiple cores running.
-   */
-
-  /* enable all SGI, disable all PPI */
-  gp->icenable[0] = 0xffff0000;
-  gp->isenable[0] = 0x0000ffff;
-
-  /* priority for PPI and SGI */
-  for (i = 0; i < 8; i++) gp->ipriority[i] = 0xa0a0a0a0;
+  gp->ctl = G0_ENABLE;
 
   cp->pm = 0xff;
-  cp->ctl = G0_ENABLE | G1_ENABLE;
+  cp->bp = 0x7;
+  cp->ctl = G0_ENABLE;
 }
 
 void gic_check(void) {

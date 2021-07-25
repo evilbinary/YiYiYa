@@ -10,15 +10,20 @@ Import('env')
 
 
 driver=[]
+gpu=['gpu/bcm2836.c',
+        'gpu/gpu.c',
+        'gpu/mailbox.c'
+        ]
 if env['ARCH']=='arm':
+    if env['PLATFORM']=='v3s':
+        gpu=['gpu/v3s.c',
+            'gpu/gpu.c',]
+
     driver=[
         'hello/hello.c',
         'dev/devfs.c',
-        'pty/pty.c',
-        'gpu/bcm2836.c',
-        'gpu/gpu.c',
-        'gpu/mailbox.c'
-    ]
+        'pty/pty.c'
+    ]+gpu
 elif env['ARCH']=='x86':
     driver=['pci.c',
     'pic.c',
@@ -44,10 +49,18 @@ elif env['ARCH']=='x86':
 
     'sound/sb16.c',]
 
-env.Library('driver', driver+[
+
+
+
+source=driver+[
     '../kernel/libyiyiya.a',
     '../arch/libarch.a',
     '../libs/libalgorithm/libalgorithm.a',
     '../libs/libkernel/libkernel.a'
-    ],
+    ]
+
+if env.get('MYLIB'):
+    source.append(env.get('MYLIB'))
+
+env.Library('driver', source,
     CFLAGS='$CFLAGS -Idrivers')

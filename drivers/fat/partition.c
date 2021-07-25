@@ -97,7 +97,7 @@ struct partition_struct* partition_open(device_read_t device_read, device_read_i
         return 0;
 #endif
 
-    memset(new_partition, 0, sizeof(*new_partition));
+    kmemset(new_partition, 0, sizeof(*new_partition));
 
     /* fill partition descriptor */
     new_partition->device_read = device_read;

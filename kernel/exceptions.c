@@ -28,8 +28,13 @@ void exception_info(interrupt_context_t *context) {
   } else {
     kprintf("EXCEPTION %d:\n=======================\n", context->no);
   }
-  kprintf("dfsr:%x dfar:%x\n", read_dfsr(), read_dfar());
-  kprintf("lr:%x psr:%x\n", context->lr, context->psr);
+  thread_t *current = thread_current();
+  if (current != NULL) {
+    kprintf("tid:%d\n", current->id);
+  }
+  kprintf("ifsr:%x dfsr:%x dfar:%x\n",read_ifsr(), read_dfsr(), read_dfar());
+  kprintf("pc:%x lr:%x cpsr:%x\n",read_pc(), context->lr, context->psr);
+  kprintf("sp:%x\n", context->sp);
   kprintf("r1:%x\n", context->r1);
   kprintf("r2:%x\n", context->r2);
   kprintf("r3:%x\n", context->r3);
@@ -42,12 +47,7 @@ void exception_info(interrupt_context_t *context) {
   kprintf("r10:%x\n", context->r10);
   kprintf("r11:%x\n", context->r11);
   kprintf("r12:%x\n", context->r12);
-  kprintf("pc:%x\n", read_pc());
-  kprintf("ifsr:%x\n", read_ifsr());
-  thread_t *current = thread_current();
-  if (current != NULL) {
-    kprintf("tid:%d\n", current->id);
-  }
+
 #elif defined(X86)
   static const char *exception_msg[] = {
       "DIVIDE ERROR",      "DEBUG EXCEPTION",

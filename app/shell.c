@@ -29,7 +29,6 @@ void do_shell_thread(void) {
   u32 col = 0;
   u32 row = 0;
   syscall1(SYS_PRINT, "#");
-  // syscall1(SYS_PRINT, "#1");
 
   // move_cursor();
   char buf[2] = {0};
@@ -46,8 +45,11 @@ void do_shell_thread(void) {
   int count=0;
   for (;;) {
     int ret = 0;
-    // kprintf("A%d ",count++);
+    // kprintf("A%d ",count);
     // syscall1(SYS_PRINT, "1");
+    // if(count%100==0){
+    //   syscall1(SYS_PRINT, "\n");
+    // }
     // read key
     // ret = syscall3(SYS_READ,fd, &scan_code, 1);
     // if (ret >= 1) {

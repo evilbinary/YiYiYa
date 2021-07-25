@@ -45,7 +45,7 @@ void kprintf(const char* format, ...) {
         case 'd':
         case 'u':
         case 'x':
-          itoa(buf, c, *((int*)arg++));
+          kitoa(buf, c, *((int*)arg++));
           p = buf;
           goto string;
           break;

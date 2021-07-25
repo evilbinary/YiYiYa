@@ -29,7 +29,7 @@
 #define L2_NG    (1<<11) //The not global bit
 
 #define L1_DESC      (L1_PAGE_TABLE |L1_PXN|L1_NS|L1_SBZ|L1_DOMAIN(0))
-#define L2_DESC      (L2_XN|L2_SMALL_PAGE|L2_NCNB|L2_AP_ACCESS|L2_AP_RW|L2_TEXT|L2_S|L2_NG)
+#define L2_DESC      (L2_XN|L2_SMALL_PAGE|L2_NCNB|L2_AP_ACCESS|L2_AP_RW|L2_S|L2_NG)
 
 
 static mem_block_t* block_alloc_head = NULL;
@@ -50,7 +50,7 @@ void map_page_on(page_dir_t* l1, u32 virtualaddr, u32 physaddr, u32 flags) {
   u32* l2=((u32)l1[l1_index])&0xFFFFFC00;
   if (l2 == NULL) {
     l2 = mm_alloc_zero_align(0x1000, 0x1000);
-    memset(l2,0,0x1000);
+    kmemset(l2,0,0x1000);
     l1[l1_index] = (((u32)l2)&0xFFFFFC00) | L1_DESC;
   }
   l2[l2_index] = (physaddr>>12)<<12| flags| L2_DESC;
@@ -71,21 +71,24 @@ void mm_init() {
   mm_alloc_init();
   mm_test();
   boot_info->pdt_base = page_dir;  
-  memset(page_dir,0,4096*4);
+  kmemset(page_dir,0,4096*4);
 
   u32 address=0;
+  kprintf("map %x - %x\n",address,0x1000*512);
   for(int j =0; j < 512 ; j++){
     map_page(address,address,0);
     address+=0x1000;
   }
-  kprintf("map gpio\n");
-  //map gpio
+
   address=boot_info->kernel_entry;
+  kprintf("map kernel %x ",address);
   int i;
   for(i=0;i< (((u32)boot_info->kernel_size)/0x1000+2);i++){
-    map_page(address,address,0);
+    map_page(address,address,L2_TEXT);
     address+=0x1000;
   }
+  kprintf("- %x\n",address);
+  
   map_page(MMIO_BASE,MMIO_BASE,0);
   map_page(UART0_DR,UART0_DR,0);
   map_page(CORE0_TIMER_IRQCNTL,CORE0_TIMER_IRQCNTL,0);

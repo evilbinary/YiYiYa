@@ -185,8 +185,9 @@ void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
   }
 
   interrupt_context_t* user = stack0;
-  memset(user, 0, sizeof(interrupt_context_t));
-  user->lr = entry;
+  kmemset(user, 0, sizeof(interrupt_context_t));
+  user->lr = entry; //r14
+  user->lr +=4;
   user->psr = cpsr.val;
   user->r0 = 0;
   user->r1 = 0x00010001;
@@ -199,9 +200,10 @@ void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
   user->r8 = 0x00080008;
   user->r9 = 0x00090009;
   user->r10 = 0x00100010;
-  user->r11 = 0x00110011;
-  user->r12 = 0x00120012;
-  user->sp =stack3;
+  user->r11 = 0x00110011; //fp
+  user->r12 = 0x00120012; //ip
+  user->sp =stack3;       // r13
+  user->lr0=user->lr;
   context->esp = stack3;
   context->esp0 = stack0;
 }
@@ -211,27 +213,29 @@ void context_switch(interrupt_context_t* context, context_t** current,
   context_t* current_context = *current;
   interrupt_context_t* c=current_context->esp0;
 #if DEBUG
-   kprintf("\n=>ip:%x sp:%x lr:%x sp:%x irq=> lr:%x sp:%x\n",
+   kprintf("\n=>lr:%x sp:%x lr:%x sp:%x fp:%x irq=> lr:%x sp:%x fp:%x\n",
     current_context->eip,
     current_context->esp,
     c->lr,
     c->sp,
+    c->r11,
     context->lr,
-    context->sp
+    context->sp,
+    context->r11
     );
 #endif
     current_context->esp0 = context;
     current_context->esp = context->sp;
     current_context->eip=context->lr;
-    
     *current = next_context;
 #if DEBUG
     c=next_context->esp0;
-    kprintf("  ip:%x sp:%x lr:%x sp:%x\n",
+    kprintf("  lr:%x sp:%x irq=> lr:%x sp:%x  fp:%x\n",
       next_context->eip,
       next_context->esp,
        c->lr,
-       c->sp
+       c->sp,
+       c->r11
       );
 #endif
 }

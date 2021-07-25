@@ -27,7 +27,7 @@ u32 read_core0timer_pending(void) {
 void timer_init(int hz) {
   kprintf("timer init\n");
   cntfrq = read_cntfrq();
-  cntfrq=cntfrq/20;
+  cntfrq=cntfrq/hz;
   kprintf("cntfrq %d\n", cntfrq);
   write_cntv_tval(cntfrq);
 
@@ -40,7 +40,7 @@ void timer_init(int hz) {
 void timer_end() {
   if (read_core0timer_pending() & 0x08) {
     write_cntv_tval(cntfrq);
-    kprintf("cntfrq:%x cnt val:%x\n", read_cntvct(),read_cntv_tval());
+    // kprintf("cntfrq:%x cnt val:%x\n", read_cntvct(),read_cntv_tval());
     // cpu_sti();
   }
 }

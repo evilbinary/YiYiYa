@@ -16,7 +16,6 @@ typedef struct interrupt_context {
   // manual push
   u32 no;
   u32 code;
-  u32 sp;
 
   u32 psr;
 
@@ -31,33 +30,34 @@ typedef struct interrupt_context {
   u32 r8;
   u32 r9;
   u32 r10;
-  u32 r11;
-  u32 r12;
+  u32 r11;  // fp
+  u32 r12;  // ip
+  u32 lr0;
 
-  u32 lr;
+  u32 sp;  // sp
+  u32 lr;  // r14
+
 } __attribute__((packed)) interrupt_context_t;
 
 #define interrupt_process(X) \
   asm volatile(              \
-      "push {r0-r7} \n"      \
+      "push {r0-r12} \n"     \
       "blx " #X              \
       "\n"                   \
-      "pop {r0-r7}\n"        \
+      "pop {r0-r12}\n"       \
       :                      \
       :)
 
 #define interrupt_entering_code(VEC, CODE) \
   asm volatile(                            \
-      "stmdb sp!, {r0-r12,lr} \n"          \
+      "stmfd sp, {sp,lr}^ \n"              \
+      "sub sp,sp,#8\n"                     \
+      "stmfd sp!, {r0-r12,lr}\n"          \
       "mrs r0,spsr\n"                      \
-      "stmdb sp!, {r0} \n"                 \
-      "mrs r0,cpsr \n"                     \ 
-      "cps #0x1f \n  "                     \
-      "mov r3,sp \n"                       \
-      "msr cpsr,r0 \n"                     \ 
+      "stmfd sp!, {r0} \n"                 \
       "mov r1,%0\n"                        \
       "mov r2,%1\n"                        \
-      "stmdb sp!, {r1,r2,r3} \n"           \
+      "stmfd sp!, {r1,r2} \n"              \
       "mov r0,sp\n"                        \
       :                                    \
       : "i"(VEC), "i"(CODE))
@@ -65,32 +65,28 @@ typedef struct interrupt_context {
 #define interrupt_exit_context(duck_context) \
   asm volatile(                              \
       "ldr sp,%0 \n"                         \
-      "ldmia sp!,{r1,r2,r3}\n"               \
-      "mrs r0,cpsr \n"                       \ 
-      "cps #0x1f \n  "                       \
-      "mov sp, r3 \n"                        \
-      "msr cpsr,r0 \n"                       \ 
-      "ldmia sp!,{r0}\n"                     \
+      "ldmfd sp!,{r1,r2}\n"                  \
+      "ldmfd sp!,{r0}\n"                     \
       "msr spsr,r0\n"                        \
-      "ldmia sp!,{r0-r12,lr}\n"              \
-      "movs pc,lr\n"                         \
+      "ldmfd sp!,{r0-r12,lr}\n"              \
+      "ldmfd sp,{sp,lr}^\n"                  \
+      "add sp,sp,#8\n"                       \
+      "subs pc,lr,#4\n"                      \
       :                                      \
       : "m"(duck_context->esp0))
 
 #define interrupt_entering(VEC) interrupt_entering_code(VEC, 0)
 
-#define interrupt_exit()         \
-  asm volatile(                  \
-      "ldmia sp!,{r1,r2,r3}\n"   \
-      "mrs r0,cpsr \n"           \
-      "cps #0x1f \n  "           \
-      "mov sp, r3 \n"            \
-      "msr cpsr,r0 \n"          \ 
-      "ldmia sp!,{r0}\n"         \
-      "msr spsr,r0\n"            \
-      "ldmia sp!,{r0-r12,lr}\n" \
-      "movs pc,lr\n"             \
-      :                          \
+#define interrupt_exit()        \
+  asm volatile(                 \
+      "ldmfd sp!,{r1,r2}\n"     \
+      "ldmfd sp!,{r0}\n"        \
+      "msr spsr,r0\n"           \
+      "ldmfd sp!,{r0-r12,lr}\n" \
+      "ldmfd sp,{sp,lr}^\n"     \
+      "add sp,sp,#8\n"          \
+      "subs pc,lr,#0\n"         \
+      :                         \
       :)
 
 #endif

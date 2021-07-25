@@ -52,6 +52,7 @@ void schedule(interrupt_context_t* interrupt_context) {
   // kprintf("schedule next %d\n",next_thread->id);
   if (next_thread == NULL) {
     kprintf("schedule error next\n");
+    return;
   }
   prev_thread = current_thread;
   current_thread = next_thread;

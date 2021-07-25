@@ -67,7 +67,7 @@ size_t fat_write_bytes(vnode_t *node, u32 offset, size_t nbytes, u8 *buf) {
   u32 count = nbytes / BYTE_PER_SECTOR;
   u32 rest = nbytes % BYTE_PER_SECTOR;
   char small_buf[BYTE_PER_SECTOR * 2];
-  memset(small_buf, 0, BYTE_PER_SECTOR);
+  kmemset(small_buf, 0, BYTE_PER_SECTOR);
   u32 ret = 0;
   for (int i = 0; i < count; i++) {
     fat_device_read(node, offset, BYTE_PER_SECTOR, small_buf);
