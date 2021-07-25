@@ -8,7 +8,8 @@ import os
 
 Import('env')
 
-env.Library('etk', [
+
+source=[
     'etk_rect.c',
     'etk_stack.c',
     'etk_widget.c',
@@ -46,7 +47,12 @@ env.Library('etk', [
     '../libjpeg/libjpeg.a',
     '../libgui/libgui.a',
     '../../libs/libc/libc.a',
-    ],
+    ]
+
+if env.get('MYLIB'):
+    source.append(env.get('MYLIB'))
+
+env.Library('etk', source,
     CFLAGS='$CFLAGS -Ilibs/include/c/ -Iapp/libgui/ -Iapp/libjpeg/',)
 
 

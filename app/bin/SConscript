@@ -15,11 +15,16 @@ env = env.Clone(
   PATH= [os.environ['PATH'],'/opt/local/bin' ],
   )
 
-env.Program('ls', [
+source=[
     'ls.c',
     '../../libs/libc/libc.a',
     '../../libs/libalgorithm/libalgorithm.a',
-    ],
+    ]
+
+if env.get('MYLIB'):
+    source.append(env.get('MYLIB'))
+
+env.Program('ls', source,
     CFLAGS='$CFLAGS -Ilibs/include/c/ ',
     LINKFLAGS= '$LINKFLAGS --entry main -Tuser.ld')
 

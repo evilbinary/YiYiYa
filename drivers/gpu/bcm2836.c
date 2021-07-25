@@ -23,7 +23,7 @@ static uint32_t get_value_buffer_len(property_message_tag_t * tag) {
 static void write_pixel(vga_device_t* vga, uint32_t x, uint32_t y,
                  const pixel_t* pix) {
   uint8_t* location = vga->frambuffer + y * vga->bpp + x * BYTES_PER_PIXEL;
-  memcpy(location, pix, BYTES_PER_PIXEL);
+  kmemcpy(location, pix, BYTES_PER_PIXEL);
 }
 
 int bcm2836_init(vga_device_t* vga) {
@@ -113,7 +113,8 @@ int gpu_init_mode(vga_device_t* vga, int mode) {
   vga->mode = mode;
   vga->write = NULL;
 
-  map_page(MAILBOX_BASE, MAILBOX_BASE, 0);
+  kprintf("map box %x\n",MAILBOX_BASE&~0xfff);
+  map_page(MAILBOX_BASE&~0xfff, MAILBOX_BASE&~0xfff, 0);
 
   bcm2836_init(vga);
 

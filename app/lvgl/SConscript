@@ -8,8 +8,7 @@ import os
 
 Import('env')
 
-
-env.Program('lvgl', [
+source= [
     'lvgl.c',
     'lv_demo_widgets.c',
     'assets/img_lvgl_logo.c',
@@ -25,6 +24,11 @@ env.Program('lvgl', [
     '../../libs/libc/libc.a',
     '../../libs/libalgorithm/libalgorithm.a',
 
-    ],
+    ]
+    
+if env.get('MYLIB'):
+    source.append(env.get('MYLIB'))
+
+env.Program('lvgl', source,
     CFLAGS='$CFLAGS -Ilibs/include/c/ -Iapp/liblvgl -Iapp/libgui/ -Iapp/libjpeg -DLV_LVGL_H_INCLUDE_SIMPLE=1',
     LINKFLAGS= '$LINKFLAGS --entry main -Tuser.ld')

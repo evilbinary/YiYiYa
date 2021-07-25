@@ -6,35 +6,7 @@
 #include "common.h"
 
 
-void* memcpy(void* /* restrict */ s1, const void* /* restrict */ s2, size_t n) {
-  char* cdest;
-  char* csrc;
-  uint32_t* ldest = (uint32_t*)s1;
-  uint32_t* lsrc = (uint32_t*)s2;
-
-  while (n >= 4) {
-    *ldest++ = *lsrc++;
-    n -= 4;
-  }
-
-  cdest = (char*)ldest;
-  csrc = (char*)lsrc;
-
-  while (n > 0) {
-    *cdest++ = *csrc++;
-    n -= 1;
-  }
-
-  return s1;
-}
-
-void* memset(void* s, int c, size_t n) {
-  int i;
-  for (i = 0; i < n; i++) ((char*)s)[i] = c;
-  return s;
-}
-
-void itoa(char* buf, int base, int d) {
+void kitoa(char* buf, int base, int d) {
   char* p = buf;
   char *p1, *p2;
   unsigned long ud = d;

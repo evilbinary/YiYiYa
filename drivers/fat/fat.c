@@ -101,7 +101,7 @@ struct fat_fs_struct* fat_open(struct partition_struct* partition) {
   if (i >= FAT_FS_COUNT) return 0;
 #endif
 
-  memset(fs, 0, sizeof(*fs));
+  kmemset(fs, 0, sizeof(*fs));
 
   fs->partition = partition;
   if (!fat_read_header(fs)) {
@@ -210,7 +210,7 @@ uint8_t fat_read_header(struct fat_fs_struct* fs) {
 
   /* fill header information */
   struct fat_header_struct* header = &fs->header;
-  memset(header, 0, sizeof(*header));
+  kmemset(header, 0, sizeof(*header));
 
   header->size = (offset_t)sector_count * bytes_per_sector;
 
@@ -624,7 +624,7 @@ uint8_t fat_clear_cluster(const struct fat_fs_struct* fs,
   offset_t cluster_offset = fat_cluster_offset(fs, cluster_num);
 
   uint8_t zero[16];
-  memset(zero, 0, sizeof(zero));
+  kmemset(zero, 0, sizeof(zero));
   return fs->partition->device_write_interval(cluster_offset, zero,
                                               fs->header.cluster_size,
                                               fat_clear_cluster_callback, 0);
@@ -677,7 +677,7 @@ uint8_t fat_get_dir_entry_of_path(struct fat_fs_struct* fs, const char* path,
   if (path[0] == '/') ++path;
 
   /* begin with the root directory */
-  memset(dir_entry, 0, sizeof(*dir_entry));
+  kmemset(dir_entry, 0, sizeof(*dir_entry));
   dir_entry->attributes = FAT_ATTRIB_DIR;
 
   while (1) {
@@ -754,7 +754,7 @@ struct fat_file_struct* fat_open_file(
   if (i >= FAT_FILE_COUNT) return 0;
 #endif
 
-  memcpy(&fd->dir_entry, dir_entry, sizeof(*dir_entry));
+  kmemcpy(&fd->dir_entry, dir_entry, sizeof(*dir_entry));
   fd->fs = fs;
   fd->pos = 0;
   fd->pos_cluster = dir_entry->cluster;
@@ -1165,7 +1165,7 @@ struct fat_dir_struct* fat_open_dir(
   if (i >= FAT_DIR_COUNT) return 0;
 #endif
 
-  memcpy(&dd->dir_entry, dir_entry, sizeof(*dir_entry));
+  kmemcpy(&dd->dir_entry, dir_entry, sizeof(*dir_entry));
   dd->fs = fs;
   dd->entry_cluster = dir_entry->cluster;
   dd->entry_offset = 0;
@@ -1225,8 +1225,8 @@ uint8_t fat_read_dir(struct fat_dir_struct* dd,
   }
 
   /* reset callback arguments */
-  memset(&arg, 0, sizeof(arg));
-  memset(dir_entry, 0, sizeof(*dir_entry));
+  kmemset(&arg, 0, sizeof(arg));
+  kmemset(dir_entry, 0, sizeof(*dir_entry));
   arg.dir_entry = dir_entry;
 
   /* check if we read from the root directory */
@@ -1354,7 +1354,7 @@ uint8_t fat_dir_entry_read_callback(uint8_t* buffer, offset_t offset, void* p) {
     /* checksum validation */
     if (arg->checksum == 0 || arg->checksum != buffer[13]) {
       /* reset directory entry */
-      memset(dir_entry, 0, sizeof(*dir_entry));
+      kmemset(dir_entry, 0, sizeof(*dir_entry));
 
       arg->checksum = buffer[13];
       dir_entry->entry_offset = offset;
@@ -1382,7 +1382,7 @@ uint8_t fat_dir_entry_read_callback(uint8_t* buffer, offset_t offset, void* p) {
 #endif
     {
       /* reset directory entry */
-      memset(dir_entry, 0, sizeof(*dir_entry));
+      kmemset(dir_entry, 0, sizeof(*dir_entry));
       dir_entry->entry_offset = offset;
 
       uint8_t i;
@@ -1618,7 +1618,7 @@ uint8_t fat_write_dir_entry(const struct fat_fs_struct* fs,
   /* write 8.3 entry */
 
   /* generate 8.3 file name */
-  memset(&buffer[0], ' ', 11);
+  kmemset(&buffer[0], ' ', 11);
   char* name_ext = kstrrchr(name, '.');
   if (name_ext && *++name_ext) {
     uint8_t name_ext_len = kstrlen(name_ext);
@@ -1631,11 +1631,11 @@ uint8_t fat_write_dir_entry(const struct fat_fs_struct* fs,
       return 0;
 #endif
 
-    memcpy(&buffer[8], name_ext, name_ext_len);
+    kmemcpy(&buffer[8], name_ext, name_ext_len);
   }
 
   if (name_len <= 8) {
-    memcpy(buffer, name, name_len);
+    kmemcpy(buffer, name, name_len);
 
 #if FAT_LFN_SUPPORT
     /* For now, we create lfn entries for all files,
@@ -1653,7 +1653,7 @@ uint8_t fat_write_dir_entry(const struct fat_fs_struct* fs,
 #endif
   } else {
 #if FAT_LFN_SUPPORT
-    memcpy(buffer, name, 8);
+    kmemcpy(buffer, name, 8);
 
     /* Minimize 8.3 name clashes by appending
      * the lower byte of the cluster number.
@@ -1670,7 +1670,7 @@ uint8_t fat_write_dir_entry(const struct fat_fs_struct* fs,
   if (buffer[0] == FAT_DIRENTRY_DELETED) buffer[0] = 0x05;
 
   /* fill directory entry buffer */
-  memset(&buffer[11], 0, sizeof(buffer) - 11);
+  kmemset(&buffer[11], 0, sizeof(buffer) - 11);
   buffer[0x0b] = dir_entry->attributes;
 #if FAT_DATETIME_SUPPORT
   write16(&buffer[0x16], dir_entry->modification_time);
@@ -1697,7 +1697,7 @@ uint8_t fat_write_dir_entry(const struct fat_fs_struct* fs,
 
   /* write lfn entries */
   for (uint8_t lfn_entry = lfn_entry_count; lfn_entry > 0; --lfn_entry) {
-    memset(buffer, 0xff, sizeof(buffer));
+    kmemset(buffer, 0xff, sizeof(buffer));
 
     /* set file name */
     const char* long_name_curr = name + (lfn_entry - 1) * 13;
@@ -1788,7 +1788,7 @@ uint8_t fat_create_file(struct fat_dir_struct* parent, const char* file,
   struct fat_fs_struct* fs = parent->fs;
 
   /* prepare directory entry with values already known */
-  memset(dir_entry, 0, sizeof(*dir_entry));
+  kmemset(dir_entry, 0, sizeof(*dir_entry));
   kstrncpy(dir_entry->long_name, file, sizeof(dir_entry->long_name) - 1);
 
   /* find place where to store directory entry */
@@ -1961,7 +1961,7 @@ uint8_t fat_create_dir(struct fat_dir_struct* parent, const char* dir,
   /* clear cluster to prevent bogus directory entries */
   fat_clear_cluster(fs, dir_cluster);
 
-  memset(dir_entry, 0, sizeof(*dir_entry));
+  kmemset(dir_entry, 0, sizeof(*dir_entry));
   dir_entry->attributes = FAT_ATTRIB_DIR;
 
   /* create "." directory self reference */

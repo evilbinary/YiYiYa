@@ -9,10 +9,17 @@ import os
 Import('env')
 
 
-env.Program('file.elf', [
+
+source= [
     'file.c',
     '../../libs/libc/libc.a',
-    ],
+    ]
+    
+if env.get('MYLIB'):
+    source.append(env.get('MYLIB'))
+
+
+env.Program('file.elf', source,
     CFLAGS='$CFLAGS -Ilibs/include/c/ ',
     LINKFLAGS= '$LINKFLAGS --entry main -Tuser.ld')
 

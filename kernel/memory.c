@@ -23,7 +23,7 @@ void* kmalloc(size_t size) {
     kprintf("kmalloc error\n");
     return addr;
   }
-  memset(addr, 0, size);
+  kmemset(addr, 0, size);
   // void* addr=kmalloc_alignment(size,PAGE_SIZE);
   return addr;
 }

@@ -47,7 +47,7 @@ int ahci_dev_port_write(ahci_device_t* ahci_dev, int no, u32 startl, u32 starth,
   addr = (((cmdheader->ctbau) << 32) | cmdheader->ctba);
   hba_cmd_tbl_t* cmdtbl = (hba_cmd_tbl_t*)(addr);
 
-  memset(cmdtbl, 0,
+  kmemset(cmdtbl, 0,
          sizeof(hba_cmd_tbl_t) +
              (cmdheader->prdtl - 1) * sizeof(hba_prdt_entry_t));
   int i = 0;
@@ -152,7 +152,7 @@ int ahci_dev_port_read(ahci_device_t* ahci_dev, int no, u32 startl, u32 starth,
 
   addr = (((cmdheader->ctbau) << 32) | cmdheader->ctba);
   hba_cmd_tbl_t* cmdtbl = (hba_cmd_tbl_t*)(addr);
-  memset(cmdtbl, 0,
+  kmemset(cmdtbl, 0,
          sizeof(hba_cmd_tbl_t) +
              (cmdheader->prdtl - 1) * sizeof(hba_prdt_entry_t));
 
@@ -275,13 +275,13 @@ void ahci_dev_port_init(ahci_device_t* ahci_dev, int no) {
   ahci_dev->base_cmd = ahci_base;
   port->clb = ahci_base + (no << 10);
   port->clbu = 0;
-  memset((void*)(port->clb), 0, 1024);
+  kmemset((void*)(port->clb), 0, 1024);
 
   // FIS offset: 32K+256*portno
   // FIS entry size = 256 bytes per port
   port->fb = ahci_base + (32 << 10) + (no << 8);
   port->fbu = 0;
-  memset((void*)(port->fb), 0, 256);
+  kmemset((void*)(port->fb), 0, 256);
 
   // Command table offset: 40K + 8K*portno
   // Command table size = 256*32 = 8K per port
@@ -292,7 +292,7 @@ void ahci_dev_port_init(ahci_device_t* ahci_dev, int no) {
     // Command table offset: 40K + 8K*portno + cmdheader_index*256
     cmdheader[i].ctba = ahci_base + (40 << 10) + (no << 13) + (i << 8);
     cmdheader[i].ctbau = 0;
-    memset((void*)cmdheader[i].ctba, 0, 256);
+    kmemset((void*)cmdheader[i].ctba, 0, 256);
   }
 
   start_cmd(port);  // Start command engine

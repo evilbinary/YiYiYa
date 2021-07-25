@@ -8,7 +8,8 @@ import os
 
 Import('env')
 
-env.Program('etk.elf', [
+
+source=[
     'main.c',
     'etk_app.c',
     'sinclock.c',
@@ -22,8 +23,13 @@ env.Program('etk.elf', [
     '../libjpeg/libjpeg.a',
     '../libgui/libgui.a',
     '../../libs/libc/libc.a',
+    ]
 
-    ],
+if env.get('MYLIB'):
+    source.append(env.get('MYLIB'))
+
+
+env.Program('etk.elf', source,
     CFLAGS='$CFLAGS -Ilibs/include/c/ -Iapp/libgui/ -Iapp/libjpeg/ -Iapp/libetk/',
     LINKFLAGS= '$LINKFLAGS --entry main -Tuser.ld')
 

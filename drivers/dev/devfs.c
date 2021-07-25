@@ -4,10 +4,10 @@
  * 邮箱: rootdebug@163.com
  ********************************************************************/
 #include "kernel/device.h"
+#include "kernel/fd.h"
 #include "kernel/module.h"
 #include "kernel/vfs.h"
 #include "pty/pty.h"
-#include "kernel/fd.h"
 
 vnode_t *devfs_create_device(device_t *dev) {
   vnode_t *t = kmalloc(sizeof(vnode_t));
@@ -57,28 +57,43 @@ int devfs_init(void) {
   stdout->write = device_write;
 
   // frambuffer
-  vnode_t *frambuffer = vfs_create("fb", V_FILE);
-  vfs_mount(NULL, "/dev", frambuffer);
-  frambuffer->device = device_find(DEVICE_VGA);
-  if (frambuffer->device == NULL) {
-    frambuffer->device = device_find(DEVICE_VGA_QEMU);
+  device_t *fb_dev = device_find(DEVICE_VGA);
+  if (fb_dev == NULL) {
+    fb_dev = device_find(DEVICE_VGA_QEMU);
   }
-  frambuffer->write = device_write;
-  frambuffer->ioctl = device_ioctl;
+  if (fb_dev != NULL) {
+    vnode_t *frambuffer = vfs_create("fb", V_FILE);
+    vfs_mount(NULL, "/dev", frambuffer);
+    frambuffer->device = fb_dev;
+    frambuffer->write = device_write;
+    frambuffer->ioctl = device_ioctl;
+  } else {
+    kprintf("dev fb not found\n");
+  }
 
   // mouse
-  vnode_t *mouse = vfs_create("mouse", V_FILE);
-  vfs_mount(NULL, "/dev", mouse);
-  mouse->device = device_find(DEVICE_MOUSE);
-  mouse->read = device_read;
-  mouse->ioctl = device_ioctl;
+  device_t *mouse_dev = device_find(DEVICE_MOUSE);
+  if (mouse_dev != NULL) {
+    vnode_t *mouse = vfs_create("mouse", V_FILE);
+    vfs_mount(NULL, "/dev", mouse);
+    mouse->device = mouse_dev;
+    mouse->read = device_read;
+    mouse->ioctl = device_ioctl;
+  } else {
+    kprintf("dev mouse not found\n");
+  }
 
   // time
-  vnode_t *time = vfs_create("time", V_FILE);
-  vfs_mount(NULL, "/dev", time);
-  time->device = device_find(DEVICE_RTC);
-  time->read = device_read;
-  time->ioctl = device_ioctl;
+  device_t *rtc_dev = device_find(DEVICE_RTC);
+  if (rtc_dev != NULL) {
+    vnode_t *time = vfs_create("time", V_FILE);
+    vfs_mount(NULL, "/dev", time);
+    time->device = rtc_dev;
+    time->read = device_read;
+    time->ioctl = device_ioctl;
+  } else {
+    kprintf("dev time not found\n");
+  }
 
   // pty
   vnode_t *pts = NULL;

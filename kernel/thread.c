@@ -16,8 +16,8 @@ extern context_t* current_context;
 
 thread_t* thread_create(void* entry, void* data) {
   u32 size = PAGE_SIZE;
-  u8* stack0 = kmalloc(size);
-  u8* stack3 = kmalloc(size);
+  u8* stack0 = kmalloc_alignment(size,4*8);
+  u8* stack3 = kmalloc_alignment(size,4*8);
   thread_t* thread = thread_create_ex(entry, stack0, stack3, data, size);
   return thread;
 }
