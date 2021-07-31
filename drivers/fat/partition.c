@@ -59,12 +59,12 @@ static struct partition_struct partition_handles[PARTITION_COUNT];
  * \returns 0 on failure, a partition descriptor on success.
  * \see partition_close
  */
-struct partition_struct* partition_open(device_read_t device_read, device_read_interval_t device_read_interval, device_write_t device_write, device_write_interval_t device_write_interval, int8_t index)
+struct partition_struct* partition_open(device_read_t device_read, device_read_interval_t device_read_interval, device_write_t device_write, device_write_interval_t device_write_interval, int index)
 {
     struct partition_struct* new_partition = 0;
     uint8_t buffer[0x10];
 
-    if(!device_read || !device_read_interval||!device_write_interval || index >= 4)
+    if(!device_read || !device_read_interval||!device_write_interval ||index>4)
         return 0;
 
     if(index >= 0)

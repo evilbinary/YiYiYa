@@ -43,8 +43,8 @@ int event_init() {
     return 0;
   }
   event_info.is_init = 1;
-  event_info.mouse_fd = open("/dev/mouse", 0);
   event_info.input_fd = open("/dev/stdin", 0);
+  event_info.mouse_fd = open("/dev/mouse", 0);
   return 1;
 }
 

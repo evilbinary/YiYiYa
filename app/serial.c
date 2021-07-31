@@ -5,15 +5,15 @@
  ********************************************************************/
 #include "main.h"
 
-
-void gg(){
-
-#ifdef V3S
-  printf("screen init\n");
+void test_gui() {
+#ifdef ARM
+  char wheel[] = {'\\', '|', '/', '-'};
   screen_init();
-  printf("screen init end\n");
+  int i = 0,j=0;
   for (;;) {
-    screen_printf(0, 0, "hello dispaly\n");
+    screen_printf(0, 0, "Hello YiYiYa Os\n");
+    screen_fill_rect(0, 40, 30, 30, 0x00ff00);
+    screen_draw_line(0, 0, 140, 140, 0xff0000);
     screen_flush();
   }
 #endif
@@ -27,16 +27,16 @@ void do_serial_thread(void) {
   char buf[512];
   kmemset(buf, 1, 512);
   // syscall3(SYS_WRITE, DEVICE_SERIAL, test, kstrlen(test));
-  //int fd = syscall2(SYS_OPEN, "/dev/sda/B.TXT", 0);
+  // int fd = syscall2(SYS_OPEN, "/dev/sda/B.TXT", 0);
   for (;;) {
     // kprintf("B%d ",count);
     // syscall1(SYS_PRINT, "2");
     // if(count%100==0){
     //   // syscall1(SYS_PRINT, "\n");
     // }
-     gg();
+    // test_gui();
     // syscall1(SYS_PRINT, "\n");
-    //syscall3(SYS_READ, fd, buf, 512);
+    // syscall3(SYS_READ, fd, buf, 512);
     // syscall3(SYS_PRINT_AT, &wheel[i++], 100, 1);
     // syscall3(DEV_READ,DEVICE_SATA,buf,512);
     // syscall3(DEV_IOCTL, DEVICE_SATA, IOC_WRITE_OFFSET, 0x400);

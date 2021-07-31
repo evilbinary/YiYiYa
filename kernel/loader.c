@@ -24,13 +24,13 @@ void* load_elf(Elf32_Ehdr* elf_header, u32 fd, page_dir_t* page) {
   u32 entry = 0;
   for (int i = 0; i < elf_header->e_phnum; i++) {
 #ifdef DEBUG
-    kprintf("type:%d\n\r", phdr[i].p_type);
+    kprintf("ptype:%d\n\r", phdr[i].p_type);
 #endif
     switch (phdr[i].p_type) {
       case PT_NULL:
-        // kprintf(" %s %x %x %x %s %x %x \r\n", "NULL", phdr[i].p_offset,
-        //        phdr[i].p_vaddr, phdr[i].p_paddr, "", phdr[i].p_filesz,
-        //        phdr[i].p_memsz);
+        kprintf(" %s %x %x %x %s %x %x \r\n", "NULL", phdr[i].p_offset,
+               phdr[i].p_vaddr, phdr[i].p_paddr, "", phdr[i].p_filesz,
+               phdr[i].p_memsz);
         break;
       case PT_LOAD: {
 #ifdef DEBUG
@@ -124,7 +124,7 @@ void* load_elf(Elf32_Ehdr* elf_header, u32 fd, page_dir_t* page) {
       char* start = shdr[i].sh_offset;
       char* vaddr = shdr[i].sh_addr;
 #ifdef DEBUG
-      kprintf("load start:%x vaddr:%x size:%x \n\r", start, vaddr,
+      kprintf("data start:%x vaddr:%x size:%x \n\r", start, vaddr,
               phdr[i].p_filesz);
 #endif
       syscall2(SYS_SEEK, fd, start);

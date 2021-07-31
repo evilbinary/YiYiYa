@@ -73,7 +73,7 @@ void* valloc(void* addr, size_t size) {
     } else {
       map_page(vaddr, paddr, PAGE_P | PAGE_USU | PAGE_RWW);
     }
-    //kprintf("vmap vaddr:%x paddr:%x\n", vaddr, paddr);
+    // kprintf("vmap vaddr:%x paddr:%x\n", vaddr, paddr);
     vaddr += PAGE_SIZE;
     paddr += PAGE_SIZE;
   }
@@ -127,11 +127,6 @@ void page_clone_user(u64* page, u64* page_dir_ptr_tab) {
   use_user_page();
 }
 
-void* page_alloc_clone(u64* kernel_page_dir){
-  u64* page_dir_ptr_tab = kmalloc_alignment(sizeof(u64) * 4, 0x1000);
-  page_clone(kernel_page_dir, page_dir_ptr_tab);
-  return page_dir_ptr_tab;
-}
 
 void kpool_init() {
   kernel_pool = queue_pool_create(10, PAGE_SIZE);

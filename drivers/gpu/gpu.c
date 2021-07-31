@@ -54,7 +54,7 @@ void gpu_init_device(device_t* dev) {
   vga_device_t* vga = kmalloc(sizeof(vga_device_t));
   vga->frambuffer = 0;
   dev->data = vga;
-  gpu_init_mode(vga, VGA_MODE_480x272x24);
+  gpu_init_mode(vga, VGA_MODE_480x272x32);
   kprintf("gpu_init_device end\n");
 }
 

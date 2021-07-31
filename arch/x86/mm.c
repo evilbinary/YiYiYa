@@ -404,3 +404,10 @@ void page_clone(u64* page, u64* page_dir_ptr_tab) {
     }
   }
 }
+
+
+void* page_alloc_clone(u64* kernel_page_dir){
+  u64* page_dir_ptr_tab = kmalloc_alignment(sizeof(u64) * 4, 0x1000);
+  page_clone(kernel_page_dir, page_dir_ptr_tab);
+  return page_dir_ptr_tab;
+}

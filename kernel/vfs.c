@@ -19,6 +19,7 @@ size_t vioctl(vnode_t *node, u32 cmd, va_list args) {
     // va_end(args);
     return ret;
   } else {
+    kprintf("node ioctl is null\n");
     return 0;
   }
 }
@@ -27,6 +28,7 @@ u32 vread(vnode_t *node, u32 offset, u32 size, u8 *buffer) {
   if (node->read != NULL) {
     return node->read(node, offset, size, buffer);
   } else {
+    kprintf("node read is null\n");
     return 0;
   }
 }
@@ -34,6 +36,7 @@ u32 vwrite(vnode_t *node, u32 offset, u32 size, u8 *buffer) {
   if (node->write != NULL) {
     return node->write(node, offset, size, buffer);
   } else {
+    kprintf("node write is null\n");
     return 0;
   }
 }
@@ -41,6 +44,7 @@ u32 vopen(vnode_t *node) {
   if (node->open != NULL) {
     return node->open(node);
   } else {
+    kprintf("node open is null\n");
     return;
   }
 }
@@ -48,6 +52,7 @@ void vclose(vnode_t *node) {
   if (node->close != NULL) {
     return node->close(node);
   } else {
+    kprintf("node close is null\n");
     return;
   }
 }
@@ -55,6 +60,7 @@ struct vdirent *vreaddir(vnode_t *node, u32 index) {
   if ((node->flags & 0x7) == V_DIRECTORY && node->readdir != NULL) {
     return node->readdir(node, index);
   } else {
+    kprintf("node readdir is null\n");
     return 0;
   }
 }
@@ -62,6 +68,7 @@ vnode_t *vfinddir(vnode_t *node, char *name) {
   if ((node->flags & 0x7) == V_DIRECTORY && node->finddir != NULL) {
     return node->finddir(node, name);
   } else {
+    kprintf("node finddir is null\n");
     return 0;
   }
 }
@@ -73,6 +80,7 @@ vnode_t *vfind(vnode_t *node, char *name) {
   if (node->find != NULL) {
     return node->find(node, name);
   } else {
+    kprintf("node find is null\n");
     return 0;
   }
 }
@@ -81,6 +89,7 @@ void vmount(vnode_t *root, u8 *path, vnode_t *node) {
   if (root->mount != NULL) {
     return node->mount(root, path, node);
   } else {
+    kprintf("node mount is null\n");
     return;
   }
 }

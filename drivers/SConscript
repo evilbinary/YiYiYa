@@ -8,27 +8,44 @@ import os
 
 Import('env')
 
+arch=env['ARCH']
+
+platform=env['PLATFORM']
 
 driver=[]
-gpu=['gpu/bcm2836.c',
-        'gpu/gpu.c',
-        'gpu/mailbox.c'
+other=[]
+if arch=='arm':
+    if platform=='v3s':
+        other=[
+            'gpu/v3s.c',
+            'mmc/v3s.c'
         ]
-if env['ARCH']=='arm':
-    if env['PLATFORM']=='v3s':
-        gpu=['gpu/v3s.c',
-            'gpu/gpu.c',]
+    elif platform=='raspi2':
+        other=[
+            'gpu/bcm2836.c',
+            'gpu/mailbox.c',
+            'mmc/bcm2836.c',
+            'mmc/bcm2835_vc.c'
+            ]
 
     driver=[
+        'fat/fat.c',
+        'fat/byteordering.c',
+        'fat/partition.c',
+        'fat/mod.c',
+        
+        'gpu/gpu.c',
+        'mmc/sdhci.c',
         'hello/hello.c',
         'dev/devfs.c',
         'pty/pty.c'
-    ]+gpu
-elif env['ARCH']=='x86':
+    ]+other
+
+elif arch=='x86':
     driver=['pci.c',
-    'pic.c',
-    'ahci.c',
-    'dma.c',
+    'pic/pic.c',
+    'ahci/ahci.c',
+    'dma/dma.c',
 
     'hello/hello.c',
     'serial/serial.c',

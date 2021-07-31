@@ -1,7 +1,12 @@
-#include "drivers/ahci.h"
 #include "fat.h"
 #include "fat_config.h"
 #include "kernel/device.h"
+
+#ifdef ARM
+#include "drivers/mmc/sdhci.h"
+#else
+#include "drivers/ahci/ahci.h"
+#endif
 
 typedef struct file_info {
   struct fat_fs_struct *fs;

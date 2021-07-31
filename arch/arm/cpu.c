@@ -206,6 +206,10 @@ void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
   user->lr0=user->lr;
   context->esp = stack3;
   context->esp0 = stack0;
+
+  ulong addr = (ulong)boot_info->pdt_base;
+  context->kernel_page_dir = addr;
+  context->page_dir=addr;
 }
 
 void context_switch(interrupt_context_t* context, context_t** current,
@@ -228,6 +232,7 @@ void context_switch(interrupt_context_t* context, context_t** current,
     current_context->esp = context->sp;
     current_context->eip=context->lr;
     *current = next_context;
+    context_switch_page(next_context->page_dir);
 #if DEBUG
     c=next_context->esp0;
     kprintf("  lr:%x sp:%x irq=> lr:%x sp:%x  fp:%x\n",

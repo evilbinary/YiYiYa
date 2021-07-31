@@ -195,7 +195,7 @@ struct partition_struct
     uint32_t length;
 };
 
-struct partition_struct* partition_open(device_read_t device_read, device_read_interval_t device_read_interval, device_write_t device_write, device_write_interval_t device_write_interval, int8_t index);
+struct partition_struct* partition_open(device_read_t device_read, device_read_interval_t device_read_interval, device_write_t device_write, device_write_interval_t device_write_interval, int index);
 uint8_t partition_close(struct partition_struct* partition);
 
 /**
