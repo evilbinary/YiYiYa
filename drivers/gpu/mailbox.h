@@ -1,112 +1,57 @@
-#include "kernel/kernel.h"
-
-#include "gpio.h"
-
 #ifndef MAILBOX_H
 #define MAILBOX_H
 
-#define MAILBOX_OFFSET 0xB880
-
-#define MAILBOX_BASE MMIO_BASE + MAILBOX_OFFSET
-#define MAIL0_READ (((mail_message_t *)(0x00 + MAILBOX_BASE)))
-#define MAIL0_STATUS (((mail_status_t *)(0x18 + MAILBOX_BASE)))
-#define MAIL0_WRITE (((mail_message_t *)(0x20 + MAILBOX_BASE)))
+#include "kernel/kernel.h"
+#include "bcm2836.h"
 
 
-#define MAILBOX_CHANNEL_POWER_MANAGEMENT 0
-#define MAILBOX_CHANNEL_FRAMEBUFFER 1
-#define MAILBOX_CHANNEL_VIRTUAL_UART 2
-#define MAILBOX_CHANNEL_VCHIQ 3
-#define MAILBOX_CHANNEL_LEDS 4
-#define MAILBOX_CHANNEL_BUTTONS 5
-#define MAILBOX_CHANNEL_TOUCH_SCREEN 6
-#define MAILBOX_CHANNEL_COUNT 7
-#define MAILBOX_CHANNEL_PROPERTY_TAGS_ARM_TO_VC 8
-#define MAILBOX_CHANNEL_PROPERTY_TAGS_VC_TO_ARM 9
+ // Tag Framebuffer
+#define BCM2835_VC_TAG_ALLOCATE_BUFFER			0x00040001	///<
+#define BCM2835_VC_TAG_RELEASE_BUFFER			0x00048001	///<
+#define BCM2835_VC_TAG_BLANK_SCREEN				0x00040002	///<
+#define BCM2835_VC_TAG_GET_PHYS_WH				0x00040003	///<
+#define BCM2835_VC_TAG_TEST_PHYS_WH				0x00044003	///<
+#define BCM2835_VC_TAG_SET_PHYS_WH				0x00048003	///<
+#define BCM2835_VC_TAG_GET_VIRT_WH				0x00040004	///<
+#define BCM2835_VC_TAG_TEST_VIRT_WH				0x00044004	///<
+#define BCM2835_VC_TAG_SET_VIRT_WH				0x00048004	///<
+#define BCM2835_VC_TAG_GET_DEPTH				0x00040005	///<
+#define BCM2835_VC_TAG_TEST_DEPTH				0x00044005	///<
+#define BCM2835_VC_TAG_SET_DEPTH				0x00048005	///<
+#define BCM2835_VC_TAG_GET_PIXEL_ORDER			0x00040006	///<
+#define BCM2835_VC_TAG_TEST_PIXEL_ORDER			0x00044006	///<
+#define BCM2835_VC_TAG_SET_PIXEL_ORDER			0x00048006	///<
+#define BCM2835_VC_TAG_GET_ALPHA_MODE			0x00040007	///<
+#define BCM2835_VC_TAG_TEST_ALPHA_MODE			0x00044007	///<
+#define BCM2835_VC_TAG_SET_ALPHA_MODE			0x00048007	///<
+#define BCM2835_VC_TAG_GET_PITCH				0x00040008	///<
+#define BCM2835_VC_TAG_GET_VIRT_OFFSET			0x00040009	///<
+#define BCM2835_VC_TAG_TEST_VIRT_OFFSET			0x00044009	///<
+#define BCM2835_VC_TAG_SET_VIRT_OFFSET			0x00048009	///<
+#define BCM2835_VC_TAG_GET_OVERSCAN				0x0004000a	///<
+#define BCM2835_VC_TAG_TEST_OVERSCAN			0x0004400a	///<
+#define BCM2835_VC_TAG_SET_OVERSCAN				0x0004800a	///<
+#define BCM2835_VC_TAG_GET_PALETTE				0x0004000b	///<
+#define BCM2835_VC_TAG_TEST_PALETTE				0x0004400b	///<
+#define BCM2835_VC_TAG_SET_PALETTE				0x0004800b	///<
 
-typedef struct {
-    uint8_t channel: 4;
-    uint32_t data: 28;
-} mail_message_t;
-
-typedef struct {
-    uint32_t reserved: 30;
-    uint8_t empty: 1;
-    uint8_t full:1;
-} mail_status_t;
-
-mail_message_t mailbox_read(int channel);
-void mailbox_send(mail_message_t msg, int channel);
-
-/**
- * A property message can either be a request, or a response, and a response can be successfull or an error
- */
 typedef enum {
-    REQUEST = 0x00000000,
-    RESPONSE_SUCCESS = 0x80000000,
-    RESPONSE_ERROR = 0x80000001
-} buffer_req_res_code_t;
+	BCM2835_MAILBOX_POWER_CHANNEL 	= 0,	///< For use by the power management interface
+	BCM2835_MAILBOX_FB_CHANNEL 		= 1,	///< https://github.com/raspberrypi/firmware/wiki/Mailbox-framebuffer-interface
+	BCM2835_MAILBOX_VCHIQ_CHANNEL 	= 3,    ///< For use by the VCHIQ interface
+	BCM2835_MAILBOX_PROP_CHANNEL 	= 8		///< https://github.com/raspberrypi/firmware/wiki/Mailbox-property-interface
+} bcm2835MailboxChannels;
+
+#define BCM2835_MAILBOX_SUCCESS	(uint32_t)0x80000000	///< Request successful
+#define BCM2835_MAILBOX_ERROR	(uint32_t)0x80000001	///< Error parsing request buffer (partial response)
+
+#define BCM2835_MAILBOX_STATUS_WF	0x80000000	///< Write full
+#define	BCM2835_MAILBOX_STATUS_RE	0x40000000	///< Read empty
 
 
-/*
- * A buffer that holds many property messages.
- * The last tag must be a 4 byte zero, and then padding to make the whole thing 4 byte aligned
- */
-typedef struct {
-    uint32_t size;                      // Size includes the size itself
-    buffer_req_res_code_t req_res_code;
-    uint32_t* tags;                    // A concatenated sequence of tags. will use overrun to make large enough
-} property_message_buffer_t;
 
+u32 mailbox_read(int channel);
+void mailbox_send(int channel, u32 data);
 
-/**
- * A message is identified by a tag. These are some of the possible tags
- */
-typedef enum {
-    NULL_TAG = 0,
-    FB_ALLOCATE_BUFFER = 0x00040001,
-    FB_RELESE_BUFFER = 0x00048001,
-    FB_GET_PHYSICAL_DIMENSIONS = 0x00040003,
-    FB_SET_PHYSICAL_DIMENSIONS = 0x00048003,
-    FB_GET_VIRTUAL_DIMENSIONS = 0x00040004,
-    FB_SET_VIRTUAL_DIMENSIONS = 0x00048004,
-    FB_GET_BITS_PER_PIXEL = 0x00040005,
-    FB_SET_BITS_PER_PIXEL = 0x00048005,
-    FB_GET_BYTES_PER_ROW = 0x00040008
-} property_tag_t;
-
-/**
- * For each possible tag, we create a struct corresponding to the request value buffer, and the response value buffer
- */
-
-typedef struct {
-    void * fb_addr;
-    uint32_t fb_size;
-} fb_allocate_res_t;
-
-typedef struct {
-    uint32_t width;
-    uint32_t height;
-} fb_screen_size_t;
-
-
-/*
- * The value buffer can be any one of these types
- */
-typedef union {
-    uint32_t fb_allocate_align;
-    fb_allocate_res_t fb_allocate_res;
-    fb_screen_size_t fb_screen_size;
-    uint32_t fb_bits_per_pixel;
-    uint32_t fb_bytes_per_row;
-} value_buffer_t;
-
-/*
- * A message_buffer can contain any number of these
- */
-typedef struct {
-    property_tag_t proptag;
-    value_buffer_t value_buffer;
-} property_message_tag_t;
 
 #endif

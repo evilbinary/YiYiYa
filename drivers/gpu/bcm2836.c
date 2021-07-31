@@ -1,95 +1,64 @@
 #include "bcm2836.h"
-
 #include "drivers/vga/vga.h"
 
-static uint32_t get_value_buffer_len(property_message_tag_t * tag) {
-    switch(tag->proptag) {
-        case FB_ALLOCATE_BUFFER: 
-        case FB_GET_PHYSICAL_DIMENSIONS:
-        case FB_SET_PHYSICAL_DIMENSIONS:
-        case FB_GET_VIRTUAL_DIMENSIONS:
-        case FB_SET_VIRTUAL_DIMENSIONS:
-            return 8;
-        case FB_GET_BITS_PER_PIXEL:
-        case FB_SET_BITS_PER_PIXEL:
-        case FB_GET_BYTES_PER_ROW:
-            return 4;
-        case FB_RELESE_BUFFER:
-        default:
-            return 0;
-    }
-}
+#define RGB24_2_RGB565(r, g, b) \
+  (u16)((((r) << 8) & 0xF800) | (((g) << 3) & 0x7E0) | (((b) >> 3)))
 
-static void write_pixel(vga_device_t* vga, uint32_t x, uint32_t y,
-                 const pixel_t* pix) {
-  uint8_t* location = vga->frambuffer + y * vga->bpp + x * BYTES_PER_PIXEL;
-  kmemcpy(location, pix, BYTES_PER_PIXEL);
+static void write_pixel(vga_device_t *vga, uint32_t x, uint32_t y,
+                        const pixel_t *pix) {
+  u32 color = RGB24_2_RGB565(pix->red, pix->green, pix->blue);
+  vga->frambuffer[x + y * vga->width] = color;
 }
 
 int bcm2836_init(vga_device_t* vga) {
-  mail_message_t mail;
-  property_message_buffer_t * msg=kmalloc_alignment(sizeof(property_message_buffer_t),16);
-  mail.channel=MAILBOX_CHANNEL_PROPERTY_TAGS_ARM_TO_VC;
-  mail.data=msg;
-  property_message_tag_t tags[5];
+  uint32_t __attribute__((aligned(16))) mailbuffer[28];
+  int i=0;
+  mailbuffer[0] = 22 * 4;
+  mailbuffer[1] = 0;
 
-  //set phisyic width height
-  tags[0].proptag = FB_SET_PHYSICAL_DIMENSIONS;
-  tags[0].value_buffer.fb_screen_size.width = vga->width;
-  tags[0].value_buffer.fb_screen_size.height = vga->height;
+  mailbuffer[2] = BCM2835_VC_TAG_SET_PHYS_WH;
+  mailbuffer[3] = 8;
+  mailbuffer[4] = 8;
+  mailbuffer[5] = vga->width;
+  mailbuffer[6] = vga->height;
 
- //set virtual widht height
-  tags[1].proptag = FB_SET_VIRTUAL_DIMENSIONS;
-  tags[1].value_buffer.fb_screen_size.width = vga->width;
-  tags[1].value_buffer.fb_screen_size.height = vga->height;
+  mailbuffer[7] = BCM2835_VC_TAG_SET_VIRT_WH;
+  mailbuffer[8] = 8;
+  mailbuffer[9] = 8;
+  mailbuffer[10] = vga->width;
+  mailbuffer[11] = vga->height;
 
-  //set bit per pixe
-  tags[2].proptag = FB_SET_BITS_PER_PIXEL;
-  tags[2].value_buffer.fb_bits_per_pixel = vga->bpp;
-  tags[3].proptag = NULL_TAG;
+  mailbuffer[12] = BCM2835_VC_TAG_SET_DEPTH;
+  mailbuffer[13] = 4;
+  mailbuffer[14] = 4;
+  mailbuffer[15] = vga->bpp;//depth
 
-  //tag size  
-  for (int i = 0; tags[i].proptag != NULL_TAG&&i<5; i++) {
-    msg->size += get_value_buffer_len(&tags[i]) + 3*sizeof(uint32_t);          
-  }
-  msg->size += 3*sizeof(uint32_t); 
+  //set pix order
+  mailbuffer[16] = BCM2835_VC_TAG_SET_PIXEL_ORDER;
+  mailbuffer[17] = 4;
+  mailbuffer[18] = 4;
+  mailbuffer[19] = 0;//0x0: BGR 0x1: RGB
 
-  msg->req_res_code=REQUEST;
-  msg->tags=tags;
+  mailbuffer[20] = BCM2835_VC_TAG_ALLOCATE_BUFFER;
+  mailbuffer[21] = 8;
+  mailbuffer[22] = 8;
+  mailbuffer[23] = 16;//pointer
+  mailbuffer[24] = 0;
 
-  //init
-  mailbox_send_data(mail,MAILBOX_CHANNEL_PROPERTY_TAGS_ARM_TO_VC);
+  mailbuffer[25] = 0;
 
-  if(msg->req_res_code != RESPONSE_SUCCESS ) {
-    kprintf("int bcm error %d\n",msg->req_res_code);
+  mailbox_write_read(BCM2835_MAILBOX_PROP_CHANNEL, mailbuffer);
+
+  if (mailbuffer[1] != BCM2835_MAILBOX_SUCCESS) {
+    kprintf("init bcm error\n");
     return -1;
   }
 
-  tags[0].proptag = FB_ALLOCATE_BUFFER;
-  tags[0].value_buffer.fb_screen_size.width = 0;
-  tags[0].value_buffer.fb_screen_size.height = 0;
-  tags[0].value_buffer.fb_allocate_align = 16;
-  tags[1].proptag = NULL_TAG;
-  
-  for (int i = 0; tags[i].proptag != NULL_TAG&&i<5; i++) {
-    msg->size += get_value_buffer_len(&tags[i]) + 3*sizeof(uint32_t);          
-  }
-  msg->size += 3*sizeof(uint32_t); 
-  msg->req_res_code=REQUEST;
-  msg->tags=tags;
-  mail.channel=MAILBOX_CHANNEL_PROPERTY_TAGS_ARM_TO_VC;
-  mail.data=msg;
-  
-  //frambuffer
-  mailbox_send_data(mail,MAILBOX_CHANNEL_PROPERTY_TAGS_ARM_TO_VC);
-  if (msg->req_res_code != RESPONSE_SUCCESS ) {
-    kprintf("int bcm error 2\n");
-    return -1;
-  }
+  u32 fb_addr = mailbuffer[23] & 0x3FFFFFFF;
+  u32 fb_size = mailbuffer[24];
 
-
-  vga->frambuffer = (u32)tags[0].value_buffer.fb_allocate_res.fb_addr & 0x3fffffff;
-  vga->framebuffer_length = tags[0].value_buffer.fb_allocate_res.fb_size;
+  vga->frambuffer = fb_addr;
+  vga->framebuffer_length = fb_size;
 
   return 0;
 }
@@ -105,7 +74,19 @@ int gpu_init_mode(vga_device_t* vga, int mode) {
     vga->width = 640;
     vga->height = 480;
     vga->bpp = 24;
-  } else if (mode == VGA_MODE_1024x768x32) {
+  }  else if (mode == VGA_MODE_480x272x24) {
+    vga->width = 640;
+    vga->height = 480;
+    vga->bpp = 24;
+  }else if (mode == VGA_MODE_480x272x32) {
+    vga->width = 640;
+    vga->height = 480;
+    vga->bpp = 32;
+  } else if (mode == VGA_MODE_480x272x18) {
+    vga->width = 640;
+    vga->height = 480;
+    vga->bpp = 18;
+  }else if (mode == VGA_MODE_1024x768x32) {
     vga->width = 1024;
     vga->height = 768;
     vga->bpp = 32;
@@ -113,25 +94,18 @@ int gpu_init_mode(vga_device_t* vga, int mode) {
   vga->mode = mode;
   vga->write = NULL;
 
-  kprintf("map box %x\n",MAILBOX_BASE&~0xfff);
-  map_page(MAILBOX_BASE&~0xfff, MAILBOX_BASE&~0xfff, 0);
+  kprintf("map box %x\n", BCM2835_MAILBOX_BASE & ~0xfff);
+  map_page(BCM2835_MAILBOX_BASE & ~0xfff, BCM2835_MAILBOX_BASE & ~0xfff, 0);
 
   bcm2836_init(vga);
 
   vga->framebuffer_index = 0;
   vga->framebuffer_count = 1;
   kprintf("fb addr:%x len:%x\n", vga->frambuffer, vga->framebuffer_length);
-  u32 addr = 0;
+  u32 addr = vga->frambuffer;
   for (int i = 0; i < vga->framebuffer_length / PAGE_SIZE; i++) {
     map_page(addr, addr, 0);
     addr += 0x1000;
   }
-
-  // static const pixel_t BLACK = {0xff, 0xff, 0xff};
-  // for (uint32_t j = 0; j < vga->height; j++) {
-  //   for (uint32_t i = 0; i < vga->width; i++) {
-  //     write_pixel(vga, i, j, &BLACK);
-  //   }
-  // }
   return 0;
 }

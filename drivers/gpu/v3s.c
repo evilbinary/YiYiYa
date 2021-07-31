@@ -294,13 +294,13 @@ int gpu_init_mode(vga_device_t *vga, int mode) {
 
   u8 *buffer = vga->frambuffer;
   for (int i = 0; i < vga->framebuffer_length / 8; i++) {
-    buffer[i] = 0xff;
+    buffer[i] = 0x00;
   }
 
   return 0;
 }
 
-static void test_pixel() {
+static void test_pixel(vga_device_t *vga) {
   static const pixel_t BLACK = {0xff, 0x00, 0x00};
   static const pixel_t RED = {0x00, 0x00, 0xff};
 

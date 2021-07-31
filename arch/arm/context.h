@@ -89,4 +89,16 @@ typedef struct interrupt_context {
       :                         \
       :)
 
+#define interrupt_exit2()        \
+  asm volatile(                 \
+      "ldmfd sp!,{r1,r2}\n"     \
+      "ldmfd sp!,{r0}\n"        \
+      "msr spsr,r0\n"           \
+      "ldmfd sp!,{r0-r12,lr}\n" \
+      "ldmfd sp,{sp,lr}^\n"     \
+      "add sp,sp,#8\n"          \
+      "subs pc,lr,#8\n"         \
+      :                         \
+      :)
+
 #endif

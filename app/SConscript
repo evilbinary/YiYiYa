@@ -27,7 +27,7 @@ kernel=[
     'serial.c',
     ]
 
-if env.get('PLATFORM')=='v3s':
+if env.get('ARCH')=='arm':
     libs.append('../app/libgui/libgui.a')
     libs.append('../libs/libc/libc.a')
 

@@ -14,14 +14,9 @@ void exception_regist(u32 vec, interrupt_handler_t handler) {
 
 void exception_info(interrupt_context_t *context) {
 #ifdef ARM
-  static const char *exception_msg[] = {"RESET",
-                                        "UNDEFINED",
-                                        "SVC",
-                                        "PREF ABORT",
-                                        "DATA ABORT",
-                                        "NOT USE",
-                                        "IRQ",
-                                        "FIQ"};
+  static const char *exception_msg[] = {"RESET",      "UNDEFINED",  "SVC",
+                                        "PREF ABORT", "DATA ABORT", "NOT USE",
+                                        "IRQ",        "FIQ"};
   if (context->no < sizeof exception_msg) {
     kprintf("EXCEPTION %d: %s\n=======================\n", context->no,
             exception_msg[context->no]);
@@ -32,8 +27,8 @@ void exception_info(interrupt_context_t *context) {
   if (current != NULL) {
     kprintf("tid:%d\n", current->id);
   }
-  kprintf("ifsr:%x dfsr:%x dfar:%x\n",read_ifsr(), read_dfsr(), read_dfar());
-  kprintf("pc:%x lr:%x cpsr:%x\n",read_pc(), context->lr, context->psr);
+  kprintf("ifsr:%x dfsr:%x dfar:%x\n", read_ifsr(), read_dfsr(), read_dfar());
+  kprintf("pc:%x lr:%x cpsr:%x\n", read_pc(), context->lr, context->psr);
   kprintf("sp:%x\n", context->sp);
   kprintf("r1:%x\n", context->r1);
   kprintf("r2:%x\n", context->r2);
@@ -207,7 +202,121 @@ void coprocessor_error() {
 }
 
 #ifdef ARM
-void do_page_fault(interrupt_context_t *context) {}
+
+INTERRUPT_SERVICE
+void reset_handler() {
+  interrupt_entering_code(0, 0);
+  interrupt_process(exception_info);
+  cpu_halt();
+}
+
+INTERRUPT_SERVICE
+void undefined_handler() {
+  interrupt_entering_code(1, 0);
+  interrupt_process(exception_info);
+  cpu_halt();
+}
+
+INTERRUPT_SERVICE
+void svc_handler() {
+  interrupt_entering_code(2, 0);
+  interrupt_process(exception_info);
+  cpu_halt();
+}
+
+INTERRUPT_SERVICE
+void pref_abort_handler() {
+  interrupt_entering_code(3, 0);
+  interrupt_process(exception_info);
+  cpu_halt();
+}
+
+
+INTERRUPT_SERVICE
+void data_abort_handler() {
+  interrupt_entering_code(4, 0);
+  interrupt_process(do_page_fault);
+  // cpu_halt();
+  // interrupt_exit();
+  interrupt_exit2();
+}
+
+INTERRUPT_SERVICE
+void unuse_handler() {
+  interrupt_entering_code(5, 0);
+  interrupt_process(exception_info);
+  cpu_halt();
+}
+
+void do_irq(interrupt_context_t *interrupt_context) {}
+extern context_t *current_context;
+
+INTERRUPT_SERVICE
+void irq_handler() {
+  // interrupt_entering_code(0, 0);
+  // interrupt_process(do_irq);
+  // cpu_halt();
+  interrupt_entering_code(ISR_TIMER, 0);
+  interrupt_process(do_schedule);
+  // interrupt_exit();
+  interrupt_exit_context(current_context);
+}
+
+INTERRUPT_SERVICE
+void frq_handler() {
+  interrupt_entering_code(0, 0);
+  interrupt_process(exception_info);
+  cpu_halt();
+}
+
+void do_page_fault(interrupt_context_t *context) {
+  u32 fault_addr = read_dfar();
+  thread_t *current = thread_current();
+  if (current != NULL) {
+    vmemory_area_t *area = vmemory_area_find(current->vmm, fault_addr, 0);
+    if (area == NULL) {
+      kprintf("tid: %d memory fault at %x\n", current->id, fault_addr);
+      dump_fault(context, fault_addr);
+      thread_exit(current, -1);
+      return;
+    }
+    void *phy = virtual_to_physic(current->context.page_dir, fault_addr);
+
+#ifdef DEBUG_EXCEPTION
+    kprintf(" tid: %x ", current->id);
+#endif
+    if (phy == NULL) {
+      valloc(fault_addr, PAGE_SIZE);
+    } else {
+      kprintf("tid: %d phy realloc memory fault at %x\n", current->id,
+              fault_addr);
+      dump_fault(context, fault_addr);
+      thread_exit(current, -1);
+    }
+  }
+}
+
+void dump_fault(interrupt_context_t *context, u32 fault_addr) {
+  kprintf("=============================\n");
+   kprintf("ifsr:%x dfsr:%x dfar:%x\n", read_ifsr(), read_dfsr(), read_dfar());
+  kprintf("pc:%x lr:%x cpsr:%x\n", read_pc(), context->lr, context->psr);
+  kprintf("sp:%x\n", context->sp);
+  kprintf("r1:%x\n", context->r1);
+  kprintf("r2:%x\n", context->r2);
+  kprintf("r3:%x\n", context->r3);
+  kprintf("r4:%x\n", context->r4);
+  kprintf("r5:%x\n", context->r5);
+  kprintf("r6:%x\n", context->r6);
+  kprintf("r7:%x\n", context->r7);
+  kprintf("r8:%x\n", context->r8);
+  kprintf("r9:%x\n", context->r9);
+  kprintf("r10:%x\n", context->r10);
+  kprintf("r11:%x\n", context->r11);
+  kprintf("r12:%x\n", context->r12);
+
+  kprintf("fault: 0x%x \n", fault_addr);
+  kprintf("=============================\n\n");
+}
 #elif defined(X86)
 
 void dump_fault(interrupt_context_t *context, u32 fault_addr) {
@@ -270,69 +379,6 @@ void do_page_fault(interrupt_context_t *context) {
   }
 }
 #endif
-
-INTERRUPT_SERVICE
-void reset_handler() {
-  interrupt_entering_code(0, 0);
-  interrupt_process(exception_info);
-  cpu_halt();
-}
-
-INTERRUPT_SERVICE
-void undefined_handler() {
-  interrupt_entering_code(1, 0);
-  interrupt_process(exception_info);
-  cpu_halt();
-}
-
-INTERRUPT_SERVICE
-void svc_handler() {
-  interrupt_entering_code(2, 0);
-  interrupt_process(exception_info);
-  cpu_halt();
-}
-
-INTERRUPT_SERVICE
-void pref_abort_handler() {
-  interrupt_entering_code(3, 0);
-  interrupt_process(exception_info);
-  cpu_halt();
-}
-
-INTERRUPT_SERVICE
-void data_abort_handler() {
-  interrupt_entering_code(4, 0);
-  interrupt_process(exception_info);
-  cpu_halt();
-}
-
-INTERRUPT_SERVICE
-void unuse_handler() {
-  interrupt_entering_code(5, 0);
-  interrupt_process(exception_info);
-  cpu_halt();
-}
-
-void do_irq(interrupt_context_t *interrupt_context) {}
-extern context_t *current_context;
-
-INTERRUPT_SERVICE
-void irq_handler() {
-  // interrupt_entering_code(0, 0);
-  // interrupt_process(do_irq);
-  // cpu_halt();
-  interrupt_entering_code(ISR_TIMER, 0);
-  interrupt_process(do_schedule);
-  // interrupt_exit();
-  interrupt_exit_context(current_context);
-}
-
-INTERRUPT_SERVICE
-void frq_handler() {
-  interrupt_entering_code(0, 0);
-  interrupt_process(exception_info);
-  cpu_halt();
-}
 
 void exception_init() {
 #ifdef ARM

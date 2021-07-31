@@ -31,7 +31,9 @@ void* do_syscall(interrupt_context_t* context) {
   if (context_fn(context) >= 0 && context_fn(context) < SYSCALL_NUMBER) {
     void* fn = syscall_table[context_fn(context)];
     if (fn != NULL) {
+      // kprintf("syscall fn:%d r0:%x r1:%x r2:%x r3:%x\n",context->r7,context->r0,context->r1,context->r2,context->r3);
       sys_fn_call((context), fn);
+      // kprintf(" ret=%x\n",context_ret(context));
       return context_ret(context);
     } else {
       kprintf("syscall %x not found\n", context_fn(context));

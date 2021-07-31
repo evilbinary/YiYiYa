@@ -8,6 +8,13 @@
 
 #include "libs/include/types.h"
 #include "boot.h"
+#ifdef ARM
+  #include "arm/mm.h"
+#elif defined(X86)
+  #include "x86/mm.h"
+#else
+
+#endif
 
 
 #define NR_BLOCKS   30
@@ -17,11 +24,6 @@
 #define MEM_SHARE	4
 #define MEM_HEAD	5
 
-#define PAGE_P   1
-#define PAGE_RWR   0 //读执行
-#define PAGE_RWW   2 //读/写/执行
-#define PAGE_USS   0 //系统级
-#define PAGE_USU   4 //用户级
 
 #define PAGE_SIZE 0x1000
 
@@ -38,6 +40,5 @@ void mm_init();
 void* mm_alloc(size_t size);
 void mm_free(void* p);
 void* mm_alloc_zero_align(size_t size,u32 alignment);
-void map_page_on(page_dir_t* page,u32 virtualaddr, u32 physaddr, u32 flags);
 
 #endif

@@ -12,6 +12,7 @@
 #include "syscall.h"
 
 screen_info_t gscreen;
+u32 gfd;
 
 u8 SCREEN_ASCII[] = {
 
@@ -355,6 +356,7 @@ void screen_draw_rect(i32 x1, i32 y1, i32 x2, i32 y2, i32 color,
 void screen_printf(i32 x, i32 y, char *fmt, ...) {
   int i;
   char buf[1024];
+  memset(buf,0,1024);
   va_list args;
   va_start(args, fmt);
   i = vsprintf(buf, fmt, args);
@@ -542,6 +544,7 @@ void screen_show_bmp_picture(i32 x, i32 y, void *bmp_addr, i32 mask_color,
 void screen_init() {
   int fd = open("/dev/fb", 0);
   gscreen.fd = fd;
+  gfd=fd;
   ioctl(fd, IOC_READ_FRAMBUFFER_INFO, &(gscreen.fb),
         sizeof(framebuffer_info_t));
   gscreen.buffer = gscreen.fb.frambuffer;
@@ -550,7 +553,6 @@ void screen_init() {
   gscreen.bpp = gscreen.fb.bpp;
 
   event_init();
-
   // printf("gscreen.buffer=%x\n", gscreen.buffer);
 }
 
@@ -566,7 +568,8 @@ void screen_flush() {
       (++gscreen.fb.framebuffer_index) % gscreen.fb.framebuffer_count;
   gscreen.buffer = gscreen.fb.frambuffer + gscreen.width * gscreen.height *
                                                gscreen.fb.framebuffer_index;
-  ioctl(gscreen.fd, IOC_FLUSH_FRAMBUFFER, current_index);
+  
+  ioctl(gfd, IOC_FLUSH_FRAMBUFFER, current_index);
 }
 
 void do_screen_thread(void) {

@@ -43,7 +43,6 @@ int sys_print_at(char* s, u32 x, u32 y) {
 //   va_end(args);
 //   return ret;
 // }
-
 size_t sys_ioctl(u32 fd, u32 cmd, va_list args) {
   u32 ret = 0;
   fd_t* f = thread_find_fd_id(thread_current(), fd);
@@ -196,6 +195,7 @@ u32 sys_exec(char* filename, char* const argv[],char *const envp[]) {
   // map_2gb(page_dir_ptr_tab, PAGE_P | PAGE_USU | PAGE_RWW);
   context->page_dir = page_alloc_clone(t->context.kernel_page_dir);
 
+  // map_page_on(t->context.page_dir, 0, 0,0);
   // init vmm
   t->vmm = vmemory_area_create(HEAP_ADDR, MEMORY_CREATE_SIZE, MEMORY_HEAP);
   vmemory_area_t* vmexec =
@@ -236,9 +236,7 @@ int sys_fork() {
   thread_t* copy_thread = thread_clone(current, STACK_ADDR, THREAD_STACK_SIZE);
   copy_thread->pid = current->id;
 
-
 #ifdef ARM
-  kprintf("c eax no zero\n");
 #elif defined(X86)
   interrupt_context_t* c0 = current->context.esp0;
   interrupt_context_t* c = copy_thread->context.esp0;

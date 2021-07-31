@@ -5,7 +5,7 @@
  ********************************************************************/
 #include "vga.h"
 
-#include "dma.h"
+#include "dma/dma.h"
 
 size_t vga_read(device_t* dev, void* buf, size_t len) {
   u32 ret = 0;
