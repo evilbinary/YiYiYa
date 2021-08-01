@@ -1205,7 +1205,7 @@ int sd_card_init(void) {
   }
 
   struct emmc_block_dev *ret = &block_dev;
-  memset(ret, 0, sizeof(struct emmc_block_dev));
+  kmemset(ret, 0, sizeof(struct emmc_block_dev));
 
   ret->bd.block_size = 512;
 
