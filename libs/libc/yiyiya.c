@@ -33,7 +33,8 @@ typedef struct free_block {
 // static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 static int page_size = -1;
 void* last_heap_addr = NULL;
-u32 time_fd;
+
+u32 time_fd=-1;
 
 static free_block_t free_block_list_head = {0, 0};
 static const size_t align_to = 16;
@@ -151,11 +152,21 @@ uint32_t secs_of_month(int months, int year) {
 }
 
 u32 ya_time(time_t* current) {
-  if (time_fd == NULL) {
-    time_fd = ya_open("/dev/time", 0);
+  if(time_fd==-1){
+    time_fd= ya_open("/dev/time", 0);
   }
+  if(time_fd<0) return 0;
   rtc_time_t time;
+  time.day=1;
+  time.hour=0;
+  time.minute=0;
+  time.month=1;
+  time.second=0;
+  time.year=1900;
   int ret = ya_read(time_fd, &time, sizeof(rtc_time_t));
+  if(ret<0){
+    return 0;
+  }
   uint32_t seconds = secs_of_years(time.year - 1) +
                      secs_of_month(time.month - 1, time.year) +
                      (time.day - 1) * 86400 + time.hour * 3600 +

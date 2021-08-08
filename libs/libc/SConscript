@@ -8,7 +8,7 @@ import os
 
 Import('env')
 
-env.Library('c', [
+source=[
     'string.c',
     'malloc.c',
     'vsprintf.c',
@@ -32,4 +32,17 @@ env.Library('c', [
     'ioctl.c',
     'dirent.c',
     'assert.c',
-],CFLAGS='$CFLAGS -Ilibs/include/c/')
+]
+
+if env['ARCH']=='arm':
+    source=source+[
+        'arm/longjmp.S',
+        'arm/setjmp.S'
+    ]
+elif env['ARCH']=='x86':
+    source=source+[
+        'i386/longjmp.s',
+        'i386/setjmp.s'
+    ]
+
+env.Library('c',source ,CFLAGS='$CFLAGS -Ilibs/include/c/')

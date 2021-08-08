@@ -214,10 +214,10 @@ void screen_draw_poi32(i32 x, i32 y, i32 color) {
   i32 y_max = gscreen.height - 1;  // 每列像素数
 
   // 防止越界
-  if (x > x_max) {
+  if (x >= x_max) {
     return;
   }
-  if (y > y_max) {
+  if (y >= y_max) {
     return;
   }
 
@@ -251,17 +251,36 @@ i32 screen_get_poi32_color(i32 x, i32 y) {
 }
 
 void screen_draw_vline(i32 x1, i32 x2, i32 y, i32 color) {
-  if (y > gscreen.height || y < 0) {
-    return;
-  }
   register i32 i;
-  i32 start_pos, end_pos;
-  start_pos = y * gscreen.width + x1;
-  end_pos = y * gscreen.width + x2;
-  for (i = start_pos; i < end_pos; i++) gscreen.buffer[i] = color;
+  i32 x_max = gscreen.width - 1;   // 每行像素数
+  i32 y_max = gscreen.height - 1;  // 每列像素数
+  // 防止越界
+  if (x1 >= x_max) {
+    x1 = x_max;
+  }
+  if (x2 >= x_max) {
+    x2 = x_max;
+  }
+  if (y >= y_max) {
+    y = y_max;
+  }
+  for (i = x1; i < x2; i++) screen_put_pixel(i, y, color);
 }
+
 void screen_draw_hline(i32 y1, i32 y2, i32 x, i32 color) {
   register i32 i;
+  i32 x_max = gscreen.width - 1;   // 每行像素数
+  i32 y_max = gscreen.height - 1;  // 每列像素数
+  // 防止越界
+  if (y1 >= y_max) {
+    y1 = y_max;
+  }
+  if (y2 >= y_max) {
+    y2 = y_max;
+  }
+  if (x >= x_max) {
+    x = x_max;
+  }
   for (i = y1; i < y2; i++) screen_put_pixel(x, i, color);
 }
 void screen_draw_line(u32 x1, u32 y1, u32 x2, u32 y2, u32 color) {
@@ -326,27 +345,13 @@ void screen_put_ascii(i32 x, i32 y, u8 ch, i32 color) {
         screen_put_pixel(x + j, y + i, color);
 }
 
-// 画横线函数
-void screen_draw_x_line(i32 y, i32 x1, i32 x2, i32 color) {
-  for (i32 x = x1; x < x2 + 1; ++x) {
-    screen_draw_poi32(x, y, color);
-  }
-}
-
-// 画竖线函数
-void screen_draw_y_line(i32 x, i32 y1, i32 y2, i32 color) {
-  for (i32 y = y1; y < y2 + 1; ++y) {
-    screen_draw_poi32(x, y, color);
-  }
-}
-
 // 画矩形函数
 void screen_draw_rect(i32 x1, i32 y1, i32 x2, i32 y2, i32 color,
                       i32 dose_fill_it) {
-  screen_draw_x_line(y1, x1, x2, color);
-  screen_draw_x_line(y2, x1, x2, color);
-  screen_draw_y_line(x1, y1, y2, color);
-  screen_draw_y_line(x2, y1, y2, color);
+  screen_draw_vline(y1, x1, x2, color);
+  screen_draw_vline(y2, x1, x2, color);
+  screen_draw_hline(x1, y1, y2, color);
+  screen_draw_hline(x2, y1, y2, color);
 
   if (dose_fill_it) {
     screen_fill_rect(x1, y1, x2, y2, color);
@@ -356,7 +361,7 @@ void screen_draw_rect(i32 x1, i32 y1, i32 x2, i32 y2, i32 color,
 void screen_printf(i32 x, i32 y, char *fmt, ...) {
   int i;
   char buf[1024];
-  memset(buf,0,1024);
+  memset(buf, 0, 1024);
   va_list args;
   va_start(args, fmt);
   i = vsprintf(buf, fmt, args);
@@ -373,7 +378,7 @@ void screen_draw_char(i32 x, i32 y, u16 ch) {
 
 void screen_draw_char_witdh_color(i32 x, i32 y, u16 ch, u32 frcolor,
                                   u32 bgcolor) {
-  if (y < 0 || y > gscreen.height) {
+  if (y < 0 || y >= (gscreen.height-16)) {
     return 0;
   }
   u32 i, j;
@@ -544,7 +549,7 @@ void screen_show_bmp_picture(i32 x, i32 y, void *bmp_addr, i32 mask_color,
 void screen_init() {
   int fd = open("/dev/fb", 0);
   gscreen.fd = fd;
-  gfd=fd;
+  gfd = fd;
   ioctl(fd, IOC_READ_FRAMBUFFER_INFO, &(gscreen.fb),
         sizeof(framebuffer_info_t));
   gscreen.buffer = gscreen.fb.frambuffer;
@@ -553,14 +558,13 @@ void screen_init() {
   gscreen.bpp = gscreen.fb.bpp;
 
   event_init();
-  // printf("gscreen.buffer=%x\n", gscreen.buffer);
 }
 
 screen_info_t *screen_info() { return &gscreen; }
 
 void screen_flush() {
   if (gscreen.fb.framebuffer_count <= 0) {
-    printf("init screen has some error\n");
+    printf("init screen has some error,maybe no init first\n");
     return;
   }
   u32 current_index = gscreen.fb.framebuffer_index;
@@ -568,7 +572,7 @@ void screen_flush() {
       (++gscreen.fb.framebuffer_index) % gscreen.fb.framebuffer_count;
   gscreen.buffer = gscreen.fb.frambuffer + gscreen.width * gscreen.height *
                                                gscreen.fb.framebuffer_index;
-  
+
   ioctl(gfd, IOC_FLUSH_FRAMBUFFER, current_index);
 }
 
@@ -579,6 +583,8 @@ void do_screen_thread(void) {
   char wheel[] = {'\\', '|', '/', '-'};
 
   mouse_data_t mouse_data;
+  mouse_data.x = 0;
+  mouse_data.y = 0;
   int fd = open("/dev/mouse", 0);
   for (;;) {
     buf[0] = wheel[i++];

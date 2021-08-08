@@ -25,7 +25,9 @@ if arch=='arm':
             'gpu/bcm2836.c',
             'gpu/mailbox.c',
             'mmc/bcm2836.c',
-            'mmc/bcm2835_vc.c'
+            'mmc/bcm2835_vc.c',
+            'serial/serial-bcm2836.c',
+            'mouse/mouse-bcm2836.c',
             ]
 
     driver=[
@@ -33,6 +35,7 @@ if arch=='arm':
         'fat/byteordering.c',
         'fat/partition.c',
         'fat/mod.c',
+        'fat32/fat32.c',
         
         'gpu/gpu.c',
         'mmc/sdhci.c',

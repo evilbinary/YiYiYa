@@ -45,12 +45,12 @@ int devfs_init(void) {
   vfs_mount(NULL, "/dev", stdout);
 
   stdin->device = device_find(DEVICE_KEYBOARD);
-  stdout->device = device_find(DEVICE_VGA);
+  stdout->device = device_find(DEVICE_SERIAL);
   if (stdin->device == NULL) {
     stdin->device = device_find(DEVICE_SERIAL);
   }
   if (stdout->device == NULL) {
-    stdout->device = device_find(DEVICE_SERIAL);
+    stdout->device = device_find(DEVICE_VGA);
   }
 
   stdin->read = device_read;

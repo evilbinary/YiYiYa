@@ -48,7 +48,14 @@ int event_init() {
   return 1;
 }
 
-u32 scan_code_to_key(u32 scan_code) { return key_map[scan_code & 0x7f][shf_p]; }
+u32 scan_code_to_key(u32 scan_code) {
+  int index=scan_code & 0x7f;
+  if(index>0x3a){
+    printf("scan code overflow %x\n",scan_code);
+    return 0;
+  }
+  return key_map[index][shf_p];
+}
 
 int event_read_mouse(mouse_data_t* mouse_data) {
   int ret=read(event_info.mouse_fd, &event_info.mouse, sizeof(mouse_data_t));

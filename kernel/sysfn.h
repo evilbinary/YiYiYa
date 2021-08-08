@@ -38,13 +38,6 @@ enum {
     SYS_READDIR
 };
 
-typedef struct exec{
-    char filename[256];
-    char** argv;
-}exec_t;
-
-typedef int (*entry_fn)(int, char**);
-
 u32 sys_open(char* name, int attr);
 // size_t sys_ioctl(u32 fd, u32 cmd, ...);
 size_t sys_ioctl(u32 fd, u32 cmd, va_list args);

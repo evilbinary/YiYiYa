@@ -31,7 +31,7 @@ if env.get('MYLIB'):
 
 env.Program('etk.elf', source,
     CFLAGS='$CFLAGS -Ilibs/include/c/ -Iapp/libgui/ -Iapp/libjpeg/ -Iapp/libetk/',
-    LINKFLAGS= '$LINKFLAGS --entry main -Tuser.ld')
+    LINKFLAGS= '$LINKFLAGS $USER')
 
 # env.Objcopy('etk.elf','etk',OBJCOPYFLAGS='-S')
 # env.Objcopy('etk.dbg','etk',OBJCOPYFLAGS='--only-keep-debug')

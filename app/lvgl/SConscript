@@ -31,4 +31,4 @@ if env.get('MYLIB'):
 
 env.Program('lvgl', source,
     CFLAGS='$CFLAGS -Ilibs/include/c/ -Iapp/liblvgl -Iapp/libgui/ -Iapp/libjpeg -DLV_LVGL_H_INCLUDE_SIMPLE=1',
-    LINKFLAGS= '$LINKFLAGS --entry main -Tuser.ld')
+    LINKFLAGS= '$LINKFLAGS $USER')

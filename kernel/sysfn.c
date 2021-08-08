@@ -19,8 +19,8 @@ int sys_print(char* s) {
 }
 
 void sys_test() {
-   thread_t* current = thread_current();
-   kprintf("sys test %d\n",current->id);
+  thread_t* current = thread_current();
+  kprintf("sys test %d\n", current->id);
 }
 
 int sys_print_at(char* s, u32 x, u32 y) {
@@ -76,8 +76,8 @@ u32 sys_open(char* name, int attr) {
     kprintf("sys open name return : %s fd: %d\n", name, f);
     return f;
   }
-  vnode_t* file = vfs_open(NULL, name,attr);  
-  if(file==NULL){
+  vnode_t* file = vfs_open(NULL, name, attr);
+  if (file == NULL) {
     kprintf("sys open file %s error\n", name);
     return -1;
   }
@@ -92,34 +92,34 @@ u32 sys_open(char* name, int attr) {
     kprintf("sys open %s error\n", name);
     return -1;
   }
-  kprintf("sys open new name: %s fd:%d id:%d ptr:%x\n", name, f,fd->id,fd);
+  kprintf("sys open new name: %s fd:%d fd->id:%d ptr:%x\n", name, f, fd->id, fd);
   return f;
 }
 
 void sys_close(u32 fd) {}
 
 size_t sys_write(u32 fd, void* buf, size_t nbytes) {
-  thread_t* current=thread_current();
+  thread_t* current = thread_current();
   fd_t* f = thread_find_fd_id(current, fd);
   if (f == NULL) {
-    kprintf("write not found fd %d tid %d\n", fd,current->id);
+    kprintf("write not found fd %d tid %d\n", fd, current->id);
     thread_dump_fd(current);
     return 0;
   }
   vnode_t* node = f->data;
   if (node == NULL) {
-    kprintf("sys write node is null tid %d \n",current->id);
+    kprintf("sys write node is null tid %d \n", current->id);
     return -1;
   }
-  //kprintf("sys write %d %s fd:%s\n",current->id,buf,f->name);
+  // kprintf("sys write %d %s fd:%s\n",current->id,buf,f->name);
   u32 ret = vwrite(node, f->offset, nbytes, buf);
   return ret;
 }
 size_t sys_read(u32 fd, void* buf, size_t nbytes) {
-  thread_t* current=thread_current();
+  thread_t* current = thread_current();
   fd_t* f = thread_find_fd_id(current, fd);
   if (f == NULL) {
-    kprintf("read not found fd %d tid %d\n", fd,current->id);
+    kprintf("read not found fd %d tid %d\n", fd, current->id);
     return 0;
   }
   vnode_t* node = f->data;
@@ -145,9 +145,9 @@ size_t sys_yeild() { thread_yield(); }
 
 void sys_exit(int status) {
   thread_t* current = thread_current();
-  thread_exit(current);
+  thread_exit(current,status);
   thread_dumps();
-  kprintf("sys exit %d\n", status);
+  kprintf("sys exit tid %d status %d\n", current->id, status);
 }
 
 void* sys_vmap(void* addr, size_t size) {
@@ -177,66 +177,74 @@ void sys_vfree(void* addr) {
   vfree(addr);
 }
 
-u32 sys_exec(char* filename, char* const argv[],char *const envp[]) {
-  int fd=sys_open(filename,0);
-  if(fd<0){
+u32 sys_exec(char* filename, char* const argv[], char* const envp[]) {
+  int fd = sys_open(filename, 0);
+  if (fd < 0) {
     sys_close(fd);
-    kprintf("sys exec file not found %s\n",filename);
+    kprintf("sys exec file not found %s\n", filename);
     return -1;
   }
   sys_close(fd);
 
   thread_t* current = thread_current();
   u8* stack0 = kmalloc(THREAD_STACK_SIZE);
-  thread_t* t = thread_create_ex((u32*)&run_elf_thread, stack0, STACK_ADDR,
+  u8* stack3 = kmalloc(THREAD_STACK_SIZE);
+  u8* vstack3=STACK_ADDR;
+  thread_t* t = thread_create_ex((u32*)&run_elf_thread, stack0, vstack3,
                                  THREAD_STACK_SIZE, NULL);
   context_t* context = &t->context;
-  // init 2GB
-  // map_2gb(page_dir_ptr_tab, PAGE_P | PAGE_USU | PAGE_RWW);
-  context->page_dir = page_alloc_clone(t->context.kernel_page_dir);
 
-  // map_page_on(t->context.page_dir, 0, 0,0);
+  context->page_dir = page_alloc_clone(t->context.kernel_page_dir);
+  // init 2GB
+  // map_2gb(context->page_dir, PAGE_P | PAGE_USU | PAGE_RWW);
+
   // init vmm
   t->vmm = vmemory_area_create(HEAP_ADDR, MEMORY_CREATE_SIZE, MEMORY_HEAP);
   vmemory_area_t* vmexec =
       vmemory_area_create(EXEC_ADDR, MEMORY_EXEC_SIZE, MEMORY_EXEC);
   vmemory_area_add(t->vmm, vmexec);
-  vmemory_area_t* vmdata =
-      vmemory_area_create(DATA_ADDR, PAGE_SIZE, MEMORY_DATA);
-  vmemory_area_add(t->vmm, vmdata);
   vmemory_area_t* stack =
-      vmemory_area_create(DATA_ADDR, PAGE_SIZE, MEMORY_STACK);
+      vmemory_area_create(vstack3, PAGE_SIZE, MEMORY_STACK);
   vmemory_area_add(t->vmm, stack);
 
   // init stack
-  // void* stackaddr = kmalloc_alignment(sizeof(exec_t), PAGE_SIZE);
-  // map_page_on(t->context.page_dir, stack->vaddr, stackaddr,PAGE_P | PAGE_USU
-  // | PAGE_RWW);
+  map_page_on(t->context.page_dir, vstack3, stack3,
+              PAGE_P | PAGE_USU | PAGE_RWW);
 
   // init data
-  void* paddr = kmalloc_alignment(sizeof(exec_t), PAGE_SIZE);
-  map_page_on(t->context.page_dir, vmdata->vaddr, paddr,
-              PAGE_P | PAGE_USU | PAGE_RWW);
+  void* paddr = kmalloc(sizeof(exec_t));
   exec_t* data = paddr;
   kstrcpy(data->filename, filename);
   data->argv = argv;
-  t->data = vmdata->vaddr;
+  data->argc = 1;
+  t->data = data;
 
-  //init fds
-  for(int i=0;i<3;i++){
-    t->fds[i]=current->fds[i];
+  // init fds
+  for (int i = 0; i < 3; i++) {
+    t->fds[i] = current->fds[i];
   }
-  //thread_dump_fd(t);
+  // thread_dump_fd(t);
   thread_run(t);
   return 0;
 }
 
 int sys_fork() {
   thread_t* current = thread_current();
-  thread_t* copy_thread = thread_clone(current, STACK_ADDR, THREAD_STACK_SIZE);
-  copy_thread->pid = current->id;
+  context_t* current_context = &current->context;
+  interrupt_context_t* ct = current_context->esp0;
 
+  thread_t* copy_thread = thread_clone(current,STACK_ADDR,THREAD_STACK_SIZE);
+  copy_thread->pid = current->id;
+  
 #ifdef ARM
+  kprintf("sysfork %d =>lr:%x sp:%x current context=> lr:%x sp:%x fp:%x\n",current->id, current_context->eip,
+          current_context->esp, ct->lr, ct->sp, ct->r11);
+  interrupt_context_t* c0 = current->context.esp0;
+  interrupt_context_t* c = copy_thread->context.esp0;
+  kprintf("# current tid %d eip:%x sp:%x fp:%x \n", current->id, c0->lr, c0->sp,
+          c0->r11);
+  kprintf("# new     tid %d eip:%x sp:%x fp:%x \n", copy_thread->id, c->lr,
+          c->sp, c->r11);
 #elif defined(X86)
   interrupt_context_t* c0 = current->context.esp0;
   interrupt_context_t* c = copy_thread->context.esp0;
@@ -256,15 +264,17 @@ int sys_pipe(int fds[2]) {
   vnode_t* node = pipe_make(PAGE_SIZE);
   fd_t* fd0 = fd_new(node, DEVICE_TYPE_VIRTUAL, "pipe0");
   fd_t* fd1 = fd_new(node, DEVICE_TYPE_VIRTUAL, "pipe1");
-  fds[0]=thread_add_fd(current,fd0);;
-  fds[1]=thread_add_fd(current,fd1);;
+  fds[0] = thread_add_fd(current, fd0);
+  ;
+  fds[1] = thread_add_fd(current, fd1);
+  ;
   return 0;
 }
 
 int sys_getpid() {
   thread_t* current = thread_current();
 #ifdef SYS_DEBUG
-  kprintf("sys get pid %d\n",current->id);
+  kprintf("sys get pid %d\n", current->id);
 #endif
   return current->id;
 }
@@ -283,7 +293,7 @@ int sys_dup(int oldfd) {
   }
   int newfd = thread_add_fd(current, fd);
 #ifdef DEBUG_SYS_FN
-  kprintf("sys dup %d %s\n",newfd,fd->name);
+  kprintf("sys dup %d %s\n", newfd, fd->name);
 #endif
   return newfd;
 }
@@ -305,18 +315,18 @@ int sys_dup2(int oldfd, int newfd) {
   return newfd;
 }
 
-int sys_readdir(int fd,int index,void* dirent){
+int sys_readdir(int fd, int index, void* dirent) {
   thread_t* current = thread_current();
   fd_t* findfd = thread_find_fd_id(current, fd);
   if (fd == NULL) {
     kprintf("readdir not found fd %d\n", fd);
     return 0;
   }
-  vdirent_t* d= vreaddir(findfd->data,index);
-  if(d==NULL){
+  vdirent_t* d = vreaddir(findfd->data, index);
+  if (d == NULL) {
     return 0;
   }
-  kmemmove(dirent,d,sizeof(vdirent_t));
+  kmemmove(dirent, d, sizeof(vdirent_t));
   kfree(d);
   return 1;
 }

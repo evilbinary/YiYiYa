@@ -5,8 +5,10 @@
  ********************************************************************/
 #include "sdhci.h"
 
-
 static size_t sdhci_read(device_t* dev, void* buf, size_t len) {
+  if (len == 0) {
+    return 0;
+  }
   sdhci_device_t* sdhci_dev = dev->data;
   int no = dev->id - DEVICE_SATA;
   u32 startl = sdhci_dev->offsetl / BYTE_PER_SECTOR;
@@ -26,6 +28,9 @@ static size_t sdhci_read(device_t* dev, void* buf, size_t len) {
 }
 
 static size_t sdhci_write(device_t* dev, void* buf, size_t len) {
+  if (len == 0) {
+    return 0;
+  }
   sdhci_device_t* sdhci_dev = dev->data;
   int no = dev->id - DEVICE_SATA;
   u32 startl = sdhci_dev->offsetl / BYTE_PER_SECTOR;
@@ -49,7 +54,7 @@ static size_t sdhci_ioctl(device_t* dev, u32 cmd, ...) {
   sdhci_device_t* sdhci_dev = dev->data;
   int no = dev->id - DEVICE_SATA;
   if (sdhci_dev == NULL) {
-    kprintf("not found vga\n");
+    kprintf("not found sdhci\n");
     return ret;
   }
   va_list ap;
@@ -78,8 +83,8 @@ int sdhci_init(void) {
   device_add(dev);
 
   sdhci_device_t* sdhci_dev = kmalloc(sizeof(sdhci_device_t));
-  sdhci_dev->offseth=0;
-  sdhci_dev->offsetl=0;
+  sdhci_dev->offseth = 0;
+  sdhci_dev->offsetl = 0;
   dev->data = sdhci_dev;
   sdhci_dev_init(sdhci_dev);
 

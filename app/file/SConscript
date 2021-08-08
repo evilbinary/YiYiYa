@@ -21,5 +21,5 @@ if env.get('MYLIB'):
 
 env.Program('file.elf', source,
     CFLAGS='$CFLAGS -Ilibs/include/c/ ',
-    LINKFLAGS= '$LINKFLAGS --entry main -Tuser.ld')
+    LINKFLAGS= '$LINKFLAGS $USER')
 

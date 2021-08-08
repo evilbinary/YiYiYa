@@ -274,21 +274,27 @@ void init_memory() {
     // count++;
 
     ptr->base  =0x40000000;
-    ptr->length=0x1000000;
+    ptr->length=0x1000000;//16M
     ptr->type=1;
     boot_info->total_memory += ptr->length;
     ptr++;
     count++;
 
   #else
-    for (; count < 1;) {
-        ptr->type=1;
-        ptr->base=0x00000000;
-        ptr->length=0x00100000;
-        boot_info->total_memory += ptr->length;
-        ptr++;
-        count++;
-    }
+      //
+      ptr->type=1;
+      ptr->base=0x00000000;
+      ptr->length=boot_info->kernel_base; 
+      boot_info->total_memory += ptr->length;
+      ptr++;
+      count++;
+      
+      ptr->type=1;
+      ptr->base=(u32)boot_info->kernel_base+(u32)boot_info->kernel_size;
+      ptr->length=0xf000000; //64M
+      boot_info->total_memory += ptr->length;
+      ptr++;
+      count++;
   #endif
   boot_info->memory_number = count;
   // page setup
@@ -357,7 +363,7 @@ void load_elf(Elf32_Ehdr* elf_header) {
   u16* elf = elf_header;
   Elf32_Phdr* phdr = (elf + elf_header->e_phoff / 2);
   // printf("addr %x elf=%x\n\r", phdr, elf);
-
+  u32 entry=0;
   for (int i = 0; i < elf_header->e_phnum; i++) {
     printf("type:%d\n\r", phdr[i].p_type);
     switch (phdr[i].p_type) {
@@ -372,9 +378,10 @@ void load_elf(Elf32_Ehdr* elf_header) {
         //        phdr[i].p_memsz);
         char* start = elf + phdr[i].p_offset / 2;
         char* vaddr = phdr[i].p_vaddr;
+        entry=vaddr;
         printf("load start:%x vaddr:%x size:%x \n\r", start, vaddr,
                phdr[i].p_filesz);
-        memmove32(vaddr, start, phdr[i].p_filesz);
+        memmove32(vaddr, start, phdr[i].p_memsz);
         printf("move end\n\r");
       } break;
       default:
@@ -388,7 +395,7 @@ void load_elf(Elf32_Ehdr* elf_header) {
       char* vaddr = shdr[i].sh_addr;
       memset(vaddr,0,shdr[i].sh_size);
       // map_alignment(page,vaddr,buf,shdr[i].sh_size);
-    } else if (elf_header->e_entry != shdr[i].sh_addr &&
+    } else if (entry != shdr[i].sh_addr &&
                SHT_PROGBITS == shdr[i].sh_type &&
                shdr[i].sh_flags & SHF_ALLOC && shdr[i].sh_flags) {
       char* start = shdr[i].sh_offset;

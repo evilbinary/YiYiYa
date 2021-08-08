@@ -6,7 +6,11 @@
 #ifndef FAT32_H
 #define FAT32_H
 
+#ifdef ARM
+#include "drivers/mmc/sdhci.h"
+#else
 #include "drivers/ahci/ahci.h"
+#endif
 #include "kernel/device.h"
 #include "kernel/kernel.h"
 #include "kernel/module.h"

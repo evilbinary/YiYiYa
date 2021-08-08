@@ -11,7 +11,7 @@ void* load_bmp(char* name) {
   char* buffer = malloc(200 * 1024);
   memset(buffer, 0, 200 * 1024);
   FILE* fp;
-  fp = fopen("/dev/sda/duck.jpg", "r+");
+  fp = fopen(name, "r+");
   printf("fd=%d\n", fp->fd);
   u32 offset = 0;
   for (;;) {
@@ -65,7 +65,7 @@ void yiyiya_gui() {
     // screen_fill_rect(10, 20, 30, 30, 0xff0000);
 
     screen_printf(10, 100, "mouse=%d,%d", mouse.x, mouse.y);
-    //screen_fill_rect(mouse.x, screen->height - mouse.y, 4, 4, 0x00ff00);
+    // screen_fill_rect(mouse.x, screen->height - mouse.y, 4, 4, 0x00ff00);
 
     display_time();
 
@@ -75,24 +75,35 @@ void yiyiya_gui() {
 }
 
 void yiyiya_display() {
+  printf("screen_init\n");
   screen_init();
+  printf("screen_init end\n");
   for (;;) {
-    screen_printf(0, 0, "hello dispaly\n");
+    // screen_fill_rect(0,0,640,490,0xff0000);
+    screen_printf(0, 0, "hello display YiYiYa Os\n");
     screen_flush();
   }
 }
 
-void yiyiya_bitmap(){
-  bitmap_t* bitmap = load_jpeg("/dev/sda/home.jpg");
-  for(;;){
-
+void yiyiya_bitmap() {
+  screen_init();
+  // bitmap_t* bitmap = load_jpeg("/dev/sda/home.jpg");
+  bitmap_t* bitmap = load_jpeg("/dev/sda/duck.jpg");
+  //  bitmap_t* bitmap = load_png("/dev/sda/normal.png");
+  // void* bmp = load_bmp("/dev/sda/bomb.bmp");
+  for (;;) {
+    screen_show_bitmap(0, 0, 227, 149, bitmap);
+    // screen_show_bitmap(0, 0, 1024, 768, bitmap);
+    // screen_show_bitmap(0, 0, 640, 480, bitmap);
+    // screen_show_bmp_picture(200, 200, bmp, 0, 0);
+    screen_flush();
   }
 }
 
 int main(int argc, char* argv[]) {
   printf(buf);
-  yiyiya_gui();
-  // yiyiya_display();
+  // yiyiya_gui();
+  yiyiya_display();
   // yiyiya_bitmap();
 
   return 0;

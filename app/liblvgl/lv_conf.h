@@ -42,7 +42,7 @@
 #define LV_MEM_CUSTOM      0
 #if LV_MEM_CUSTOM == 0
 /*Size of the memory available for `lv_mem_alloc()` in bytes (>= 2kB)*/
-#  define LV_MEM_SIZE    (10*32U * 1024U)          /*[bytes]*/
+#  define LV_MEM_SIZE    (40*32U * 1024U)          /*[bytes]*/
 
 /*Set an address for the memory pool instead of allocating it as a normal array. Can be in external SRAM too.*/
 #  define LV_MEM_ADR          0     /*0: unused*/
@@ -137,7 +137,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
  *-----------*/
 
 /*Enable the log module*/
-#define LV_USE_LOG      0
+#define LV_USE_LOG      1
 #if LV_USE_LOG
 
 /*How important log should be added:
@@ -147,7 +147,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
  *LV_LOG_LEVEL_ERROR       Only critical issue, when the system may fail
  *LV_LOG_LEVEL_USER        Only logs added by the user
  *LV_LOG_LEVEL_NONE        Do not log anything*/
-#  define LV_LOG_LEVEL    LV_LOG_LEVEL_ERROR
+#  define LV_LOG_LEVEL    LV_LOG_LEVEL_TRACE
 
 /*1: Print the log with 'printf';
  *0: User need to register a callback with `lv_log_register_print_cb()`*/
@@ -503,8 +503,8 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #define LV_BUILD_EXAMPLES   0
 
 
-#define LV_HOR_RES_MAX 1024
-#define LV_VER_RES_MAX 768
+#define LV_HOR_RES_MAX 640
+#define LV_VER_RES_MAX 480
 
 /*--END OF LV_CONF_H--*/
 

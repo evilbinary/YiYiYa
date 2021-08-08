@@ -310,11 +310,16 @@ void mine_rand_mine(mine_type* mine){
 			MINE_GET(mine, top, j, i) = MINE_BMP_STA_BLANK;
 		}
 	}
-
+	int count=0;
 	for(i = 0; i < mine->bombcount; ++i){
 		do{
 			x = rand() % MINE_COLS;
 			y = rand() % MINE_ROWS;
+			count++;
+			if(count>2000){
+				printf("random not work\n");
+				break;
+			}
 		}while(MINE_GET(mine, bottom, y, x) != MINE_EMPTY);
 		MINE_GET(mine, bottom, y, x) = MINE_BOMB;
 	}	

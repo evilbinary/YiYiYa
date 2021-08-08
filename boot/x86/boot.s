@@ -36,7 +36,7 @@ bits 16
 ;;磁盘读取到内存 es:bx 地址
 load_init:
     mov ah,0x02 ;读取功能
-    mov al,0x0b ;读取几个扇区
+    mov al,0x0e ;读取几个扇区
     mov cl,0x02 ;0x01 boot sector, 0x02 is first sector
     mov ch,0x00
     mov dh,0x00

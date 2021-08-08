@@ -8,7 +8,7 @@ void* syscall0(u32 num) {
       "mov %0,r0\n\t"
       : "=r"(ret)
       : "r"(num)
-      : "r0", "r1", "r2", "r3", "r4", "r7");
+      : "r0","r7");
   return ret;
 }
 

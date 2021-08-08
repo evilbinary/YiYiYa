@@ -88,6 +88,8 @@ int rtc_init(void) {
   dev->id = DEVICE_RTC;
   dev->type = DEVICE_TYPE_CHAR;
   dev->data = &rtc_time;
+
+  device_add(dev);
   return 0;
 }
 

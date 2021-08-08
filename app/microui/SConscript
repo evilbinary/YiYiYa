@@ -28,7 +28,7 @@ if env.get('MYLIB'):
 
 env.Program('microui.elf',source,
     CFLAGS='$CFLAGS -Ilibs/include/c/ -Iapp/libgui/',
-    LINKFLAGS= '$LINKFLAGS --entry main -Tuser.ld')
+    LINKFLAGS= '$LINKFLAGS $USER')
 
 # env.Objcopy('microui.elf','microui',OBJCOPYFLAGS='-S')
 # env.Objcopy('microui.dbg','microui.elf',OBJCOPYFLAGS='--only-keep-debug')

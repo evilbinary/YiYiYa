@@ -9,6 +9,7 @@ import os
 Import('env')
 
 sources=[
+    'lv_conf.h',
     'port/lv_port_disp.c',
     # "port/lv_port_fs.c',",
     'port/lv_port_indev.c',
