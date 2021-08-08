@@ -8,6 +8,12 @@
 
 #define LVGL_TICK 5
 
+#ifdef ARM
+#define TICK_RATE 1
+#else
+#define TICK_RATE 100
+#endif
+
 static void btn_event_cb(lv_event_t *e) {
   lv_event_code_t code = lv_event_get_code(e);
   lv_obj_t *btn = lv_event_get_target(e);
@@ -191,7 +197,6 @@ uint32_t custom_tick_get(void) {
 
 int main(int argc, char **argv) {
   lv_init();
-
   lv_port_disp_init();
   lv_port_indev_init();
   // lv_port_fs_init();
@@ -203,10 +208,12 @@ int main(int argc, char **argv) {
 
   lv_demo_widgets();
 
+  printf("loop\n");
+
   int tickets = 0;
   while (1) {
     // 先调用 lv_tick_inc 再调用 lv_task_handler
-    if (tickets % (100 * LVGL_TICK)==0) {
+    if (tickets % (TICK_RATE * LVGL_TICK)==0) {
       lv_tick_inc(LVGL_TICK);
       tickets = 0;
     }

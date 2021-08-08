@@ -199,14 +199,9 @@ void context_clone(context_t* context, context_t* src, u32* stack0, u32* stack3,
     c0->eflags= 0x0200;
   }
   if (stack3 != NULL) {
-    // c0->esp = stack3 - ((u32)old3 - s0->esp);
-    // c0->ebp = stack3 - ((u32)old3- s0->ebp);
-    // c0->esp=stack3;
-    // c0->ebp=stack3;
-    context->esp = c0->esp;
+    context->esp = s0->esp;
   }
   context->esp0 = (u32)c0;
-  
 }
 
 void context_switch(interrupt_context_t* context, context_t** current,
@@ -227,30 +222,6 @@ void context_switch(interrupt_context_t* context, context_t** current,
   tss->esp0 = next_context->esp0 + sizeof(interrupt_context_t);
   tss->ss0 = next_context->ss0;
   tss->cr3 = next_context->page_dir;
-
-  // asm volatile("mov %%cr3, %0" : "=r" (current_context->page_dir));
-  // tss->esp= next_context->esp;
-  // tss->ss = next_context->ss;
-  /*tss->esp = next_context->esp;
-
-  tss->eax = c->eax;
-  tss->ecx = c->ecx;
-  tss->edx = c->edx;
-  tss->ebx = c->ebx;
-  tss->esp = c->esp_n;
-  tss->ebp = c->ebp;
-  tss->esi = c->esi;
-  tss->edi = c->edi;
-
-  tss->ds = c->ds;
-  tss->es = c->es;
-  tss->fs = c->fs;
-  tss->gs = c->gs;
-  tss->eip= c->eip;
-  tss->eflags=c->eflags;
-  tss->cs = c->cs;
-  tss->ss = c->ss;
-  */
 
   *current = next_context;
   context_switch_page(next_context->page_dir);

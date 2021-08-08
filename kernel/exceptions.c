@@ -67,10 +67,10 @@ void exception_info(interrupt_context_t *context) {
   if (context->no != 14) {
     thread_t *current = thread_current();
     if (context->no < sizeof exception_msg) {
-      kprintf("EXCEPTION %d: %s\n=======================\n", context->no,
+      kprintf("EXCEPTION %d: %s\n----------------------------\n", context->no,
               exception_msg[context->no]);
     } else {
-      kprintf("INTERRUPT %d\n=======================\n", context->no);
+      kprintf("INTERRUPT %d\n----------------------------\n", context->no);
     }
     if (current != NULL) {
       kprintf("tid:%d\n", current->id);
@@ -80,12 +80,12 @@ void exception_info(interrupt_context_t *context) {
     kprintf("ss:\t%x\tesp:\t%x\n", context->ss, context->esp);
     // kprintf("old ss:\t%x\told esp:%x\n", old_ss, old_esp);
     kprintf("code:%x\tcr2:\t%x\tcr3:\t%x\n", context->no, cr2, cr3);
-    kprintf("General Registers:\n=======================\n");
+    kprintf("General Registers:\n----------------------------\n");
     kprintf("eax:\t%x\tebx:\t%x\n", context->eax, context->ebx);
     kprintf("ecx:\t%x\tedx:\t%x\n", context->ecx, context->edx);
     kprintf("esi:\t%x\tedi:\t%x\tebp:\t%x\n", context->esi, context->edi,
             context->ebp);
-    kprintf("Segment Registers:\n=======================\n");
+    kprintf("Segment Registers:\n----------------------------\n");
     kprintf("ds:\t%x\tes:\t%x\n", ds, es);
     kprintf("fs:\t%x\tgs:\t%x\n", fs, gs);
   }
@@ -278,6 +278,7 @@ void do_page_fault(interrupt_context_t *context) {
       kprintf("tid: %d memory fault at %x\n", current->id, fault_addr);
       dump_fault(context, fault_addr);
       thread_exit(current, -1);
+      cpu_halt();
       return;
     }
     void *phy = virtual_to_physic(current->context.page_dir, fault_addr);
@@ -288,11 +289,13 @@ void do_page_fault(interrupt_context_t *context) {
     if (phy == NULL) {
       valloc(fault_addr, PAGE_SIZE);
     } else {
-      kprintf("tid: %d phy realloc memory fault at %x\n", current->id,
-              fault_addr);
+      // valloc(fault_addr, PAGE_SIZE);
+      kprintf("tid: %d phy: %x remap memory fault at %x\n", current->id,phy,fault_addr);
       dump_fault(context, fault_addr);
       thread_exit(current, -1);
     }
+  } else {
+    map_page(fault_addr, fault_addr, PAGE_P | PAGE_USU | PAGE_RWW);
   }
 }
 
@@ -325,7 +328,7 @@ void dump_fault(interrupt_context_t *context, u32 fault_addr) {
   int us = context->code & 0x4;       // user mode
   int reserved = context->code & 0x8;
   int id = context->code & 0x10;
-  kprintf("=============================\n");
+  kprintf("----------------------------\n");
   kprintf("eip: %x \ncs: %x \nds: %x \nss: %x \nesp: %x \nebp: %x \npage: [",
           context->eip, context->cs, context->ds, context->ss, context->esp,
           context->ebp);
@@ -343,7 +346,7 @@ void dump_fault(interrupt_context_t *context, u32 fault_addr) {
   }
   kprintf("]\n");
   kprintf("fault: 0x%x \n", fault_addr);
-  kprintf("=============================\n");
+  kprintf("----------------------------\n");
 }
 void do_page_fault(interrupt_context_t *context) {
   u32 fault_addr;
@@ -355,7 +358,7 @@ void do_page_fault(interrupt_context_t *context) {
     if (current != NULL) {
       vmemory_area_t *area = vmemory_area_find(current->vmm, fault_addr, 0);
       if (area == NULL) {
-        kprintf("tid: %d memory fault at %x\n", current->id, fault_addr);
+        kprintf("\ntid: %d memory fault at %x\n", current->id, fault_addr);
         dump_fault(context, fault_addr);
         thread_exit(current, -1);
         return;
@@ -368,7 +371,7 @@ void do_page_fault(interrupt_context_t *context) {
       if (phy == NULL) {
         valloc(fault_addr, PAGE_SIZE);
       } else {
-        kprintf("tid: %d phy realloc memory fault at %x\n", current->id,
+        kprintf("tid: %d phy remap memory fault at %x\n", current->id,
                 fault_addr);
         dump_fault(context, fault_addr);
         thread_exit(current, -1);

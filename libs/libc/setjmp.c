@@ -1,7 +1,7 @@
-#include <setjmp.h>
+#include "setjmp.h"
 
-int setjmp(jmp_buf env) {
 #ifdef __i386__
+int setjmp(jmp_buf env) {
   asm volatile(
       "mov %0, %%eax\n"
       "movl %%ebp, (%%eax)\n"
@@ -16,15 +16,10 @@ int setjmp(jmp_buf env) {
       :
       : "p"(&(env[0].regs))
       : "eax", "ebx", "ecx");
-#else
-  printf("setjmp not implemented for anything besides x86");
-#endif
-
   return 0;
 }
 
 void longjmp(jmp_buf env, int val) {
-#ifdef __i386__
   asm volatile(
       "mov %1, %%eax\n"
       "mov %0, %%esp\n"
@@ -44,7 +39,11 @@ void longjmp(jmp_buf env, int val) {
       :
       : "p"(&(env[0].regs)), "g"(val)
       : "eax", "ecx", "esp");
-#else
-  printf("longjmp not implemented for anything besides x86");
-#endif
 }
+#elif defined(ARM)
+
+  int __hwcap[38];
+
+#else
+
+#endif

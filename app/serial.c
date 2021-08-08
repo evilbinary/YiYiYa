@@ -6,7 +6,7 @@
 #include "main.h"
 
 void test_gui() {
-#ifdef ARM
+#ifdef XTENSA
   char wheel[] = {'\\', '|', '/', '-'};
   screen_init();
   int i = 0,j=0;

@@ -61,6 +61,8 @@ void* valloc(void* addr, size_t size) {
   void* phy_addr = queue_pool_poll(user_pool);
   if (phy_addr == NULL) {
     phy_addr = kmalloc_alignment(size, PAGE_SIZE);
+  }else{
+    kprintf("use pool addr %x\n",phy_addr);
   }
 #else
   void* phy_addr = kmalloc_alignment(size, PAGE_SIZE);
@@ -129,8 +131,8 @@ void page_clone_user(u64* page, u64* page_dir_ptr_tab) {
 
 
 void kpool_init() {
-  kernel_pool = queue_pool_create(10, PAGE_SIZE);
-  user_pool = queue_pool_create_align(1, PAGE_SIZE, PAGE_SIZE);
+  kernel_pool = queue_pool_create(KERNEL_POOL_NUM, PAGE_SIZE);
+  user_pool = queue_pool_create_align(USER_POOL_NUM, PAGE_SIZE, PAGE_SIZE);
 }
 
 int kpool_put(void* e) { return queue_pool_put(kernel_pool, e); }

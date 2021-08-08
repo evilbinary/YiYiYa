@@ -27,7 +27,7 @@ kernel=[
     'serial.c',
     ]
 
-if env.get('ARCH')=='arm':
+if env.get('ARCH')=='xtensa':
     libs.append('../app/libgui/libgui.a')
     libs.append('../libs/libc/libc.a')
 
@@ -61,7 +61,7 @@ if env.get('APP'):
 
     if plt=='Darwin':
         env.Command('copyhello', 
-            ['hello/hello.elf',
+            ['hello/hello',
             'gui/gui.elf',
             'microui/microui.elf',
             'file/file.elf',
@@ -75,7 +75,7 @@ if env.get('APP'):
         pass
     elif plt=='Linux':
         env.Command('copyhello', 
-            ['hello/hello.elf',
+            ['hello/hello',
             'gui/gui.elf',
             'microui/microui.elf',
             'file/file.elf',

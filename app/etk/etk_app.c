@@ -160,8 +160,8 @@ int etk_app_main(int argc, char* argv[]) {
   wins[6]=etk_app_clock(840, 40, 180, 180);
 
   // //mine
-  // etk_game_mine(10, 30, 8, 8, 10);
-  wins[7]=etk_game_mine(160, 230, 10, 10, 14);
+  wins[7]=etk_game_mine(10, 30, 8, 8, 10);
+  // wins[7]=etk_game_mine(160, 230, 10, 10, 14);
   // etk_game_mine(340, 30, 16, 16, 20);
   EtkWidget* terminal = etk_terminal(340, 140, 420, 340);
   wins[8]=terminal;

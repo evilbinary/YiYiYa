@@ -34,4 +34,4 @@ env.Library('png', [
 #     '../../libs/libc/libc.a',
 #     ],
 #     CFLAGS='$CFLAGS -Ilibs/include/c/ ',
-#     LINKFLAGS= '$LINKFLAGS --entry main -Tuser.ld')
+#     LINKFLAGS= '$LINKFLAGS $USER')

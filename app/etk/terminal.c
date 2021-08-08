@@ -53,7 +53,7 @@ str_t* str_new(const char* str) {
   s->buf = malloc(size);
   s->buf_len = size;
   s->len = size - 1;
-  strncpy(s->buf, str,strlen(str));
+  strncpy(s->buf, str, strlen(str));
   return s;
 }
 
@@ -63,15 +63,15 @@ void str_append(str_t* str, const char* text) {
   if (needed > str->buf_len) {
     char* new_buf = malloc(2 * needed);
 
-    strncpy(new_buf, str->buf,str->buf_len);
-    new_buf[str->buf_len]=0;
+    strncpy(new_buf, str->buf, str->buf_len);
+    new_buf[str->buf_len] = 0;
     free(str->buf);
 
     str->buf = new_buf;
     str->buf_len = 2 * needed;
   }
 
-  strncpy(&str->buf[prev_len], text,strlen(text)+1);
+  strncpy(&str->buf[prev_len], text, strlen(text) + 1);
   str->len = needed - 1;
 }
 
@@ -110,11 +110,11 @@ void interpret_cmd(char* cmd) {
   int32_t ret = 0;
   // ret = execl((uintptr_t)args[0], (uintptr_t)args);
   char buf[128];
-  sprintf(buf,"/dev/sda/%s",args[0]);
+  sprintf(buf, "/dev/sda/%s", args[0]);
   ret = execl(buf, args);
-  if(ret<0){
+  if (ret < 0) {
     printf("exec error\n");
-  }else{
+  } else {
     printf("\n");
   }
   while (args && *args) {
@@ -224,12 +224,12 @@ int etk_terminal_get_cmd_result() {
   u32 nread;
   u8 anything_read = false;
   memset(ret_buf, 0, ret_buf_size);
-  for(int i=0;i<1;i++){
+  for (int i = 0; i < 1; i++) {
     nread = read(fd_ptm, ret_buf, ret_buf_size - 1);
     if (nread >= 0) {
       ret_buf[nread] = '\0';
-      //printf("read from ptm size:%d %s", nread, ret_buf);
-      str_append(text_buf,"\n");
+      printf("read from ptm size:%d %s", nread, ret_buf);
+      str_append(text_buf, "\n");
       str_append(text_buf, ret_buf);
       anything_read = true;
       break;
@@ -246,10 +246,11 @@ void etk_terminal_do_cmd() {
   u32 pts = ioctl(fd_ptm, IOC_SLAVE);
   char buf[256];
   u32 len = 256;
+  memset(buf,0,256);
   sprintf(buf, "/dev/pts/%d", pts);
   fd_pts = open(buf, "r");
   if (fd_pts < 0) {
-    printf("error get pts \n");
+    printf("error get pts %d\n",pts);
   }
   printf("ptm %d pts %d\n", fd_ptm, fd_pts);
   fd_out = dup(STDOUT_FILENO);
@@ -264,7 +265,6 @@ void etk_terminal_do_cmd() {
     int ret = read(fd_pts, buf, len);
     if (ret >= 0) {
       interpret_cmd(buf);
-      
     }
   }
 }
@@ -280,7 +280,7 @@ static Ret etk_terminal_event(EtkWidget* thiz, EtkEvent* event) {
         case 0x0d:
           str_append(text_buf, input_buf->buf);
           send_input(input_buf);
-          if(input_buf->len>0){
+          if (input_buf->len > 0) {
             u32 cmdret = etk_terminal_get_cmd_result();
             if (cmdret > 0) {
               printf("cmd ret:%d text:%s\n", cmdret, text_buf->buf);

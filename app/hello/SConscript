@@ -35,7 +35,7 @@ source=[
 if env.get('MYLIB'):
     source.append(env.get('MYLIB'))
 
-env.Program('hello.elf', source,
+env.Program('hello', source,
     CFLAGS='$CFLAGS -Ilibs/include/c/ ',
-    LINKFLAGS= '$LINKFLAGS --entry main -Tuser.ld')
+    LINKFLAGS= '$LINKFLAGS $USER')
 

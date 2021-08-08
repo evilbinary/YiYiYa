@@ -1,13 +1,14 @@
 #include "pty.h"
+
 #include "kernel/rw_queue.h"
 
 size_t pty_ioctl(vnode_t *node, u32 cmd, va_list args) {
   if (cmd == IOC_SLAVE) {
     pty_t *pty = node->device;
-    return pty->slave->child_size;
-  }else if (cmd == IOC_MASTER_READ_NOBLOCK) {
+    return pty->slave->child_number - 1;
+  } else if (cmd == IOC_MASTER_READ_NOBLOCK) {
     pty_t *pty = node->device;
-    pty->master_read_block=0;
+    pty->master_read_block = 0;
     return 1;
   }
   return -1;
@@ -15,6 +16,9 @@ size_t pty_ioctl(vnode_t *node, u32 cmd, va_list args) {
 
 u32 pty_open(vnode_t *node) {
   pty_t *pty = node->device;
+#ifdef DEBUG_PTY
+  kprintf("pty salve add:%s\n", node->name);
+#endif
   return pty_slave_add(pty->slave);
 }
 
@@ -24,14 +28,14 @@ u32 pty_master_read(vnode_t *node, u32 offset, u32 size, u8 *buffer) {
     kprintf("pyt read null\n");
     return -1;
   }
-  buffer_read_wait_fn waitfn=pty->in->read_wait;
-  if(pty->master_read_block==0){
-    pty->in->read_wait=NULL;
+  buffer_read_wait_fn waitfn = pty->in->read_wait;
+  if (pty->master_read_block == 0) {
+    pty->in->read_wait = NULL;
   }
-  u32 ret=buffer_read(pty->in, buffer, size);
-  pty->in->read_wait=waitfn;
+  u32 ret = buffer_read(pty->in, buffer, size);
+  pty->in->read_wait = waitfn;
 #ifdef DEBUG_PTY
-  kprintf("pty master read ret:%d %s\n",ret,buffer);
+  kprintf("pty master read ret:%d %s\n", ret, buffer);
 #endif
   return ret;
 }
@@ -43,7 +47,7 @@ u32 pty_master_write(vnode_t *node, u32 offset, u32 size, u8 *buffer) {
     return -1;
   }
 #ifdef DEBUG_PTY
-  kprintf("pty master write %s\n",buffer);
+  kprintf("pty master write %s\n", buffer);
 #endif
   return buffer_write(pty->out, buffer, size);
 }
@@ -57,9 +61,13 @@ u32 pty_slave_read(vnode_t *node, u32 offset, u32 size, u8 *buffer) {
 #ifdef DEBUG_PTY
   kprintf("pty slave read\n");
 #endif
-  u32 ret= buffer_read(pty->out, buffer, size);
+  if(pty->out==NULL){
+    kprintf("pty slave read erro for out null\n");
+    return -1;
+  }
+  u32 ret = buffer_read(pty->out, buffer, size);
 #ifdef DEBUG_PTY
-  kprintf("pty slave read ret:%d %s\n",ret,buffer);
+  kprintf("pty slave read ret:%d %s\n", ret, buffer);
 #endif
   return ret;
 }
@@ -71,9 +79,19 @@ u32 pty_slave_write(vnode_t *node, u32 offset, u32 size, u8 *buffer) {
     return -1;
   }
 #ifdef DEBUG_PTY
-  kprintf("pty slave write %s\n",buffer);
+  kprintf("pty slave write %s\n", buffer);
 #endif
   return buffer_write(pty->in, buffer, size);
+}
+
+u32 pty_slave_open(vnode_t *node) {
+#ifdef DEBUG_PTY
+  kprintf("pty slave open %s\n", node->name);
+#endif
+  // node->device = node->parent->device;
+  // node->read = pty_slave_read;
+  // node->write = pty_slave_write;
+  return 1;
 }
 
 size_t pty_buffer_read_wait(buffer_t *buffer) {
@@ -105,7 +123,9 @@ int pty_slave_add(vnode_t *pts) {
   int i = pts->child_size;
   sprintf(buf, "%d", i);
   vnode_t *child = vfs_create(buf, V_FILE);
-  child->device = pts;
+  child->device = pts->device;
+  child->read = pty_slave_read;
+  child->write = pty_slave_write;
   vfs_add_child(pts, child);
   return i;
 }
@@ -129,8 +149,9 @@ int pty_create(vnode_t **ptm, vnode_t **pts) {
   pty->master->read = pty_master_read;
   pty->master->write = pty_master_write;
   pty->master->ioctl = pty_ioctl;
-  pty->master_read_block=1;
+  pty->master_read_block = 1;
 
+  pty->slave->open = pty_slave_open;
   pty->slave->read = pty_slave_read;
   pty->slave->write = pty_slave_write;
   pty->slave->device = pty;

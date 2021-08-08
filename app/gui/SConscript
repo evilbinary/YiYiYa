@@ -25,7 +25,7 @@ if env.get('MYLIB'):
 
 env.Program('gui.elf', source,
     CFLAGS='$CFLAGS -Ilibs/include/c/ -Iapp/libgui/ -Iapp/libjpeg',
-    LINKFLAGS= '$LINKFLAGS --entry main -Tuser.ld')
+    LINKFLAGS= '$LINKFLAGS $USER')
 
 # env.Objcopy('gui.elf','gui',OBJCOPYFLAGS='-S --strip-all')
 #env.Objcopy('gui.dbg','gui.elf',OBJCOPYFLAGS='--only-keep-debug')

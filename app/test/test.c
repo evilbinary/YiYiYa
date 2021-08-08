@@ -46,9 +46,10 @@ void test_fork() {
     printf("parent %d %d %d\n", getppid(), getpid(), fpid);
   }
   for (int i = 0; i < 10; i++) {
-    printf("%d %d| ", getpid(), i++);
+    printf("pid:%d count:%d\n", getpid(), i++);
     // getpid();
   }
+  printf("\n");
 }
 
 void test_read_write() {
@@ -95,7 +96,7 @@ void test_read_write() {
     }
   }
   for (int i = 0; i < 1000000; i++) {
-    printf("%d %d| ", getpid(), i++);
+    printf("pid:%d count:%d\n", getpid(), i++);
     // getpid();
   }
 }
@@ -111,7 +112,7 @@ void test_dup_pty() {
   pid_t fpid = fork();
   printf("fork end %d\n", fpid);
   if (fpid == 0) {
-    printf("child %d %d %d\n", getppid(), getpid(), fpid);
+    printf("child ppid:%d pid:%d fork ret:%d\n", getppid(), getpid(), fpid);
     u32 pts = ioctl(fd_ptm, IOC_SLAVE);
     char buf[20];
     sprintf(buf, "/dev/pts/%d", pts);
@@ -119,31 +120,33 @@ void test_dup_pty() {
     if (fd_pts < 0) {
       printf("error get pts \n");
     }
+    printf(" salve pts:%d\n",fd_pts);
     int j = 0;
     int pid = getpid();
     for (;;) {
       char buf2[64];
       int len = 1;
       memset(buf2, 0, len);
-      read(fd_pts, buf2, len);
-      printf("pid:%d %d read from ptm: %s\n", pid, j++, buf2);
+      int ret=read(fd_pts, buf2, len);
+      printf("pid:%d %d read from ptm: %s ret:%d\n", pid, j++, buf2,ret);
     }
   } else {
-    printf("parent %d %d %d\n", getppid(), getpid(), fpid);
+    printf("parent ppid:%d pid:%d fork ret:%d\n", getppid(), getpid(), fpid);
     int j = 0;
     int pid = getpid();
     for (;;) {
       char* buf2 = "abcdef";
       int len = strlen(buf2);
-      if (j < 2 || j > 10000000) {
-        printf("pid:%d %d write ptm: %s\n", pid, j, buf2);
-        write(fd_ptm, buf2, len);
-        j++;
+      if (j < 3 || j > 10000000) {
+        printf("pid:%d %d write ptm: %s ", pid, j, buf2);
+        u32 ret=write(fd_ptm, buf2, len);
+        printf("   ret=%d\n");
       }
+      j++;
     }
   }
   for (int i = 0; i < 10; i++) {
-    printf("%d %d| ", getpid(), i++);
+    printf("pid:%d count:%d\n", getpid(), i++);
     // getpid();
   }
 }
@@ -222,8 +225,29 @@ void test_exec(){
   execv("/dev/sda/hello.elf", argv);
 }
 
+
+void test_malloc_free(){
+  for(int i=0;i<100;i++){
+    void*  p=malloc(1024*2);
+    if(p==NULL){
+      printf("malloc error\n");
+    }else{
+      free(p);
+    }
+  }
+}
+
+void test_pc(){
+  printf("fork\n");
+  u32 i = 0;
+  pid_t fpid = fork();
+  for(;;){
+  }
+}
+
 int main(int argc, char* argv[]) {
   printf(buf);
+  test_pc();
   // test_fork();
   // test_pty();
   // test_dup();
@@ -231,6 +255,7 @@ int main(int argc, char* argv[]) {
   // test_pipe();
   // test_exec();
   // test_dup_pty();
-  test_read_write();
+  // test_read_write();
+  // test_malloc_free();
   return 0;
 }

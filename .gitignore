@@ -27,5 +27,5 @@ image/disk.vmdk.lck**
 
 app/lvgl/lvgl
 app/bin/ls
-
+app/hello/hello
 **.bin

@@ -47,10 +47,11 @@ static u32 fat_device_write(vnode_t *node, u32 offset, size_t nbytes,
 }
 
 size_t fat_read_bytes(vnode_t *node, u32 offset, size_t nbytes, u8 *buf) {
+  u32 ret = 0;
   u32 count = nbytes / BYTE_PER_SECTOR;
   u32 rest = nbytes % BYTE_PER_SECTOR;
   char small_buf[BYTE_PER_SECTOR];
-  u32 ret = 0;
+  kmemset(small_buf,0,BYTE_PER_SECTOR);
   for (int i = 0; i < count; i++) {
     ret = fat_device_read(node, offset, BYTE_PER_SECTOR, small_buf);
     kmemmove(buf, small_buf + offset % BYTE_PER_SECTOR, BYTE_PER_SECTOR);
