@@ -6,7 +6,7 @@
 #include "mouse.h"
 
 #include "kernel/kernel.h"
-#include "pic.h"
+#include "pic/pic.h"
 
 mouse_device_t mouse_device;
 mouse_event_t event;

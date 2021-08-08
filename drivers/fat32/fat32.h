@@ -6,7 +6,7 @@
 #ifndef FAT32_H
 #define FAT32_H
 
-#include "drivers/ahci.h"
+#include "drivers/ahci/ahci.h"
 #include "kernel/device.h"
 #include "kernel/kernel.h"
 #include "kernel/module.h"
