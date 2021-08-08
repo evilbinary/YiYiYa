@@ -10,13 +10,13 @@ import platform
 plt = platform.system()
 
 # arch support x86 arm
-arch='arm'
-# arch='x86' 
+#arch='arm'
+arch='x86' 
 
 # board select platform
-# platform='intel'
+platform='intel'
 # platform='v3s'
-platform='raspi2'
+#platform='raspi2'
 
 DefaultEnvironment(tools=[])
 env = Environment(ENV = {}, tools=['gcc'])
