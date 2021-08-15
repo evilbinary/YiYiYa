@@ -272,9 +272,8 @@ void init_memory() {
     // boot_info->total_memory += ptr->length;
     // ptr++;
     // count++;
-
-    ptr->base  =0x40000000;
-    ptr->length=0x1000000;//16M
+    ptr->base  =0x40000000; 
+    ptr->length=0x1000000*4;//16M*4
     ptr->type=1;
     boot_info->total_memory += ptr->length;
     ptr++;

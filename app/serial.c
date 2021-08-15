@@ -8,13 +8,13 @@
 void test_gui() {
 #ifdef XTENSA
   char wheel[] = {'\\', '|', '/', '-'};
-  screen_init();
+  // screen_init();
   int i = 0,j=0;
   for (;;) {
-    screen_printf(0, 0, "Hello YiYiYa Os\n");
-    screen_fill_rect(0, 40, 30, 30, 0x00ff00);
-    screen_draw_line(0, 0, 140, 140, 0xff0000);
-    screen_flush();
+    // screen_printf(0, 0, "Hello YiYiYa Os\n");
+    // screen_fill_rect(0, 40, 30, 30, 0x00ff00);
+    // screen_draw_line(0, 0, 140, 140, 0xff0000);
+    // screen_flush();
   }
 #endif
 }
@@ -26,6 +26,7 @@ void do_serial_thread(void) {
   char wheel[] = {'\\', '|', '/', '-'};
   char buf[512];
   kmemset(buf, 1, 512);
+  // syscall1(SYS_PRINT, "2");
   // syscall3(SYS_WRITE, DEVICE_SERIAL, test, kstrlen(test));
   // int fd = syscall2(SYS_OPEN, "/dev/sda/B.TXT", 0);
   for (;;) {

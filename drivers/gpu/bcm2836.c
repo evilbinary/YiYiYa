@@ -75,21 +75,23 @@ int gpu_init_mode(vga_device_t* vga, int mode) {
     vga->height = 480;
     vga->bpp = 24;
   }  else if (mode == VGA_MODE_480x272x24) {
-    vga->width = 640;
-    vga->height = 480;
+    vga->width = 480;
+    vga->height = 272;
     vga->bpp = 24;
   }else if (mode == VGA_MODE_480x272x32) {
-    vga->width = 640;
-    vga->height = 480;
+    vga->width = 480;
+    vga->height = 272;
     vga->bpp = 32;
   } else if (mode == VGA_MODE_480x272x18) {
-    vga->width = 640;
-    vga->height = 480;
+    vga->width = 480;
+    vga->height = 272;
     vga->bpp = 18;
   }else if (mode == VGA_MODE_1024x768x32) {
     vga->width = 1024;
     vga->height = 768;
     vga->bpp = 32;
+  }else{
+    kprintf("no support mode %x\n");
   }
   vga->mode = mode;
   vga->write = NULL;
@@ -103,7 +105,7 @@ int gpu_init_mode(vga_device_t* vga, int mode) {
   vga->framebuffer_count = 1;
   kprintf("fb addr:%x len:%x\n", vga->frambuffer, vga->framebuffer_length);
   u32 addr = vga->frambuffer;
-  for (int i = 0; i < vga->framebuffer_length / PAGE_SIZE; i++) {
+  for (int i = 0; i < vga->framebuffer_length*8 / PAGE_SIZE; i++) {
     map_page(addr, addr, 0);
     addr += 0x1000;
   }

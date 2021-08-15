@@ -10,13 +10,15 @@ import platform
 plt = platform.system()
 
 # arch support x86 arm
-#arch='arm'
-arch='x86' 
+arch='arm'
+# arch='x86' 
+# arch='xtensa'
 
 # board select platform
-platform='intel'
+# platform='intel'
 # platform='v3s'
-#platform='raspi2'
+platform='raspi2'
+# platform='esp32'
 
 DefaultEnvironment(tools=[])
 env = Environment(ENV = {}, tools=['gcc'])
@@ -35,6 +37,9 @@ else:
 
 if arch=='arm':
     cc_prefix='arm-none-eabi-'
+elif arch=='xtensa':
+    cc_prefix='xtensa-esp32-elf-'
+    cc_path='~/.espressif/tools/xtensa-esp32-elf/esp-2021r1-8.4.0/xtensa-esp32-elf/bin/'
 
 gcc= cc_path+cc_prefix
 env = Environment(
@@ -73,7 +78,13 @@ if arch=='arm':
     if platform=='raspi2':   
         pass
     elif platform=='v3s':
+        env['USER']='--entry main -Tuser-v3s.ld'
         env['LINKLD']='link-v3s.ld'
+elif arch=='xtensa':
+    env['APP']=False
+    env['CFLAGS']='-DXTENSA -I. -I./include  -Ilibs/include -g -nostdlib -nostdinc -fno-builtin -c -std=c99 -std=gnu99 -w  -D'+platform.upper()
+    env['LINKLD']='link-esp32.ld'
+    pass
 
 
 def generate_bin(source, target, env, for_signature):

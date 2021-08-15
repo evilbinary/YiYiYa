@@ -18,30 +18,18 @@ void exception_info(interrupt_context_t *context) {
                                         "PREF ABORT", "DATA ABORT", "NOT USE",
                                         "IRQ",        "FIQ"};
   if (context->no < sizeof exception_msg) {
-    kprintf("EXCEPTION %d: %s\n=======================\n", context->no,
+    kprintf("exception %d: %s\n----------------------------\n", context->no,
             exception_msg[context->no]);
   } else {
-    kprintf("EXCEPTION %d:\n=======================\n", context->no);
+    kprintf("exception %d:\n----------------------------\n", context->no);
   }
   thread_t *current = thread_current();
   if (current != NULL) {
     kprintf("tid:%d\n", current->id);
   }
   kprintf("ifsr:%x dfsr:%x dfar:%x\n", read_ifsr(), read_dfsr(), read_dfar());
-  kprintf("pc:%x lr:%x cpsr:%x\n", read_pc(), context->lr, context->psr);
-  kprintf("sp:%x\n", context->sp);
-  kprintf("r1:%x\n", context->r1);
-  kprintf("r2:%x\n", context->r2);
-  kprintf("r3:%x\n", context->r3);
-  kprintf("r4:%x\n", context->r4);
-  kprintf("r5:%x\n", context->r5);
-  kprintf("r6:%x\n", context->r6);
-  kprintf("r7:%x\n", context->r7);
-  kprintf("r8:%x\n", context->r8);
-  kprintf("r9:%x\n", context->r9);
-  kprintf("r10:%x\n", context->r10);
-  kprintf("r11:%x\n", context->r11);
-  kprintf("r12:%x\n", context->r12);
+  kprintf("pc:%x\n", read_pc());
+  context_dump_interrupt(context);
 
 #elif defined(X86)
   static const char *exception_msg[] = {
@@ -56,38 +44,15 @@ void exception_info(interrupt_context_t *context) {
       "COPROCESSOR_ERROR",
   };
   cls();
-  u32 cr2, cr3;
-  u32 ds, es, fs, gs;
-  asm volatile("movl	%%cr2,	%%eax" : "=a"(cr2));
-  asm volatile("movl %%cr3,	%%eax" : "=a"(cr3));
-  asm volatile("movl %%ds,	%%eax" : "=a"(ds));
-  asm volatile("movl %%es,	%%eax" : "=a"(es));
-  asm volatile("movl %%fs,	%%eax" : "=a"(fs));
-  asm volatile("movl %%gs,	%%eax" : "=a"(gs));
   if (context->no != 14) {
     thread_t *current = thread_current();
     if (context->no < sizeof exception_msg) {
-      kprintf("EXCEPTION %d: %s\n----------------------------\n", context->no,
+      kprintf("exception %d: %s\n----------------------------\n", context->no,
               exception_msg[context->no]);
     } else {
-      kprintf("INTERRUPT %d\n----------------------------\n", context->no);
+      kprintf("interrupt %d\n----------------------------\n", context->no);
     }
-    if (current != NULL) {
-      kprintf("tid:%d\n", current->id);
-    }
-    kprintf("cs:\t%x\teip:\t%x\teflags:\t%x\n", context->cs, context->eip,
-            context->eflags);
-    kprintf("ss:\t%x\tesp:\t%x\n", context->ss, context->esp);
-    // kprintf("old ss:\t%x\told esp:%x\n", old_ss, old_esp);
-    kprintf("code:%x\tcr2:\t%x\tcr3:\t%x\n", context->no, cr2, cr3);
-    kprintf("General Registers:\n----------------------------\n");
-    kprintf("eax:\t%x\tebx:\t%x\n", context->eax, context->ebx);
-    kprintf("ecx:\t%x\tedx:\t%x\n", context->ecx, context->edx);
-    kprintf("esi:\t%x\tedi:\t%x\tebp:\t%x\n", context->esi, context->edi,
-            context->ebp);
-    kprintf("Segment Registers:\n----------------------------\n");
-    kprintf("ds:\t%x\tes:\t%x\n", ds, es);
-    kprintf("fs:\t%x\tgs:\t%x\n", fs, gs);
+    context_dump_interrupt(context);
   }
 #endif
   if (exception_handlers[context->no] != 0) {
@@ -231,7 +196,6 @@ void pref_abort_handler() {
   cpu_halt();
 }
 
-
 INTERRUPT_SERVICE
 void data_abort_handler() {
   interrupt_entering_code(4, 0);
@@ -273,26 +237,31 @@ void do_page_fault(interrupt_context_t *context) {
   u32 fault_addr = read_dfar();
   thread_t *current = thread_current();
   if (current != NULL) {
-    vmemory_area_t *area = vmemory_area_find(current->vmm, fault_addr, 0);
-    if (area == NULL) {
-      kprintf("tid: %d memory fault at %x\n", current->id, fault_addr);
-      dump_fault(context, fault_addr);
-      thread_exit(current, -1);
-      cpu_halt();
-      return;
-    }
-    void *phy = virtual_to_physic(current->context.page_dir, fault_addr);
-
-#ifdef DEBUG_EXCEPTION
-    kprintf(" tid: %x ", current->id);
-#endif
-    if (phy == NULL) {
-      valloc(fault_addr, PAGE_SIZE);
+    int mode = context_get_mode(&current->context);
+    // kprintf("mode %x\n", mode);
+    if (mode == USER_MODE) {
+      vmemory_area_t *area = vmemory_area_find(current->vmm, fault_addr, 0);
+      if (area == NULL) {
+        kprintf("tid: %d memory fault at %x\n", current->id, fault_addr);
+        dump_fault(context, fault_addr);
+        thread_exit(current, -1);
+        cpu_halt();
+        return;
+      }
+      void *phy = virtual_to_physic(current->context.page_dir, fault_addr);
+      if (phy == NULL) {
+        valloc(fault_addr, PAGE_SIZE);
+      } else {
+        // valloc(fault_addr, PAGE_SIZE);
+        kprintf("tid: %d phy: %x remap memory fault at %x\n", current->id, phy,
+                fault_addr);
+        dump_fault(context, fault_addr);
+        thread_exit(current, -1);
+        cpu_halt();
+      }
     } else {
-      // valloc(fault_addr, PAGE_SIZE);
-      kprintf("tid: %d phy: %x remap memory fault at %x\n", current->id,phy,fault_addr);
-      dump_fault(context, fault_addr);
-      thread_exit(current, -1);
+      kprintf("tid: %d kernel memory fault at %x\n", current->id, fault_addr);
+      map_page(fault_addr, fault_addr, PAGE_P | PAGE_USU | PAGE_RWW);
     }
   } else {
     map_page(fault_addr, fault_addr, PAGE_P | PAGE_USU | PAGE_RWW);
@@ -300,25 +269,12 @@ void do_page_fault(interrupt_context_t *context) {
 }
 
 void dump_fault(interrupt_context_t *context, u32 fault_addr) {
-  kprintf("=============================\n");
-   kprintf("ifsr:%x dfsr:%x dfar:%x\n", read_ifsr(), read_dfsr(), read_dfar());
-  kprintf("pc:%x lr:%x cpsr:%x\n", read_pc(), context->lr, context->psr);
-  kprintf("sp:%x\n", context->sp);
-  kprintf("r1:%x\n", context->r1);
-  kprintf("r2:%x\n", context->r2);
-  kprintf("r3:%x\n", context->r3);
-  kprintf("r4:%x\n", context->r4);
-  kprintf("r5:%x\n", context->r5);
-  kprintf("r6:%x\n", context->r6);
-  kprintf("r7:%x\n", context->r7);
-  kprintf("r8:%x\n", context->r8);
-  kprintf("r9:%x\n", context->r9);
-  kprintf("r10:%x\n", context->r10);
-  kprintf("r11:%x\n", context->r11);
-  kprintf("r12:%x\n", context->r12);
-
+  kprintf("----------------------------\n");
+  kprintf("ifsr:%x dfsr:%x dfar:%x\n", read_ifsr(), read_dfsr(), read_dfar());
+  kprintf("pc:%x\n", read_pc());
+  context_dump_interrupt(context);
   kprintf("fault: 0x%x \n", fault_addr);
-  kprintf("=============================\n\n");
+  kprintf("----------------------------\n\n");
 }
 #elif defined(X86)
 
@@ -329,9 +285,8 @@ void dump_fault(interrupt_context_t *context, u32 fault_addr) {
   int reserved = context->code & 0x8;
   int id = context->code & 0x10;
   kprintf("----------------------------\n");
-  kprintf("eip: %x \ncs: %x \nds: %x \nss: %x \nesp: %x \nebp: %x \npage: [",
-          context->eip, context->cs, context->ds, context->ss, context->esp,
-          context->ebp);
+  context_dump_interrupt(context);
+  kprintf("page: [");
   if (present == 1) {
     kprintf("present ");
   }

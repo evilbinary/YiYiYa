@@ -29,6 +29,13 @@ extern module_t fat32_module;
 extern module_t rtc_module;
 extern module_t fat_module;
 extern module_t sb16_module;
+
+#elif defined(XTENSA)
+extern module_t hello_module;
+
+#else 
+extern module_t hello_module;
+
 #endif
 
 extern void serial_write(char a);
@@ -72,6 +79,12 @@ int kmain(int argc, char* argv[]) {
   // module_regist(&fat32_module);
   module_regist(&fat_module);
   module_regist(&sb16_module);
+
+#elif defined(XTENSA)
+  module_regist(&hello_module);
+
+#else 
+  module_regist(&hello_module);
 #endif
 
   thread_t* t0 = thread_create((u32*)&do_serial_thread,NULL);

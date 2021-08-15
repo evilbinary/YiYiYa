@@ -13,8 +13,10 @@
   #include "arm/context.h"
 #elif defined(X86)
   #include "x86/context.h"
-#else 
-  
+#elif defined(XTENSA)
+  #include "xtensa/context.h"
+#else
+    #error "no support"
 #endif
 
 typedef void (*interrupt_handler_t)(interrupt_context_t* context);

@@ -137,7 +137,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
  *-----------*/
 
 /*Enable the log module*/
-#define LV_USE_LOG      1
+#define LV_USE_LOG      0
 #if LV_USE_LOG
 
 /*How important log should be added:
@@ -503,8 +503,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #define LV_BUILD_EXAMPLES   0
 
 
-#define LV_HOR_RES_MAX 640
-#define LV_VER_RES_MAX 480
+#define LV_MAX_LINE 100
 
 /*--END OF LV_CONF_H--*/
 

@@ -4,8 +4,6 @@
 #include "bcm2835_vc.h"
 #include "sdhci.h"
 
-
-
 /* * Based on
  * https://github.com/jncronin/rpi-boot/blob/master/emmc.c
  */
@@ -13,6 +11,14 @@
 // #define EMMC_DEBUG
 // #define SD_DEBUG
 
+#define SECTOR_SIZE 512
+#define CACHE_ENABLED 1
+
+#ifdef CACHE_ENABLED
+#define CACHE_ENTRIES (1 << 4)          ///< 16 entries
+#define CACHE_MASK (CACHE_ENTRIES - 1)  ///< mask 0x0F
+
+#endif
 
 #define SD_OK 0
 #define SD_ERROR -1
@@ -26,7 +32,6 @@
 #define SD_CARD_CHANGED -10
 #define SD_CARD_ABSENT -11
 #define SD_CARD_REINSERTED -12
-
 
 #define TIMEOUT_WAIT(stop_if_true, usec)                     \
   do {                                                       \
@@ -366,7 +371,6 @@ static struct emmc_block_dev block_dev __attribute__((aligned(4)));
 #define MIN_FREQ 400000
 #define BCM2835_EMMC_WRITE_DELAY (((2 * 1000000) / MIN_FREQ) + 1)
 
-
 #ifdef DEBUG
 #define EMMC_DEBUG
 #define SD_DEBUG
@@ -377,8 +381,8 @@ extern int printf(const char *format, ...);
 #endif
 
 #ifdef EMMC_DEBUG
-#define EMMC_TRACE(...)                                         \
-  {                                                             \
+#define EMMC_TRACE(...)                                          \
+  {                                                              \
     kprintf("EMMC %s:%4d[%s] : ", __FILE__, __LINE__, __func__); \
     kprintf(__VA_ARGS__);                                        \
     kprintf("\n");                                               \
@@ -388,8 +392,8 @@ extern int printf(const char *format, ...);
 #endif
 
 #ifdef SD_DEBUG
-#define SD_TRACE(...)                                           \
-  {                                                             \
+#define SD_TRACE(...)                                            \
+  {                                                              \
     kprintf("SD   %s:%4d[%s] : ", __FILE__, __LINE__, __func__); \
     kprintf(__VA_ARGS__);                                        \
     kprintf("\n");                                               \
@@ -1325,7 +1329,9 @@ int sd_card_init(void) {
   // At this point, we know the card is definitely an SD card, so will
   // definitely
   //  support SDR12 mode which runs at 25 MHz
-  emmc_set_clock(SD_CLOCK_NORMAL);
+  // emmc_set_clock(SD_CLOCK_NORMAL);
+   emmc_set_clock(SD_CLOCK_HIGH);
+  
 
 #ifdef SD_1_8V_SUPPORT
   // A small wait before the voltage switch
@@ -1707,38 +1713,61 @@ int sd_write(uint8_t *buf, size_t buf_size, uint32_t block_no) {
 
 void sdhci_dev_prob(sdhci_device_t *sdhci_dev) { sd_card_init(); }
 
-int sdhci_dev_port_write(sdhci_device_t *sdhci_dev, int no, u32 startl,
-                         u32 starth, u32 count, u32 buf) {
-  u32 ret=0;
+int sdhci_dev_port_write(sdhci_device_t *sdhci_dev, int no, sector_t sector,
+                         u32 count, u32 buf) {
+  u32 ret = 0;
   size_t buf_size = count * BYTE_PER_SECTOR;
-  ret=sd_write((uint8_t *)buf, buf_size, startl);
+  ret = sd_write((uint8_t *)buf, buf_size, sector.startl);
   if (ret < buf_size) {
     return SD_ERROR;
   }
+#ifdef CACHE_ENABLED
+  int i;
+  u8* p=buf;
+  for (i = 0; i < count; i++) {
+    int index = (sector.startl + i) & CACHE_MASK;
+    void *cache_p = (void *)(sdhci_dev->cache_buffer + SECTOR_SIZE * index);
+   
+    kmemcpy(cache_p,&p[SECTOR_SIZE * i], SECTOR_SIZE);
+  }
+#endif
   return ret;
 }
 
-
-static void print_hex(u8* addr,u32 size){
-   for (int x = 0; x < size; x++) {
-      kprintf("%x ", addr[x]);
-      if(x!=0&& (x%32)==0){
-        kprintf("\n");
-      }
+static void print_hex(u8 *addr, u32 size) {
+  for (int x = 0; x < size; x++) {
+    kprintf("%x ", addr[x]);
+    if (x != 0 && (x % 32) == 0) {
+      kprintf("\n");
     }
-    kprintf("\n\r");
+  }
+  kprintf("\n\r");
 }
 
-
-int sdhci_dev_port_read(sdhci_device_t *sdhci_dev, int no, u32 startl,
-                        u32 starth, u32 count, u32 buf) {
+int sdhci_dev_port_read(sdhci_device_t *sdhci_dev, int no, sector_t sector,
+                        u32 count, u32 buf) {
   size_t buf_size = count * BYTE_PER_SECTOR;
-  u32 ret=0;
-  ret=sd_read(buf, buf_size,startl);
-  if (ret < buf_size) {
-    return SD_ERROR;
+  u32 ret = 0;
+
+#ifdef CACHE_ENABLED
+  if (count == 1) {
+    int index = sector.startl & CACHE_MASK;
+    void *cache_p = (void *)(sdhci_dev->cache_buffer + SECTOR_SIZE * index);
+    if (sdhci_dev->cached_blocks[index] != sector.startl) {
+      ret = sd_read(cache_p, buf_size, sector.startl);
+      sdhci_dev->cached_blocks[index] = sector.startl;
+    }
+    kmemcpy(buf, cache_p, SECTOR_SIZE);
+  } else {
+#endif
+    ret = sd_read(buf, buf_size, sector.startl);
+    if (ret < buf_size) {
+      return SD_ERROR;
+    }
+#ifdef CACHE_ENABLED
   }
-  // kprintf("sd read offset:%x %x count:%d\n",startl*BYTE_PER_SECTOR,starth*BYTE_PER_SECTOR,count);
+#endif
+  // kprintf("sd read offset:%x %x count:%d\n",sector.startl*BYTE_PER_SECTOR,sector.starth*BYTE_PER_SECTOR,count);
   // print_hex(buf,buf_size);
   // kprintf("ret %d\n",ret);
   return ret;
@@ -1748,4 +1777,14 @@ void sdhci_dev_init(sdhci_device_t *sdhci_dev) {
   map_page(BCM2835_EMMC, BCM2835_EMMC, 0);
   map_page(BCM2835_ST_BASE, BCM2835_ST_BASE, 0);
   sdhci_dev_prob(sdhci_dev);
+
+#ifdef CACHE_ENABLED
+  sdhci_dev->cached_blocks = kmalloc(CACHE_ENTRIES);
+  sdhci_dev->cache_buffer = kmalloc(SECTOR_SIZE * CACHE_ENTRIES);
+  int i;
+  for (i = 0; i < CACHE_ENTRIES; i++) {
+    sdhci_dev->cached_blocks[i] = 0xFFFFFFFF;
+  }
+  kmemset(sdhci_dev->cache_buffer, 0, SECTOR_SIZE * CACHE_ENTRIES);
+#endif
 }

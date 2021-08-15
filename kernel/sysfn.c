@@ -14,13 +14,18 @@
 #include "vfs.h"
 
 int sys_print(char* s) {
-  kprintf("%s", s);
+  thread_t* current = thread_current();
+  kprintf("sys print %d %s\n", current->id, s);
+  // kprintf("%s", s);
   return 0;
 }
 
 void sys_test() {
   thread_t* current = thread_current();
   kprintf("sys test %d\n", current->id);
+
+  kprintf("-------dump thread %d-------------\n", current->id);
+  thread_dump(current);
 }
 
 int sys_print_at(char* s, u32 x, u32 y) {
@@ -29,20 +34,6 @@ int sys_print_at(char* s, u32 x, u32 y) {
   return 0;
 }
 
-// size_t sys_ioctl(u32 fd, u32 cmd, ...) {
-//   u32 ret = 0;
-//   fd_t* f = thread_find_fd_id(thread_current(), fd);
-//   if (f == NULL) {
-//     kprintf("ioctl not found fd %d\n", fd);
-//     return 0;
-//   }
-//   va_list args;
-//   va_start(args, cmd);
-//   vnode_t* node = f->data;
-//   ret = vioctl(node, cmd, args);
-//   va_end(args);
-//   return ret;
-// }
 size_t sys_ioctl(u32 fd, u32 cmd, va_list args) {
   u32 ret = 0;
   fd_t* f = thread_find_fd_id(thread_current(), fd);
@@ -92,7 +83,8 @@ u32 sys_open(char* name, int attr) {
     kprintf("sys open %s error\n", name);
     return -1;
   }
-  kprintf("sys open new name: %s fd:%d fd->id:%d ptr:%x\n", name, f, fd->id, fd);
+  kprintf("sys open new name: %s fd:%d fd->id:%d ptr:%x\n", name, f, fd->id,
+          fd);
   return f;
 }
 
@@ -145,7 +137,7 @@ size_t sys_yeild() { thread_yield(); }
 
 void sys_exit(int status) {
   thread_t* current = thread_current();
-  thread_exit(current,status);
+  thread_exit(current, status);
   thread_dumps();
   kprintf("sys exit tid %d status %d\n", current->id, status);
 }
@@ -189,12 +181,12 @@ u32 sys_exec(char* filename, char* const argv[], char* const envp[]) {
   thread_t* current = thread_current();
   u8* stack0 = kmalloc(THREAD_STACK_SIZE);
   u8* stack3 = kmalloc(THREAD_STACK_SIZE);
-  u8* vstack3=STACK_ADDR;
+  u8* vstack3 = STACK_ADDR;
   thread_t* t = thread_create_ex((u32*)&run_elf_thread, stack0, vstack3,
                                  THREAD_STACK_SIZE, NULL);
-  context_t* context = &t->context;
 
-  context->page_dir = page_alloc_clone(t->context.kernel_page_dir);
+  t->context.page_dir = page_alloc_clone(current->context.page_dir);
+  t->context.kernel_page_dir = current->context.kernel_page_dir;
   // init 2GB
   // map_2gb(context->page_dir, PAGE_P | PAGE_USU | PAGE_RWW);
 
@@ -204,16 +196,20 @@ u32 sys_exec(char* filename, char* const argv[], char* const envp[]) {
       vmemory_area_create(EXEC_ADDR, MEMORY_EXEC_SIZE, MEMORY_EXEC);
   vmemory_area_add(t->vmm, vmexec);
   vmemory_area_t* stack =
-      vmemory_area_create(vstack3, PAGE_SIZE, MEMORY_STACK);
+      vmemory_area_create(vstack3, THREAD_STACK_SIZE, MEMORY_STACK);
   vmemory_area_add(t->vmm, stack);
 
   // init stack
-  map_page_on(t->context.page_dir, vstack3, stack3,
-              PAGE_P | PAGE_USU | PAGE_RWW);
+  for (int i = 0; i < (THREAD_STACK_SIZE / PAGE_SIZE + 1); i++) {
+    // kprintf("vstack3:%x stack3:%x\n", vstack3, stack3);
+    map_page_on(t->context.page_dir, vstack3, stack3,
+                PAGE_P | PAGE_USU | PAGE_RWW);
+    vstack3 += PAGE_SIZE;
+    stack3 += PAGE_SIZE;
+  }
 
   // init data
-  void* paddr = kmalloc(sizeof(exec_t));
-  exec_t* data = paddr;
+  exec_t* data = kmalloc(sizeof(exec_t) + 4);
   kstrcpy(data->filename, filename);
   data->argv = argv;
   data->argc = 1;
@@ -223,37 +219,26 @@ u32 sys_exec(char* filename, char* const argv[], char* const envp[]) {
   for (int i = 0; i < 3; i++) {
     t->fds[i] = current->fds[i];
   }
-  // thread_dump_fd(t);
+  // thread_dump(t);
   thread_run(t);
   return 0;
 }
 
 int sys_fork() {
   thread_t* current = thread_current();
-  context_t* current_context = &current->context;
-  interrupt_context_t* ct = current_context->esp0;
+  if (current == NULL) {
+    kprintf("current is null\n");
+    return -1;
+  }
+  thread_t* copy_thread = thread_clone(current, STACK_ADDR, THREAD_STACK_SIZE);
 
-  thread_t* copy_thread = thread_clone(current,STACK_ADDR,THREAD_STACK_SIZE);
-  copy_thread->pid = current->id;
-  
-#ifdef ARM
-  kprintf("sysfork %d =>lr:%x sp:%x current context=> lr:%x sp:%x fp:%x\n",current->id, current_context->eip,
-          current_context->esp, ct->lr, ct->sp, ct->r11);
-  interrupt_context_t* c0 = current->context.esp0;
-  interrupt_context_t* c = copy_thread->context.esp0;
-  kprintf("# current tid %d eip:%x sp:%x fp:%x \n", current->id, c0->lr, c0->sp,
-          c0->r11);
-  kprintf("# new     tid %d eip:%x sp:%x fp:%x \n", copy_thread->id, c->lr,
-          c->sp, c->r11);
-#elif defined(X86)
-  interrupt_context_t* c0 = current->context.esp0;
-  interrupt_context_t* c = copy_thread->context.esp0;
-  kprintf("# current tid %d eip:%x esp:%x ebp:%x \n", current->id, c0->eip,
-          c0->esp, c0->ebp);
-  kprintf("# new     tid %d eip:%x esp:%x ebp:%x \n", copy_thread->id, c->eip,
-          c->esp, c->ebp);
-  c->eax = 0;
-#endif
+  kprintf("-------dump current thread %d-------------\n", current->id);
+  thread_dump(current);
+  kprintf("-------dump clone thread %d-------------\n", copy_thread->id);
+  thread_dump(copy_thread);
+
+  interrupt_context_t* context = current->context.esp0;
+  context_ret(context) = 0;
 
   thread_run(copy_thread);
   return copy_thread->id;

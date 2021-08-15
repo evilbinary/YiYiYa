@@ -182,11 +182,56 @@ void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
   }
 }
 
+int context_get_mode(context_t* context){
+  int mode=0;
+  if(context!=NULL){
+    
+  }
+  return mode;
+}
+
 void backtrace(stack_frame_t* fp, void** buf, int size) {
   int i;
   for (i = 0; i < size && fp != NULL; fp = fp->prev, i++) {
     buf[i] = fp->return_addr;
   }
+}
+
+void context_dump(context_t* c) {
+  kprintf("eip:%x\n", c->eip);
+  kprintf("esp0:%x\n", c->esp0);
+  kprintf("esp:%x\n", c->esp);
+
+  kprintf("page_dir:%x\n", c->page_dir);
+  kprintf("kernel page_dir:%x\n", c->kernel_page_dir);
+
+  if (c->esp0 != 0) {
+    context_dump_interrupt(c->esp0);
+  }
+}
+
+void context_dump_interrupt(interrupt_context_t* context) {
+  u32 cr2, cr3;
+  u32 ds, es, fs, gs;
+  asm volatile("movl	%%cr2,	%%eax" : "=a"(cr2));
+  asm volatile("movl %%cr3,	%%eax" : "=a"(cr3));
+  asm volatile("movl %%ds,	%%eax" : "=a"(ds));
+  asm volatile("movl %%es,	%%eax" : "=a"(es));
+  asm volatile("movl %%fs,	%%eax" : "=a"(fs));
+  asm volatile("movl %%gs,	%%eax" : "=a"(gs));
+  kprintf("cs:\t%x\teip:\t%x\teflags:\t%x\n", context->cs, context->eip,
+          context->eflags);
+  kprintf("ss:\t%x\tesp:\t%x\n", context->ss, context->esp);
+  // kprintf("old ss:\t%x\told esp:%x\n", old_ss, old_esp);
+  kprintf("code:%x\tcr2:\t%x\tcr3:\t%x\n", context->no, cr2, cr3);
+  kprintf("General Registers:\n----------------------------\n");
+  kprintf("eax:\t%x\tebx:\t%x\n", context->eax, context->ebx);
+  kprintf("ecx:\t%x\tedx:\t%x\n", context->ecx, context->edx);
+  kprintf("esi:\t%x\tedi:\t%x\tebp:\t%x\n", context->esi, context->edi,
+          context->ebp);
+  kprintf("Segment Registers:\n----------------------------\n");
+  kprintf("ds:\t%x\tes:\t%x\n", ds, es);
+  kprintf("fs:\t%x\tgs:\t%x\n", fs, gs);
 }
 
 void context_clone(context_t* context, context_t* src, u32* stack0, u32* stack3,
@@ -195,8 +240,8 @@ void context_clone(context_t* context, context_t* src, u32* stack0, u32* stack3,
   interrupt_context_t* c0 = stack0;
   interrupt_context_t* s0 = src->esp0;
   if (stack0 != NULL) {
-    *c0 = *s0;    
-    c0->eflags= 0x0200;
+    *c0 = *s0;
+    c0->eflags = 0x0200;
   }
   if (stack3 != NULL) {
     context->esp = s0->esp;
@@ -208,10 +253,10 @@ void context_switch(interrupt_context_t* context, context_t** current,
                     context_t* next_context) {
   context_t* current_context = *current;
 
-  if(context==NULL){
-    context=current_context->esp0;
-    context->esp=current_context->esp;
-  }else{
+  if (context == NULL) {
+    context = current_context->esp0;
+    context->esp = current_context->esp;
+  } else {
     current_context->esp0 = context;
     current_context->esp = context->esp;
   }

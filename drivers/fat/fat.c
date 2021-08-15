@@ -17,57 +17,13 @@
 #if USE_DYNAMIC_MEMORY
 #endif
 
-
-
 #if !USE_DYNAMIC_MEMORY
 static struct fat_fs_struct fat_fs_handles[FAT_FS_COUNT];
 static struct fat_file_struct fat_file_handles[FAT_FILE_COUNT];
 static struct fat_dir_struct fat_dir_handles[FAT_DIR_COUNT];
 #endif
 
-static uint8_t fat_read_header(struct fat_fs_struct* fs);
-static cluster_t fat_get_next_cluster(const struct fat_fs_struct* fs,
-                                      cluster_t cluster_num);
-static offset_t fat_cluster_offset(const struct fat_fs_struct* fs,
-                                   cluster_t cluster_num);
-static uint8_t fat_dir_entry_read_callback(uint8_t* buffer, offset_t offset,
-                                           void* p);
-#if FAT_LFN_SUPPORT
-static uint8_t fat_calc_83_checksum(const uint8_t* file_name_83);
-#endif
 
-static uint8_t fat_get_fs_free_16_callback(uint8_t* buffer, offset_t offset,
-                                           void* p);
-#if FAT_FAT32_SUPPORT
-static uint8_t fat_get_fs_free_32_callback(uint8_t* buffer, offset_t offset,
-                                           void* p);
-#endif
-
-#if FAT_WRITE_SUPPORT
-static cluster_t fat_append_clusters(struct fat_fs_struct* fs,
-                                     cluster_t cluster_num, cluster_t count);
-static uint8_t fat_free_clusters(struct fat_fs_struct* fs,
-                                 cluster_t cluster_num);
-static uint8_t fat_terminate_clusters(struct fat_fs_struct* fs,
-                                      cluster_t cluster_num);
-static uint8_t fat_clear_cluster(const struct fat_fs_struct* fs,
-                                 cluster_t cluster_num);
-static uintptr_t fat_clear_cluster_callback(uint8_t* buffer, offset_t offset,
-                                            void* p);
-static offset_t fat_find_offset_for_dir_entry(
-    struct fat_fs_struct* fs, const struct fat_dir_struct* parent,
-    const struct fat_dir_entry_struct* dir_entry);
-static uint8_t fat_write_dir_entry(const struct fat_fs_struct* fs,
-                                   struct fat_dir_entry_struct* dir_entry);
-#if FAT_DATETIME_SUPPORT
-static void fat_set_file_modification_date(
-    struct fat_dir_entry_struct* dir_entry, uint16_t year, uint8_t month,
-    uint8_t day);
-static void fat_set_file_modification_time(
-    struct fat_dir_entry_struct* dir_entry, uint8_t hour, uint8_t min,
-    uint8_t sec);
-#endif
-#endif
 
 /**
  * \ingroup fat_fs
@@ -88,8 +44,11 @@ struct fat_fs_struct* fat_open(struct partition_struct* partition) {
     return 0;
 
 #if USE_DYNAMIC_MEMORY
-  struct fat_fs_struct* fs = kmalloc(sizeof(*fs));
-  if (!fs) return 0;
+  struct fat_fs_struct* fs = kmalloc(sizeof(struct fat_fs_struct));
+  if (!fs) {
+    kprintf("malloc error\n");
+    return 0;
+  }
 #else
   struct fat_fs_struct* fs = fat_fs_handles;
   uint8_t i;
@@ -100,11 +59,10 @@ struct fat_fs_struct* fat_open(struct partition_struct* partition) {
   }
   if (i >= FAT_FS_COUNT) return 0;
 #endif
-
-  kmemset(fs, 0, sizeof(*fs));
-
   fs->partition = partition;
-  if (!fat_read_header(fs)) {
+  u32 ret=fat_read_header(fs);
+  if (!ret) {
+    kprintf("fat header error ret %d\n ",ret);
 #if USE_DYNAMIC_MEMORY
     kfree(fs);
 #else
@@ -143,21 +101,30 @@ void fat_close(struct fat_fs_struct* fs) {
  * \param[in,out] fs The filesystem for which to parse the header.
  * \returns 0 on failure, 1 on success.
  */
-uint8_t fat_read_header(struct fat_fs_struct* fs) {
-  if (!fs) return 0;
-
+uint32_t fat_read_header(struct fat_fs_struct* fs) {
+  if (!fs) {
+    kprintf("fat_read_header fs error\n");
+    return -1;
+  }
   struct partition_struct* partition = fs->partition;
-  if (!partition) return 0;
+  if (!partition) {
+    kprintf("fat_read_header partition error\n");
+    return -2;
+  }
 
-    /* read fat parameters */
+  /* read fat parameters */
 #if FAT_FAT32_SUPPORT
   uint8_t buffer[37];
 #else
   uint8_t buffer[25];
 #endif
   offset_t partition_offset = (offset_t)partition->offset * 512;
-  if (!partition->device_read(partition_offset + 0x0b, buffer, sizeof(buffer)))
-    return 0;
+  int ret =
+      partition->device_read(partition_offset + 0x0b, buffer, sizeof(buffer));
+  if (!ret) {
+    kprintf("fat_read_header error %d\n", ret);
+    return -3;
+  }
 
   uint16_t bytes_per_sector = read16(&buffer[0x00]);
   uint16_t reserved_sectors = read16(&buffer[0x03]);
@@ -174,19 +141,23 @@ uint8_t fat_read_header(struct fat_fs_struct* fs) {
 
   if (sector_count == 0) {
     if (sector_count_16 == 0) /* illegal volume size */
-      return 0;
+      return -4;
     else
       sector_count = sector_count_16;
   }
 #if FAT_FAT32_SUPPORT
   if (sectors_per_fat != 0)
     sectors_per_fat32 = sectors_per_fat;
-  else if (sectors_per_fat32 == 0)
+  else if (sectors_per_fat32 == 0) {
+    kprintf("fat_read_header neither FAT16 nor FAT32 0\n");
     /* this is neither FAT16 nor FAT32 */
-    return 0;
+    return -5;
+  }
 #else
-  if (sectors_per_fat == 0) /* this is not a FAT16 */
+  if (sectors_per_fat == 0) { /* this is not a FAT16 */
+    kprintf("fat_read_header neither FAT16 \n");
     return 0;
+  }
 #endif
 
   /* determine the type of FAT we have here */
@@ -199,9 +170,10 @@ uint8_t fat_read_header(struct fat_fs_struct* fs) {
 #endif
       - ((max_root_entries * 32 + bytes_per_sector - 1) / bytes_per_sector);
   uint32_t data_cluster_count = data_sector_count / sectors_per_cluster;
-  if (data_cluster_count < 4085) /* this is a FAT12, not supported */
+  if (data_cluster_count < 4085) { /* this is a FAT12, not supported */
+    kprintf("fat_read_header this is a FAT12, not supported \n");
     return 0;
-  else if (data_cluster_count < 65525)
+  } else if (data_cluster_count < 65525)
     /* this is a FAT16 */
     partition->type = PARTITION_TYPE_FAT16;
   else
@@ -1220,6 +1192,7 @@ uint8_t fat_read_dir(struct fat_dir_struct* dd,
      * So we now reset the handle and signal the caller the
      * end of the listing.
      */
+    kprintf("cluster_offset>cluster_size %d %d\n",cluster_offset,cluster_size);
     fat_reset_dir(dd);
     return 0;
   }

@@ -28,3 +28,12 @@ elif env['ARCH']=='x86':
         'x86/interrupt.c',
         '../platform/libplatform.a'
         ])
+elif env['ARCH']=='xtensa':
+    env.Library('arch', ['arch.c','lock.c',
+        'xtensa/io.c',
+        'xtensa/cpu.c',
+        'xtensa/mm.c',
+        'xtensa/display.c',
+        'xtensa/interrupt.c',
+        '../platform/libplatform.a'
+        ])

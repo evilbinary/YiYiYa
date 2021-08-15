@@ -116,7 +116,7 @@ if env.get('run')=='bochs' or env.get('run')=='b':
 elif env.get('run')=='qemu' or env.get('run')=='q':
   build_duck_image()
   if env.get('ARCH')=='x86':
-    env.Command('qemu', 'duck.img','qemu-system-i386 -rtc base=localtime,clock=host -boot a  -fda $SOURCE -serial stdio -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor  -D ./qemu.log  -drive id=disk,file=image/disk.img,format=raw,if=none -device ahci,id=ahci -device ide-hd,drive=disk,bus=ahci.0 -soundhw sb16')
+    env.Command('qemu', 'duck.img','qemu-system-i386 -rtc base=localtime,clock=host -boot a  -fda $SOURCE -serial stdio -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor  -D ./qemu.log  -drive id=disk,file=image/disk.img,format=raw,if=none -device ahci,id=ahci -device ide-hd,drive=disk,bus=ahci.0 -soundhw sb16 ') #-d in_asm -d cpu_reset -d in_asm,int,mmu
   elif env.get('ARCH')=='arm':
     env.Command('qemu', 'duck.img','qemu-system-arm -M raspi2   -rtc base=localtime -kernel image/duck.img  -serial stdio -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor  -D ./qemu.log -drive if=sd,id=sd0,format=raw,file=image/disk.img ') #-d in_asm -d cpu_reset -d in_asm,int,mmu
 
@@ -130,4 +130,16 @@ elif env.get('run')=='debug':
 elif env.get('run')=='v3s':
   build_duck_fit()
   env.Command('v3s', 'duck.fit','~/dev/c/sunxi-tools/sunxi-fel -v uboot ~/dev/c/u-boot-v3s/u-boot-sunxi-with-spl.bin  write 0x41000000 ~/dev/c/duck-os/image/duck.fit')
+  
+elif env.get('run')=='esp32':
+  env.Command('esp32', 
+    [ '../boot/xtensa/init.elf',
+      '../app/kernel.elf'
+    ],
+    ['esptool.py --chip esp32 elf2image --flash_mode="dio" --flash_freq "40m" --flash_size "4MB" -o boot/xtensa/init.bin  ${SOURCES[0]}',
+    'esptool.py --chip esp32 elf2image --flash_mode="dio" --flash_freq "40m" --flash_size "4MB" -o app/kernel.bin  ${SOURCES[1]}',
+    'esptool.py --chip esp32 --port /dev/tty.wchusbserial14120 --baud 460800 --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 40m --flash_size detect 0x1000 boot/xtensa/init.bin 0x10000 app/kernel.bin',
+    'idf_monitor.py -p /dev/tty.wchusbserial14120 -b 115200 --toolchain-prefix xtensa-esp32-elf- --target esp32 --revision 0 boot/xtensa/init.elf '  
+  ])
+  
   

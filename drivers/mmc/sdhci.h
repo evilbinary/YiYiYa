@@ -49,8 +49,15 @@
 typedef struct sdhci_device {
   u32 offsetl;
   u32 offseth;
-
+  u32* cached_blocks;
+  u8* cache_buffer;
+  void* data;
 } sdhci_device_t;
+
+typedef struct sector{
+  u32 startl;
+  u32 starth;
+} sector_t;
 
 
 #endif

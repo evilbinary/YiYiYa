@@ -20,7 +20,10 @@ static size_t sdhci_read(device_t* dev, void* buf, size_t len) {
     count++;
   }
   u32 ret = 0;
-  ret = sdhci_dev_port_read(sdhci_dev, no, startl, starth, count, buf);
+  sector_t sector;
+  sector.startl = startl;
+  sector.starth = starth;
+  ret = sdhci_dev_port_read(sdhci_dev, no, sector, count, buf);
   if (ret == 0) {
     return -1;
   }
@@ -42,7 +45,10 @@ static size_t sdhci_write(device_t* dev, void* buf, size_t len) {
     count++;
   }
   u32 ret = 0;
-  ret = sdhci_dev_port_write(sdhci_dev, no, startl, starth, count, buf);
+  sector_t sector;
+  sector.startl = startl;
+  sector.starth = starth;
+  ret = sdhci_dev_port_write(sdhci_dev, no, sector, count, buf);
   if (ret == 0) {
     return -1;
   }

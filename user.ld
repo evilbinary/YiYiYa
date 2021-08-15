@@ -29,9 +29,6 @@ SECTIONS
                 *(COMMON)
                 *(.bss)
         }
-        .eh_frame BLOCK(4K) : ALIGN(4K)
-        {
-                *(.eh_frame)
-        }
+        
        _end = .;
 }

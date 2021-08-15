@@ -47,5 +47,11 @@ typedef struct context_t {
 #define context_ret(context) context->eax
 
 #define context_restore(duck_context) interrupt_exit_context(duck_context)
+void context_clone(context_t* context, context_t* src, u32* stack0, u32* stack3,
+                   u32* old0, u32* old3);
+void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
+                  u32 level);
+                             
+void context_dump(context_t* c);
 
 #endif

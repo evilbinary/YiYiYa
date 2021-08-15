@@ -158,10 +158,11 @@ u32 fat_op_write(vnode_t *node, u32 offset, size_t nbytes, u8 *buffer) {
   return fat_write_file(file_info->fd, buffer, nbytes);
 }
 
-uint8_t find_file_in_dir(struct fat_fs_struct *fs, struct fat_dir_struct *dd,
+u32 find_file_in_dir(struct fat_fs_struct *fs, struct fat_dir_struct *dd,
                          const char *name,
                          struct fat_dir_entry_struct *dir_entry) {
   while (fat_read_dir(dd, dir_entry)) {
+    //kprintf("find_file_in_dir %s==%s\n",dir_entry->long_name,name);
     if (kstrcmp(dir_entry->long_name, name) == 0) {
       fat_reset_dir(dd);
       return 1;
@@ -175,8 +176,11 @@ struct fat_file_struct *open_file_in_dir(struct fat_fs_struct *fs,
                                          struct fat_dir_struct *dd,
                                          const char *name) {
   struct fat_dir_entry_struct file_entry;
-  if (!find_file_in_dir(fs, dd, name, &file_entry)) return 0;
-
+  u32 ret=find_file_in_dir(fs, dd, name, &file_entry);
+  if (!ret){ 
+      kprintf("find_file_in_dir failed %s\n",name);
+    return 0;
+  }
   return fat_open_file(fs, &file_entry);
 }
 
@@ -322,7 +326,7 @@ void fat_init(void) {
   }
 
   struct fat_dir_entry_struct directory;
-  uint8_t res;
+  u32 res;
   res = fat_get_dir_entry_of_path(fs, "/", &directory);
 
   struct fat_dir_struct *dd = fat_open_dir(fs, &directory);

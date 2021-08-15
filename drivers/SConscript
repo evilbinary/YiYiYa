@@ -18,7 +18,9 @@ if arch=='arm':
     if platform=='v3s':
         other=[
             'gpu/v3s.c',
-            'mmc/v3s.c'
+            'mmc/v3s.c',
+            'serial/v3s.c',
+            'mouse/v3s.c',
         ]
     elif platform=='raspi2':
         other=[
@@ -26,8 +28,8 @@ if arch=='arm':
             'gpu/mailbox.c',
             'mmc/bcm2836.c',
             'mmc/bcm2835_vc.c',
-            'serial/serial-bcm2836.c',
-            'mouse/mouse-bcm2836.c',
+            'serial/bcm2836.c',
+            'mouse/bcm2836.c',
             ]
 
     driver=[
@@ -35,7 +37,7 @@ if arch=='arm':
         'fat/byteordering.c',
         'fat/partition.c',
         'fat/mod.c',
-        'fat32/fat32.c',
+        # 'fat32/fat32.c',
         
         'gpu/gpu.c',
         'mmc/sdhci.c',
@@ -69,8 +71,10 @@ elif arch=='x86':
 
     'sound/sb16.c',]
 
-
-
+elif arch=='xtensa':
+     driver=[
+          'hello/hello.c',
+        ]
 
 source=driver+[
     '../kernel/libyiyiya.a',

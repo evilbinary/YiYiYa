@@ -21,8 +21,8 @@
 #define MEMORY_CREATE_SIZE 4096*10 //40k
 #define MEMORY_EXEC_SIZE 4096*100*1024 //400m
 
-#define KERNEL_POOL_NUM 10
-#define USER_POOL_NUM 1
+#define KERNEL_POOL_NUM 20
+#define USER_POOL_NUM 20
 
 typedef struct vmemory_area{
     void* vaddr;
@@ -36,8 +36,6 @@ void kfree(void* ptr);
 void* kmalloc_alignment(size_t size, int alignment);
 void kfree_alignment(void* ptr);
 
-
-void page_clone(u64* page, u64* page_dir_ptr_tab);
 void map_alignment(void* page, void* vaddr, void* buf, u32 size);
 
 

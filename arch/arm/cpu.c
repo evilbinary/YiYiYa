@@ -121,6 +121,7 @@ void cpu_set_page(u32 page_table) {
   isb();
   write_ttbcr(TTBCRN_4K);
   isb();
+  dsb();
   // set all permission
   // cpu_set_domain(~0);
 }
@@ -162,6 +163,18 @@ void cpu_halt() {
   for (;;) {
     asm("wfi");
   };
+}
+
+int context_get_mode(context_t* context){
+  int mode=0;
+  if(context!=NULL){
+    interrupt_context_t* c=context->esp0;
+    // kprintf("psr %x\n",c->psr);
+    if((c->psr&0x1F)==0x10){
+      return 3; //user mode
+    }
+  }
+  return mode;
 }
 
 void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
@@ -222,52 +235,81 @@ void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
   context->page_dir = addr;
 }
 
-#define DEBUG 0
+// #define DEBUG 1
 void context_switch(interrupt_context_t* context, context_t** current,
                     context_t* next_context) {
   context_t* current_context = *current;
-  interrupt_context_t* c = current_context->esp0;
 #if DEBUG
-  kprintf("\n=>lr:%x sp:%x lr:%x sp:%x fp:%x irq=> lr:%x sp:%x fp:%x\n",
-          current_context->eip, current_context->esp, c->lr, c->sp, c->r11,
-          context->lr, context->sp, context->r11);
+  kprintf("-----switch dump current------\n");
+  context_dump(current_context);
 #endif
   current_context->esp0 = context;
   current_context->esp = context->sp;
   current_context->eip = context->lr;
-  *current = next_context;
   context_switch_page(next_context->page_dir);
+  *current = next_context;
 #if DEBUG
-  c = next_context->esp0;
-  kprintf("  lr:%x sp:%x irq=> lr:%x sp:%x  fp:%x\n", next_context->eip,
-          next_context->esp, c->lr, c->sp, c->r11);
+  kprintf("-----switch dump next------\n");
+  context_dump(next_context);
+  kprintf("\n");
 #endif
+}
+
+void context_dump(context_t* c) {
+  kprintf("ip:%x\n", c->eip);
+  kprintf("sp0:%x\n", c->esp0);
+  kprintf("sp:%x\n", c->esp);
+
+  kprintf("page_dir:%x\n", c->page_dir);
+  kprintf("kernel page_dir:%x\n", c->kernel_page_dir);
+  kprintf("--interrupt context--\n");
+  interrupt_context_t* context = c->esp0;
+  context_dump_interrupt(context);
+}
+
+void context_dump_interrupt(interrupt_context_t* context) {
+  kprintf("lr:%x cpsr:%x\n", context->lr, context->psr);
+  kprintf("sp:%x\n", context->sp);
+  kprintf("r0:%x\n", context->r0);
+  kprintf("r1:%x\n", context->r1);
+  kprintf("r2:%x\n", context->r2);
+  kprintf("r3:%x\n", context->r3);
+  kprintf("r4:%x\n", context->r4);
+  kprintf("r5:%x\n", context->r5);
+  kprintf("r6:%x\n", context->r6);
+  kprintf("r7:%x\n", context->r7);
+  kprintf("r8:%x\n", context->r8);
+  kprintf("r9:%x\n", context->r9);
+  kprintf("r10:%x\n", context->r10);
+  kprintf("r11(fp):%x\n", context->r11);
+  kprintf("r12(ip):%x\n", context->r12);
 }
 
 void context_clone(context_t* des, context_t* src, u32* stack0, u32* stack3,
                    u32* old0, u32* old3) {
-  *des = *src;
   interrupt_context_t* d0 = stack0;
   interrupt_context_t* s0 = src->esp0;
-
-  // s0->lr=0x4000a48+4;
-
-  kprintf("context_clone====>lr:%x sp:%x  lr:%x sp:%x  fp:%x\n", src->eip, src->esp,
-          s0->lr, s0->sp, s0->r11);
-
+#if DEBUG
+  kprintf("------context clone dump src--------------\n");
+  context_dump(src);
+#endif
+  des->eip = src->eip;
   if (stack0 != NULL) {
-    kmemmove(d0, s0, sizeof(interrupt_context_t));
     des->esp0 = (u32)d0;
+    kmemmove(d0, s0, sizeof(interrupt_context_t));
   }
   if (stack3 != NULL) {
-    cpsr_t cpsr;
-    cpsr.val = 0;
-    cpsr.M = 0x10;
-    d0->psr = cpsr.val;
-    des->esp = d0->sp;
+    // cpsr_t cpsr;
+    // cpsr.val = 0;
+    // cpsr.M = 0x10;
+    // d0->psr = cpsr.val;
+    des->esp = s0->sp;
   }
-  // d0->lr-=4;
-  
+  // d0->lr+=8;
+#if DEBUG
+  kprintf("------context clone dump des--------------\n");
+#endif
+  context_dump(des);
 }
 
 ulong cpu_get_cs(void) {
@@ -285,10 +327,6 @@ int TAS(volatile int* addr, int newval) {
   return result;
 }
 
-// void context_restore(context_t* context){
-//   cpu_sti();
-//   interrupt_exit_context(context);
-// }
 
 void cpu_backtrace(void) {
   int topfp = read_fp();
