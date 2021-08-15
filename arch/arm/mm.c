@@ -94,7 +94,7 @@ void mm_init() {
 #ifdef V3S
   // memory
   address = 0x40000000;
-  for (int i = 0; i < 0x100000 / 0x1000; i++) {
+  for (int i = 0; i < 0x700000 / 0x1000; i++) {
     map_page(address, address, 0);
     address += 0x1000;
   }
@@ -232,8 +232,7 @@ void* mm_alloc(size_t size) {
         block_alloc_tail = new_block;
       }
       count++;
-      // kprintf("alloc count:%d: addr:%x size:%d\n", count, new_block->addr,
-      //         new_block->size);
+      // kprintf("alloc count:%d: addr:%x size:%d\n", count, new_block->addr,new_block->size);
       if (new_block->addr == 0) {
         mm_dump();
       }
@@ -303,7 +302,8 @@ void* virtual_to_physic(u64* page, void* vaddr) {
   return phyaddr;
 }
 
-void page_clone(u64* old_page, u64* new_page) {
+void page_clone(u32* old_page, u32* new_page) {
+  // kprintf("page_clone:%x %x\n",old_page,new_page);
   if (old_page == NULL) {
     kprintf("page clone error old page null\n");
     return;
@@ -329,8 +329,8 @@ void page_clone(u64* old_page, u64* new_page) {
   }
 }
 
-void* page_alloc_clone(u64* kernel_page_dir) {
-  u64* page_dir_ptr_tab = kmalloc_alignment(sizeof(u32) * 4096, 0x4000);
+u32* page_alloc_clone(u32* kernel_page_dir) {
+  u32* page_dir_ptr_tab = kmalloc_alignment(sizeof(u32) * 4096, 0x4000);
   page_clone(kernel_page_dir, page_dir_ptr_tab);
   return page_dir_ptr_tab;
 }

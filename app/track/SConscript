@@ -1,0 +1,43 @@
+# coding:utf-8
+# *******************************************************************
+# * Copyright 2021-2080 evilbinary
+# * 作者: evilbinary on 01/01/20
+# * 邮箱: rootdebug@163.com
+# ********************************************************************
+import os
+
+Import('env')
+
+
+env = env.Clone(
+  w=GetOption('w'),
+  ENV = os.environ,
+  PATH= [os.environ['PATH'],'/opt/local/bin' ],
+  )
+
+
+source=[ 
+]
+
+source+= Glob('*.c')
+
+
+
+source += [
+     '../liblvgl/liblvgl.a',
+    '../libgui/libgui.a',
+    '../libgui/libimage.a',
+    '../libpng/libpng.a',
+    '../../libs/libc/libc.a',
+    '../../libs/libalgorithm/libalgorithm.a',
+    ]
+
+cflags=' -Iapp/liblvgl/ -Iapp/libgui/ -Iapp/libjpeg -DLV_LVGL_H_INCLUDE_SIMPLE=1 -Iapp/xtrack/Pages -Iapp/xtrack/Pages/Config -Iapp/xtrack/Pages/Resource -Iapp/xtrack/'
+
+if env.get('MYLIB'):
+    source.append(env.get('MYLIB'))
+
+env.Program('track.elf', source,
+    CFLAGS='$CFLAGS -Ilibs/include/c/ '+cflags,
+    LINKFLAGS= '$LINKFLAGS $USER')
+

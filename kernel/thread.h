@@ -19,9 +19,9 @@
 #define THREAD_SLEEP	5
 #define THREAD_UNINTERRUPTIBLE 15
 
-#define THREAD_STACK_SIZE 4096
+#define THREAD_STACK_SIZE PAGE_SIZE
 
-typedef struct thread_s{
+typedef struct thread {
     u32 id;
     context_t context;
     int priority;

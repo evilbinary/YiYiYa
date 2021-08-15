@@ -42,6 +42,12 @@
 #define ATA_DEV_BUSY 0x80
 #define ATA_DEV_DRQ 0x08
 
+
+typedef struct sector{
+  u32 startl;
+  u32 starth;
+} sector_t;
+
 typedef enum {
   FIS_TYPE_REG_H2D = 0x27,    // Register FIS - host to device
   FIS_TYPE_REG_D2H = 0x34,    // Register FIS - device to host

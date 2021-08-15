@@ -6,17 +6,25 @@
 #ifndef LOADER_H
 #define LOADER_H
 
-#define STACK_ADDR 0x8000000
-#define HEAP_ADDR  0x8200000
+
 
 #ifdef X86 
 #define EXEC_ADDR  0x200000
+#define STACK_ADDR 0x8000000
+#define HEAP_ADDR  0x8200000
+
+#elif defined(V3S)
+#define EXEC_ADDR  0x50000000
+#define STACK_ADDR 0x60000000
+#define HEAP_ADDR  0x61000000
 #else
 #define EXEC_ADDR  0x4000000
+#define STACK_ADDR 0x8000000
+#define HEAP_ADDR  0x8200000
 #endif
 
-#define MAX_PHDR 6
-#define MAX_SHDR 20
+#define MAX_PHDR 10
+#define MAX_SHDR 30
 
 typedef struct exec{
     char filename[256];

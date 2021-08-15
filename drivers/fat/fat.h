@@ -14,8 +14,7 @@
 #include "fat_config.h"
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 /**
@@ -55,29 +54,27 @@ extern "C"
 /** The given offset is relative to the end of the file. */
 #define FAT_SEEK_END 2
 
-
 /**
  * \ingroup fat_file
  * Describes a directory entry.
  */
-struct fat_dir_entry_struct
-{
-    /** The file's name, truncated to 31 characters. */
-    char long_name[32];
-    /** The file's attributes. Mask of the FAT_ATTRIB_* constants. */
-    uint8_t attributes;
+struct fat_dir_entry_struct {
+  /** The file's name, truncated to 31 characters. */
+  char long_name[32];
+  /** The file's attributes. Mask of the FAT_ATTRIB_* constants. */
+  uint8_t attributes;
 #if FAT_DATETIME_SUPPORT
-    /** Compressed representation of modification time. */
-    uint16_t modification_time;
-    /** Compressed representation of modification date. */
-    uint16_t modification_date;
+  /** Compressed representation of modification time. */
+  uint16_t modification_time;
+  /** Compressed representation of modification date. */
+  uint16_t modification_date;
 #endif
-    /** The cluster in which the file's first byte resides. */
-    cluster_t cluster;
-    /** The file's size. */
-    uint32_t file_size;
-    /** The total disk offset of this directory entry. */
-    offset_t entry_offset;
+  /** The cluster in which the file's first byte resides. */
+  cluster_t cluster;
+  /** The file's size. */
+  uint32_t file_size;
+  /** The total disk offset of this directory entry. */
+  offset_t entry_offset;
 };
 
 /**
@@ -87,8 +84,6 @@ struct partition_struct;
 struct fat_fs_struct;
 struct fat_file_struct;
 struct fat_dir_struct;
-
-
 
 /**
  * \addtogroup fat FAT support
@@ -255,34 +250,48 @@ struct fat_usage_count_callback_arg {
   uintptr_t buffer_size;
 };
 
-
-
 struct fat_fs_struct* fat_open(struct partition_struct* partition);
 void fat_close(struct fat_fs_struct* fs);
 
-struct fat_file_struct* fat_open_file(struct fat_fs_struct* fs, const struct fat_dir_entry_struct* dir_entry);
+struct fat_file_struct* fat_open_file(
+    struct fat_fs_struct* fs, const struct fat_dir_entry_struct* dir_entry);
 void fat_close_file(struct fat_file_struct* fd);
-intptr_t fat_read_file(struct fat_file_struct* fd, uint8_t* buffer, uintptr_t buffer_len);
-intptr_t fat_write_file(struct fat_file_struct* fd, const uint8_t* buffer, uintptr_t buffer_len);
-uint8_t fat_seek_file(struct fat_file_struct* fd, int32_t* offset, uint8_t whence);
+intptr_t fat_read_file(struct fat_file_struct* fd, uint8_t* buffer,
+                       uintptr_t buffer_len);
+intptr_t fat_write_file(struct fat_file_struct* fd, const uint8_t* buffer,
+                        uintptr_t buffer_len);
+uint8_t fat_seek_file(struct fat_file_struct* fd, int32_t* offset,
+                      uint8_t whence);
 uint8_t fat_resize_file(struct fat_file_struct* fd, uint32_t size);
 
-struct fat_dir_struct* fat_open_dir(struct fat_fs_struct* fs, const struct fat_dir_entry_struct* dir_entry);
+struct fat_dir_struct* fat_open_dir(
+    struct fat_fs_struct* fs, const struct fat_dir_entry_struct* dir_entry);
 void fat_close_dir(struct fat_dir_struct* dd);
-uint8_t fat_read_dir(struct fat_dir_struct* dd, struct fat_dir_entry_struct* dir_entry);
+uint8_t fat_read_dir(struct fat_dir_struct* dd,
+                     struct fat_dir_entry_struct* dir_entry);
 uint8_t fat_reset_dir(struct fat_dir_struct* dd);
 
-uint8_t fat_create_file(struct fat_dir_struct* parent, const char* file, struct fat_dir_entry_struct* dir_entry);
-uint8_t fat_delete_file(struct fat_fs_struct* fs, struct fat_dir_entry_struct* dir_entry);
-uint8_t fat_move_file(struct fat_fs_struct* fs, struct fat_dir_entry_struct* dir_entry, struct fat_dir_struct* parent_new, const char* file_new);
-uint8_t fat_create_dir(struct fat_dir_struct* parent, const char* dir, struct fat_dir_entry_struct* dir_entry);
+uint8_t fat_create_file(struct fat_dir_struct* parent, const char* file,
+                        struct fat_dir_entry_struct* dir_entry);
+uint8_t fat_delete_file(struct fat_fs_struct* fs,
+                        struct fat_dir_entry_struct* dir_entry);
+uint8_t fat_move_file(struct fat_fs_struct* fs,
+                      struct fat_dir_entry_struct* dir_entry,
+                      struct fat_dir_struct* parent_new, const char* file_new);
+uint8_t fat_create_dir(struct fat_dir_struct* parent, const char* dir,
+                       struct fat_dir_entry_struct* dir_entry);
 #define fat_delete_dir fat_delete_file
 #define fat_move_dir fat_move_file
 
-void fat_get_file_modification_date(const struct fat_dir_entry_struct* dir_entry, uint16_t* year, uint8_t* month, uint8_t* day);
-void fat_get_file_modification_time(const struct fat_dir_entry_struct* dir_entry, uint8_t* hour, uint8_t* min, uint8_t* sec);
+void fat_get_file_modification_date(
+    const struct fat_dir_entry_struct* dir_entry, uint16_t* year,
+    uint8_t* month, uint8_t* day);
+void fat_get_file_modification_time(
+    const struct fat_dir_entry_struct* dir_entry, uint8_t* hour, uint8_t* min,
+    uint8_t* sec);
 
-uint8_t fat_get_dir_entry_of_path(struct fat_fs_struct* fs, const char* path, struct fat_dir_entry_struct* dir_entry);
+uint8_t fat_get_dir_entry_of_path(struct fat_fs_struct* fs, const char* path,
+                                  struct fat_dir_entry_struct* dir_entry);
 
 offset_t fat_get_fs_size(const struct fat_fs_struct* fs);
 offset_t fat_get_fs_free(const struct fat_fs_struct* fs);
@@ -291,9 +300,44 @@ offset_t fat_get_fs_free(const struct fat_fs_struct* fs);
  * @}
  */
 
+uint32_t fat_read_header(struct fat_fs_struct* fs);
+cluster_t fat_get_next_cluster(const struct fat_fs_struct* fs,
+                               cluster_t cluster_num);
+offset_t fat_cluster_offset(const struct fat_fs_struct* fs,
+                            cluster_t cluster_num);
+uint8_t fat_dir_entry_read_callback(uint8_t* buffer, offset_t offset, void* p);
+#if FAT_LFN_SUPPORT
+uint8_t fat_calc_83_checksum(const uint8_t* file_name_83);
+#endif
+
+uint8_t fat_get_fs_free_16_callback(uint8_t* buffer, offset_t offset, void* p);
+#if FAT_FAT32_SUPPORT
+uint8_t fat_get_fs_free_32_callback(uint8_t* buffer, offset_t offset, void* p);
+#endif
+
+#if FAT_WRITE_SUPPORT
+cluster_t fat_append_clusters(struct fat_fs_struct* fs, cluster_t cluster_num,
+                              cluster_t count);
+uint8_t fat_free_clusters(struct fat_fs_struct* fs, cluster_t cluster_num);
+uint8_t fat_terminate_clusters(struct fat_fs_struct* fs, cluster_t cluster_num);
+uint8_t fat_clear_cluster(const struct fat_fs_struct* fs,
+                          cluster_t cluster_num);
+uintptr_t fat_clear_cluster_callback(uint8_t* buffer, offset_t offset, void* p);
+offset_t fat_find_offset_for_dir_entry(
+    struct fat_fs_struct* fs, const struct fat_dir_struct* parent,
+    const struct fat_dir_entry_struct* dir_entry);
+uint8_t fat_write_dir_entry(const struct fat_fs_struct* fs,
+                            struct fat_dir_entry_struct* dir_entry);
+#if FAT_DATETIME_SUPPORT
+void fat_set_file_modification_date(struct fat_dir_entry_struct* dir_entry,
+                                    uint16_t year, uint8_t month, uint8_t day);
+void fat_set_file_modification_time(struct fat_dir_entry_struct* dir_entry,
+                                    uint8_t hour, uint8_t min, uint8_t sec);
+#endif
+#endif
+
 #ifdef __cplusplus
 }
 #endif
 
 #endif
-

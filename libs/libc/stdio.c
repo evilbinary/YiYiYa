@@ -23,7 +23,6 @@ int putchar(int ch) {
     stdin = &STDIN;
   }
   int ret = ya_write((u32)stdout->fd, &ch, 1);
-
   return ret;
 }
 

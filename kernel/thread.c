@@ -189,6 +189,17 @@ thread_t* thread_clone(thread_t* thread,u32 *vstack3,u32 size) {
   }
   thread_t* copy = kmalloc(sizeof(thread_t));
 
+  copy->id = thread_ids++;
+  copy->next = NULL;
+  copy->state = THREAD_CREATE;
+  copy->priority = thread->priority;
+  copy->counter = thread->counter;
+  copy->vmm = thread->vmm;
+  copy->data = thread->data;
+  copy->context.page_dir = page_alloc_clone(thread->context.page_dir);
+  copy->pid = thread->id;
+  copy->context.kernel_page_dir=thread->context.kernel_page_dir;
+
   //copy files
   copy->fd_size = thread->fd_size;
   copy->fd_number = thread->fd_number;
@@ -223,14 +234,6 @@ thread_t* thread_clone(thread_t* thread,u32 *vstack3,u32 size) {
   context_clone(&copy->context, &thread->context, stack0_top, stack3_top,
                 thread->stack0_top, thread_stack3_top);
   
-  copy->id = thread_ids++;
-  copy->next = NULL;
-  copy->state = THREAD_CREATE;
-  copy->priority = thread->priority;
-  copy->counter = thread->counter;
-  copy->vmm = thread->vmm;
-  copy->data = thread->data;
-  copy->context.page_dir = page_alloc_clone(thread->context.page_dir);
 
   if(vstack3!=NULL){
     // may ref by vmm area
@@ -301,10 +304,23 @@ void thread_dump_fd(thread_t* thread) {
   }
 }
 
+void thread_dump(thread_t* thread) {
+  if(thread==NULL) return;
+  kprintf("id       %d\n",thread->id);
+  kprintf("priority %d\n",thread->priority);
+  kprintf("counter  %d\n",thread->counter);
+  kprintf("state    %d\n",thread->state);
+  kprintf("stack0   %x\n",thread->stack0);
+  kprintf("stack3   %x\n",thread->stack3);
+  kprintf("pid      %d\n",thread->pid);
+  kprintf("fd_num   %d\n",thread->fd_number);
+  kprintf("code     %d\n",thread->code);
+  kprintf("--context--\n");
+  context_dump(&thread->context);
+}
+
 void thread_dumps() {
-  // cpu_cli();
-  kprintf("\ndump all thread\n");
-  kprintf("----------------------------\n");
+  kprintf("\n--------------dump all thread--------------\n");
   kprintf("tid state counter\n");
   for (thread_t* p = head_thread; p != NULL; p = p->next) {
     kprintf("%d  %d %d\n", p->id, p->state, p->counter);

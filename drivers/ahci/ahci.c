@@ -20,7 +20,7 @@ int find_cmdslot(ahci_device_t* ahci_dev, int no) {
   return -1;
 }
 
-int ahci_dev_port_write(ahci_device_t* ahci_dev, int no, u32 startl, u32 starth,
+int ahci_dev_port_write(ahci_device_t* ahci_dev, int no, sector_t sector,
                         u32 count, u32 buf) {
   hba_memory_t* hab_memory = ahci_dev->abar;
   hba_port_t* port = &hab_memory->ports[no];
@@ -48,8 +48,8 @@ int ahci_dev_port_write(ahci_device_t* ahci_dev, int no, u32 startl, u32 starth,
   hba_cmd_tbl_t* cmdtbl = (hba_cmd_tbl_t*)(addr);
 
   kmemset(cmdtbl, 0,
-         sizeof(hba_cmd_tbl_t) +
-             (cmdheader->prdtl - 1) * sizeof(hba_prdt_entry_t));
+          sizeof(hba_cmd_tbl_t) +
+              (cmdheader->prdtl - 1) * sizeof(hba_prdt_entry_t));
   int i = 0;
   //    print("[PRDTL][%d]", cmdheader->prdtl);
   // 8K bytes (16 sectors) per PRDT
@@ -86,14 +86,14 @@ table, ignoring any additional padding.**/
   cmdfis->c = 1;  // Command
   cmdfis->command = ATA_CMD_WRITE_DMA_EX;
 
-  cmdfis->lba0 = (u8)startl;
-  cmdfis->lba1 = (u8)(startl >> 8);
-  cmdfis->lba2 = (u8)(startl >> 16);
+  cmdfis->lba0 = (u8)sector.startl;
+  cmdfis->lba1 = (u8)(sector.startl >> 8);
+  cmdfis->lba2 = (u8)(sector.startl >> 16);
   cmdfis->device = 1 << 6;  // LBA mode
 
-  cmdfis->lba3 = (u8)(startl >> 24);
-  cmdfis->lba4 = (u8)starth;
-  cmdfis->lba5 = (u8)(starth >> 8);
+  cmdfis->lba3 = (u8)(sector.startl >> 24);
+  cmdfis->lba4 = (u8)sector.starth;
+  cmdfis->lba5 = (u8)(sector.starth >> 8);
 
   cmdfis->countl = count & 0xff;
   cmdfis->counth = (count >> 8) & 0xff;
@@ -112,7 +112,7 @@ table, ignoring any additional padding.**/
     if ((port->ci & (1 << slot)) == 0) break;
     if (port->is & HBA_PxIS_TFES)  // Task file error
     {
-      kprintf("write disk error startl:%x\n", startl);
+      kprintf("write disk error startl:%x\n", sector.startl);
       return 0;
     }
   }
@@ -120,7 +120,7 @@ table, ignoring any additional padding.**/
   //   print("\nafter issue : %d" , port->tfd);
   // Check again
   if (port->is & HBA_PxIS_TFES) {
-    kprintf("write disk error startl:%x\n", startl);
+    kprintf("write disk error startl:%x\n", sector.startl);
     return 0;
   }
 
@@ -132,7 +132,7 @@ table, ignoring any additional padding.**/
   return 1;
 }
 
-int ahci_dev_port_read(ahci_device_t* ahci_dev, int no, u32 startl, u32 starth,
+int ahci_dev_port_read(ahci_device_t* ahci_dev, int no, sector_t sector,
                        u32 count, u32 buf) {
   hba_memory_t* hab_memory = ahci_dev->abar;
   hba_port_t* port = &hab_memory->ports[no];
@@ -153,8 +153,8 @@ int ahci_dev_port_read(ahci_device_t* ahci_dev, int no, u32 startl, u32 starth,
   addr = (((cmdheader->ctbau) << 32) | cmdheader->ctba);
   hba_cmd_tbl_t* cmdtbl = (hba_cmd_tbl_t*)(addr);
   kmemset(cmdtbl, 0,
-         sizeof(hba_cmd_tbl_t) +
-             (cmdheader->prdtl - 1) * sizeof(hba_prdt_entry_t));
+          sizeof(hba_cmd_tbl_t) +
+              (cmdheader->prdtl - 1) * sizeof(hba_prdt_entry_t));
 
   // 8K bytes (16 sectors) per PRDT
   int i;
@@ -183,14 +183,14 @@ int ahci_dev_port_read(ahci_device_t* ahci_dev, int no, u32 startl, u32 starth,
   cmdfis->c = 1;  // Command
   cmdfis->command = ATA_CMD_READ_DMA_EX;
 
-  cmdfis->lba0 = (uint8_t)startl;
-  cmdfis->lba1 = (uint8_t)(startl >> 8);
-  cmdfis->lba2 = (uint8_t)(startl >> 16);
+  cmdfis->lba0 = (uint8_t)sector.startl;
+  cmdfis->lba1 = (uint8_t)(sector.startl >> 8);
+  cmdfis->lba2 = (uint8_t)(sector.startl >> 16);
   cmdfis->device = 1 << 6;  // LBA mode
 
-  cmdfis->lba3 = (uint8_t)(startl >> 24);
-  cmdfis->lba4 = (uint8_t)starth;
-  cmdfis->lba5 = (uint8_t)(starth >> 8);
+  cmdfis->lba3 = (uint8_t)(sector.startl >> 24);
+  cmdfis->lba4 = (uint8_t)sector.starth;
+  cmdfis->lba5 = (uint8_t)(sector.starth >> 8);
 
   cmdfis->countl = count & 0xFF;
   cmdfis->counth = (count >> 8) & 0xFF;
@@ -214,14 +214,14 @@ int ahci_dev_port_read(ahci_device_t* ahci_dev, int no, u32 startl, u32 starth,
     if ((port->ci & (1 << slot)) == 0) break;
     if (port->is & HBA_PxIS_TFES)  // Task file error
     {
-      kprintf("read disk error startl:%x\n", startl);
+      kprintf("read disk error startl:%x\n", sector.startl);
       return 0;
     }
   }
 
   // Check again
   if (port->is & HBA_PxIS_TFES) {
-    kprintf("read disk error startl:%x\n", startl);
+    kprintf("read disk error startl:%x\n", sector.startl);
     return 0;
   }
 
@@ -350,7 +350,10 @@ static size_t ahci_read(device_t* dev, void* buf, size_t len) {
     count++;
   }
   u32 ret = 0;
-  ret = ahci_dev_port_read(ahci_dev, no, startl, starth, count, buf);
+  sector_t sector;
+  sector.startl = startl;
+  sector.starth = starth;
+  ret = ahci_dev_port_read(ahci_dev, no, sector, count, buf);
   if (ret == 0) {
     return -1;
   }
@@ -369,7 +372,10 @@ static size_t ahci_write(device_t* dev, void* buf, size_t len) {
     count++;
   }
   u32 ret = 0;
-  ret = ahci_dev_port_write(ahci_dev, no, startl, starth, count, buf);
+  sector_t sector;
+  sector.startl = startl;
+  sector.starth = starth;
+  ret = ahci_dev_port_write(ahci_dev, no, sector, count, buf);
   if (ret == 0) {
     return -1;
   }

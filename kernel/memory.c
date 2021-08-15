@@ -131,8 +131,14 @@ void page_clone_user(u64* page, u64* page_dir_ptr_tab) {
 
 
 void kpool_init() {
+
+#ifdef USE_POOL
   kernel_pool = queue_pool_create(KERNEL_POOL_NUM, PAGE_SIZE);
   user_pool = queue_pool_create_align(USER_POOL_NUM, PAGE_SIZE, PAGE_SIZE);
+#else
+  kernel_pool=NULL;
+  user_pool=NULL;
+#endif
 }
 
 int kpool_put(void* e) { return queue_pool_put(kernel_pool, e); }
@@ -203,6 +209,7 @@ vmemory_area_t* vmemory_area_find(vmemory_area_t* areas, void* addr,
                                   size_t size) {
   vmemory_area_t* p = areas;
   for (; p != NULL; p = p->next) {
+    // kprintf("vmemory_area_find addr: %x p->vaddr:%x p->size:%x\n",addr,p->vaddr,p->size);
     if ((addr >= p->vaddr) && (addr <= (p->vaddr + p->size ))) {
       return p;
     }

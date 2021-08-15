@@ -28,8 +28,9 @@ kernel=[
     ]
 
 if env.get('ARCH')=='xtensa':
-    libs.append('../app/libgui/libgui.a')
-    libs.append('../libs/libc/libc.a')
+    # libs.append('../app/libgui/libgui.a')
+    # libs.append('../libs/libc/libc.a')
+    pass
 
 if env.get('MYLIB'):
     libs.append(env.get('MYLIB'))
@@ -58,6 +59,8 @@ if env.get('APP'):
     SConscript(dirs=['bin'], exports='env')
     SConscript(dirs=['lvgl'], exports='env')
 
+    SConscript(dirs=['track'], exports='env')
+
 
     if plt=='Darwin':
         env.Command('copyhello', 
@@ -68,7 +71,8 @@ if env.get('APP'):
             'etk/etk.elf',
             'test/test.elf',
             'bin/ls',
-            'lvgl/lvgl'
+            'lvgl/lvgl',
+            'track/track.elf'
             ],
             ['hdid  image/disk.img &&  cp ${SOURCES} /Volumes/NO\ NAME/ && hdiutil eject /Volumes/NO\ NAME/'
         ])
@@ -82,7 +86,8 @@ if env.get('APP'):
             'etk/etk.elf',
             'test/test.elf',
             'bin/ls',
-            'lvgl/lvgl'
+            'lvgl/lvgl',
+            'track/track.elf'
             ],
             ['sudo losetup /dev/loop10 image/disk.img && sudo mount /dev/loop10 /mnt && sudo cp ${SOURCES} /mnt && sudo umount /mnt && sudo losetup -d /dev/loop10'
         ])

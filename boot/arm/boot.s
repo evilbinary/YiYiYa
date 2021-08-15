@@ -5,6 +5,11 @@ _start:
  // save CPSR.
 mrs r0, cpsr
 
+mrc p15, #0, r1, c0, c0, #5
+and r1, r1, #3
+cmp r1, #0
+bne halt 
+
 ldr sp, = stack_top
 ldr fp, = stack_top
 
@@ -33,7 +38,7 @@ bic r1, r0, #0x1F
 orr r1, r1, #0x13
 msr cpsr_c, r0
 mov sp, #0x3000
-//ldr sp,= stack_svc
+//ldr sp,= stack_svc_top
 
 bl init_boot
 

@@ -66,21 +66,22 @@ struct partition_struct* partition_open(device_read_t device_read, device_read_i
 
     if(!device_read || !device_read_interval||!device_write_interval ||index>4)
         return 0;
-
     if(index >= 0)
     {
         /* read specified partition table index */
-        if(!device_read(0x01be + index * 0x10, buffer, sizeof(buffer)))
+        if(!device_read(0x01be + index * 0x10, buffer, sizeof(buffer))){
+            kprintf("read partition table index failed\n");
             return 0;
-
+        }
         /* abort on empty partition entry */
-        if(buffer[4] == 0x00)
+        if(buffer[4] == 0x00){
+            kprintf("empty partition entry\n");
             return 0;
+        }
     }
-
     /* allocate partition descriptor */
 #if USE_DYNAMIC_MEMORY
-    new_partition = malloc(sizeof(*new_partition));
+    new_partition = kmalloc(sizeof(*new_partition));
     if(!new_partition)
         return 0;
 #else
@@ -96,7 +97,6 @@ struct partition_struct* partition_open(device_read_t device_read, device_read_i
     if(i >= PARTITION_COUNT)
         return 0;
 #endif
-
     kmemset(new_partition, 0, sizeof(*new_partition));
 
     /* fill partition descriptor */
@@ -110,12 +110,13 @@ struct partition_struct* partition_open(device_read_t device_read, device_read_i
         new_partition->type = buffer[4];
         new_partition->offset = read32(&buffer[8]);
         new_partition->length = read32(&buffer[12]);
+        kprintf("partition type:%x offset:%x length:%d\n",new_partition->type,new_partition->offset,new_partition->length);
     }
     else
     {
         new_partition->type = 0xff;
+        kprintf("partition type:%x offset:%x length:%d\n",new_partition->type,new_partition->offset,new_partition->length);
     }
-
     return new_partition;
 }
 
@@ -138,7 +139,7 @@ uint8_t partition_close(struct partition_struct* partition)
 
     /* destroy partition descriptor */
 #if USE_DYNAMIC_MEMORY
-    free(partition);
+    kfree(partition);
 #else
     partition->type = PARTITION_TYPE_FREE;
 #endif

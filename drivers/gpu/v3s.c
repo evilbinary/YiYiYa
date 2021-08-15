@@ -270,18 +270,24 @@ int gpu_init_mode(vga_device_t *vga, int mode) {
     vga->width = 640;
     vga->height = 480;
     vga->bpp = 24;
+  }  else if (mode == VGA_MODE_480x272x24) {
+    vga->width = 480;
+    vga->height = 272;
+    vga->bpp = 24;
+  }else if (mode == VGA_MODE_480x272x32) {
+    vga->width = 480;
+    vga->height = 272;
+    vga->bpp = 32;
   } else if (mode == VGA_MODE_480x272x18) {
     vga->width = 480;
     vga->height = 272;
     vga->bpp = 18;
-  } else if (mode == VGA_MODE_480x272x24) {
-    vga->width = 480;
-    vga->height = 272;
-    vga->bpp = 24;
-  } else if (mode == VGA_MODE_1024x768x32) {
+  }else if (mode == VGA_MODE_1024x768x32) {
     vga->width = 1024;
     vga->height = 768;
     vga->bpp = 32;
+  }else{
+    kprintf("no support mode %x\n");
   }
   vga->mode = mode;
   vga->write = NULL;
@@ -300,19 +306,19 @@ int gpu_init_mode(vga_device_t *vga, int mode) {
   return 0;
 }
 
-static void test_pixel(vga_device_t *vga) {
-  static const pixel_t BLACK = {0xff, 0x00, 0x00};
-  static const pixel_t RED = {0x00, 0x00, 0xff};
+// static void test_pixel(vga_device_t *vga) {
+//   static const pixel_t BLACK = {0xff, 0x00, 0x00};
+//   static const pixel_t RED = {0x00, 0x00, 0xff};
 
-  for (int i = 0; i < 300; i++) {
-    write_pixel(vga, i, 20, &BLACK);
-    write_pixel(vga, i, 40, &RED);
-    write_pixel(vga, i, 180, &BLACK);
-    write_pixel(vga, i, 190, &RED);
-  }
-  for (uint32_t j = 0; j < vga->height; j++) {
-    for (uint32_t i = 0; i < vga->width; i++) {
-      write_pixel(vga, i, j, &BLACK);
-    }
-  }
-}
+//   for (int i = 0; i < 300; i++) {
+//     write_pixel(vga, i, 20, &BLACK);
+//     write_pixel(vga, i, 40, &RED);
+//     write_pixel(vga, i, 180, &BLACK);
+//     write_pixel(vga, i, 190, &RED);
+//   }
+//   for (uint32_t j = 0; j < vga->height; j++) {
+//     for (uint32_t i = 0; i < vga->width; i++) {
+//       write_pixel(vga, i, j, &BLACK);
+//     }
+//   }
+// }

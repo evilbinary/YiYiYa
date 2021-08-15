@@ -71,8 +71,10 @@ void* ya_alloc(size_t size) {
 
 void ya_free(void* ptr) {
   free_block_t* block = (free_block_t*)(((char*)ptr) - sizeof(free_block_t));
+  memset(ptr,0,block->size);
   block->next = free_block_list_head.next;
   free_block_list_head.next = block;
+  
 }
 
 void* ya_valloc(void* addr, size_t size) {

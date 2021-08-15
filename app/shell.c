@@ -6,22 +6,6 @@
 #include "main.h"
 
 void do_shell_thread(void) {
-  // static const char key_map[0x3a][2] = {
-  //     /*00*/ {0x0, 0x0},   {0x0, 0x0}, {'1', '!'},   {'2', '@'},
-  //     /*04*/ {'3', '#'},   {'4', '$'}, {'5', '%'},   {'6', '^'},
-  //     /*08*/ {'7', '&'},   {'8', '*'}, {'9', '('},   {'0', ')'},
-  //     /*0c*/ {'-', '_'},   {'=', '+'}, {'\b', '\b'}, {'\t', '\t'},
-  //     /*10*/ {'q', 'Q'},   {'w', 'W'}, {'e', 'E'},   {'r', 'R'},
-  //     /*14*/ {'t', 'T'},   {'y', 'Y'}, {'u', 'U'},   {'i', 'I'},
-  //     /*18*/ {'o', 'O'},   {'p', 'P'}, {'[', '{'},   {']', '}'},
-  //     /*1c*/ {'\n', '\n'}, {0x0, 0x0}, {'a', 'A'},   {'s', 'S'},
-  //     /*20*/ {'d', 'D'},   {'f', 'F'}, {'g', 'G'},   {'h', 'H'},
-  //     /*24*/ {'j', 'J'},   {'k', 'K'}, {'l', 'L'},   {';', ':'},
-  //     /*28*/ {'\'', '\"'}, {'`', '~'}, {0x0, 0x0},   {'\\', '|'},
-  //     /*2c*/ {'z', 'Z'},   {'x', 'X'}, {'c', 'C'},   {'v', 'V'},
-  //     /*30*/ {'b', 'B'},   {'n', 'N'}, {'m', 'M'},   {',', '<'},
-  //     /*34*/ {'.', '>'},   {'/', '?'}, {0x0, 0x0},   {'*', '*'},
-  //     /*38*/ {0x0, 0x0},   {' ', ' '}};
   u8 scan_code;
   u8 shf_p = 0;
   u8 ctl_p = 0;
@@ -37,22 +21,25 @@ void do_shell_thread(void) {
   // syscall2(SYS_EXEC,"/dev/sda/hello",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/gui.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/file.elf",NULL);
-  syscall2(SYS_EXEC,"/dev/sda/etk.elf",NULL);
+  // syscall2(SYS_EXEC,"/dev/sda/etk.elf",NULL);
+  // syscall2(SYS_EXEC,"/dev/sda/track.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/test.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/microui.elf",NULL);
-  // syscall2(SYS_EXEC,"/dev/sda/lvgl",NULL);
+  syscall2(SYS_EXEC,"/dev/sda/lvgl",NULL);
   // kprintf("fd=>%d\n",fd);
 #else defined(ARM)
- syscall2(SYS_EXEC,"/dev/sda/test.elf",NULL);
-  // syscall2(SYS_EXEC,"/dev/sda/hello.elf",NULL);
+//  syscall2(SYS_EXEC,"/dev/sda/test.elf",NULL);
+  // syscall2(SYS_EXEC,"/dev/sda/hello",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/lvgl",NULL);
+  syscall2(SYS_EXEC,"/dev/sda/track.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/gui.elf",NULL);
 // syscall2(SYS_EXEC,"/dev/sda/etk.elf",NULL);
 //  syscall2(SYS_EXEC,"/dev/sda/test.elf",NULL);
 //  syscall2(SYS_EXEC,"/dev/sda/microui.elf",NULL);
-// for(int i=0;i<200;i++){
+// for(int i=0;i<1000;i++){
 //   kprintf("kmalloc %d\n",i);
-//   kmalloc(4096);
+//   void* p=kmalloc(4096);
+//   // kfree(p);
 // }
 // kprintf("malloc end\n");
 #endif

@@ -1,0 +1,29 @@
+# coding:utf-8
+# *******************************************************************
+# * Copyright 2021-2080 evilbinary
+# * 作者: evilbinary on 01/01/20
+# * 邮箱: rootdebug@163.com
+# ********************************************************************
+import os
+
+Import('env')               
+
+
+env.GenerateKernelSize('config.h',['../../app/kernel'])
+
+env.Object('boot', ['boot.s'],ASFLAGS='')
+
+source = [
+    'boot.o',
+    'init.c',
+    ]
+
+if env.get('MYLIB'):
+    source.append(env.get('MYLIB'))
+
+env.Program(target ='init.elf', source=source,
+    CFLAGS='$CFLAGS -I. -Iinclude',
+    LINKFLAGS= '-nostdlib -nostartfiles -T boot/xtensa/link.ld'
+    )
+
+env.Objcopy('init.bin','init.elf',OBJCOPYFLAGS='-O binary -S --strip-debug')

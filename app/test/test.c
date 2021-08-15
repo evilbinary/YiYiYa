@@ -238,17 +238,20 @@ void test_malloc_free(){
 }
 
 void test_pc(){
-  printf("fork\n");
+  // printf("fork\n");
+  // syscall0(12);
   u32 i = 0;
   pid_t fpid = fork();
   for(;;){
+    printf("tid:%d i=>%d\n",fpid,i++);
   }
 }
 
 int main(int argc, char* argv[]) {
   printf(buf);
-  test_pc();
-  // test_fork();
+  // test_pc();
+  // syscall0(12);
+  test_fork();
   // test_pty();
   // test_dup();
   // test_dup2();

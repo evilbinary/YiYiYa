@@ -14,8 +14,10 @@
   #include "arm/cpu.h"
 #elif defined(X86)
   #include "x86/cpu.h"
+#elif defined(XTENSA)
+  #include "xtensa/cpu.h"
 #else
-
+    #error "no support"
 #endif
 
 
