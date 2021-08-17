@@ -29,3 +29,5 @@ app/lvgl/lvgl
 app/bin/ls
 app/hello/hello
 **.bin
+
+app/**/**/target/**
