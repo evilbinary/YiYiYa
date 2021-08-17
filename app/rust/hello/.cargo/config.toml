@@ -1,0 +1,6 @@
+[target.armv7a-none-eabi]
+rustflags = [   "-C", "link-arg=-Tuser-arm.ld" ,
+                ]
+
+[build]
+target = "armv7a-none-eabi"
