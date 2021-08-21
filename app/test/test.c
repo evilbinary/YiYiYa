@@ -1,6 +1,6 @@
-#include "ioctl.h"
 #include "stdio.h"
 #include "stdlib.h"
+#include "sys/ioctl.h"
 #include "types.h"
 #include "unistd.h"
 
@@ -92,7 +92,6 @@ void test_read_write() {
         write(fd_ptm, buf2, len);
       }
       j++;
-
     }
   }
   for (int i = 0; i < 1000000; i++) {
@@ -120,15 +119,15 @@ void test_dup_pty() {
     if (fd_pts < 0) {
       printf("error get pts \n");
     }
-    printf(" salve pts:%d\n",fd_pts);
+    printf(" salve pts:%d\n", fd_pts);
     int j = 0;
     int pid = getpid();
     for (;;) {
       char buf2[64];
       int len = 1;
       memset(buf2, 0, len);
-      int ret=read(fd_pts, buf2, len);
-      printf("pid:%d %d read from ptm: %s ret:%d\n", pid, j++, buf2,ret);
+      int ret = read(fd_pts, buf2, len);
+      printf("pid:%d %d read from ptm: %s ret:%d\n", pid, j++, buf2, ret);
     }
   } else {
     printf("parent ppid:%d pid:%d fork ret:%d\n", getppid(), getpid(), fpid);
@@ -139,7 +138,7 @@ void test_dup_pty() {
       int len = strlen(buf2);
       if (j < 3 || j > 10000000) {
         printf("pid:%d %d write ptm: %s ", pid, j, buf2);
-        u32 ret=write(fd_ptm, buf2, len);
+        u32 ret = write(fd_ptm, buf2, len);
         printf("   ret=%d\n");
       }
       j++;
@@ -192,16 +191,16 @@ void test_pipe() {
 }
 
 void test_dup() {
-  FILE *fp = fopen("/dev/sda/testdup.txt", "w");
-  printf("open fp %x\n",fp);
-  int fno=fileno(fp);
-  fno=STDOUT_FILENO;
+  FILE* fp = fopen("/dev/sda/testdup.txt", "w");
+  printf("open fp %x\n", fp);
+  int fno = fileno(fp);
+  fno = STDOUT_FILENO;
 
-  int fd=dup(fno);
-  printf("dup fd %d\n",fd);
+  int fd = dup(fno);
+  printf("dup fd %d\n", fd);
 
-  FILE* nfp=fdopen(fd,"w");
-  fprintf(nfp,"test dup\n");
+  FILE* nfp = fdopen(fd, "w");
+  fprintf(nfp, "test dup\n");
   close(fd);
 }
 
@@ -219,36 +218,48 @@ void test_dup2() {
   close(fd);
 }
 
-void test_exec(){
-  char * argv[] = {"ls", "-al", "/etc/passwd",};
+void test_exec() {
+  char* argv[] = {
+      "ls",
+      "-al",
+      "/etc/passwd",
+  };
   // execv("/bin/ls", argv);
   execv("/dev/sda/hello.elf", argv);
 }
 
-
-void test_malloc_free(){
-  for(int i=0;i<100;i++){
-    void*  p=malloc(1024*2);
-    if(p==NULL){
+void test_malloc_free() {
+  for (int i = 0; i < 100; i++) {
+    void* p = malloc(1024 * 2);
+    if (p == NULL) {
       printf("malloc error\n");
-    }else{
+    } else {
       free(p);
     }
   }
 }
 
-void test_pc(){
+void test_pc() {
   // printf("fork\n");
   // syscall0(12);
   u32 i = 0;
   pid_t fpid = fork();
-  for(;;){
-    printf("tid:%d i=>%d\n",fpid,i++);
+  printf("t:%d\n",fpid);
+  for (;;) {
+    printf("t:%d i=>%d\n", fpid, i++);
   }
+}
+
+void test_syscall() {
+  // printf("haha\n");
+#ifdef LIBYC
+  syscall0(12);
+#endif
 }
 
 int main(int argc, char* argv[]) {
   printf(buf);
+  // test_syscall();
   // test_pc();
   // syscall0(12);
   test_fork();

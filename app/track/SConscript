@@ -27,10 +27,8 @@ source += [
      '../liblvgl/liblvgl.a',
     '../libgui/libgui.a',
     '../libgui/libimage.a',
-    '../libpng/libpng.a',
-    '../../libs/libc/libc.a',
-    '../../libs/libalgorithm/libalgorithm.a',
-    ]
+    '../libpng/libpng.a'
+    ]+env['LIBC']
 
 cflags=' -Iapp/liblvgl/ -Iapp/libgui/ -Iapp/libjpeg -DLV_LVGL_H_INCLUDE_SIMPLE=1 -Iapp/xtrack/Pages -Iapp/xtrack/Pages/Config -Iapp/xtrack/Pages/Resource -Iapp/xtrack/'
 
@@ -38,6 +36,6 @@ if env.get('MYLIB'):
     source.append(env.get('MYLIB'))
 
 env.Program('track.elf', source,
-    CFLAGS='$CFLAGS -Ilibs/include/c/ '+cflags,
+    CFLAGS='$CFLAGS $LIBCFLAGS '+cflags,
     LINKFLAGS= '$LINKFLAGS $USER')
 

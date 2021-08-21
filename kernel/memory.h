@@ -26,6 +26,7 @@
 
 typedef struct vmemory_area{
     void* vaddr;
+    void* vend;
     u32 size;
     u8 flags;
     struct vmemory_area* next; 

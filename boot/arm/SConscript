@@ -14,7 +14,7 @@ Import('env')
 #     for key in env_dumped:
 #         file.write(key)
 
-env.GenerateKernelSize('config.h',['../../app/kernel'])
+env.GenerateKernelSize('config.h',['../../init/kernel'])
 
 env.Object('boot', ['boot.s'],ASFLAGS='')
 

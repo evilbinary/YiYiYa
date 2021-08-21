@@ -12,14 +12,13 @@ Import('env')
 
 source= [
     'file.c',
-    '../../libs/libc/libc.a',
-    ]
+    ]+env['LIBC']
     
 if env.get('MYLIB'):
     source.append(env.get('MYLIB'))
 
 
 env.Program('file.elf', source,
-    CFLAGS='$CFLAGS -Ilibs/include/c/ ',
+    CFLAGS='$CFLAGS $LIBCFLAGS ',
     LINKFLAGS= '$LINKFLAGS $USER')
 

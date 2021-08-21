@@ -11,7 +11,6 @@ asm("jmpl $0x0000, $init_boot\n");
 
 boot_info_t* boot_info = NULL;
 boot_info_t boot_data;
-u64 gdts[GDT_NUMBER];
 u8 kernel_stack[1024];  // 1k
 u8 kernel_stack_top[0];
 
@@ -118,7 +117,6 @@ void init_boot_info() {
   boot_info->kernel_origin_base = KERNEL_ORIGIN_BASE;
   boot_info->kernel_base = KERNEL_BASE;
   boot_info->kernel_size = KERNEL_BLOCK_SIZE * READ_BLOCK_SIZE * 2;
-  boot_info->gdt_base = gdts;
   boot_info->gdt_number = GDT_NUMBER;
   boot_info->pdt_base = PDT_BASE;
   boot_info->tss_number = MAX_CPU;

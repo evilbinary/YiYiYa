@@ -1211,7 +1211,10 @@ uint8_t fat_read_dir(struct fat_dir_struct* dd,
 #endif
       cluster_size = header->cluster_zero_offset - header->root_dir_offset;
   }
-
+  if(fs->partition->device_read_interval==NULL){
+    kprintf("fs->partition->device_read_interval is null\n");
+    return 0;
+  }
   /* read entries */
   uint8_t buffer[32];
   while (!arg.finished) {
@@ -1228,7 +1231,6 @@ uint8_t fat_read_dir(struct fat_dir_struct* dd,
                                              cluster_left,
                                              fat_dir_entry_read_callback, &arg))
       return 0;
-
     cluster_offset += arg.bytes_read;
 
     if (cluster_offset >= cluster_size) {

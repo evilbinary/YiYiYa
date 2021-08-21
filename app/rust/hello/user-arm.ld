@@ -20,7 +20,7 @@ SECTIONS
         /* Read-write data (initialized) */
         .data  : ALIGN(4K)
         {
-                *(.data)
+                *(.data*)
         }
 
         /* Read-write data (uninitialized) and stack */
@@ -31,11 +31,15 @@ SECTIONS
         }
         .eh_frame  : ALIGN(4K)
         {
-                *(.eh_frame)
+                *(.eh_frame*)
         }
         .debug  : ALIGN(4K)
         {
                 *(.debug*)
         }
+        .ARM.extab   : { *(.ARM.extab*) }
+        .ARM.exidx   : { *(.ARM.exidx*) }
+        .tdata             : { *(.tdata .tdata.*) }
+        .tbss              : { *(.tbss .tbss.*) }
        _end = .;
 }

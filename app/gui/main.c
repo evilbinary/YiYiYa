@@ -12,7 +12,7 @@ void* load_bmp(char* name) {
   memset(buffer, 0, 200 * 1024);
   FILE* fp;
   fp = fopen(name, "r+");
-  printf("fd=%d\n", fp->fd);
+  // printf("fd=%d\n", fp->fd);
   u32 offset = 0;
   for (;;) {
     fseek(fp, offset, SEEK_SET);
@@ -22,7 +22,7 @@ void* load_bmp(char* name) {
     }
     offset++;
   }
-  printf("read end=%d\n", fp->fd);
+  // printf("read end=%d\n", fp->fd);
   fclose(fp);
   return buffer;
 }

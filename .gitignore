@@ -31,3 +31,5 @@ app/hello/hello
 **.bin
 
 app/**/**/target/**
+
+**.lo

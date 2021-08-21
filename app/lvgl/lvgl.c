@@ -204,11 +204,7 @@ int main(int argc, char **argv) {
   // lv_example_get_started_1();
   // lv_example_chart_1();
   // lv_example_table_1();
-#ifdef ARM
-  lv_example_keyboard_1();
-#else
   lv_demo_widgets();
-#endif
   printf("loop\n");
 
   int tickets = 0;

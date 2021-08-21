@@ -25,13 +25,4 @@ env.Library('png', [
     "pngwrite.c",
     "pngwtran.c",
     "pngwutil.c",
-    '../../libs/libc/libc.a',
-],CFLAGS='$CFLAGS -Ilibs/include/c/ -Iapp/libzlib/ -I.')
-
-
-# env.Program('jpeg.elf', [
-#     'libjpeg.a',
-#     '../../libs/libc/libc.a',
-#     ],
-#     CFLAGS='$CFLAGS -Ilibs/include/c/ ',
-#     LINKFLAGS= '$LINKFLAGS $USER')
+]+env['LIBC'],CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libzlib/ -I.')

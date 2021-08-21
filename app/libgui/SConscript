@@ -11,17 +11,15 @@ Import('env')
 env.Library('gui', [
     'screen.c',
     'event.c',
-    '../../libs/libc/libc.a',
-],CFLAGS='$CFLAGS -Ilibs/include/c/')
+]+env['LIBC'],CFLAGS='$CFLAGS $LIBCFLAGS')
 
 env.Library('image', [
     'image.c',
     'jpeg_decoder.c',
     'png_decoder.c',
-    '../../libs/libc/libc.a',
     '../libjpeg/libjpeg.a',
     '../libpng/libpng.a',
-],CFLAGS='$CFLAGS -Ilibs/include/c/ -Iapp/libjpeg -Iapp/libpng')
+]+env['LIBC'],CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libjpeg -Iapp/libpng')
 
 # env.Objcopy('gui.elf','gui',OBJCOPYFLAGS='-S --strip-all')
 #env.Objcopy('gui.dbg','gui.elf',OBJCOPYFLAGS='--only-keep-debug')

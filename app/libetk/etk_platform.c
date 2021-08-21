@@ -16,7 +16,7 @@ EtkRect last_rect;
 size_t etk_get_relative_time(void) {
   struct timeval t_curr;
   gettimeofday(&t_curr, NULL);
-  uint64_t inus = 1000 * 1000 * t_curr.tv_sec + t_curr.tv_usec;
+  uint32_t inus = 1000 * 1000 * t_curr.tv_sec + t_curr.tv_usec;
   return (size_t)(inus / 1000);
 }
 

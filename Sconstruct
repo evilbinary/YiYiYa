@@ -10,14 +10,14 @@ import platform
 plt = platform.system()
 
 # arch support x86 arm
-#arch='arm'
+# arch='arm'
 arch='x86' 
 # arch='xtensa'
 
 # board select platform
 platform='intel'
 # platform='v3s'
-#platform='raspi2'
+# platform='raspi2'
 # platform='esp32'
 
 DefaultEnvironment(tools=[])
@@ -52,7 +52,7 @@ env = Environment(
         RANLIB=gcc+'ranlib',
         OBJCOPY=gcc+'objcopy',
         AS=gcc+'as',
-        CFLAGS=' -DX86 -march=i486 -I. -I./include -Ilibs/include -g -nostdlib -nostdinc -fno-builtin -m32 -c -std=c99 -std=gnu99 -w -D'+platform.upper(),
+        CFLAGS=' -DX86 -march=i486 -I. -I./include -Ilibs/include -g -nostdlib -nostdinc  -fno-builtin -m32 -c -std=c99 -std=gnu99 -w -D'+platform.upper(),
         #PATH= os.environ['PATH'],
         LIBPATH=['.','../arch/','../driver','../libs/'],
         LINKFLAGS='-nostdlib -nostartfiles -e start  -g ',
@@ -61,6 +61,10 @@ env = Environment(
         PLATFORM=platform,
         LINKLD='link.ld',
         MYLIB=None,
+        LIBC=['../../libs/libc/libc.a','../../libs/libalgorithm/libalgorithm.a'],
+        LIBCFLAGS='-Ilibs/include/c/ -DLIBYC',
+        # LIBC=['../../app/libmusl/lib/libc.a'],
+        # LIBCFLAGS=' -Iapp/libmusl/include/ -Iapp/libmusl/obj/include/ -Iapp/libmusl/arch/generic/ -Iapp/libmusl/arch/arm/ ',
         USER='--entry main -Tuser.ld'
         )
 
@@ -140,9 +144,8 @@ SConscript(dirs=['platform'], exports='env')
 SConscript(dirs=['arch'], exports='env')
 SConscript(dirs=['kernel'], exports='env')
 SConscript(dirs=['libs/libkernel'], exports='env')
-SConscript(dirs=['libs/libc'], exports='env')
 SConscript(dirs=['drivers'], exports='env')
-kernel=SConscript(dirs=['app'], exports='env')
+kernel=SConscript(dirs=['init'], exports='env')
 
 
 boot=SConscript(dirs=['boot/'+arch], exports='env')
@@ -150,3 +153,10 @@ Depends(boot, kernel)
 
 image=SConscript(dirs=['image'], exports='env')
 Depends(image, kernel)
+
+
+SConscript(dirs=['libs/libc'], exports='env')
+app=SConscript(dirs=['app'], exports='env')
+
+
+

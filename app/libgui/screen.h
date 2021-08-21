@@ -6,7 +6,7 @@
 #ifndef SCREEN_H
 #define SCREEN_H
 
-#include "ioctl.h"
+#include "sys/ioctl.h"
 #include "stdint.h"
 #include "stdlib.h"
 #include "types.h"

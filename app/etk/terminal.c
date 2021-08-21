@@ -1,6 +1,6 @@
 #include "terminal.h"
 
-#include "ioctl.h"
+#include "sys/ioctl.h"
 
 #define IOC_PTY_MAGIC 'p'
 
@@ -97,7 +97,7 @@ void interpret_cmd(char* cmd) {
     while (isspace(*next)) {
       next++;
     }
-    u32 n = strchrnul(next, ' ') - next;
+    u32 n = (u32)strchrnul(next, ' ') - (u32)next;
     args[n_args - 1] = strndup(next, n);
     args[n_args] = NULL;
     fprintf(file_out, "arg[%d]: %s", n_args - 1, args[n_args - 1]);
@@ -117,6 +117,11 @@ void interpret_cmd(char* cmd) {
   } else {
     printf("\n");
   }
+  // u32 cmdret = etk_terminal_get_cmd_result();
+  // if (cmdret > 0) {
+  //   printf("cmd ret:%d text:%s\n", cmdret, text_buf->buf);
+  // }
+
   while (args && *args) {
     free(*args);
     args++;
@@ -224,11 +229,11 @@ int etk_terminal_get_cmd_result() {
   u32 nread;
   u8 anything_read = false;
   memset(ret_buf, 0, ret_buf_size);
-  for (int i = 0; i < 1; i++) {
+  for (int i = 0; i < 10; i++) {
     nread = read(fd_ptm, ret_buf, ret_buf_size - 1);
     if (nread >= 0) {
       ret_buf[nread] = '\0';
-      printf("read from ptm size:%d %s", nread, ret_buf);
+      printf("read from ptm size:%d result:%s\n", nread, ret_buf);
       str_append(text_buf, "\n");
       str_append(text_buf, ret_buf);
       anything_read = true;

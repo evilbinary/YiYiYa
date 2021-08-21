@@ -30,7 +30,7 @@ typedef u32 (*vread_t)(struct vnode*,u32,u32,u8*);
 typedef u32 (*vwrite_t)(struct vnode*,u32,u32,u8*);
 typedef u32 (*vopen_t)(struct vnode*);
 typedef void (*vclose_t)(struct vnode*);
-typedef size_t (*vioctl_t)(struct vnode*,u32 cmd, ...);
+typedef size_t (*vioctl_t)(struct vnode*,u32 cmd, void* args);
 
 typedef struct vdirent * (*vreaddir_t)(struct vnode*,u32);
 typedef struct vnode * (*vfinddir_t)(struct vnode*,char *name);
@@ -73,7 +73,7 @@ vnode_t *vfinddir(vnode_t *node, char *name);
 vnode_t *vfind(vnode_t *node, char *name);
 vnode_t *vcreate(u8 *name, u32 flags);
 void vmount(vnode_t* node,u8 *path, vnode_t *node1);
-size_t vioctl(vnode_t *node, u32 cmd,va_list args);
+size_t vioctl(vnode_t *node, u32 cmd,void* args);
 
 vnode_t* vfs_find(vnode_t* root,u8 *path);
 void vfs_mount(vnode_t *root, u8 *path, vnode_t *node);

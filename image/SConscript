@@ -33,7 +33,7 @@ env = env.Clone(
   )
 # export PATH=$PATH:/Volumes/android/u-boot/scripts/dtc/:/Volumes/android/u-boot/tools/
 env.AppendENVPath('PATH', ['/Volumes/android/u-boot/scripts/dtc/','/Volumes/android/u-boot/tools/'])
-env.KernelSize(['size'],['../app/kernel'])
+env.KernelSize(['size'],['../init/kernel'])
 
 
 def build_duck_image():
@@ -43,7 +43,7 @@ def build_duck_image():
       ''
       '../boot/x86/boot',
       '../boot/x86/init.bin',
-      '../app/kernel' ],
+      '../init/kernel' ],
       [
         'dd if=/dev/zero bs=512 count=2880 conv=notrunc of=$TARGET',
         'dd if=${SOURCES[0]} bs=512 count=1 conv=notrunc of=$TARGET',
@@ -55,7 +55,7 @@ def build_duck_image():
         env.Command('duck.img',[
           ''
           '../boot/arm/init.bin',
-          '../app/kernel'
+          '../init/kernel'
         ],[
           'dd if=/dev/zero bs=512 count=2880 conv=notrunc of=$TARGET',
           'tools/mksunxi/mksunxiboot ${SOURCES[0]} boot/arm/init-spl.bin',
@@ -67,7 +67,7 @@ def build_duck_image():
         [
         ''
         '../boot/arm/init.bin',
-        '../app/kernel' 
+        '../init/kernel' 
         ],
         [
           'dd if=/dev/zero bs=512 count=2880 conv=notrunc of=$TARGET',
@@ -79,7 +79,7 @@ def build_duck_fit():
   if env.get('ARCH')=='arm':
     env.Command('duck.fit', 
     ['kernel-'+env.get('PLATFORM')+'.its',
-    '../app/kernel.elf', 
+    '../init/kernel.elf', 
     '../boot/arm/init.bin'
     ],
     ['mkimage -f ${SOURCES[0]} $TARGET'
@@ -87,7 +87,7 @@ def build_duck_fit():
   elif env.get('ARCH')=='x86':
     env.Command('duck.fit', 
       ['kernel.its',
-      '../app/kernel.bin', 
+      '../init/kernel.bin', 
       '../boot/x86/init.bin'
       ],
       ['mkimage -f ${SOURCES[0]} $TARGET'
@@ -96,12 +96,12 @@ def build_duck_fit():
 if env.get('build')=='uImage':
   if env.get('ARCH')=='x86':
     env.Command('uImage.img', 
-      ['../app/kernel' ],
+      ['../init/kernel' ],
       ['mkimage -n YiYiYa -A x86 -O u-boot -T kernel -C none -a 0x30008000 -e 0x30008000 -d ${SOURCES[0]} $TARGET'
     ])
   elif env.get('ARCH')=='arm':
     env.Command('uImage.img', 
-      ['../app/kernel' ],
+      ['../init/kernel' ],
       ['mkimage -n YiYiYa -A arm -O u-boot -T kernel -C none -a 0x41000000 -e 0x1000000 -d ${SOURCES[0]} $TARGET'
     ])
 
@@ -134,7 +134,7 @@ elif env.get('run')=='v3s':
 elif env.get('run')=='esp32':
   env.Command('esp32', 
     [ '../boot/xtensa/init.elf',
-      '../app/kernel.elf'
+      '../init/kernel.elf'
     ],
     ['esptool.py --chip esp32 elf2image --flash_mode="dio" --flash_freq "40m" --flash_size "4MB" -o boot/xtensa/init.bin  ${SOURCES[0]}',
     'esptool.py --chip esp32 elf2image --flash_mode="dio" --flash_freq "40m" --flash_size "4MB" -o app/kernel.bin  ${SOURCES[1]}',

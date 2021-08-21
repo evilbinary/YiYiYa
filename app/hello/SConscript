@@ -28,14 +28,12 @@ env = env.Clone(
 
 source=[
     'hello.c',
-    '../../libs/libc/libc.a',
-    '../../libs/libalgorithm/libalgorithm.a',
-    ]
+    ]+env['LIBC']
 
 if env.get('MYLIB'):
     source.append(env.get('MYLIB'))
 
 env.Program('hello', source,
-    CFLAGS='$CFLAGS -Ilibs/include/c/ ',
+    CFLAGS='$CFLAGS $LIBCFLAGS ',
     LINKFLAGS= '$LINKFLAGS $USER')
 
