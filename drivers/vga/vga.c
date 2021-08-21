@@ -23,7 +23,7 @@ size_t vga_write(device_t* dev, const void* buf, size_t len) {
   return ret;
 }
 
-size_t vga_ioctl(device_t* dev, u32 cmd, va_list args) {
+size_t vga_ioctl(device_t* dev, u32 cmd, void* args) {
   u32 ret = 0;
   vga_device_t* vga = dev->data;
   if (vga == NULL) {
@@ -40,13 +40,13 @@ size_t vga_ioctl(device_t* dev, u32 cmd, va_list args) {
     ret = vga->bpp;
   } else if (cmd == IOC_FLUSH_FRAMBUFFER) {
     if (vga->frambuffer != NULL&&vga->flip_buffer!=NULL) {
-      u32 offset=va_arg(args,u32);
+      u32 offset=(u32*)args;
       vga->flip_buffer(vga,offset%vga->framebuffer_count);
     }
   }
   else if (cmd == IOC_READ_FRAMBUFFER_INFO) {
-   vga_device_t* buffer_info=va_arg(args,u32);
-   u32 size=va_arg(args,u32);
+   vga_device_t* buffer_info=(u32*)args;
+   u32 size=(u32*)args;
    *buffer_info=*vga;
   }
   return ret;

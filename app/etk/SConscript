@@ -22,15 +22,14 @@ source=[
     '../libetk/libetk.a',
     '../libjpeg/libjpeg.a',
     '../libgui/libgui.a',
-    '../../libs/libc/libc.a',
-    ]
+    ]+env['LIBC']
 
 if env.get('MYLIB'):
     source.append(env.get('MYLIB'))
 
 
 env.Program('etk.elf', source,
-    CFLAGS='$CFLAGS -Ilibs/include/c/ -Iapp/libgui/ -Iapp/libjpeg/ -Iapp/libetk/',
+    CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libgui/ -Iapp/libjpeg/ -Iapp/libetk/',
     LINKFLAGS= '$LINKFLAGS $USER')
 
 # env.Objcopy('etk.elf','etk',OBJCOPYFLAGS='-S')

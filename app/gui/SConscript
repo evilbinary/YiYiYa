@@ -15,16 +15,13 @@ source=[
     '../libjpeg/libjpeg.a',
     '../libpng/libpng.a',
     '../libzlib/libzlib.a',
-    '../../libs/libc/libc.a',
-    '../../libs/libalgorithm/libalgorithm.a',
-
-    ]
+    ]+env['LIBC']
 
 if env.get('MYLIB'):
     source.append(env.get('MYLIB'))
 
 env.Program('gui.elf', source,
-    CFLAGS='$CFLAGS -Ilibs/include/c/ -Iapp/libgui/ -Iapp/libjpeg',
+    CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libgui/ -Iapp/libjpeg',
     LINKFLAGS= '$LINKFLAGS $USER')
 
 # env.Objcopy('gui.elf','gui',OBJCOPYFLAGS='-S --strip-all')

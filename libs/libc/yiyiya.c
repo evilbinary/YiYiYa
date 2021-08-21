@@ -177,7 +177,7 @@ u32 ya_time(time_t* current) {
   return ret;
 }
 
-int ya_ioctl(int fd, int cmd, va_list args) {
+int ya_ioctl(int fd, int cmd, void* args) {
   return syscall3(SYS_IOCTL, fd, cmd, args);
 }
 

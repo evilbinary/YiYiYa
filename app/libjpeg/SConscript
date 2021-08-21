@@ -39,13 +39,4 @@ env.Library('jpeg', [
     "jdmainct.c",
     "jdapimin.c",
     "jmemsysextern.c",
-    '../../libs/libc/libc.a',
-],CFLAGS='$CFLAGS -Ilibs/include/c/')
-
-
-# env.Program('jpeg.elf', [
-#     'libjpeg.a',
-#     '../../libs/libc/libc.a',
-#     ],
-#     CFLAGS='$CFLAGS -Ilibs/include/c/ ',
-#     LINKFLAGS= '$LINKFLAGS $USER')
+]+env['LIBC'],CFLAGS='$CFLAGS $LIBCFLAGS')

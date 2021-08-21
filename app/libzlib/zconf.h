@@ -9,6 +9,7 @@
 #define ZCONF_H
 
 #include <unistd.h>
+#include <fcntl.h>
 
 /*
  * If you *really* need a unique prefix for all types and library functions,

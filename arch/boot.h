@@ -9,14 +9,14 @@
 #include "libs/include/types.h"
 
 #define MAX_MEMORY_BLOCK 10
-#define MAX_CPU 1
+#define MAX_CPU 2
+#define GDT_NUMBER 12
 
 #ifdef ARM
 
 typedef u32 idt_entry_t;
 
 #elif defined(X86)
-#define GDT_NUMBER 10
 #define GDT_SIZE 8
 
 #define GDT_ENTRY_NULL 0
@@ -112,23 +112,27 @@ typedef struct tss_t {
   u32 trace_bitmap;
 } tss_t;
 
-typedef struct boot_info {
+typedef struct boot_info {  
   i32 version;
   u32* kernel_origin_base;
   u32* kernel_base;
   u32* kernel_size;
   u32* kernel_entry;
-  u32* gdt_base;
-  i32 gdt_number;
   tss_t tss[MAX_CPU];
+
   i32 tss_number;
   u32* idt_base;
   i32 idt_number;
   
   u32* pdt_base;
   i32 page_type;
+  
+  u64 gdt_base[GDT_NUMBER];
+  i32 gdt_number;
+
   disk_info_t disk;
   disply_info_t disply;
+
   i32 memory_number;
   i32 total_memory;
   memory_info_t memory[MAX_MEMORY_BLOCK];

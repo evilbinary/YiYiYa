@@ -9,6 +9,10 @@ typedef int  ebool;
 typedef unsigned char   u8;
 typedef unsigned short  u16;
 typedef unsigned int    u32;
+
+#ifndef LIBYC
+typedef u8 bool;
+#endif
 // typedef double u64;
 
 

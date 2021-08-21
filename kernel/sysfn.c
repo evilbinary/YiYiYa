@@ -34,7 +34,7 @@ int sys_print_at(char* s, u32 x, u32 y) {
   return 0;
 }
 
-size_t sys_ioctl(u32 fd, u32 cmd, va_list args) {
+size_t sys_ioctl(u32 fd, u32 cmd, void* args) {
   u32 ret = 0;
   fd_t* f = thread_find_fd_id(thread_current(), fd);
   if (f == NULL) {
@@ -83,8 +83,8 @@ u32 sys_open(char* name, int attr) {
     kprintf("sys open %s error\n", name);
     return -1;
   }
-  kprintf("sys open new name: %s fd:%d fd->id:%d ptr:%x\n", name, f, fd->id,
-          fd);
+  kprintf("sys open new name: %s fd:%d fd->id:%d ptr:%x tid:%d\n", name, f,
+          fd->id, fd, current->id);
   return f;
 }
 
@@ -177,7 +177,6 @@ u32 sys_exec(char* filename, char* const argv[], char* const envp[]) {
     return -1;
   }
   sys_close(fd);
-
   thread_t* current = thread_current();
   u8* stack0 = kmalloc(THREAD_STACK_SIZE);
   u8* stack3 = kmalloc(THREAD_STACK_SIZE);
@@ -237,11 +236,11 @@ int sys_fork() {
   kprintf("-------dump clone thread %d-------------\n", copy_thread->id);
   thread_dump(copy_thread);
 
-  interrupt_context_t* context = current->context.esp0;
+  interrupt_context_t* context = copy_thread->context.esp0;
   context_ret(context) = 0;
 
   thread_run(copy_thread);
-  return copy_thread->id;
+  return current->id;
 }
 
 int sys_pipe(int fds[2]) {
@@ -314,4 +313,83 @@ int sys_readdir(int fd, int index, void* dirent) {
   kmemmove(dirent, d, sizeof(vdirent_t));
   kfree(d);
   return 1;
+}
+
+int sys_brk(int addr) {
+  thread_t* current = thread_current();
+  kprintf("sys sbrk tid:%x addr:%x\n", current->id, addr);
+
+  vmemory_area_t* vm = vmemory_area_find_flag(current->vmm, MEMORY_HEAP);
+  if (vm == NULL) {
+    kprintf("sys brk not found vm\n");
+    return 0;
+  }
+  if (addr == 0) {
+    if (vm->vend == vm->vaddr) {
+      vm->vend = vm->vaddr + addr;
+    }
+    addr = vm->vend;
+    kprintf("sys sbrk return first addr:%x\n", addr);
+    return addr;
+  }
+  vm->vend = addr;
+  kprintf("sys sbrk return addr:%x\n", vm->vend);
+  return vm->vend;
+}
+
+int sys_readv(int fd, iovec_t* vector, int count) {
+  int ret = 0;
+  int n;
+  int i;
+  for (i = 0; i < count; i++, vector++) {
+    n = sys_read(fd, vector->iov_base, vector->iov_len);
+    if (n < 0) return n;
+    ret += n;
+    if (n != vector->iov_len) break;
+  }
+  return ret;
+}
+
+int sys_writev(int fd, iovec_t* vector, int count) {
+  int ret = 0;
+  int n;
+  int i;
+  for (i = 0; i < count; i++, vector++) {
+    n = sys_write(fd, vector->iov_base, vector->iov_len);
+    if (n < 0) return n;
+    ret += n;
+    if (n != vector->iov_len) break;
+  }
+  return ret;
+}
+
+int sys_chdir(const char* path) {
+  int ret = 0;
+  kprintf("sys chdir not impl %s\n", path);
+  return ret;
+}
+
+void* sys_mmap2(void* addr, int length, int prot, int flags, int fd,
+                int pgoffset) {
+  int ret = 0;
+  ret=addr;
+  if (fd >= 0 || pgoffset > 0) {
+    kprintf("mmap2 system call : fd = %d, prot = %x, pgoffset = %d\n", fd, prot,
+            pgoffset);
+    return -1;
+  }
+
+  return ret;
+}
+
+int sys_mprotect(const void* start, size_t len, int prot) {
+  int ret = 0;
+  kprintf("sys mprotect not impl\n");
+
+  return ret;
+}
+
+int sys_rt_sigprocmask(int h, void *set, void* old_set){
+  kprintf("sys sigprocmask not impl\n");
+  return 0;
 }

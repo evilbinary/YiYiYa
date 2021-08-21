@@ -10,7 +10,6 @@
 
 typedef struct file_info {
   struct fat_fs_struct *fs;
-  struct partition_struct *partition;
   struct fat_dir_struct *dd;
   struct fat_file_struct *fd;
 } file_info_t;
@@ -51,7 +50,7 @@ size_t fat_read_bytes(vnode_t *node, u32 offset, size_t nbytes, u8 *buf) {
   u32 count = nbytes / BYTE_PER_SECTOR;
   u32 rest = nbytes % BYTE_PER_SECTOR;
   char small_buf[BYTE_PER_SECTOR];
-  kmemset(small_buf,0,BYTE_PER_SECTOR);
+  kmemset(small_buf, 0, BYTE_PER_SECTOR);
   for (int i = 0; i < count; i++) {
     ret = fat_device_read(node, offset, BYTE_PER_SECTOR, small_buf);
     kmemmove(buf, small_buf + offset % BYTE_PER_SECTOR, BYTE_PER_SECTOR);
@@ -159,11 +158,11 @@ u32 fat_op_write(vnode_t *node, u32 offset, size_t nbytes, u8 *buffer) {
 }
 
 u32 find_file_in_dir(struct fat_fs_struct *fs, struct fat_dir_struct *dd,
-                         const char *name,
-                         struct fat_dir_entry_struct *dir_entry) {
+                     const char *name, struct fat_dir_entry_struct *dir_entry) {
   while (fat_read_dir(dd, dir_entry)) {
-    //kprintf("find_file_in_dir %s==%s\n",dir_entry->long_name,name);
     if (kstrcmp(dir_entry->long_name, name) == 0) {
+      // kprintf("find_file_in_dir %s==%s
+      // attr:%x\n",dir_entry->long_name,name,dir_entry->attributes);
       fat_reset_dir(dd);
       return 1;
     }
@@ -172,16 +171,26 @@ u32 find_file_in_dir(struct fat_fs_struct *fs, struct fat_dir_struct *dd,
   return 0;
 }
 
-struct fat_file_struct *open_file_in_dir(struct fat_fs_struct *fs,
-                                         struct fat_dir_struct *dd,
-                                         const char *name) {
+int open_file_in_dir(struct fat_fs_struct *fs, struct fat_dir_struct *dd,
+                     const char *name, file_info_t *new_file_info) {
   struct fat_dir_entry_struct file_entry;
-  u32 ret=find_file_in_dir(fs, dd, name, &file_entry);
-  if (!ret){ 
-      kprintf("find_file_in_dir failed %s\n",name);
+  if (kstrlen(name) == 0) {
+    new_file_info->dd =dd;
+    return 1;
+  }
+  u32 ret = find_file_in_dir(fs, dd, name, &file_entry);
+  if (!ret) {
+    kprintf("find_file_in_dir failed %s\n", name);
     return 0;
   }
-  return fat_open_file(fs, &file_entry);
+  if (file_entry.attributes & FAT_ATTRIB_DIR) {
+    new_file_info->dd = fat_open_dir(fs, &file_entry);
+    new_file_info->fd = NULL;
+  } else {
+    new_file_info->dd = NULL;
+    new_file_info->fd = fat_open_file(fs, &file_entry);
+  }
+  return 1;
 }
 
 u32 fat_op_open(vnode_t *node) {
@@ -190,16 +199,16 @@ u32 fat_op_open(vnode_t *node) {
   file_info_t *file_info = node->data;
   struct fat_fs_struct *fs = file_info->fs;
 
-  if (file_info->fd == NULL) {
+  if (file_info->fd == NULL && file_info->dd == NULL) {
     kprintf("create new file %s\n", name);
-    file_info_t *parent_file_info=node->parent->data;
+    file_info_t *parent_file_info = node->parent->data;
     file_info_t *new_file_info = kmalloc(sizeof(file_info_t));
-    struct fat_dir_struct* dd=kmalloc(sizeof(struct fat_dir_struct));
-    new_file_info->dd=dd;
-    dd->fs=fs;
-    node->data=new_file_info;
-    uint8_t res=fat_create_file(parent_file_info->dd,name,&dd->dir_entry);
-    if(!res){
+    struct fat_dir_struct *dd = kmalloc(sizeof(struct fat_dir_struct));
+    new_file_info->dd = dd;
+    dd->fs = fs;
+    node->data = new_file_info;
+    uint8_t res = fat_create_file(parent_file_info->dd, name, &dd->dir_entry);
+    if (!res) {
       kprintf("fat_create_file faild\n");
       return -1;
     }
@@ -208,7 +217,7 @@ u32 fat_op_open(vnode_t *node) {
       kprintf("create file bad fd %s\n", name);
       return -1;
     }
-    new_file_info->fd=fd;
+    new_file_info->fd = fd;
   }
   // uint8_t res;
   // res = fat_get_dir_entry_of_path(fs, name, &directory);
@@ -243,8 +252,10 @@ vnode_t *fat_op_find(vnode_t *node, char *name) {
     return NULL;
   }
 
-  struct fat_file_struct *fd = open_file_in_dir(fs, dd, name);
-  if (!fd) {
+  file_info_t *new_file_info = kmalloc(sizeof(file_info_t));
+  new_file_info->fs = fs;
+  int ret = open_file_in_dir(fs, dd, name, new_file_info);
+  if (!ret) {
     kprintf("bad fd %s\n", name);
     return NULL;
   }
@@ -254,11 +265,6 @@ vnode_t *fat_op_find(vnode_t *node, char *name) {
     type = V_DIRECTORY;
   }
   vnode_t *file = vfs_create(name, type);
-  file_info_t *new_file_info = kmalloc(sizeof(file_info_t));
-  new_file_info->dd = dd;
-  new_file_info->fd = fd;
-  new_file_info->fs = fs;
-
   file->data = new_file_info;
   file->device = node->device;
   fat_init_op(file);
@@ -275,13 +281,14 @@ vdirent_t *fat_op_read_dir(vnode_t *node, u32 index) {
   struct fat_dir_entry_struct dir_entry;
   u32 i = 0;
   while (fat_read_dir(file_info->dd, &dir_entry)) {
-    if (i == index) {
+    if (i <= index) {
       if ((dir_entry.attributes & FAT_ATTRIB_DIR) == FAT_ATTRIB_DIR) {
         dirent->type = V_DIRECTORY;
-      } else if ((dir_entry.attributes & FAT_ATTRIB_ARCHIVE) == FAT_ATTRIB_ARCHIVE) {
+      } else if ((dir_entry.attributes & FAT_ATTRIB_ARCHIVE) ==
+                 FAT_ATTRIB_ARCHIVE) {
         dirent->type = V_FILE;
       }
-      kstrcpy(dirent->name,dir_entry.long_name);
+      kstrcpy(dirent->name, dir_entry.long_name);
       return dirent;
     }
     i++;
@@ -337,7 +344,7 @@ void fat_init(void) {
 
   file_info_t *file_info = kmalloc(sizeof(file_info_t));
   file_info->fs = fs;
-  file_info->dd =dd;
+  file_info->dd = dd;
   node->data = file_info;
 }
 

@@ -1,11 +1,13 @@
-#include "ioctl.h"
+#include "sys/ioctl.h"
 
 #include "stdarg.h"
 
 int ioctl(int fd, int cmd, ...) {
-  va_list args;
-  va_start(args, cmd);
-  int ret=ya_ioctl(fd, cmd, args);
-  va_end(args);
+  void *arg;
+  va_list ap;
+  va_start(ap, cmd);
+  arg = va_arg(ap, void *);
+  va_end(ap);
+  int ret=ya_ioctl(fd, cmd, arg);
   return ret;
 }

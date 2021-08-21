@@ -15,17 +15,27 @@ env = env.Clone(
   PATH= [os.environ['PATH'],'/opt/local/bin' ],
   )
 
-
 source= [
-    'test.c',
-    '../../libs/libc/libc.a',
-    '../../libs/libalgorithm/libalgorithm.a',
-    ]
+    'test.c'
+    ]+env['LIBC']
 
 if env.get('MYLIB'):
     source.append(env.get('MYLIB'))
 
 env.Program('test.elf', source,
-    CFLAGS='$CFLAGS -Ilibs/include/c/ ',
+    CFLAGS='$CFLAGS $LIBCFLAGS',
     LINKFLAGS= '$LINKFLAGS $USER')
+
+if env.get('ARCH')=='arm':
+    source= [
+        'test-musl.c',
+        ]+env['LIBC']
+    if env.get('MYLIB'):
+        source.append(env.get('MYLIB'))
+
+    env.Program('test-musl.elf', source,
+        CFLAGS='$CFLAGS $LIBCFLAGS',
+        LINKFLAGS= '$LINKFLAGS $USER')
+
+
 

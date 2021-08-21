@@ -27,8 +27,8 @@ void exception_info(interrupt_context_t *context) {
   if (current != NULL) {
     kprintf("tid:%d\n", current->id);
   }
-  kprintf("ifsr:%x dfsr:%x dfar:%x\n", read_ifsr(), read_dfsr(), read_dfar());
-  kprintf("pc:%x\n", read_pc());
+  kprintf("ifsr: %x dfsr: %x dfar: %x\n", read_ifsr(), read_dfsr(), read_dfar());
+  kprintf("pc: %x\n", read_pc());
   context_dump_interrupt(context);
 
 #elif defined(X86)
@@ -270,8 +270,8 @@ void do_page_fault(interrupt_context_t *context) {
 
 void dump_fault(interrupt_context_t *context, u32 fault_addr) {
   kprintf("----------------------------\n");
-  kprintf("ifsr:%x dfsr:%x dfar:%x\n", read_ifsr(), read_dfsr(), read_dfar());
-  kprintf("pc:%x\n", read_pc());
+  kprintf("ifsr: %x dfsr: %x dfar: %x\n", read_ifsr(), read_dfsr(), read_dfar());
+  kprintf("pc: %x\n", read_pc());
   context_dump_interrupt(context);
   kprintf("fault: 0x%x \n", fault_addr);
   kprintf("----------------------------\n\n");

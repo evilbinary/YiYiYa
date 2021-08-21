@@ -113,6 +113,21 @@ static inline void set_ldt(u16 tss) {
 void cpu_init() {
   unsigned long cr0 = read_cr0();
   kprintf("cpu init cr0=%x\n", cr0);
+
+  u32 tss_base = (u32) & (boot_info->tss[0]);
+  kprintf("tr base %x\n", tss_base);
+
+  u64* gdt_addr = boot_info->gdt_base;
+  kprintf("gdt base %x\n", gdt_addr);
+  gdt_addr[GDT_ENTRY_32BIT_TSS] = GDT_ENTRY(tss_base, 0xfffff, 0xc089);  // 0x20
+
+  // load gdt
+  gdt_ptr_t gdt;
+  gdt.limit = (boot_info->gdt_number * GDT_SIZE) - 1;
+  gdt.base = (u32)boot_info->gdt_base;
+  asm volatile("lgdtl %0\n" : : "m"(gdt));
+
+  kprintf("idt base %x\n", boot_info->pdt_base);
 }
 
 void cpu_halt() { asm("hlt\n"); }
@@ -182,10 +197,9 @@ void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
   }
 }
 
-int context_get_mode(context_t* context){
-  int mode=0;
-  if(context!=NULL){
-    
+int context_get_mode(context_t* context) {
+  int mode = 0;
+  if (context != NULL) {
   }
   return mode;
 }
@@ -198,12 +212,12 @@ void backtrace(stack_frame_t* fp, void** buf, int size) {
 }
 
 void context_dump(context_t* c) {
-  kprintf("eip:%x\n", c->eip);
-  kprintf("esp0:%x\n", c->esp0);
-  kprintf("esp:%x\n", c->esp);
+  kprintf("eip:     %x\n", c->eip);
+  kprintf("esp0:    %x\n", c->esp0);
+  kprintf("esp:     %x\n", c->esp);
 
-  kprintf("page_dir:%x\n", c->page_dir);
-  kprintf("kernel page_dir:%x\n", c->kernel_page_dir);
+  kprintf("page_dir: %x\n", c->page_dir);
+  kprintf("kernel page_dir: %x\n", c->kernel_page_dir);
 
   if (c->esp0 != 0) {
     context_dump_interrupt(c->esp0);
@@ -234,9 +248,9 @@ void context_dump_interrupt(interrupt_context_t* context) {
   kprintf("fs:\t%x\tgs:\t%x\n", fs, gs);
 }
 
-void context_clone(context_t* context, context_t* src, u32* stack0, u32* stack3,
+void context_clone(context_t* des, context_t* src, u32* stack0, u32* stack3,
                    u32* old0, u32* old3) {
-  *context = *src;
+  *des = *src;
   interrupt_context_t* c0 = stack0;
   interrupt_context_t* s0 = src->esp0;
   if (stack0 != NULL) {
@@ -244,9 +258,11 @@ void context_clone(context_t* context, context_t* src, u32* stack0, u32* stack3,
     c0->eflags = 0x0200;
   }
   if (stack3 != NULL) {
-    context->esp = s0->esp;
+    des->esp = s0->esp;
   }
-  context->esp0 = (u32)c0;
+  des->esp0 = (u32)c0;
+
+  des->page_dir = page_alloc_clone(src->page_dir);
 }
 
 void context_switch(interrupt_context_t* context, context_t** current,

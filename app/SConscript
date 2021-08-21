@@ -21,12 +21,6 @@ libs=[
     '../libs/libkernel/libkernel.a'
 ]
 
-kernel=[
-    'main.c',
-    'shell.c',
-    'serial.c',
-    ]
-
 if env.get('ARCH')=='xtensa':
     # libs.append('../app/libgui/libgui.a')
     # libs.append('../libs/libc/libc.a')
@@ -34,12 +28,6 @@ if env.get('ARCH')=='xtensa':
 
 if env.get('MYLIB'):
     libs.append(env.get('MYLIB'))
-
-env.Program('kernel.elf',kernel+libs,LINKFLAGS = linkflags)
-
-env.Objcopy('kernel','kernel.elf',OBJCOPYFLAGS='-S')
-env.Objcopy('kernel.dbg','kernel.elf',OBJCOPYFLAGS='--only-keep-debug')
-# env.Objcopy('kernel.bin','kernel',OBJCOPYFLAGS='-O binary')
 
 if env.get('APP'):
     SConscript(dirs=['libjpeg'], exports='env')
@@ -61,6 +49,9 @@ if env.get('APP'):
 
     SConscript(dirs=['track'], exports='env')
 
+    # SConscript(dirs=['liblua'], exports='env')
+    # SConscript(dirs=['lua'], exports='env')
+
 
     if plt=='Darwin':
         env.Command('copyhello', 
@@ -70,6 +61,7 @@ if env.get('APP'):
             'file/file.elf',
             'etk/etk.elf',
             'test/test.elf',
+            'test/test-musl.elf',
             'bin/ls',
             'lvgl/lvgl',
             'track/track.elf'

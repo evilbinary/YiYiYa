@@ -19,15 +19,14 @@ source= [
     'microui.c',
     'renderer.c',
     '../libgui/libgui.a',
-    '../../libs/libc/libc.a',
-    ]
+    ]+env['LIBC']
 
 if env.get('MYLIB'):
     source.append(env.get('MYLIB'))
 
 
 env.Program('microui.elf',source,
-    CFLAGS='$CFLAGS -Ilibs/include/c/ -Iapp/libgui/',
+    CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libgui/',
     LINKFLAGS= '$LINKFLAGS $USER')
 
 # env.Objcopy('microui.elf','microui',OBJCOPYFLAGS='-S')

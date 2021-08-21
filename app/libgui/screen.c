@@ -557,6 +557,7 @@ void screen_show_bmp_picture(i32 x, i32 y, void *bmp_addr, i32 mask_color,
 
 void screen_init() {
   int fd = open("/dev/fb", 0);
+  printf("screen init fd:%d\n",fd);
   gscreen.fd = fd;
   gfd = fd;
   ioctl(fd, IOC_READ_FRAMBUFFER_INFO, &(gscreen.fb),
@@ -565,7 +566,7 @@ void screen_init() {
   gscreen.width = gscreen.fb.width;
   gscreen.height = gscreen.fb.height;
   gscreen.bpp = gscreen.fb.bpp;
-
+  printf("screen init %dx%d bpp:%d\n",gscreen.width,gscreen.height,gscreen.fb.bpp);
   event_init();
 }
 
@@ -609,7 +610,8 @@ void do_screen_thread(void) {
     screen_fill_rect(10, 20, 30, 30, 0xff0000);
     screen_printf(200, 10, "hello,YiYiYa");
 
-    syscall3(SYS_READ, fd, &mouse_data, sizeof(mouse_data_t));
+    read(fd,&mouse_data,sizeof(mouse_data_t));
+    // syscall3(SYS_READ, fd, &mouse_data, sizeof(mouse_data_t));
     screen_printf(10, 100, "%d %d", mouse_data.x, mouse_data.y);
     screen_fill_rect(mouse_data.x, gscreen.height - mouse_data.y, 4, 4,
                      0x00ff00);

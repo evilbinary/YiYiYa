@@ -10,7 +10,7 @@ Import('env')
 
 if env['ARCH']=='arm':
     plt=env['PLATFORM']
-    env.Library('arch', ['arch.c','lock.c',
+    env.Library('arch', ['arch.c','lock.c','mm.c',
         'arm/io.c',
         'arm/cpu.c',
         'arm/mm.c',
@@ -20,7 +20,7 @@ if env['ARCH']=='arm':
         '../platform/libplatform.a'
         ])
 elif env['ARCH']=='x86':
-    env.Library('arch', ['arch.c','lock.c',
+    env.Library('arch', ['arch.c','lock.c','mm.c',
         'x86/io.c',
         'x86/cpu.c',
         'x86/mm.c',
@@ -29,7 +29,7 @@ elif env['ARCH']=='x86':
         '../platform/libplatform.a'
         ])
 elif env['ARCH']=='xtensa':
-    env.Library('arch', ['arch.c','lock.c',
+    env.Library('arch', ['arch.c','lock.c','mm.c',
         'xtensa/io.c',
         'xtensa/cpu.c',
         'xtensa/mm.c',

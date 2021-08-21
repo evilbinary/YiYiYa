@@ -195,6 +195,7 @@ vmemory_area_t* vmemory_area_create(void* addr, u32 size, u8 flags) {
   area->next = NULL;
   area->vaddr = addr;
   area->flags = flags;
+  area->vend=addr;
   return area;
 }
 
@@ -219,10 +220,10 @@ vmemory_area_t* vmemory_area_find(vmemory_area_t* areas, void* addr,
 
 vmemory_area_t* vmemory_area_destroy(vmemory_area_t* area) {}
 
-void* vmemory_area_find_flag(vmemory_area_t* areas, u8 flags) {
+vmemory_area_t* vmemory_area_find_flag(vmemory_area_t* areas, u32 flags) {
   vmemory_area_t* p = areas;
   for (; p != NULL; p = p->next) {
-    if (p->flags & ~flags == flags) {
+    if (p->flags== flags) {
       return p;
     }
   }

@@ -10,7 +10,7 @@
 
 vnode_t *root_node = NULL;
 
-size_t vioctl(vnode_t *node, u32 cmd, va_list args) {
+size_t vioctl(vnode_t *node, u32 cmd, void* args) {
   if (node->ioctl != NULL) {
     u32 ret = 0;
     // va_list args;
@@ -19,7 +19,7 @@ size_t vioctl(vnode_t *node, u32 cmd, va_list args) {
     // va_end(args);
     return ret;
   } else {
-    kprintf("node ioctl is null\n");
+    kprintf("node %s ioctl is null\n",node->name);
     return 0;
   }
 }

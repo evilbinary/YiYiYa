@@ -256,33 +256,33 @@ void context_switch(interrupt_context_t* context, context_t** current,
 }
 
 void context_dump(context_t* c) {
-  kprintf("ip:%x\n", c->eip);
-  kprintf("sp0:%x\n", c->esp0);
-  kprintf("sp:%x\n", c->esp);
+  kprintf("ip:  %x\n", c->eip);
+  kprintf("sp0: %x\n", c->esp0);
+  kprintf("sp:  %x\n", c->esp);
 
-  kprintf("page_dir:%x\n", c->page_dir);
-  kprintf("kernel page_dir:%x\n", c->kernel_page_dir);
+  kprintf("page_dir: %x\n", c->page_dir);
+  kprintf("kernel page_dir: %x\n", c->kernel_page_dir);
   kprintf("--interrupt context--\n");
   interrupt_context_t* context = c->esp0;
   context_dump_interrupt(context);
 }
 
 void context_dump_interrupt(interrupt_context_t* context) {
-  kprintf("lr:%x cpsr:%x\n", context->lr, context->psr);
-  kprintf("sp:%x\n", context->sp);
-  kprintf("r0:%x\n", context->r0);
-  kprintf("r1:%x\n", context->r1);
-  kprintf("r2:%x\n", context->r2);
-  kprintf("r3:%x\n", context->r3);
-  kprintf("r4:%x\n", context->r4);
-  kprintf("r5:%x\n", context->r5);
-  kprintf("r6:%x\n", context->r6);
-  kprintf("r7:%x\n", context->r7);
-  kprintf("r8:%x\n", context->r8);
-  kprintf("r9:%x\n", context->r9);
-  kprintf("r10:%x\n", context->r10);
-  kprintf("r11(fp):%x\n", context->r11);
-  kprintf("r12(ip):%x\n", context->r12);
+  kprintf("lr:  %x cpsr:%x\n", context->lr, context->psr);
+  kprintf("sp:  %x\n", context->sp);
+  kprintf("r0:  %x\n", context->r0);
+  kprintf("r1:  %x\n", context->r1);
+  kprintf("r2:  %x\n", context->r2);
+  kprintf("r3:  %x\n", context->r3);
+  kprintf("r4:  %x\n", context->r4);
+  kprintf("r5:  %x\n", context->r5);
+  kprintf("r6:  %x\n", context->r6);
+  kprintf("r7:  %x\n", context->r7);
+  kprintf("r8:  %x\n", context->r8);
+  kprintf("r9:  %x\n", context->r9);
+  kprintf("r10: %x\n", context->r10);
+  kprintf("r11(fp): %x\n", context->r11);
+  kprintf("r12(ip): %x\n", context->r12);
 }
 
 void context_clone(context_t* des, context_t* src, u32* stack0, u32* stack3,
@@ -305,7 +305,10 @@ void context_clone(context_t* des, context_t* src, u32* stack0, u32* stack3,
     // d0->psr = cpsr.val;
     des->esp = s0->sp;
   }
-  // d0->lr+=8;
+  // des->page_dir =src->page_dir;
+  des->page_dir = page_alloc_clone(src->page_dir);
+  des->kernel_page_dir= src->kernel_page_dir;
+  // d0->lr+=4;
 #if DEBUG
   kprintf("------context clone dump des--------------\n");
 #endif
