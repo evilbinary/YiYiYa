@@ -204,16 +204,16 @@ u8 SCREEN_ASCII[] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 };
 
-void screen_put_pixel(u32 x, u32 y, u32 c) {
-  i32 x_max = gscreen.width - 1;   // 每行像素数
-  i32 y_max = gscreen.height - 1;  // 每列像素数
-  // 防止越界
-  if (x >= x_max) {
-    return;
-  }
-  if (y >= y_max) {
-    return;
-  }
+inline void screen_put_pixel(u32 x, u32 y, u32 c) {
+  // i32 x_max = gscreen.width - 1;   // 每行像素数
+  // i32 y_max = gscreen.height - 1;  // 每列像素数
+  // // 防止越界
+  // if (x >= x_max) {
+  //   return;
+  // }
+  // if (y >= y_max) {
+  //   return;
+  // }
   gscreen.buffer[gscreen.width * y + x] = c;
 }
 

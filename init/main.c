@@ -14,6 +14,9 @@ extern module_t fat_module;
 extern module_t serial_module;
 extern module_t fat32_module;
 extern module_t mouse_module;
+extern module_t hello_module;
+extern module_t i2c_module;
+extern module_t gpio_module;
 
 #elif defined(X86)
 extern module_t keyboard_module;
@@ -59,11 +62,15 @@ int kmain(int argc, char* argv[]) {
 #ifdef ARM 
   module_regist(&serial_module);
   module_regist(&gpu_module);
-  module_regist(&sdhci_module);
   module_regist(&mouse_module);
+  module_regist(&sdhci_module);
   module_regist(&devfs_module);
   module_regist(&fat_module);
+  module_regist(&i2c_module);
+  module_regist(&gpio_module);
+
   // module_regist(&fat32_module);
+  // module_regist(&hello_module);
 
 #elif defined(X86)
   module_regist(&pci_module);

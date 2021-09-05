@@ -6,7 +6,6 @@
 #ifndef DEVCFN_H
 #define DEVCFN_H
 
-#include "arch/arch.h"
 #include "vfs.h"
 
 

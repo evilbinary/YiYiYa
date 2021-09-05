@@ -14,23 +14,58 @@ extern context_t* current_context;
 
 void memory_init() { kpool_init(); }
 
+#ifdef MALLOC_TRACE
+
+int alloc_count = 0;
+int alloc_total = 0;
+
+void* kmalloc_trace(size_t size, void* name, void* no, void* fun) {
+  void* addr = NULL;
+  addr = mm_alloc(size);
+  u32 tid = -1;
+  thread_t* current = thread_current();
+  if (current != NULL) {
+    tid = current->id;
+  }
+  alloc_total += size;
+  kprintf("tid:%d kmalloc count:%d total:%dk size:%d addr:%x %s:%d %s\n", tid,
+          alloc_count++, alloc_total / 1024, size, addr, name, no, fun);
+  if (addr == NULL) {
+    kprintf("kmalloc error\n");
+    return addr;
+  }
+  kmemset(addr, 0, size);
+  return addr;
+}
+
+void* kmalloc_alignment_trace(size_t size, int alignment, void* name, void* no,
+                              void* fun) {
+  void* addr = mm_alloc_zero_align(size, alignment);
+  u32 tid=-1;
+  thread_t* current = thread_current();
+  if (current != NULL) {
+    tid = current->id;
+  }
+  alloc_total += size;
+  kprintf("tid:%d kmalloc a count:%d total:%dk size:%d addr:%x %s:%d %s\n", tid,
+          alloc_count++, alloc_total / 1024, size, addr, name, no, fun);
+  return addr;
+}
+
+#else
 void* kmalloc(size_t size) {
   void* addr = NULL;
-  size = ((size + PAGE_SIZE) / PAGE_SIZE) * PAGE_SIZE;
-  // size=((size+1024)/1024)*1024;
+#ifdef X86
+  // size = ((size + PAGE_SIZE) / PAGE_SIZE) * PAGE_SIZE;
+  size=((size+1024)/1024)*1024;
+#endif
   addr = mm_alloc(size);
   if (addr == NULL) {
     kprintf("kmalloc error\n");
     return addr;
   }
   kmemset(addr, 0, size);
-  // void* addr=kmalloc_alignment(size,PAGE_SIZE);
   return addr;
-}
-
-void kfree(void* ptr) {
-  mm_free(ptr);
-  // kfree_alignment(ptr);
 }
 
 void* kmalloc_alignment(size_t size, int alignment) {
@@ -39,6 +74,13 @@ void* kmalloc_alignment(size_t size, int alignment) {
   void* addr = mm_alloc_zero_align(size, alignment);
   // use_user_page();
   return addr;
+}
+
+#endif
+
+void kfree(void* ptr) {
+  mm_free(ptr);
+  // kfree_alignment(ptr);
 }
 
 void kfree_alignment(void* ptr) {
@@ -56,13 +98,14 @@ void* valloc(void* addr, size_t size) {
   if ((size % PAGE_SIZE) > 0) {
     size += PAGE_SIZE;
   }
-  void* vaddr = addr;
+  u32 page_alignt = PAGE_SIZE - 1;
+  void* vaddr = (u32)addr & (~page_alignt);
 #ifdef USE_POOL
   void* phy_addr = queue_pool_poll(user_pool);
   if (phy_addr == NULL) {
     phy_addr = kmalloc_alignment(size, PAGE_SIZE);
-  }else{
-    kprintf("use pool addr %x\n",phy_addr);
+  } else {
+    kprintf("use pool addr %x\n", phy_addr);
   }
 #else
   void* phy_addr = kmalloc_alignment(size, PAGE_SIZE);
@@ -91,7 +134,7 @@ void vfree(void* addr) {
   // unmap_page_on(current->context.page_dir, addr);
   if (phy != NULL) {
 #ifdef USE_POOL
-    int ret = queue_pool_put(user_pool,phy);
+    int ret = queue_pool_put(user_pool, phy);
     if (ret == 0) {
       kfree(phy);
     }
@@ -129,15 +172,13 @@ void page_clone_user(u64* page, u64* page_dir_ptr_tab) {
   use_user_page();
 }
 
-
 void kpool_init() {
-
 #ifdef USE_POOL
   kernel_pool = queue_pool_create(KERNEL_POOL_NUM, PAGE_SIZE);
   user_pool = queue_pool_create_align(USER_POOL_NUM, PAGE_SIZE, PAGE_SIZE);
 #else
-  kernel_pool=NULL;
-  user_pool=NULL;
+  kernel_pool = NULL;
+  user_pool = NULL;
 #endif
 }
 
@@ -195,7 +236,7 @@ vmemory_area_t* vmemory_area_create(void* addr, u32 size, u8 flags) {
   area->next = NULL;
   area->vaddr = addr;
   area->flags = flags;
-  area->vend=addr;
+  area->vend = addr;
   return area;
 }
 
@@ -210,8 +251,9 @@ vmemory_area_t* vmemory_area_find(vmemory_area_t* areas, void* addr,
                                   size_t size) {
   vmemory_area_t* p = areas;
   for (; p != NULL; p = p->next) {
-    // kprintf("vmemory_area_find addr: %x p->vaddr:%x p->size:%x\n",addr,p->vaddr,p->size);
-    if ((addr >= p->vaddr) && (addr <= (p->vaddr + p->size ))) {
+    // kprintf("vmemory_area_find addr: %x p->vaddr:%x
+    // p->size:%x\n",addr,p->vaddr,p->size);
+    if ((addr >= p->vaddr) && (addr <= (p->vaddr + p->size))) {
       return p;
     }
   }
@@ -223,7 +265,7 @@ vmemory_area_t* vmemory_area_destroy(vmemory_area_t* area) {}
 vmemory_area_t* vmemory_area_find_flag(vmemory_area_t* areas, u32 flags) {
   vmemory_area_t* p = areas;
   for (; p != NULL; p = p->next) {
-    if (p->flags== flags) {
+    if (p->flags == flags) {
       return p;
     }
   }

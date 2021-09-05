@@ -29,7 +29,7 @@ env.Library('yiyiya', [
     '../libs/libalgorithm/libalgorithm.a',
     '../libs/libkernel/libkernel.a',
     ],
-    CFLAGS='$CFLAGS '#-DUSE_POOL
+    CFLAGS='$CFLAGS '#-DUSE_POOL -finstrument-functions
     )
 
 

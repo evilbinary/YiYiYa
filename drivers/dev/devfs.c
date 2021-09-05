@@ -22,7 +22,7 @@ int devfs_init(void) {
   vnode_t *node_dev = vfs_create("dev", V_DIRECTORY);
   vfs_mount(NULL, "/", node_dev);
   char *name;
-  for (int i = 0; i < 6; i++) {
+  for (int i = 0; i < 3; i++) {
     device_t *dev = device_find(DEVICE_SATA + i);
     if (dev == NULL) {
       continue;

@@ -77,11 +77,13 @@ void yiyiya_gui() {
 void yiyiya_display() {
   printf("screen_init\n");
   screen_init();
+  int i=0;
   printf("screen_init end\n");
   for (;;) {
-    // screen_fill_rect(0,0,640,490,0xff0000);
-    screen_printf(0, 0, "hello display YiYiYa Os\n");
+    screen_fill_rect(0,0,480,272,0xff0000);
+    screen_printf(0, 0, "hello display YiYiYa Os %d\n",i);
     screen_flush();
+    i++;
   }
 }
 

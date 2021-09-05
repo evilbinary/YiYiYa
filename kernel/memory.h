@@ -18,7 +18,7 @@
 #define MEMORY_DATA 5
 #define MEMORY_STACK 6
 
-#define MEMORY_CREATE_SIZE 4096*10 //40k
+#define MEMORY_CREATE_SIZE 4096*1024 //4m
 #define MEMORY_EXEC_SIZE 4096*100*1024 //400m
 
 #define KERNEL_POOL_NUM 20
@@ -32,9 +32,16 @@ typedef struct vmemory_area{
     struct vmemory_area* next; 
 }vmemory_area_t;
 
+
+#ifdef MALLOC_TRACE
+#define kmalloc(size) kmalloc_trace(size, __FILE__, __LINE__, __FUNCTION__)
+#define kmalloc_alignment(size,alignment) kmalloc_alignment_trace(size,alignment, __FILE__, __LINE__, __FUNCTION__)
+#else
 void* kmalloc(size_t size);
-void kfree(void* ptr);
 void* kmalloc_alignment(size_t size, int alignment);
+#endif
+
+void kfree(void* ptr);
 void kfree_alignment(void* ptr);
 
 void map_alignment(void* page, void* vaddr, void* buf, u32 size);

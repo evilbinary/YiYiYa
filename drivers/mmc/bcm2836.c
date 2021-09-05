@@ -1728,7 +1728,7 @@ int sdhci_dev_port_write(sdhci_device_t *sdhci_dev, int no, sector_t sector,
     int index = (sector.startl + i) & CACHE_MASK;
     void *cache_p = (void *)(sdhci_dev->cache_buffer + SECTOR_SIZE * index);
    
-    kmemcpy(cache_p,&p[SECTOR_SIZE * i], SECTOR_SIZE);
+    kmemmove(cache_p,&p[SECTOR_SIZE * i], SECTOR_SIZE);
   }
 #endif
   return ret;
@@ -1757,7 +1757,7 @@ int sdhci_dev_port_read(sdhci_device_t *sdhci_dev, int no, sector_t sector,
       ret = sd_read(cache_p, buf_size, sector.startl);
       sdhci_dev->cached_blocks[index] = sector.startl;
     }
-    kmemcpy(buf, cache_p, SECTOR_SIZE);
+    kmemmove(buf, cache_p, SECTOR_SIZE);
   } else {
 #endif
     ret = sd_read(buf, buf_size, sector.startl);

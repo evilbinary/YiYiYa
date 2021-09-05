@@ -46,8 +46,9 @@ void test_fork() {
     printf("parent %d %d %d\n", getppid(), getpid(), fpid);
   }
   for (int i = 0; i < 10; i++) {
-    printf("pid:%d count:%d\n", getpid(), i++);
+    printf("ppid:%d pid:%d count:%d\n",getppid(),getpid(), i++);
     // getpid();
+    // syscall0(505);
   }
   printf("\n");
 }

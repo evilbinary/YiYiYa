@@ -169,6 +169,8 @@ void sys_vfree(void* addr) {
   vfree(addr);
 }
 
+#define PAGE_CLONE 1
+
 u32 sys_exec(char* filename, char* const argv[], char* const envp[]) {
   int fd = sys_open(filename, 0);
   if (fd < 0) {
@@ -178,16 +180,17 @@ u32 sys_exec(char* filename, char* const argv[], char* const envp[]) {
   }
   sys_close(fd);
   thread_t* current = thread_current();
-  u8* stack0 = kmalloc(THREAD_STACK_SIZE);
-  u8* stack3 = kmalloc(THREAD_STACK_SIZE);
+  u8* stack0 = kmalloc(KERNEL_THREAD_STACK_SIZE);
+  u8* stack3 = kmalloc_alignment(THREAD_STACK_SIZE,PAGE_SIZE);
   u8* vstack3 = STACK_ADDR;
   thread_t* t = thread_create_ex((u32*)&run_elf_thread, stack0, vstack3,
                                  THREAD_STACK_SIZE, NULL);
 
+  t->context.page_dir = current->context.page_dir;
+  #ifdef PAGE_CLONE
   t->context.page_dir = page_alloc_clone(current->context.page_dir);
+  #endif
   t->context.kernel_page_dir = current->context.kernel_page_dir;
-  // init 2GB
-  // map_2gb(context->page_dir, PAGE_P | PAGE_USU | PAGE_RWW);
 
   // init vmm
   t->vmm = vmemory_area_create(HEAP_ADDR, MEMORY_CREATE_SIZE, MEMORY_HEAP);
@@ -197,15 +200,6 @@ u32 sys_exec(char* filename, char* const argv[], char* const envp[]) {
   vmemory_area_t* stack =
       vmemory_area_create(vstack3, THREAD_STACK_SIZE, MEMORY_STACK);
   vmemory_area_add(t->vmm, stack);
-
-  // init stack
-  for (int i = 0; i < (THREAD_STACK_SIZE / PAGE_SIZE + 1); i++) {
-    // kprintf("vstack3:%x stack3:%x\n", vstack3, stack3);
-    map_page_on(t->context.page_dir, vstack3, stack3,
-                PAGE_P | PAGE_USU | PAGE_RWW);
-    vstack3 += PAGE_SIZE;
-    stack3 += PAGE_SIZE;
-  }
 
   // init data
   exec_t* data = kmalloc(sizeof(exec_t) + 4);

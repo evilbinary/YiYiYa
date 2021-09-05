@@ -1,0 +1,15 @@
+# coding:utf-8
+# *******************************************************************
+# * Copyright 2021-2080 evilbinary
+# * 作者: evilbinary on 01/01/20
+# * 邮箱: rootdebug@163.c",om
+# ********************************************************************
+import os
+
+Import('env')
+
+
+env.Library('lvqrcode', [
+    'lv_qrcode.c',
+    'qrcodegen.c',
+]+env['LIBC'],CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/liblvgl  -Iapp/libzlib/ -I. -DLV_LVGL_H_INCLUDE_SIMPLE=1')
