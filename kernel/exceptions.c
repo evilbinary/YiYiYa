@@ -248,6 +248,7 @@ void do_page_fault(interrupt_context_t *context) {
         cpu_halt();
         return;
       }
+      // kprintf("exception at %x\n",page_fault);
       void *phy = virtual_to_physic(current->context.page_dir, fault_addr);
       if (phy == NULL) {
         valloc(fault_addr, PAGE_SIZE);
@@ -256,6 +257,7 @@ void do_page_fault(interrupt_context_t *context) {
         kprintf("tid: %d phy: %x remap memory fault at %x\n", current->id, phy,
                 fault_addr);
         dump_fault(context, fault_addr);
+        // mmu_dump_page(current->context.page_dir,current->context.page_dir,0);
         thread_exit(current, -1);
         cpu_halt();
       }

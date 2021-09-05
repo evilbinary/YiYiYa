@@ -285,7 +285,7 @@ void load_elf(Elf32_Ehdr* elf_header) {
         char* start = elf + phdr[i].p_offset / 2;
         char* vaddr = phdr[i].p_vaddr;
         entry=vaddr;
-        printf("load start:%x vaddr:%x size:%x \n\r", start, vaddr,
+        printf("init load start:%x vaddr:%x size:%x \n\r", start, vaddr,
                phdr[i].p_filesz);
         memmove32(vaddr, start, phdr[i].p_memsz);
         printf("move end\n\r");
@@ -306,7 +306,7 @@ void load_elf(Elf32_Ehdr* elf_header) {
                shdr[i].sh_flags & SHF_ALLOC && shdr[i].sh_flags) {
       char* start = shdr[i].sh_offset;
       char* vaddr = shdr[i].sh_addr;
-      printf("load shdr start:%x vaddr:%x size:%x \n\r", start, vaddr,
+      printf("init load shdr start:%x vaddr:%x size:%x \n\r", start, vaddr,
               shdr[i].sh_size);
       u32 *phstart=(u32)elf+shdr[i].sh_offset;
       memset(vaddr,0,shdr->sh_size);

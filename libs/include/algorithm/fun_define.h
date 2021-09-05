@@ -9,7 +9,11 @@
 #include "types.h"
 
 #ifndef fn_malloc
+#ifdef MALLOC_TRACE
+#define fn_malloc(size) kmalloc_trace(size,__FILE__,__LINE__,__FUNCTION__)
+#else
 #define fn_malloc kmalloc
+#endif
 #endif
 
 #ifndef fn_free

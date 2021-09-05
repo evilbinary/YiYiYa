@@ -713,7 +713,7 @@ struct fat_file_struct* fat_open_file(
   if (!fs || !dir_entry || (dir_entry->attributes & FAT_ATTRIB_DIR)) return 0;
 
 #if USE_DYNAMIC_MEMORY
-  struct fat_file_struct* fd = kmalloc(sizeof(*fd));
+  struct fat_file_struct* fd = kmalloc(sizeof(struct fat_file_struct));
   if (!fd) return 0;
 #else
   struct fat_file_struct* fd = fat_file_handles;
@@ -1124,7 +1124,7 @@ struct fat_dir_struct* fat_open_dir(
   if (!fs || !dir_entry || !(dir_entry->attributes & FAT_ATTRIB_DIR)) return 0;
 
 #if USE_DYNAMIC_MEMORY
-  struct fat_dir_struct* dd = kmalloc(sizeof(*dd));
+  struct fat_dir_struct* dd = kmalloc(sizeof(struct fat_dir_struct));
   if (!dd) return 0;
 #else
   struct fat_dir_struct* dd = fat_dir_handles;

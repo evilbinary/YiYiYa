@@ -19,6 +19,7 @@
 #define THREAD_SLEEP	5
 #define THREAD_UNINTERRUPTIBLE 15
 
+#define KERNEL_THREAD_STACK_SIZE 1024*2
 #define THREAD_STACK_SIZE PAGE_SIZE
 
 typedef struct thread {

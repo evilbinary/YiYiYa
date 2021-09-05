@@ -103,6 +103,9 @@ static void mmu_dump_sections(unsigned int vaddr, unsigned int entry)
     unsigned int *tbl;
     unsigned int tblentry;
 
+    if(vaddr!=0x70000000 ) return; 
+
+
     if ((entry & 0x3) == 2) /* section or supersection */
     {
         ns = entry & 0x80000;
@@ -153,6 +156,49 @@ int mmu_dump(void)
     __asm__("mrc p15,0,%0,c2,c0,0" : "=r" (ttbr[0]));
     __asm__("mrc p15,0,%0,c2,c0,1" : "=r" (ttbr[1]));
     __asm__("mrc p15,0,%0,c2,c0,2" : "=r" (ttbcr));
+    kprintf("TTBR0: 0x%x, TTBR1: 0x%x, TTBCR: 0x%x\n", ttbr[0], ttbr[1], ttbcr);
+
+    n = ttbcr & 0x7;
+    ttbr[0] &= (unsigned int)((int)0x80000000 >> (31 - 14 + 1 - n));
+    ttbr[1] &= 0xFFFFC000;
+
+    ttb_vaddr[0] = (unsigned int *)pa2va(ttbr[0]);
+    ttb_vaddr[1] = (unsigned int *)pa2va(ttbr[1]);
+
+    kprintf("TBBR0 (physical): 0x%x, (virtual): 0x%x\n", ttbr[0], i<<12);
+    kprintf("TBBR1 (physical): 0x%x, (virtual): 0x%x\n", ttbr[1], i<<12);
+
+    unsigned int* p=(unsigned int *) (ttbr[0]);
+    kprintf("Dumping TTBR0...\n");
+    for (i = 0; i < (1 << 12 - n); i++)
+    {
+        entry = ttb_vaddr[0][i];
+        mmu_dump_sections(i<<20, entry);
+    }
+
+    if (n)
+    {
+        kprintf("Dumping TTBR1...\n");
+        for (i = ((~0xEFFF & 0xFFFF) >> n); i < 0x1000; i++)
+        {
+            entry = ttb_vaddr[1][i];
+            mmu_dump_sections(i<<20, entry);
+        }
+    }
+}
+
+
+int mmu_dump_page(unsigned int ttbr0,unsigned int ttbr1,unsigned int ttbcr){
+    int n;
+    unsigned int i;
+    int paddr;
+    unsigned int *ttb_vaddr[2];
+    unsigned int entry;
+    unsigned int ttbr[2];
+
+    ttbr[0]=ttbr0;
+    ttbr[1]=ttbr1;
+
     kprintf("TTBR0: 0x%x, TTBR1: 0x%x, TTBCR: 0x%x\n", ttbr[0], ttbr[1], ttbcr);
 
     n = ttbcr & 0x7;

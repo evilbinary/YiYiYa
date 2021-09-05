@@ -1,4 +1,5 @@
 #include "fat.h"
+#include "kernel/memory.h"
 #include "fat_config.h"
 #include "kernel/device.h"
 
@@ -19,7 +20,7 @@ typedef uint8_t (*sd_raw_read_interval_handler_t)(uint8_t *buffer,
 typedef uintptr_t (*sd_raw_write_interval_handler_t)(uint8_t *buffer,
                                                      offset_t offset, void *p);
 
-vnode_t *default_node;
+vnode_t *default_node=NULL;
 
 static u32 fat_device_read(vnode_t *node, u32 offset, size_t nbytes,
                            u8 *buffer) {
@@ -202,7 +203,7 @@ u32 fat_op_open(vnode_t *node) {
   if (file_info->fd == NULL && file_info->dd == NULL) {
     kprintf("create new file %s\n", name);
     file_info_t *parent_file_info = node->parent->data;
-    file_info_t *new_file_info = kmalloc(sizeof(file_info_t));
+    file_info_t *new_file_info = kmalloc(sizeof(struct file_info));
     struct fat_dir_struct *dd = kmalloc(sizeof(struct fat_dir_struct));
     new_file_info->dd = dd;
     dd->fs = fs;
@@ -331,7 +332,6 @@ void fat_init(void) {
     kprintf("bad fs\n");
     return;
   }
-
   struct fat_dir_entry_struct directory;
   u32 res;
   res = fat_get_dir_entry_of_path(fs, "/", &directory);
@@ -341,11 +341,14 @@ void fat_init(void) {
     kprintf("bad dd\n");
     return NULL;
   }
-
+  
   file_info_t *file_info = kmalloc(sizeof(file_info_t));
   file_info->fs = fs;
   file_info->dd = dd;
   node->data = file_info;
+  //why malloc?
+  kmalloc(1024*2);
+  kprintf("fat init end\n");
 }
 
 void fat_exit(void) { kprintf("fat exit\n"); }

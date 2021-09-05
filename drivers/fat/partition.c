@@ -81,7 +81,7 @@ struct partition_struct* partition_open(device_read_t device_read, device_read_i
     }
     /* allocate partition descriptor */
 #if USE_DYNAMIC_MEMORY
-    new_partition = kmalloc(sizeof(*new_partition));
+    new_partition = kmalloc(sizeof(struct partition_struct));
     if(!new_partition)
         return 0;
 #else

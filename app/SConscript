@@ -49,13 +49,16 @@ if env.get('APP'):
 
     SConscript(dirs=['track'], exports='env')
 
+    SConscript(dirs=['liblvqrcode'], exports='env')
+
+    SConscript(dirs=['launcher'], exports='env')
+
     # SConscript(dirs=['liblua'], exports='env')
     # SConscript(dirs=['lua'], exports='env')
 
+    
 
-    if plt=='Darwin':
-        env.Command('copyhello', 
-            ['hello/hello',
+    apps=['hello/hello',
             'gui/gui.elf',
             'microui/microui.elf',
             'file/file.elf',
@@ -64,23 +67,18 @@ if env.get('APP'):
             'test/test-musl.elf',
             'bin/ls',
             'lvgl/lvgl',
-            'track/track.elf'
-            ],
+            'track/track.elf',
+            'launcher/launcher'
+            ]
+    if plt=='Darwin':
+        env.Command('copyhello', 
+            apps,
             ['hdid  image/disk.img &&  cp ${SOURCES} /Volumes/NO\ NAME/ && hdiutil eject /Volumes/NO\ NAME/'
         ])
         pass
     elif plt=='Linux':
         env.Command('copyhello', 
-            ['hello/hello',
-            'gui/gui.elf',
-            'microui/microui.elf',
-            'file/file.elf',
-            'etk/etk.elf',
-            'test/test.elf',
-            'bin/ls',
-            'lvgl/lvgl',
-            'track/track.elf'
-            ],
+            apps,
             ['sudo losetup /dev/loop10 image/disk.img && sudo mount /dev/loop10 /mnt && sudo cp ${SOURCES} /mnt && sudo umount /mnt && sudo losetup -d /dev/loop10'
         ])
 else:

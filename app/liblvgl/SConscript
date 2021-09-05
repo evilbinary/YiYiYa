@@ -12,6 +12,7 @@ sources=[
     'lv_conf.h',
     'port/lv_port_disp.c',
     # "port/lv_port_fs.c',",
+    'port/mouse_cursor_icon.c',
     'port/lv_port_indev.c',
 ]
 sources+= Glob('src/core/*.c')

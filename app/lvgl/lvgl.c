@@ -204,7 +204,9 @@ int main(int argc, char **argv) {
   // lv_example_get_started_1();
   // lv_example_chart_1();
   // lv_example_table_1();
-  lv_demo_widgets();
+
+  lv_demo_benchmark();
+  // lv_demo_widgets();
   printf("loop\n");
 
   int tickets = 0;

@@ -5,6 +5,18 @@
  ********************************************************************/
 #include "main.h"
 
+void test_cpu_speed() {
+  int* p = 0x70100000;
+  for (;;) {
+    for (int i = 0; i < 480; i++) {
+      for (int j = 0; j < 272; j++) {
+        // *p++=0xffffff;
+      }
+    }
+    kprintf("flush=>\n");
+  }
+}
+
 void do_shell_thread(void) {
   u8 scan_code;
   u8 shf_p = 0;
@@ -21,7 +33,8 @@ void do_shell_thread(void) {
   // syscall2(SYS_EXEC,"/dev/sda/hello",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/gui.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/file.elf",NULL);
-  syscall2(SYS_EXEC,"/dev/sda/etk.elf",NULL);
+  syscall2(SYS_EXEC, "/dev/sda/etk.elf", NULL);
+  // syscall2(SYS_EXEC,"/dev/sda/launcher",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/track.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/test.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/microui.elf",NULL);
@@ -31,19 +44,21 @@ void do_shell_thread(void) {
   // syscall2(SYS_EXEC,"/dev/sda/hello-rs",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/test-rs",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/test-musl.elf",NULL);
-  // syscall2(SYS_EXEC,"/dev/sda/zhscript2",NULL);
+  // syscall2(SYS_EXEC,"/dev/sda/test-musl",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/ls",NULL);
-//  syscall2(SYS_EXEC,"/dev/sda/test.elf",NULL);
+  //  syscall2(SYS_EXEC,"/dev/sda/test.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/hello",NULL);
-  // syscall2(SYS_EXEC,"/dev/sda/lvgl",NULL);
-  syscall2(SYS_EXEC,"/dev/sda/track.elf",NULL);
+  syscall2(SYS_EXEC, "/dev/sda/lvgl", NULL);
+  // syscall2(SYS_EXEC,"/dev/sda/launcher",NULL);
+
+  // syscall2(SYS_EXEC,"/dev/sda/track.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/gui.elf",NULL);
 // syscall2(SYS_EXEC,"/dev/sda/etk.elf",NULL);
 //  syscall2(SYS_EXEC,"/dev/sda/test.elf",NULL);
 //  syscall2(SYS_EXEC,"/dev/sda/microui.elf",NULL);
-
+// test_cpu_speed();
 #endif
-  int count=0;
+  int count = 0;
   for (;;) {
     int ret = 0;
     // kprintf("A%d ",count);

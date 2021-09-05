@@ -4,13 +4,20 @@
  * 邮箱: rootdebug@163.com
  ********************************************************************/
 #include "mouse.h"
-
 #include "kernel/kernel.h"
+#include "i2c/i2c.h"
 
 mouse_device_t mouse_device;
 mouse_event_t event;
 u32 has_data=0;
 
+static u32 ns2009_read(i2c_t * i2c, u32 cmd, u8* val){
+  // i2c->read()
+
+}
+
+
+//ns2009 touch
 static size_t read(device_t* dev, void* buf, size_t len) {
 
   return 0;
@@ -37,19 +44,6 @@ void mouse_handler() {
   interrupt_exit();
 }
 
-u8 mouse_read() {
-   
-  return 0;
-}
-
-void mouse_write(u8 data) {
-  
-}
-
-void mouse_wait(u8 type) {
-  
-}
-
 int mouse_init(void) {
   device_t* dev = kmalloc(sizeof(device_t));
   dev->name = "mouse";
@@ -59,15 +53,7 @@ int mouse_init(void) {
   dev->data = &mouse_device;
 
   device_add(dev);
-  interrutp_regist(ISR_MOUSE, mouse_handler);
-
   mouse_device.events = cqueue_create(EVENT_NUMBER, CQUEUE_DROP);
-
-  // for(int i=0;i<EVENT_NUMBER;i++){
-  //   void* e=kpool_poll();
-  //   cqueue_put(mouse_device.events,e);
-  // }
-
 
   return 0;
 }

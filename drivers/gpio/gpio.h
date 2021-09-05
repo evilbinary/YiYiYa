@@ -1,24 +1,18 @@
 #ifndef __GPIO_H__
 #define __GPIO_H__
 
+#include "kernel/kernel.h"
 
-struct gpio_t{
-	char * name;
-	int base;
-	int ngpio;
-};
+typedef struct gpio{
+  char* name;
+  int base;
+  int ngpio;
+  void* data;
+}gpio_t;
 
-int gpio_is_valid(int number);
-
-int gpio_direction_input(unsigned gpio);
-int gpio_direction_output(unsigned gpio, int value);
-
-
-int gpio_get_value(unsigned gpio);
-void gpio_set_value(unsigned gpio, int value);
-
-
-int gpio_request(unsigned gpio, const char *label);
-void gpio_free(unsigned gpio);
+void gpio_config(u32 gpio, u32 pin, u32 val);
+void gpio_pull(u32 gpio, u32 pin, u32 val);
+void gpio_output(u32 gpio, u32 pin, u32 val);
+u32 gpio_input(u32 gpio, u32 pin);
 
 #endif

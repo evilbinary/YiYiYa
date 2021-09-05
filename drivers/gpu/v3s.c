@@ -145,7 +145,8 @@ static inline void v3s_tcon_set_mode(v3s_lcd_t *lcd) {
          lcd->timing.v_sync_len) /
         2;
   io_write32((u32)&tcon->tcon0_ctrl, (1 << 31) | ((val & 0x1f) << 4));
-  //   val = clk_get_rate(lcd->clktcon) / lcd->timing.pixel_clock_hz;
+  // val = clk_get_rate(lcd->clktcon) / lcd->timing.pixel_clock_hz;
+  // val=0x01000000/lcd->timing.pixel_clock_hz;
 
   io_write32((u32)&tcon->tcon0_dclk, (0xf << 28) | ((val / 2) << 0));
   io_write32((u32)&tcon->tcon0_timing_active,
@@ -204,10 +205,9 @@ int v3s_lcd_init(vga_device_t *vga) {
   lcd->bits_per_pixel = 16;
   lcd->bytes_per_pixel = 4;
   lcd->index = 0;
-  lcd->vram[0] = 0x41000000;
-  lcd->vram[1] = 0x41000000;
+  lcd->vram[0] = vga->pframbuffer;
+  lcd->vram[1] = vga->pframbuffer;
   vga->framebuffer_length = lcd->width * lcd->height * lcd->bytes_per_pixel * 8;
-  vga->frambuffer = lcd->vram[0];
 
   lcd->timing.pixel_clock_hz = 33000000;
   lcd->timing.h_front_porch = 40;
@@ -233,11 +233,14 @@ int v3s_lcd_init(vga_device_t *vga) {
     addr += 0x1000;
   }
 
+  // vga->pframbuffer=kmalloc(vga->framebuffer_length*2);
   // map fb
   addr = vga->frambuffer;
+  u32 paddr = vga->pframbuffer;
   for (int i = 0; i < vga->framebuffer_length / PAGE_SIZE; i++) {
-    map_page(addr, addr, 0);
+    map_page(addr, paddr, PAGE_DEV);
     addr += 0x1000;
+    paddr += 0x1000;
   }
 
   // init
@@ -259,6 +262,12 @@ int v3s_lcd_init(vga_device_t *vga) {
   kprintf("v3s_lcd_init end\n");
 }
 
+void gpu_flush(vga_device_t *vga, u32 index) {
+  vga->framebuffer_index = index;
+  v3s_lcd_t *lcd = vga->priv;
+  v3s_de_enable(lcd);
+}
+
 int gpu_init_mode(vga_device_t *vga, int mode) {
   if (mode == VGA_MODE_80x25) {
     vga->width = 80;
@@ -270,11 +279,11 @@ int gpu_init_mode(vga_device_t *vga, int mode) {
     vga->width = 640;
     vga->height = 480;
     vga->bpp = 24;
-  }  else if (mode == VGA_MODE_480x272x24) {
+  } else if (mode == VGA_MODE_480x272x24) {
     vga->width = 480;
     vga->height = 272;
     vga->bpp = 24;
-  }else if (mode == VGA_MODE_480x272x32) {
+  } else if (mode == VGA_MODE_480x272x32) {
     vga->width = 480;
     vga->height = 272;
     vga->bpp = 32;
@@ -282,26 +291,31 @@ int gpu_init_mode(vga_device_t *vga, int mode) {
     vga->width = 480;
     vga->height = 272;
     vga->bpp = 18;
-  }else if (mode == VGA_MODE_1024x768x32) {
+  } else if (mode == VGA_MODE_1024x768x32) {
     vga->width = 1024;
     vga->height = 768;
     vga->bpp = 32;
-  }else{
+  } else {
     kprintf("no support mode %x\n");
   }
   vga->mode = mode;
   vga->write = NULL;
+  // vga->flip_buffer=gpu_flush;
 
   vga->framebuffer_index = 0;
   vga->framebuffer_count = 1;
+  vga->frambuffer = 0x73e00000;
+  vga->pframbuffer = vga->frambuffer;
+
   v3s_lcd_init(vga);
 
-  kprintf("fb addr:%x len:%x\n", vga->frambuffer, vga->framebuffer_length);
+  kprintf("fb addr:%x vaddr:%x len:%x\n", vga->pframbuffer, vga->frambuffer,
+          vga->framebuffer_length);
 
-  u8 *buffer = vga->frambuffer;
-  for (int i = 0; i < vga->framebuffer_length / 8; i++) {
-    buffer[i] = 0x00;
-  }
+  // u8 *buffer = vga->frambuffer;
+  // for (int i = 0; i < vga->framebuffer_length / 8; i++) {
+  //   buffer[i] = 0x00;
+  // }
 
   return 0;
 }

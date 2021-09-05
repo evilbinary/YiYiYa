@@ -77,7 +77,7 @@ if arch=='arm':
     env['APP']=True
     env['USER']='--entry main -Tuser-arm.ld'
     env['MYLIB']= '/opt/local/lib/gcc/arm-none-eabi/9.2.0/libgcc.a'
-    env['CFLAGS']='-march=armv7-a -DARM -I. -I./include  -Ilibs/include -g -nostdlib -nostdinc -fno-builtin -c -std=c99 -std=gnu99 -w  -D'+platform.upper() #-mcpu=cortex-a7 
+    env['CFLAGS']='-march=armv7-a  -mfloat-abi=softfp  -DARM -I. -I./include  -Ilibs/include -g -nostdlib -nostdinc -fno-builtin -c -std=c99 -std=gnu99 -w  -D'+platform.upper() # -DMALLOC_TRACE -mcpu=cortex-a7  -mtune=cortex-a7 -mfpu=vfpv4 -mfloat-abi=hard 
     #env['CFLAGS']= env['CFLAGS']+ ' -fno-omit-frame-pointer -mapcs -mno-sched-prolog ' #for debug backtrace
     if platform=='raspi2':   
         pass

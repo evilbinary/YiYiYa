@@ -13,14 +13,14 @@
 #define STACK_ADDR 0x8000000
 #define HEAP_ADDR  0x8200000
 
-#elif defined(V3S)
-#define EXEC_ADDR  0x50000000
-#define STACK_ADDR 0x60000000
-#define HEAP_ADDR  0x61000000
+#elif defined(ARM)
+#define EXEC_ADDR  0x71000000
+#define STACK_ADDR 0x70000000
+#define HEAP_ADDR  0x70100000
 #else
-#define EXEC_ADDR  0x4000000
-#define STACK_ADDR 0x8000000
-#define HEAP_ADDR  0x8200000
+#define EXEC_ADDR  0x71000000
+#define STACK_ADDR 0x70000000
+#define HEAP_ADDR  0x70100000
 #endif
 
 #define MAX_PHDR 10

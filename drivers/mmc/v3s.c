@@ -630,6 +630,8 @@ int sdhci_v3s_probe(sdhci_device_t *hci) {
   sdhci_v3s_reset(hci);
   sdhci_v3s_setclock(hci, 400 * 1000);
   sdhci_v3s_setwidth(hci, MMC_BUS_WIDTH_1);
+  // sdhci_v3s_setclock(hci, pdat->clock);
+  // sdhci_v3s_setwidth(hci, pdat->width);
 
   if (!go_idle_state(hci)) {
     kprintf("prob go idle false\n");
@@ -924,7 +926,7 @@ void sdhci_dev_init(sdhci_device_t *sdhci_dev) {
   pdat->virt = 0x01c0f000;
 
   pdat->voltage = MMC_VDD_27_36;
-  pdat->clock = 25 * 1000 * 1000;
+  pdat->clock = 25 * 1000 * 1000*2;
   pdat->width = MMC_BUS_WIDTH_4;
 
   pdat->reset = 8;

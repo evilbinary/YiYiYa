@@ -148,6 +148,7 @@ void* mm_alloc_zero_align(size_t size, u32 alignment) {
   size_t addr = (size_t)p1 + alignment + sizeof(size_t);
   p2 = (void*)(addr - (addr % alignment));
   *((size_t*)p2 - 1) = (size_t)p1;
+  kmemset(p2,0,size);
   return p2;
 
   // int offset = alignment + sizeof(void*);

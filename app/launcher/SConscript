@@ -1,0 +1,74 @@
+# coding:utf-8
+# *******************************************************************
+# * Copyright 2021-2080 evilbinary
+# * 作者: evilbinary on 01/01/20
+# * 邮箱: rootdebug@163.com
+# ********************************************************************
+import os
+
+Import('env')
+
+source= [
+    'main.c',
+    'launcher.c',
+    'assets/weather.c',
+    'assets/wallet.c',
+    'assets/voice.c',
+    'assets/under_construction.c',
+    'assets/translate.c',
+    'assets/stocks.c',
+    'assets/shortcuts.c',
+    'assets/settings.c',
+    'assets/safari.c',
+    'assets/reminders.c',
+    'assets/podcasts.c',
+    'assets/pi_menu.c',
+    'assets/photos.c',
+    'assets/notes.c',
+    'assets/news.c',
+    'assets/nes_menu.c',
+    'assets/music.c',
+    'assets/mouse_gray.c',
+    'assets/mouse_black.c',
+    'assets/mouse.c',
+    'assets/message.c',
+    'assets/measure.c',
+    'assets/mail.c',
+    'assets/linux_menu.c',
+    'assets/launcher_menu.c',
+    'assets/duck_menu.c',
+
+    'assets/home.c',
+    'assets/health.c',
+    'assets/find.c',
+    'assets/files.c',
+    'assets/facetime.c',
+    'assets/contacts.c',
+    'assets/clocks.c',
+    'assets/clips.c',
+    'assets/camera.c',
+    'assets/calendar.c',
+    'assets/calculator.c',
+    'assets/calcuator.c',
+    'assets/books.c',
+    'assets/backhome.c',
+    # 'assets/background_dock.c',
+    'assets/background_dock_480x272.c',
+    'assets/background.c',
+    'assets/appstore.c',
+    'assets/appletv.c',
+    'assets/applestore.c',
+
+    '../liblvqrcode/liblvqrcode.a',
+    '../liblvgl/liblvgl.a',
+    '../libgui/libgui.a',
+    '../libgui/libimage.a',
+    '../libpng/libpng.a',
+    ]+env['LIBC']
+    
+if env.get('MYLIB'):
+    source.append(env.get('MYLIB'))
+
+env.Program('launcher', source,
+    CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/liblvgl -Iapp/libgui/ -Iapp/libjpeg -DLV_LVGL_H_INCLUDE_SIMPLE=1',
+    LINKFLAGS= '$LINKFLAGS $USER')

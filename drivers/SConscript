@@ -21,6 +21,10 @@ if arch=='arm':
             'mmc/v3s.c',
             'serial/v3s.c',
             'mouse/v3s.c',
+            'i2c/i2c.c',
+            'i2c/v3s.c',
+            'gpio/gpio.c',
+            'gpio/v3s.c',
         ]
     elif platform=='raspi2':
         other=[

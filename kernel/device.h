@@ -6,7 +6,7 @@
 #ifndef DEVICE_H
 #define DEVICE_H
 
-#include "arch/arch.h"
+#include "kernel/kernel.h"
 
 enum {
   DEVICE_KEYBOARD = 0,
@@ -25,6 +25,8 @@ enum {
   DEVICE_SATA4,
   DEVICE_SATA5,
   DEVICE_SATA6,
+  DEVICE_I2C,
+  DEVICE_GPIO,
 
 };
 

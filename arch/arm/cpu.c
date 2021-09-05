@@ -119,7 +119,7 @@ void cpu_set_page(u32 page_table) {
   isb();
   write_ttbr1(page_table);
   isb();
-  write_ttbcr(TTBCRN_4K);
+  write_ttbcr(TTBCRN_16K);
   isb();
   dsb();
   // set all permission
@@ -134,20 +134,46 @@ void cpu_disable_page() {
   asm volatile("mcr p15, 0, %0, c1, c0, #0" : : "r"(reg) : "cc");
 }
 
-void cpu_enable_page() {
-  u32 reg;
-  // read mmu
-  asm("mrc p15, 0, %0, c1, c0, 0" : "=r"(reg) : : "cc");  // SCTLR
-  reg |= 0x1;                                             // M enable mmu
-  // reg|=(1<<29);//AFE
-  reg |= 1 << 12;  // Instruction cache enable:
-  reg |= 1 << 2;   // Cache enable.
-  reg |= 1 << 4;   // Data Cache
-  reg |= 1 << 1;   // Alignment check enable.
-  asm volatile("mcr p15, 0, %0, c1, c0, #0" : : "r"(reg) : "cc");  // SCTLR
-  dsb();
-  isb();
+
+void cpu_enable_smp_mode() {
+  // Enable SMP mode for CPU0
+  // asm volatile(
+  //   "mrc p15, 1, r0, R1, C15\n" // Read CPUECTLR.
+  //   "orr r0, r0, #1 << 6 \n" // Set SMPEN.
+  //   "mcr p15, 1, R0, R1, C15"); // Write CPUECTLR.
+
+  asm volatile(
+      "mrc p15, 0, r0, c1, c0, 1\n"
+      "orr r0, r0, #1 << 6\n"
+      "mcr p15, 0, r0, c1, c0, 1\n");
 }
+
+static void cpu_enable_ca7_smp(void) {
+  u32 val;
+
+  /* Read MIDR */
+  asm volatile("mrc p15, 0, %0, c0, c0, 0\n\t" : "=r"(val));
+  val = (val >> 4);
+  val &= 0xf;
+
+  /* Only set the SMP for Cortex A7 */
+  if (val == 0x7) {
+    /* Read auxiliary control register */
+    asm volatile("mrc p15, 0, %0, c1, c0, 1\n\t" : "=r"(val));
+
+    if (val & (1 << 6)) return;
+
+    /* Enable SMP */
+    val |= (1 << 6);
+
+    /* Write auxiliary control register */
+    asm volatile("mcr p15, 0, %0, c1, c0, 1\n\t" : : "r"(val));
+
+    dsb();
+    isb();
+  }
+}
+
 
 inline void cpu_invalidate_tlbs(void) {
   asm("mcr p15, 0, r0, c8, c7, 0\n"
@@ -157,7 +183,109 @@ inline void cpu_invalidate_tlbs(void) {
       : "r0", "memory");
 }
 
-void cpu_init() {}
+static inline uint32_t get_ccsidr(void)
+{
+	uint32_t ccsidr;
+
+	__asm__ __volatile__("mrc p15, 1, %0, c0, c0, 0" : "=r" (ccsidr));
+	return ccsidr;
+}
+
+static inline void __v7_cache_flush_range(uint32_t start, uint32_t stop, uint32_t line)
+{
+	uint32_t mva;
+
+	start &= ~(line - 1);
+	if(stop & (line - 1))
+		stop = (stop + line) & ~(line - 1);
+	for(mva = start; mva < stop; mva = mva + line)
+	{
+		__asm__ __volatile__("mcr p15, 0, %0, c7, c14, 1" : : "r" (mva));
+	}
+}
+
+/*
+ * Flush range(clean & invalidate), affects the range [start, stop - 1]
+ */
+void cpu_cache_flush_range(unsigned long start, unsigned long stop)
+{
+	uint32_t ccsidr;
+	uint32_t line;
+
+	ccsidr = get_ccsidr();
+	line = ((ccsidr & 0x7) >> 0) + 2;
+	line += 2;
+	line = 1 << line;
+	__v7_cache_flush_range(start, stop, line);
+	dsb();
+}
+
+static inline void __v7_cache_inv_range(uint32_t start, uint32_t stop, uint32_t line)
+{
+	uint32_t mva;
+
+	start &= ~(line - 1);
+	if(stop & (line - 1))
+		stop = (stop + line) & ~(line - 1);
+	for(mva = start; mva < stop; mva = mva + line)
+	{
+		__asm__ __volatile__("mcr p15, 0, %0, c7, c6, 1" : : "r" (mva));
+	}
+}
+/*
+ * Invalidate range, affects the range [start, stop - 1]
+ */
+void cache_inv_range(unsigned long start, unsigned long stop)
+{
+	uint32_t ccsidr;
+	uint32_t line;
+
+	ccsidr = get_ccsidr();
+	line = ((ccsidr & 0x7) >> 0) + 2;
+	line += 2;
+	line = 1 << line;
+	__v7_cache_inv_range(start, stop, line);
+	dsb();
+}
+
+
+
+void mmu_inv_tlb(void)
+{
+	__asm__ __volatile__("mcr p15, 0, %0, c8, c7, 0" : : "r" (0));
+	__asm__ __volatile__("mcr p15, 0, %0, c8, c6, 0" : : "r" (0));
+	__asm__ __volatile__("mcr p15, 0, %0, c8, c5, 0" : : "r" (0));
+	dsb();
+	isb();
+}
+
+void cpu_enable_page() {
+  cpu_enable_smp_mode();
+  cache_inv_range(0, ~0);
+  // mmu_inv_tlb();
+
+  u32 reg;
+  // read mmu
+  asm("mrc p15, 0, %0, c1, c0, 0" : "=r"(reg) : : "cc");  // SCTLR
+  reg |= 0x1;                                  // M enable mmu
+  // reg|=(1<<29);//AFE
+  // reg |= 1 << 28; //TEX remap enable.
+  reg |= 1 << 12;  // Instruction cache enable:
+  reg |= 1 << 2;   // Cache enable.
+  reg |= 1 << 1;   // Alignment check enable.
+  reg |= 1 << 11;  //Branch prediction enable
+  asm volatile("mcr p15, 0, %0, c1, c0, #0" : : "r"(reg) : "cc");  // SCTLR
+  dsb();
+  isb();
+}
+
+void cpu_init() {
+  // cpu_enable_smp_mode();
+  // cpu_enable_ca7_smp();
+
+   u32 rate=cpu_get_rate(1);
+   kprintf("cpu_get_rate %d\n",rate);
+}
 
 void cpu_halt() {
   for (;;) {
@@ -165,13 +293,13 @@ void cpu_halt() {
   };
 }
 
-int context_get_mode(context_t* context){
-  int mode=0;
-  if(context!=NULL){
-    interrupt_context_t* c=context->esp0;
+int context_get_mode(context_t* context) {
+  int mode = 0;
+  if (context != NULL) {
+    interrupt_context_t* c = context->esp0;
     // kprintf("psr %x\n",c->psr);
-    if((c->psr&0x1F)==0x10){
-      return 3; //user mode
+    if ((c->psr & 0x1F) == 0x10) {
+      return 3;  // user mode
     }
   }
   return mode;
@@ -233,6 +361,9 @@ void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
   ulong addr = (ulong)boot_info->pdt_base;
   context->kernel_page_dir = addr;
   context->page_dir = addr;
+#ifdef PAGE_CLONE
+  context->page_dir = page_alloc_clone(addr);
+#endif
 }
 
 // #define DEBUG 1
@@ -246,8 +377,8 @@ void context_switch(interrupt_context_t* context, context_t** current,
   current_context->esp0 = context;
   current_context->esp = context->sp;
   current_context->eip = context->lr;
-  context_switch_page(next_context->page_dir);
   *current = next_context;
+  context_switch_page(next_context->page_dir);
 #if DEBUG
   kprintf("-----switch dump next------\n");
   context_dump(next_context);
@@ -294,21 +425,29 @@ void context_clone(context_t* des, context_t* src, u32* stack0, u32* stack3,
   context_dump(src);
 #endif
   des->eip = src->eip;
+  des->level= src->level;
   if (stack0 != NULL) {
-    des->esp0 = (u32)d0;
     kmemmove(d0, s0, sizeof(interrupt_context_t));
+    des->esp0 = (u32)d0;
   }
   if (stack3 != NULL) {
-    // cpsr_t cpsr;
-    // cpsr.val = 0;
-    // cpsr.M = 0x10;
-    // d0->psr = cpsr.val;
-    des->esp = s0->sp;
+    cpsr_t cpsr;
+    cpsr.val = 0;
+    cpsr.Z = 1;
+    cpsr.C = 1;
+    cpsr.A = 1;
+    cpsr.I = 1;
+    cpsr.F = 1;
+    cpsr.T =0;
+
+    cpsr.M = 0x13;
+    d0->psr = cpsr.val;
+    d0->sp=stack3;
+    des->esp=stack3;
   }
-  // des->page_dir =src->page_dir;
+  des->page_dir =src->page_dir;
   des->page_dir = page_alloc_clone(src->page_dir);
-  des->kernel_page_dir= src->kernel_page_dir;
-  // d0->lr+=4;
+  des->kernel_page_dir = src->kernel_page_dir;
 #if DEBUG
   kprintf("------context clone dump des--------------\n");
 #endif
@@ -329,7 +468,6 @@ int TAS(volatile int* addr, int newval) {
   //              : "cc");
   return result;
 }
-
 
 void cpu_backtrace(void) {
   int topfp = read_fp();

@@ -10,32 +10,11 @@
 #include "cpu.h"
 #include "gpio.h"
 
-#define L1_PAGE_TABLE (1 << 0)
-#define L2_SMALL_PAGE (2 << 0)
 
-#define L1_PXN (0 << 2)  // The Privileged execute-never bit
-#define L1_NS (0 << 3)   // Non-secure bit
-#define L1_SBZ (0 << 4)  // Should be Zero
-
-#define L1_DOMAIN(n) (n << 5)
-
-#define L2_XN (0 << 0)  // The Execute-never bit
-#define L2_CB (3 << 2)  // 0b11 cache write-back
-#define L2_NCNB (0 << 2)
-
-#define L2_AP_ACCESS (3 << 4)
-#define L2_AP_RW (0 << 9)  // read write any privilege level
-#define L2_TEXT (7 << 6)
-#define L2_S (1 << 10)   // The Shareable bit
-#define L2_NG (1 << 11)  // The not global bit
-
-#define L1_DESC (L1_PAGE_TABLE | L1_PXN | L1_NS | L1_SBZ | L1_DOMAIN(0))
-#define L2_DESC \
-  (L2_XN | L2_SMALL_PAGE | L2_NCNB | L2_AP_ACCESS | L2_AP_RW | L2_S | L2_NG)
-
+#define PAGE_DIR_NUMBER 4096*4
 
 extern boot_info_t* boot_info;
-static u32 page_dir[4096] __attribute__((aligned(0x4000)));
+static u32 page_dir[PAGE_DIR_NUMBER] __attribute__((aligned(0x4000)));
 
 void map_page_on(page_dir_t* l1, u32 virtualaddr, u32 physaddr, u32 flags) {
   u32 l1_index = virtualaddr >> 20;
@@ -46,7 +25,7 @@ void map_page_on(page_dir_t* l1, u32 virtualaddr, u32 physaddr, u32 flags) {
     kmemset(l2, 0, 0x1000);
     l1[l1_index] = (((u32)l2) & 0xFFFFFC00) | L1_DESC;
   }
-  l2[l2_index] = (physaddr >> 12) << 12 | flags | L2_DESC;
+  l2[l2_index] = ((physaddr >> 12) << 12 )|L2_DESC| flags;
 }
 
 void map_page(u32 virtualaddr, u32 physaddr, u32 flags) {
@@ -61,14 +40,14 @@ void mm_init_default() {
   u32 address = 0;
   kprintf("map %x - %x\n", address, 0x1000 * 1024*10);
   for (int j = 0; j < 1024*10; j++) {
-    map_page(address, address, 0);
+    map_page(address, address, L2_TEXT|L2_NCNB);
     address += 0x1000;
   }
   address = boot_info->kernel_entry;
   kprintf("map kernel %x ", address);
   int i;
-  for (i = 0; i < (((u32)boot_info->kernel_size) / 0x1000 + 2); i++) {
-    map_page(address, address, L2_TEXT);
+  for (i = 0; i < (((u32)boot_info->kernel_size) / 0x1000 + 6); i++) {
+    map_page(address, address,  L2_TEXT_1|L2_CB);
     address += 0x1000;
   }
   kprintf("- %x\n", address);
@@ -79,10 +58,12 @@ void mm_init_default() {
 #ifdef V3S
   // memory
   address = 0x40000000;
-  for (int i = 0; i < 0x700000 / 0x1000; i++) {
-    map_page(address, address, 0);
+  kprintf("map memory %x ", address);
+  for (int i = 0; i < 0x2000000 / 0x1000; i++) {
+    map_page(address, address, L2_TEXT_1|L2_NCB);
     address += 0x1000;
   }
+  kprintf("- %x\n", address);
   map_page(0x01C20000, 0x01C20000, 0);
   map_page(0x01C28000, 0x01C28000, 0);
   // timer
@@ -118,13 +99,14 @@ void mm_test() {
   // *addr=0x123456;
 }
 
-void* virtual_to_physic(u64* page, void* vaddr) {
+void* virtual_to_physic(void* page, void* vaddr) {
   void* phyaddr = NULL;
   u32* l1 = page;
   u32 l1_index = (u32)vaddr >> 20;
   u32 l2_index = (u32)vaddr >> 12 & 0xFF;
   u32* l2 = ((u32)l1[l1_index]) & 0xFFFFFC00;
   if (l2 != NULL) {
+    // kprintf("l2 %x\n",l2);
     phyaddr = (l2[l2_index] >> 12) << 12;
   }
   // kprintf("virtual_to_physic vaddr %x paddr %x\n",vaddr,phyaddr);
@@ -143,11 +125,10 @@ void page_clone(u32* old_page, u32* new_page) {
   for (int l1_index = 0; l1_index < 4096; l1_index++) {
     u32* l2 = ((u32)l1[l1_index]) & 0xFFFFFC00;
     if (l2 != NULL) {
-      page_dir_t* new_l2 = mm_alloc_zero_align(0x1000, 0x1000);
-      kmemset(new_l2, 0, 0x1000);
+      page_dir_t* new_l2 = mm_alloc_zero_align(256*sizeof(u32), 0x1000);
       new_l1[l1_index] = (((u32)new_l2) & 0xFFFFFC00) | L1_DESC;
       // kprintf("%d %x\n", l1_index, (u32)l2>>10 );
-      for (int l2_index = 0; l2_index < 512; l2_index++) {
+      for (int l2_index = 0; l2_index < 256; l2_index++) {
         u32* addr = l2[l2_index] >> 12;
         if (addr != NULL || l1_index == 0) {
           new_l2[l2_index] = l2[l2_index];
@@ -159,7 +140,7 @@ void page_clone(u32* old_page, u32* new_page) {
 }
 
 u32* page_alloc_clone(u32* kernel_page_dir) {
-  u32* page_dir_ptr_tab = kmalloc_alignment(sizeof(u32) * 4096, 0x4000);
+  u32* page_dir_ptr_tab = mm_alloc_zero_align(sizeof(u32) * PAGE_DIR_NUMBER, 0x4000);
   page_clone(kernel_page_dir, page_dir_ptr_tab);
   return page_dir_ptr_tab;
 }
@@ -175,6 +156,11 @@ void unmap_page_on(page_dir_t* page, u32 virtualaddr) {
   }
 }
 
+
+u32* page_alloc() {
+  u32* page_dir_ptr_tab = mm_alloc_zero_align(sizeof(u32) * PAGE_DIR_NUMBER, 0x4000);
+  return page_dir_ptr_tab;
+}
 // void* page_alloc_init(){
 //   void* page_dir_ptr_tab = kmalloc_alignment(sizeof(u32) * 4096, 0x4000);
 //   map_page_on(page_dir_ptr_tab, MMIO_BASE, MMIO_BASE, 0);

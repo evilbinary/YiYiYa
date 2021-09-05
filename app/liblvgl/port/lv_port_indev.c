@@ -119,9 +119,16 @@ void lv_port_indev_init(void) {
   indev_mouse = lv_indev_drv_register(&indev_drv);
 
   /*Set cursor. For simplicity set a HOME symbol now.*/
-  lv_obj_t* mouse_cursor = lv_img_create(lv_disp_get_scr_act(NULL));
-  lv_img_set_src(mouse_cursor, LV_SYMBOL_HOME);
-  lv_indev_set_cursor(indev_mouse, mouse_cursor);
+  // lv_obj_t* mouse_cursor = lv_img_create(lv_disp_get_scr_act(NULL));
+  // lv_img_set_src(mouse_cursor, LV_SYMBOL_HOME);
+  // lv_indev_set_cursor(indev_mouse, mouse_cursor);
+
+    /*Set a cursor for the mouse*/
+  LV_IMG_DECLARE(mouse_cursor_icon); /*Declare the image file.*/
+  lv_obj_t * cursor_obj = lv_img_create(lv_scr_act()); /*Create an image object for the cursor */
+  lv_img_set_src(cursor_obj, &mouse_cursor_icon);           /*Set the image source*/
+  lv_indev_set_cursor(indev_mouse, cursor_obj);  
+
 
   /*------------------
    * Keypad

@@ -8,6 +8,7 @@
 
 #include "arch/arch.h"
 #include "kernel/stdarg.h"
+#include "kernel/memory.h"
 
 #define V_FILE        0x01
 #define V_DIRECTORY   0x02
