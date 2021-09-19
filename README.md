@@ -33,9 +33,17 @@ scons --run=qemu
 
 
 ### 截图
+
 <img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/demo/etk-gui.jpeg?raw=true" width="800px" />
 
+https://user-images.githubusercontent.com/5143386/133922735-972ddceb-eab6-4102-b9a2-2e14e7d86397.mp4
+
+
 https://user-images.githubusercontent.com/5143386/121841338-acf76f80-cd10-11eb-98fe-f96cb78ba221.mp4
+
+
+
+
 
 <img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/demo/lvgl-gui.png?raw=true" width="800px" />
       
