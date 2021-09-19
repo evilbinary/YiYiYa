@@ -10,28 +10,6 @@
 
 extern boot_info_t* boot_info;
 
-// 31:14-N -> va[29:20] va[19:12]
-#define TTBCRN_4K 0b010
-#define TTBCRN_16K 0b000
-#define TTBCR_LPAE 1 << 31
-
-/* data cache clean by MVA to PoC */
-void dccmvac(unsigned long mva) {
-
-}
-
-void cpu_icache_disable() {   }
-
-void cpu_invalid_tlb() {
-
-}
-   
-
-void cp15_invalidate_icache(void) {
-   
-}
-
-
 u32 read_pc() {
   u32 val = 0;
   return val;
@@ -42,75 +20,37 @@ u32 read_fp() {
   return val;
 }
 
-static inline u32 read_ttbcr(void) {
-  u32 val = 0;
-  return val;
+u32 cpu_get_sp() {
+  void* sp;
+  asm volatile("mov %0, sp;" : "=r"(sp));
+  return sp;
 }
 
-static inline void write_ttbcr(u32 val) {
+void cpu_set_vector(u32 addr) {
+  kprintf("set vector a %x\n", addr);
+  asm volatile("wsr.VECBASE %0" ::"r"(addr));
 }
 
-static inline void write_ttbr0(u32 val) {
-}
-
-static inline u32 read_ttbr0() {
-  u32 val = 0;
-  return val;
-}
-
-static inline void write_ttbr1(u32 val) {
-}
-
-static inline u32 read_ttbr1() {
-  u32 val = 0;
-  return val;
-}
-
-u32 cpu_set_domain(u32 val) {
-  u32 old;
-
-  return old;
-}
-
-/* invalidate unified TLB by MVA and ASID */
-void tlbimva(unsigned long mva) {
-
-}
-
-void cpu_set_page(u32 page_table) {
-  // set ttbcr0
-  write_ttbr0(page_table);
-  isb();
-  write_ttbr1(page_table);
-  isb();
-  write_ttbcr(TTBCRN_4K);
-  isb();
-  // set all permission
-  // cpu_set_domain(~0);
-}
+void cpu_set_page(u32 page_table) {}
 
 void cpu_disable_page() {
   u32 reg;
   // read mmu
-  
 }
 
 void cpu_enable_page() {
   u32 reg;
-  
+
   dsb();
   isb();
 }
 
-inline void cpu_invalidate_tlbs(void) {
-   
-}
+inline void cpu_invalidate_tlbs(void) {}
 
 void cpu_init() {}
 
 void cpu_halt() {
   for (;;) {
-    
   };
 }
 
@@ -128,42 +68,42 @@ void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
   cpsr.val = 0;
   if (level == 0) {
     // kernel mode
-    cpsr.Z = 1;
-    cpsr.C = 1;
-    cpsr.A = 1;
-    cpsr.I = 0;
-    cpsr.F = 1;
-    cpsr.M = 0x1f;
+    cpsr.UM = 0;
+    cpsr.LINTLEVEL = 0;
+    cpsr.EXCM = 0;
     interrupt_context_t* c = stack0;
   } else if (level == 3) {
-    cpsr.I = 0;
-    cpsr.F = 0;
-    cpsr.T = 0;  // arm
-    cpsr.M = 0x10;
+    cpsr.UM = 1;
+    cpsr.LINTLEVEL = 3;
+    cpsr.EXCM = 0;
+
   } else {
     kprintf("not suppport level %d\n", level);
   }
 
   interrupt_context_t* user = stack0;
   kmemset(user, 0, sizeof(interrupt_context_t));
-  user->lr = entry;  // r14
-  user->lr += 4;
-  user->psr = cpsr.val;
-  user->r0 = 0;
-  user->r1 = 0x00010001;
-  user->r2 = 0x00020002;
-  user->r3 = 0x00030003;
-  user->r4 = 0x00040004;
-  user->r5 = 0x00050006;
-  user->r6 = 0x00060006;
-  user->r7 = 0x00070007;
-  user->r8 = 0x00080008;
-  user->r9 = 0x00090009;
-  user->r10 = 0x00100010;
-  user->r11 = 0x00110011;  // fp
-  user->r12 = 0x00120012;  // ip
-  user->sp = stack3;       // r13
-  user->lr0 = user->lr;
+  user->pc = entry;
+  user->ps = cpsr.val;
+
+  user->a0 = 0x00000000;
+  // user->a1 = 0x00010001;
+  user->a2 = 0x00020002;
+  user->a3 = 0x00030003;
+  user->a4 = 0x00040004;
+  user->a5 = 0x00050006;
+  user->a6 = 0x00060006;
+  user->a7 = 0x00070007;
+  user->a8 = 0x00080008;
+  user->a9 = 0x00090009;
+  user->a10 = 0x00100010;
+  user->a11 = 0x00110011;
+  user->a12 = 0x00120012;
+  user->a13 = 0x00130013;
+  user->a14 = 0x00140014;
+  user->a15 = 0x00160015;
+
+  user->sp = stack3;
   context->esp = stack3;
   context->esp0 = stack0;
 
@@ -184,7 +124,7 @@ void context_switch(interrupt_context_t* context, context_t** current,
 #endif
   current_context->esp0 = context;
   current_context->esp = context->sp;
-  current_context->eip = context->lr;
+  current_context->eip = context->pc;
   *current = next_context;
   context_switch_page(next_context->page_dir);
 #if DEBUG
@@ -200,11 +140,6 @@ void context_clone(context_t* des, context_t* src, u32* stack0, u32* stack3,
   interrupt_context_t* d0 = stack0;
   interrupt_context_t* s0 = src->esp0;
 
-  // s0->lr=0x4000a48+4;
-
-  kprintf("context_clone====>lr:%x sp:%x  lr:%x sp:%x  fp:%x\n", src->eip, src->esp,
-          s0->lr, s0->sp, s0->r11);
-
   if (stack0 != NULL) {
     kmemmove(d0, s0, sizeof(interrupt_context_t));
     des->esp0 = (u32)d0;
@@ -212,12 +147,10 @@ void context_clone(context_t* des, context_t* src, u32* stack0, u32* stack3,
   if (stack3 != NULL) {
     cpsr_t cpsr;
     cpsr.val = 0;
-    cpsr.M = 0x10;
-    d0->psr = cpsr.val;
+    // cpsr.M = 0x10;
+    d0->ps = cpsr.val;
     des->esp = d0->sp;
   }
-  // d0->lr-=4;
-  
 }
 
 ulong cpu_get_cs(void) {
@@ -259,4 +192,16 @@ void cpu_backtrace(void) {
     if (fp == 0) break;
     topfp = fp;
   }
+}
+
+void context_dump(context_t* c) {
+  kprintf("ip:  %x\n", c->eip);
+  kprintf("sp0: %x\n", c->esp0);
+  kprintf("sp:  %x\n", c->esp);
+
+  kprintf("page_dir: %x\n", c->page_dir);
+  kprintf("kernel page_dir: %x\n", c->kernel_page_dir);
+  kprintf("--interrupt context--\n");
+  interrupt_context_t* context = c->esp0;
+  // context_dump_interrupt(context);
 }

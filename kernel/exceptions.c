@@ -27,7 +27,8 @@ void exception_info(interrupt_context_t *context) {
   if (current != NULL) {
     kprintf("tid:%d\n", current->id);
   }
-  kprintf("ifsr: %x dfsr: %x dfar: %x\n", read_ifsr(), read_dfsr(), read_dfar());
+  kprintf("ifsr: %x dfsr: %x dfar: %x\n", read_ifsr(), read_dfsr(),
+          read_dfar());
   kprintf("pc: %x\n", read_pc());
   context_dump_interrupt(context);
 
@@ -272,7 +273,8 @@ void do_page_fault(interrupt_context_t *context) {
 
 void dump_fault(interrupt_context_t *context, u32 fault_addr) {
   kprintf("----------------------------\n");
-  kprintf("ifsr: %x dfsr: %x dfar: %x\n", read_ifsr(), read_dfsr(), read_dfar());
+  kprintf("ifsr: %x dfsr: %x dfar: %x\n", read_ifsr(), read_dfsr(),
+          read_dfar());
   kprintf("pc: %x\n", read_pc());
   context_dump_interrupt(context);
   kprintf("fault: 0x%x \n", fault_addr);
@@ -338,6 +340,84 @@ void do_page_fault(interrupt_context_t *context) {
     }
   }
 }
+#elif defined(XTENSA)
+INTERRUPT_SERVICE
+void reset_handler() {
+  interrupt_entering_code(0, 0);
+  interrupt_process(exception_info);
+  cpu_halt();
+}
+
+
+INTERRUPT_SERVICE
+void l1_handler() {
+  interrupt_entering_code(0, 0);
+  interrupt_process(exception_info);
+  cpu_halt();
+}
+
+INTERRUPT_SERVICE
+void l2_handler() {
+  interrupt_entering_code(0, 0);
+  interrupt_process(exception_info);
+  cpu_halt();
+}
+
+INTERRUPT_SERVICE
+void l3_handler() {
+  interrupt_entering_code(0, 0);
+  interrupt_process(exception_info);
+  cpu_halt();
+}
+
+INTERRUPT_SERVICE
+void l4_handler() {
+  interrupt_entering_code(0, 0);
+  interrupt_process(exception_info);
+  cpu_halt();
+}
+
+INTERRUPT_SERVICE
+void l5_handler() {
+  interrupt_entering_code(0, 0);
+  interrupt_process(exception_info);
+  cpu_halt();
+}
+
+INTERRUPT_SERVICE
+void debug_excetpion_handler() {
+  interrupt_entering_code(0, 0);
+  interrupt_process(exception_info);
+  cpu_halt();
+}
+
+INTERRUPT_SERVICE
+void nmi_excetpion_handler() {
+  interrupt_entering_code(0, 0);
+  interrupt_process(exception_info);
+  cpu_halt();
+}
+
+INTERRUPT_SERVICE
+void kernel_excetpion_handler() {
+  interrupt_entering_code(0, 0);
+  interrupt_process(exception_info);
+  cpu_halt();
+}
+
+INTERRUPT_SERVICE
+void user_excetpion_handler() {
+  interrupt_entering_code(0, 0);
+  interrupt_process(exception_info);
+  cpu_halt();
+}
+
+INTERRUPT_SERVICE
+void double_excetpion_handler() {
+  interrupt_entering_code(0, 0);
+  interrupt_process(exception_info);
+  cpu_halt();
+}
 #endif
 
 void exception_init() {
@@ -375,6 +455,19 @@ void exception_init() {
 
   // exception
   exception_regist(14, do_page_fault);
+
+#elif defined(XTENSA)
+  interrutp_regist(0, reset_handler);  // reset
+  interrutp_regist(6, l2_handler);
+  interrutp_regist(7, l3_handler);
+  interrutp_regist(8, l4_handler);
+  interrutp_regist(9, l5_handler);
+
+  interrutp_regist(10, debug_excetpion_handler);
+  interrutp_regist(11, nmi_excetpion_handler);
+  interrutp_regist(12, kernel_excetpion_handler);
+  interrutp_regist(15, user_excetpion_handler);
+  interrutp_regist(16, double_excetpion_handler);
 
 #endif
 }

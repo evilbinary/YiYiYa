@@ -8,6 +8,10 @@
 size_t i2c_read(device_t* dev, void* buf, size_t len) {
   u32 ret = 0;
   i2c_t* i2c = dev->data;
+  if (i2c == NULL) {
+    kprintf("i2c is null\n");
+    return ret;
+  }
   i2c->read(i2c, buf, len);
   return ret;
 }
@@ -15,13 +19,21 @@ size_t i2c_read(device_t* dev, void* buf, size_t len) {
 size_t i2c_write(device_t* dev, const void* buf, size_t len) {
   u32 ret = 0;
   i2c_t* i2c = dev->data;
+  if (i2c == NULL) {
+    kprintf("i2c is null\n");
+    return ret;
+  }
   i2c->write(i2c, buf, len);
   return ret;
 }
 
 size_t i2c_ioctl(device_t* dev, u32 cmd, void* args) {
   u32 ret = 0;
-  
+  i2c_t* i2c = dev->data;
+  if (i2c == NULL) {
+    kprintf("i2c is null\n");
+    return ret;
+  }
   return ret;
 }
 

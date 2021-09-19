@@ -24,22 +24,14 @@ typedef struct context_t {
 typedef struct cpsr {
   union {
     struct {
-      u32 M : 5;
-      u32 T : 1;
-      u32 F : 1;
-      u32 I : 1;
-      u32 A : 1;
-      u32 E : 1;
-      u32 RESERVED2 : 6;
-      u32 GE : 4;
-      u32 RESERVED1 : 4;
-      u32 J : 1;
-      u32 Res : 2;
-      u32 Q : 1;
-      u32 V : 1;
-      u32 C : 1;
-      u32 Z : 1;
-      u32 N : 1;
+      u32 LINTLEVEL : 4;
+      u32 EXCM : 1;  // 0 normal operation 1 exception mode
+      u32 UM : 1;    // 0 → kernel vector mode  1 → user vector mode
+      u32 RING : 2;  // Privilege level [MMU Option]
+      u32 OWB : 4;   // Old window base [Windowed Register Option]
+      u32 CALLINC : 2;
+      u32 WOE : 1;
+      u32 RESERVED1 : 13;
     };
     u32 val;
   };
@@ -48,25 +40,25 @@ typedef struct cpsr {
 typedef u32 (*sys_call_fn)(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5,
                            u32 arg6);
 
-#define sys_fn_call(duck_interrupt_context, fn)                               \
-  duck_interrupt_context->r0 = ((                                             \
-      sys_call_fn)fn)(duck_interrupt_context->r0, duck_interrupt_context->r1, \
-                      duck_interrupt_context->r2, duck_interrupt_context->r3, \
-                      duck_interrupt_context->r4, duck_interrupt_context->r5);
+#define sys_fn_call(duck_interrupt_context, fn)               \
+  duck_interrupt_context->a0 = ((sys_call_fn)fn)(             \
+      duck_interrupt_context->a0, duck_interrupt_context->a2, \
+      duck_interrupt_context->a3, duck_interrupt_context->a4, \
+      duck_interrupt_context->a5, duck_interrupt_context->a6);
 
-#define cpu_cli()  
-#define cpu_sti()  
+#define cpu_cli()
+#define cpu_sti()
 #define cpu_cpl() (cpu_get_cs() & 0x3)
 
-#define context_switch_page(page_dir)  cpu_set_page(page_dir)// asm volatile("mov %0, %%cr3" : : "r" (page_dir))
+#define context_switch_page(page_dir) \
+  cpu_set_page(page_dir)  // asm volatile("mov %0, %%cr3" : : "r" (page_dir))
 
-#define context_fn(context) context->r7
-#define context_ret(context) context->r0
+#define context_fn(context) context->a7
+#define context_ret(context) context->a0
 
-#define context_restore(duck_context) \
-  interrupt_exit_context(duck_context);
+#define context_restore(duck_context) interrupt_exit_context(duck_context);
 
-#define isb()  
-#define dsb()  
+#define isb()
+#define dsb()
 
 #endif
