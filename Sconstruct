@@ -10,13 +10,13 @@ import platform
 plt = platform.system()
 
 # arch support x86 arm
-arch='arm'
-# arch='x86' 
+# arch='arm'
+arch='x86' 
 # arch='xtensa'
 
 # board select platform
-# platform='intel'
-platform='v3s'
+platform='intel'
+# platform='v3s'
 # platform='raspi2'
 # platform='esp32'
 
