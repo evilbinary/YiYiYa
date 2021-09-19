@@ -503,7 +503,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #define LV_BUILD_EXAMPLES   0
 
 
-#define LV_MAX_LINE 100
+#define LV_MAX_LINE 220
 
 /*--END OF LV_CONF_H--*/
 

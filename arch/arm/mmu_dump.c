@@ -103,7 +103,7 @@ static void mmu_dump_sections(unsigned int vaddr, unsigned int entry)
     unsigned int *tbl;
     unsigned int tblentry;
 
-    if(vaddr!=0x70000000 ) return; 
+    // if(vaddr!=0x01C2A000 ) return; 
 
 
     if ((entry & 0x3) == 2) /* section or supersection */

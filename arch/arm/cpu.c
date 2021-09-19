@@ -282,9 +282,6 @@ void cpu_enable_page() {
 void cpu_init() {
   // cpu_enable_smp_mode();
   // cpu_enable_ca7_smp();
-
-   u32 rate=cpu_get_rate(1);
-   kprintf("cpu_get_rate %d\n",rate);
 }
 
 void cpu_halt() {
@@ -297,7 +294,6 @@ int context_get_mode(context_t* context) {
   int mode = 0;
   if (context != NULL) {
     interrupt_context_t* c = context->esp0;
-    // kprintf("psr %x\n",c->psr);
     if ((c->psr & 0x1F) == 0x10) {
       return 3;  // user mode
     }

@@ -4,19 +4,21 @@
  * 邮箱: rootdebug@163.com
  ********************************************************************/
 #include "io.h"
+#include "stdarg.h"
 
 write_channel_fn write_channels[10];
 u32 write_channel_number = 0;
 
+char printf_buffer[512];
+
 void io_add_write_channel(write_channel_fn fn) {
-  for(int i=0;i<write_channel_number;i++){
-    if(fn==write_channels[i]){
+  for (int i = 0; i < write_channel_number; i++) {
+    if (fn == write_channels[i]) {
       return;
     }
   }
   write_channels[write_channel_number++] = fn;
 }
-
 
 void print_char(u8 ch) {
   for (int i = 0; i < write_channel_number; i++) {
@@ -27,41 +29,15 @@ void print_char(u8 ch) {
   }
 }
 
-void kprintf(const char* format, ...) {
-  char** arg = (char**)&format;
-  u8 c;
-  char buf[20];
-
-  arg++;
-
-  while ((c = *format++) != 0) {
-    if (c != '%')
-      print_char(c);
-    else {
-      char* p;
-
-      c = *format++;
-      switch (c) {
-        case 'd':
-        case 'u':
-        case 'x':
-          kitoa(buf, c, *((int*)arg++));
-          p = buf;
-          goto string;
-          break;
-
-        case 's':
-          p = *arg++;
-          if (!p) p = "(null)";
-
-        string:
-          while (*p) print_char(*p++);
-          break;
-
-        default:
-          print_char(*((int*)arg++));
-          break;
-      }
-    }
+void kprintf(const char* fmt, ...) {
+  kmemset(printf_buffer,0,512);
+  int i;
+	va_list args;
+	va_start(args, fmt);
+	i = vsprintf(printf_buffer, fmt, args);
+	va_end(args);
+  int len=kstrlen(printf_buffer);
+  for(int i=0;i<len;i++){
+    print_char(printf_buffer[i]);
   }
 }

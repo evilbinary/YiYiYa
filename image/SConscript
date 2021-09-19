@@ -74,6 +74,16 @@ def build_duck_image():
           'dd if=${SOURCES[0]} bs=512 count=11 seek=0 conv=notrunc of=$TARGET',
           'dd if=${SOURCES[1]} bs=512 count=%s seek=12  conv=notrunc of=$TARGET'%(env.get('KERNEL_SIZE'))
       ])
+  elif env.get('ARCH')=='xtensa':
+    env.Command('esp32', 
+    [ '../boot/xtensa/init.elf',
+      '../init/kernel'
+    ],
+    [
+      'source ~/dev/c/esp/esp-idf/export.sh && esptool.py --chip esp32 elf2image --flash_mode="dio" --flash_freq "40m" --flash_size "4MB" -o boot/xtensa/init.bin  ${SOURCES[0]}',
+    # 'esptool.py --chip esp32 elf2image --flash_mode="dio" --flash_freq "40m" --flash_size "4MB" -o init/kernel.bin  ${SOURCES[1]}',
+    'source ~/dev/c/esp/esp-idf/export.sh && esptool.py --chip esp32 merge_bin --fill-flash-size 4MB -o image/flash_image.bin 0x1000 boot/xtensa/init.bin 0x10000 init/kernel',
+  ])
 
 def build_duck_fit():
   if env.get('ARCH')=='arm':
@@ -119,6 +129,10 @@ elif env.get('run')=='qemu' or env.get('run')=='q':
     env.Command('qemu', 'duck.img','qemu-system-i386 -rtc base=localtime,clock=host -boot a  -fda $SOURCE -serial stdio -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor  -D ./qemu.log  -drive id=disk,file=image/disk.img,format=raw,if=none -device ahci,id=ahci -device ide-hd,drive=disk,bus=ahci.0 -soundhw sb16 ') #-d in_asm -d cpu_reset -d in_asm,int,mmu
   elif env.get('ARCH')=='arm':
     env.Command('qemu', 'duck.img','qemu-system-arm -M raspi2   -rtc base=localtime -kernel image/duck.img  -serial stdio -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor  -D ./qemu.log -drive if=sd,id=sd0,format=raw,file=image/disk.img -d in_asm -d cpu_reset -d in_asm,int,mmu') #-d in_asm -d cpu_reset -d in_asm,int,mmu
+  elif env.get('ARCH')=='xtensa':
+    env.Command('qemu', 'flash_image.bin','~/dev/c/esp/qemu/build/qemu-system-xtensa -nographic -M esp32 -drive file=image/flash_image.bin,if=mtd,format=raw -s -serial stdio -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor  -D ./qemu.log -drive if=sd,id=sd0,format=raw,file=image/disk.img -d in_asm -d cpu_reset -d in_asm,int,mmu') #-d in_asm -d cpu_reset -d in_asm,int,mmu
+
+
 
 elif env.get('run')=='debug':
   build_duck_image()
@@ -127,6 +141,9 @@ elif env.get('run')=='debug':
   elif env.get('ARCH')=='arm':
     env.Command('qemu', 'duck.img','qemu-system-arm -M raspi2   -rtc base=localtime   -S -s -kernel image/duck.img  -serial stdio -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor  -D ./qemu.log -drive if=sd,id=sd0,format=raw,file=image/disk.img') #-d in_asm -d in_asm,int,mmu
     #versatilepb -machine raspi2 -device ahci,id=ahci -device ide-drive,drive=disk,bus=ahci.0  -append "console=ttyAMA0" 
+  elif env.get('ARCH')=='xtensa':
+    env.Command('qemu', 'flash_image.bin','~/dev/c/esp/qemu/build/qemu-system-xtensa -nographic  -S -s  -M esp32 -drive file=image/flash_image.bin,if=mtd,format=raw  -serial stdio -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor  -D ./qemu.log -drive if=sd,id=sd0,format=raw,file=image/disk.img -d in_asm -d cpu_reset -d in_asm,int,mmu') #-d in_asm -d cpu_reset -d in_asm,int,mmu
+
 elif env.get('run')=='v3s':
   build_duck_fit()
   env.Command('v3s', 'duck.fit','~/dev/c/sunxi-tools/sunxi-fel -v uboot ~/dev/c/u-boot-v3s/u-boot-sunxi-with-spl.bin  write 0x41000000 ~/dev/c/duck-os/image/duck.fit')
@@ -134,12 +151,12 @@ elif env.get('run')=='v3s':
 elif env.get('run')=='esp32':
   env.Command('esp32', 
     [ '../boot/xtensa/init.elf',
-      '../init/kernel.elf'
+      '../init/kernel'
     ],
     ['esptool.py --chip esp32 elf2image --flash_mode="dio" --flash_freq "40m" --flash_size "4MB" -o boot/xtensa/init.bin  ${SOURCES[0]}',
-    'esptool.py --chip esp32 elf2image --flash_mode="dio" --flash_freq "40m" --flash_size "4MB" -o app/kernel.bin  ${SOURCES[1]}',
-    'esptool.py --chip esp32 --port /dev/tty.wchusbserial14120 --baud 460800 --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 40m --flash_size detect 0x1000 boot/xtensa/init.bin 0x10000 app/kernel.bin',
-    'idf_monitor.py -p /dev/tty.wchusbserial14120 -b 115200 --toolchain-prefix xtensa-esp32-elf- --target esp32 --revision 0 boot/xtensa/init.elf '  
+    # 'esptool.py --chip esp32 elf2image --flash_mode="dio" --flash_freq "40m" --flash_size "4MB" -o init/kernel.bin  ${SOURCES[1]}',
+    'esptool.py --chip esp32 --port /dev/tty.wchusbserial14120 --baud 460800 --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 40m --flash_size detect 0x1000 boot/xtensa/init.bin 0x10000 init/kernel',
+    'idf_monitor.py -p /dev/tty.wchusbserial14120 -b 115200 --toolchain-prefix xtensa-esp32-elf- --target esp32 --revision 0  init/kernel.elf'   #boot/xtensa/init.elf
   ])
   
   

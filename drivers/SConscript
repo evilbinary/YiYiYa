@@ -34,6 +34,11 @@ if arch=='arm':
             'mmc/bcm2835_vc.c',
             'serial/bcm2836.c',
             'mouse/bcm2836.c',
+            'i2c/i2c.c',
+            'i2c/bcm2836.c',
+            'gpio/gpio.c',
+            'gpio/bcm2836.c',
+
             ]
 
     driver=[

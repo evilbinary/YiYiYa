@@ -1,5 +1,5 @@
 MEMORY {
-  iram : org = 0x4008c000, len = 0xFC00
+  iram : org = 0x40082000, len = 0xFC00
   dram : org = 0x3ffc0000, len = 0x20000
 }
 

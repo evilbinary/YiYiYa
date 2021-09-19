@@ -61,13 +61,14 @@ int kmain(int argc, char* argv[]) {
 
 #ifdef ARM 
   module_regist(&serial_module);
+  module_regist(&i2c_module);
+  module_regist(&gpio_module);
   module_regist(&gpu_module);
   module_regist(&mouse_module);
   module_regist(&sdhci_module);
   module_regist(&devfs_module);
   module_regist(&fat_module);
-  module_regist(&i2c_module);
-  module_regist(&gpio_module);
+
 
   // module_regist(&fat32_module);
   // module_regist(&hello_module);

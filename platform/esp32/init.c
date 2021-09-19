@@ -1,5 +1,9 @@
+typedef void (*rom_write_char_uart_fn)(char c);
+rom_write_char_uart_fn send=0x40007cf8;
+
 
 void uart_send(unsigned int c) {
+  send(c);
 //   if (c == '\n') {
 //     uart_send_ch(c);
 //     c = '\r';
@@ -18,5 +22,5 @@ void timer_end() {
 }
 
 void platform_init(){
-    
+    // kprintf("platform_init\n");
 }

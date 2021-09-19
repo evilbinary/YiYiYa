@@ -10,8 +10,7 @@
 #include "cpu.h"
 #include "gpio.h"
 
-
-#define PAGE_DIR_NUMBER 4096*4
+#define PAGE_DIR_NUMBER 4096 * 4
 
 extern boot_info_t* boot_info;
 static u32 page_dir[PAGE_DIR_NUMBER] __attribute__((aligned(0x4000)));
@@ -25,7 +24,7 @@ void map_page_on(page_dir_t* l1, u32 virtualaddr, u32 physaddr, u32 flags) {
     kmemset(l2, 0, 0x1000);
     l1[l1_index] = (((u32)l2) & 0xFFFFFC00) | L1_DESC;
   }
-  l2[l2_index] = ((physaddr >> 12) << 12 )|L2_DESC| flags;
+  l2[l2_index] = ((physaddr >> 12) << 12) | L2_DESC | flags;
 }
 
 void map_page(u32 virtualaddr, u32 physaddr, u32 flags) {
@@ -35,19 +34,19 @@ void map_page(u32 virtualaddr, u32 physaddr, u32 flags) {
 void mm_init_default() {
   mm_test();
   boot_info->pdt_base = page_dir;
-  kmemset(page_dir, 0, 4096 * 4);
+  kmemset(page_dir, 0, 4096 * 8);
 
   u32 address = 0;
-  kprintf("map %x - %x\n", address, 0x1000 * 1024*10);
-  for (int j = 0; j < 1024*10; j++) {
-    map_page(address, address, L2_TEXT|L2_NCNB);
+  kprintf("map %x - %x\n", address, 0x1000 * 1024 * 10);
+  for (int j = 0; j < 1024 * 10; j++) {
+    map_page(address, address, 0);
     address += 0x1000;
   }
   address = boot_info->kernel_entry;
   kprintf("map kernel %x ", address);
   int i;
   for (i = 0; i < (((u32)boot_info->kernel_size) / 0x1000 + 6); i++) {
-    map_page(address, address,  L2_TEXT_1|L2_CB);
+    map_page(address, address, L2_TEXT_1 | L2_CB);
     address += 0x1000;
   }
   kprintf("- %x\n", address);
@@ -60,11 +59,14 @@ void mm_init_default() {
   address = 0x40000000;
   kprintf("map memory %x ", address);
   for (int i = 0; i < 0x2000000 / 0x1000; i++) {
-    map_page(address, address, L2_TEXT_1|L2_NCB);
+    map_page(address, address, L2_TEXT_1 | L2_NCB);
     address += 0x1000;
   }
   kprintf("- %x\n", address);
+
+  // ccu -pio timer
   map_page(0x01C20000, 0x01C20000, 0);
+  // uart
   map_page(0x01C28000, 0x01C28000, 0);
   // timer
   map_page(0x01C20C00, 0x01C20C00, 0);
@@ -97,6 +99,10 @@ void mm_test() {
   // map_page(0x90000,0x600000,3);
   // u32* addr=mm_alloc(256);
   // *addr=0x123456;
+    // kprintf("===============+>\n");
+    // u32 *p = 0x1c2ac0c;
+    // *p = 1 << 6;
+    // kprintf("p=%x\n", *p);
 }
 
 void* virtual_to_physic(void* page, void* vaddr) {
@@ -125,7 +131,7 @@ void page_clone(u32* old_page, u32* new_page) {
   for (int l1_index = 0; l1_index < 4096; l1_index++) {
     u32* l2 = ((u32)l1[l1_index]) & 0xFFFFFC00;
     if (l2 != NULL) {
-      page_dir_t* new_l2 = mm_alloc_zero_align(256*sizeof(u32), 0x1000);
+      page_dir_t* new_l2 = mm_alloc_zero_align(256 * sizeof(u32), 0x1000);
       new_l1[l1_index] = (((u32)new_l2) & 0xFFFFFC00) | L1_DESC;
       // kprintf("%d %x\n", l1_index, (u32)l2>>10 );
       for (int l2_index = 0; l2_index < 256; l2_index++) {
@@ -140,13 +146,14 @@ void page_clone(u32* old_page, u32* new_page) {
 }
 
 u32* page_alloc_clone(u32* kernel_page_dir) {
-  u32* page_dir_ptr_tab = mm_alloc_zero_align(sizeof(u32) * PAGE_DIR_NUMBER, 0x4000);
+  u32* page_dir_ptr_tab =
+      mm_alloc_zero_align(sizeof(u32) * PAGE_DIR_NUMBER, 0x4000);
   page_clone(kernel_page_dir, page_dir_ptr_tab);
   return page_dir_ptr_tab;
 }
 
 void unmap_page_on(page_dir_t* page, u32 virtualaddr) {
-  u32* l1=page;
+  u32* l1 = page;
   u32 l1_index = virtualaddr >> 20;
   u32 l2_index = virtualaddr >> 12 & 0xFF;
   u32* l2 = ((u32)l1[l1_index]) & 0xFFFFFC00;
@@ -156,9 +163,9 @@ void unmap_page_on(page_dir_t* page, u32 virtualaddr) {
   }
 }
 
-
 u32* page_alloc() {
-  u32* page_dir_ptr_tab = mm_alloc_zero_align(sizeof(u32) * PAGE_DIR_NUMBER, 0x4000);
+  u32* page_dir_ptr_tab =
+      mm_alloc_zero_align(sizeof(u32) * PAGE_DIR_NUMBER, 0x4000);
   return page_dir_ptr_tab;
 }
 // void* page_alloc_init(){

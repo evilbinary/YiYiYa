@@ -3,7 +3,6 @@
 
 _start:
 
-
 j init_boot
 
 halt:

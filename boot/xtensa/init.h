@@ -11,13 +11,18 @@
 
 #define KERNEL_MOVE 
 #define READ_BLOCK_SIZE 512
-#define KERNEL_BASE 0x4008c000
-#define KERNEL_ORIGIN_BASE 0x4008c000
+#define KERNEL_BASE 0x40082000
+#define KERNEL_ORIGIN_BASE KERNEL_BASE
 
-#define KERNEL_BIN 1
+// #define KERNEL_BIN 1
 
 #define PDT_BASE 0x9000
 #define BOOT_VERSION 0x01
+
+#define KERNEL_FLASH_ADDR 0x10000
+
+#define PHDR_NUM 4
+#define SHDR_NUM 10
 
 void init_boot();
 void init_display();
@@ -25,5 +30,6 @@ void init_display();
 void* load_kernel();
 void init_memory();
 void init_kernel();
+void start_kernel();
 
 #endif

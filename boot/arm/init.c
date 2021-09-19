@@ -360,7 +360,7 @@ void* memmove32(void* s1, const void* s2, u32 n) {
 void load_elf(Elf32_Ehdr* elf_header) {
   // printf("e_phnum:%d\n\r", elf_header->e_phnum);
   u16* elf = elf_header;
-  Elf32_Phdr* phdr = (elf + elf_header->e_phoff / 2);
+  Elf32_Phdr* phdr = (elf + elf_header->e_phoff/2 );
   // printf("addr %x elf=%x\n\r", phdr, elf);
   u32 entry=0;
   for (int i = 0; i < elf_header->e_phnum; i++) {
@@ -375,7 +375,7 @@ void load_elf(Elf32_Ehdr* elf_header) {
         // printf(" %s %x %x %x %s %x %x \r\n", "LOAD", phdr[i].p_offset,
         //        phdr[i].p_vaddr, phdr[i].p_paddr, "", phdr[i].p_filesz,
         //        phdr[i].p_memsz);
-        char* start = elf + phdr[i].p_offset / 2;
+        char* start = elf + phdr[i].p_offset /2;
         char* vaddr = phdr[i].p_vaddr;
         entry=vaddr;
         printf("load start:%x vaddr:%x size:%x \n\r", start, vaddr,
@@ -388,7 +388,7 @@ void load_elf(Elf32_Ehdr* elf_header) {
     }
   }
 
-  Elf32_Shdr* shdr = (elf + elf_header->e_shoff / 2);;
+  Elf32_Shdr* shdr = (elf + elf_header->e_shoff/2 );;
   for (int i = 0; i < elf_header->e_shnum; i++) {
     if (SHT_NOBITS == shdr[i].sh_type) {
       char* vaddr = shdr[i].sh_addr;
