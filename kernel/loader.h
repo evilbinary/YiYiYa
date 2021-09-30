@@ -23,7 +23,7 @@
 #define HEAP_ADDR  0x70100000
 #endif
 
-#define MAX_PHDR 10
+#define MAX_PHDR 12
 #define MAX_SHDR 30
 
 typedef struct exec{
