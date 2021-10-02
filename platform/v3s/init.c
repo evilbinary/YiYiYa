@@ -100,7 +100,6 @@ void cpu_clock_init(void) {
   while (!(io_read32(V3S_CCU_BASE + CCU_PLL_PERIPH0_CTRL) & (1 << 28)))
     ;
 
-
   /* ahb1 = pll periph0 / 3, apb1 = ahb1 / 2 */
   io_write32(V3S_CCU_BASE + CCU_AHB_APB0_CFG, 0x00003180);
 

@@ -9,8 +9,17 @@
 #include "boot.h"
 #include "libs/include/types.h"
 
+
 #ifdef ARM
-  #include "arm/context.h"
+  #ifdef ARMV7_A
+    #include "armv7-a/context.h"
+  #elif defined(ARMV7)
+    #include "armv7/context.h"
+  #elif ARMV5
+    #include "armv5/context.h"
+  #else
+    #error "no support arm"
+  #endif
 #elif defined(X86)
   #include "x86/context.h"
 #elif defined(XTENSA)

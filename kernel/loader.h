@@ -7,6 +7,7 @@
 #define LOADER_H
 
 
+#include "config.h"
 
 #ifdef X86 
 #define EXEC_ADDR  0x200000
@@ -23,11 +24,16 @@
 #define HEAP_ADDR  0x70100000
 #endif
 
+#ifndef MAX_PHDR 
 #define MAX_PHDR 12
+#endif
+
+#ifndef MAX_SHDR 
 #define MAX_SHDR 30
+#endif
 
 typedef struct exec{
-    char filename[256];
+    char filename[EXEC_FILE_NAME_LEN];
     int argc;
     char** argv;
 }exec_t;

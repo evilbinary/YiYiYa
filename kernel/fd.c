@@ -9,7 +9,7 @@
 #include "device.h"
 #include "vfs.h"
 
-fd_t fd_list[512];
+fd_t fd_list[MAX_FD_NUMBER];
 int fd_number = 0;
 
 fd_t* fd_find(u32 fd) {
@@ -22,7 +22,7 @@ fd_t* fd_find(u32 fd) {
 }
 
 fd_t* fd_new(u32* file, u32 type, char* name) {
-  if (fd_number > 512) {
+  if (fd_number > MAX_FD_NUMBER) {
     kprintf("new fd limit \n");
     return NULL;
   }

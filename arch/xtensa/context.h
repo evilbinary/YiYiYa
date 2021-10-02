@@ -10,8 +10,6 @@
 #include "libs/include/types.h"
 #include "platform/platform.h"
 
-#define IDT_NUMBER 256
-
 typedef struct interrupt_context {
   // manual push
   u32 no;    // 0

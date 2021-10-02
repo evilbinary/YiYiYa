@@ -3,7 +3,7 @@ MEMORY {
   dram : org = 0x3ffc0000, len = 0x20000
 }
 
-ENTRY(_start)
+ENTRY(_kstart)
 
 SECTIONS {
   .text : ALIGN(4) {

@@ -8,12 +8,21 @@
 
 #include "boot.h"
 #include "libs/include/types.h"
+
 #ifdef ARM
-#include "arm/mm.h"
+  #ifdef ARMV7_A
+    #include "armv7-a/mm.h"
+  #elif defined(ARMV7)
+    #include "armv7/mm.h"
+  #elif defined(ARMV5)
+    #include "armv5/mm.h"
+  #else
+    #error "no support arm"
+  #endif
 #elif defined(X86)
-#include "x86/mm.h"
+  #include "x86/mm.h"
 #elif defined(XTENSA)
-#include "xtensa/mm.h"
+  #include "xtensa/mm.h"
 #else
 #error "no support"
 #endif
