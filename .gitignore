@@ -33,3 +33,4 @@ app/hello/hello
 app/**/**/target/**
 
 **.lo
+app/launcher/launcher
