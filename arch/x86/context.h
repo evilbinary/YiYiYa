@@ -9,14 +9,6 @@
 #include "arch/boot.h"
 #include "libs/include/types.h"
 
-
-#define ISR_TIMER 0x20
-#define ISR_KEYBOARD 0x21
-#define ISR_SYSCALL 0x30
-#define ISR_MOUSE 0x2c
-
-#define IDT_NUMBER 512
-
 typedef struct interrupt_context {
   // ds
   u32 gs, fs, es, ds;

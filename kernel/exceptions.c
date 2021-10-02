@@ -169,6 +169,38 @@ void coprocessor_error() {
 
 #ifdef ARM
 
+#ifdef ARMV7
+
+INTERRUPT_SERVICE
+void reset_handler() {
+  interrupt_entering_code(0, 0);
+  interrupt_process(exception_info);
+  cpu_halt();
+}
+
+INTERRUPT_SERVICE
+void svc_handler() {
+  interrupt_entering_code(2, 0);
+  interrupt_process(exception_info);
+  cpu_halt();
+}
+
+INTERRUPT_SERVICE
+void sys_tick_handler() {
+  interrupt_entering_code(2, 0);
+  interrupt_process(exception_info);
+  cpu_halt();
+}
+
+INTERRUPT_SERVICE
+void sys_pendsv_handler() {
+  interrupt_entering_code(2, 0);
+  interrupt_process(exception_info);
+  cpu_halt();
+}
+
+#else
+
 INTERRUPT_SERVICE
 void reset_handler() {
   interrupt_entering_code(0, 0);
@@ -280,6 +312,9 @@ void dump_fault(interrupt_context_t *context, u32 fault_addr) {
   kprintf("fault: 0x%x \n", fault_addr);
   kprintf("----------------------------\n\n");
 }
+
+#endif
+
 #elif defined(X86)
 
 void dump_fault(interrupt_context_t *context, u32 fault_addr) {
@@ -347,7 +382,6 @@ void reset_handler() {
   interrupt_process(exception_info);
   cpu_halt();
 }
-
 
 INTERRUPT_SERVICE
 void l1_handler() {
@@ -423,6 +457,13 @@ void double_excetpion_handler() {
 void exception_init() {
 #ifdef ARM
 
+#ifdef ARMV7
+  interrutp_regist(1, reset_handler);        // reset
+  interrutp_regist(11, svc_handler);         // svc_handler
+  interrutp_regist(14, sys_pendsv_handler);  // sys_pendsv_handler
+  interrutp_regist(15, sys_tick_handler);    // sys_tick_handler
+
+#else
   interrutp_regist(0, reset_handler);       // reset
   interrutp_regist(1, undefined_handler);   // undefined
   interrutp_regist(2, svc_handler);         // svc
@@ -431,6 +472,7 @@ void exception_init() {
   interrutp_regist(5, unuse_handler);       // not use
   interrutp_regist(6, irq_handler);         // irq
   interrutp_regist(7, frq_handler);         // fiq
+#endif
 
 #elif defined(X86)
   interrutp_regist(0, divide_error);

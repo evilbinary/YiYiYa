@@ -7,6 +7,10 @@
 
 #ifdef ARM 
 
+#ifdef ARMV7
+extern module_t hello_module;
+#else
+
 extern module_t gpu_module;
 extern module_t devfs_module;
 extern module_t sdhci_module;
@@ -17,6 +21,8 @@ extern module_t mouse_module;
 extern module_t hello_module;
 extern module_t i2c_module;
 extern module_t gpio_module;
+extern module_t spi_module;
+#endif
 
 #elif defined(X86)
 extern module_t keyboard_module;
@@ -45,7 +51,7 @@ extern void serial_write(char a);
 extern void do_shell_thread(void);
 extern void do_serial_thread();
 
-void start(int argc, char* argv[], char** envp) {
+void kstart(int argc, char* argv[], char** envp) {
   boot_info_t* boot_info = envp[0];
   arch_init(boot_info);
   kmain(argc, argv);
@@ -60,18 +66,23 @@ int kmain(int argc, char* argv[]) {
   kprintf("module regist\n");
 
 #ifdef ARM 
+
+#ifdef ARMV7
+
+#else
   module_regist(&serial_module);
   module_regist(&i2c_module);
   module_regist(&gpio_module);
+  module_regist(&spi_module);
   module_regist(&gpu_module);
   module_regist(&mouse_module);
   module_regist(&sdhci_module);
   module_regist(&devfs_module);
   module_regist(&fat_module);
-
-
   // module_regist(&fat32_module);
   // module_regist(&hello_module);
+
+  #endif
 
 #elif defined(X86)
   module_regist(&pci_module);

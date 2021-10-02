@@ -3,10 +3,10 @@
  * 作者: evilbinary on 01/01/20
  * 邮箱: rootdebug@163.com
  ********************************************************************/
-#include "../mm.h"
+#include "arch/mm.h"
 
-#include "../cpu.h"
-#include "../display.h"
+#include "arch/cpu.h"
+#include "arch/display.h"
 #include "cpu.h"
 #include "gpio.h"
 
@@ -50,32 +50,7 @@ void mm_init_default() {
     address += 0x1000;
   }
   kprintf("- %x\n", address);
-
-  map_page(MMIO_BASE, MMIO_BASE, 0);
-  map_page(UART0_DR, UART0_DR, 0);
-  map_page(CORE0_TIMER_IRQCNTL, CORE0_TIMER_IRQCNTL, 0);
-#ifdef V3S
-  // memory
-  address = 0x40000000;
-  kprintf("map memory %x ", address);
-  for (int i = 0; i < 0x2000000 / 0x1000; i++) {
-    map_page(address, address, L2_TEXT_1 | L2_NCB);
-    address += 0x1000;
-  }
-  kprintf("- %x\n", address);
-
-  // ccu -pio timer
-  map_page(0x01C20000, 0x01C20000, 0);
-  // uart
-  map_page(0x01C28000, 0x01C28000, 0);
-  // timer
-  map_page(0x01C20C00, 0x01C20C00, 0);
-  // gic
-  map_page(0x01C81000, 0x01C81000, 0);
-  map_page(0x01C82000, 0x01C82000, 0);
-
-#endif
-
+  
   kprintf("map page end\n");
 
   // cpu_disable_page();

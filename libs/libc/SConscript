@@ -34,7 +34,7 @@ source=[
     'assert.c',
 ]
 
-if env['ARCH']=='arm':
+if env['ARCH'] in env['ARCHS']:
     source=source+[
         'arm/longjmp.S',
         'arm/setjmp.S'

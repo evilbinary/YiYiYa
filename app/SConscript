@@ -64,7 +64,7 @@ if env.get('APP'):
             'file/file.elf',
             'etk/etk.elf',
             'test/test.elf',
-            'test/test-musl.elf',
+            # 'test/test-musl.elf',
             'bin/ls',
             'lvgl/lvgl',
             'track/track.elf',

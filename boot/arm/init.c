@@ -87,7 +87,7 @@ char uart_getc() {
     return r=='\r'?'\n':r;
 }
 
-#else
+#elif defined(RASPI2)
 void init_uart() {
   register unsigned int r;
 
@@ -135,6 +135,28 @@ char uart_getc() {
     /* convert carrige return to newline */
     return r=='\r'?'\n':r;
 }
+
+#elif defined(STM32F4XX)
+void init_uart(){
+
+}
+
+void uart_send(unsigned int c) {
+  // u32 addr = 0x01c28000;
+	// while((io_read32(addr + 0x7c) & (0x1 << 1)) == 0);
+	// io_write32(addr + 0x00, c);
+}
+
+char uart_getc() {
+    // char r;
+    // /* wait until something is in the buffer */
+    // do{asm volatile("nop");}while(*UART0_FR&0x10);
+    // /* read it and return */
+    // r=(char)(*UART0_DR);
+    // /* convert carrige return to newline */
+    // return r=='\r'?'\n':r;
+}
+
 #endif
 
 void print_string(const unsigned char* str) {

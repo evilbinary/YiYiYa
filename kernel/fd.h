@@ -6,6 +6,8 @@
 #ifndef FD_H
 #define FD_H
 
+#include "config.h"
+
 #define STDIN 0
 #define STDOUT 1
 #define STDERR 2
@@ -17,6 +19,11 @@
 #define	O_EXCL			00000200
 #define	O_NOCTTY		00000400
 #define	O_TRUNC			00001000
+
+#ifndef MAX_FD_NUMBER
+#define MAX_FD_NUMBER 512
+#endif
+
 typedef struct fd {
   u32 id;
   u32 type;  // file ,socket, pipe dir

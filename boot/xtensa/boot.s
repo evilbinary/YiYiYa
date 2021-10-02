@@ -9,5 +9,5 @@ halt:
     j halt
 
 .data
-stack: .space 1024
+stack: .space 256
 stack_top:

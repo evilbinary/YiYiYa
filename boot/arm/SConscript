@@ -9,23 +9,27 @@ import os
 Import('env')               
 
 
-# with open('env_dump.txt', 'w') as file:
-#     env_dumped = env.Dump()
-#     for key in env_dumped:
-#         file.write(key)
-
 env.GenerateKernelSize('config.h',['../../init/kernel'])
 
-env.Object('boot', ['boot.s'],ASFLAGS='')
+env.Object('boot', ['boot_'+env['ARCH']+'.s'],ASFLAGS='')
 
-env.Program(target ='init.elf', source = [
+linkflags='-nostdlib -nostartfiles -T boot/arm/link.ld'
+
+source=[ 
     'boot.o',
-    'init.c',
+    'init.c',]
+
+if env['PLATFORM']=='stm32f4xx':
+    linkflags='-nostdlib -nostartfiles -T boot/arm/link-stm32f4xx.ld'
+    source=['init.c']
+
+env.Program(target ='init.elf', source = source+[
+   
     # 'test.o',
     # 'kernel.c',
     env.get('MYLIB')
     ],
     CFLAGS='$CFLAGS -I. -Iinclude',
-    LINKFLAGS= '-nostdlib -nostartfiles -T boot/arm/link.ld')
+    LINKFLAGS= linkflags)
 
 env.Objcopy('init.bin','init.elf',OBJCOPYFLAGS='-O binary -S --strip-debug')

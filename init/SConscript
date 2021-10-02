@@ -27,10 +27,13 @@ kernel=[
     'serial.c',
     ]
 
+
 if env.get('ARCH')=='xtensa':
     # libs.append('../app/libgui/libgui.a')
     # libs.append('../libs/libc/libc.a')
     pass
+elif env.get('ARCH')=='armv7':
+    kernel.append('../boot/arm/boot_armv7.s')
 
 if env.get('MYLIB'):
     libs.append(env.get('MYLIB'))

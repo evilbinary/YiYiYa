@@ -5,6 +5,7 @@
 ********************************************************************/
 
 #include "../interrupt.h"
+#include "platform/platform.h"
 
 extern boot_info_t* boot_info;
 

@@ -11,8 +11,11 @@
 #include "kernel/stdarg.h"
 #include "devfn.h"
 #include "sysfn.h"
+#include "config.h"
 
+#ifndef SYSCALL_NUMBER
 #define SYSCALL_NUMBER 512
+#endif
 
 void* syscall0(u32 num);
 void* syscall1(u32 num,void* arg0);

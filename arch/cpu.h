@@ -11,7 +11,15 @@
 #include "interrupt.h"
 
 #ifdef ARM
-  #include "arm/cpu.h"
+  #ifdef ARMV7_A
+    #include "armv7-a/cpu.h"
+  #elif defined(ARMV7)
+    #include "armv7/cpu.h"
+  #elif defined(ARMV5)
+    #include "armv5/cpu.h"
+  #else
+    #error "no support arm"
+  #endif
 #elif defined(X86)
   #include "x86/cpu.h"
 #elif defined(XTENSA)

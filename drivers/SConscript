@@ -14,7 +14,7 @@ platform=env['PLATFORM']
 
 driver=[]
 other=[]
-if arch=='arm':
+if arch in env['ARCHS']:
     if platform=='v3s':
         other=[
             'gpu/v3s.c',
@@ -25,6 +25,8 @@ if arch=='arm':
             'i2c/v3s.c',
             'gpio/gpio.c',
             'gpio/v3s.c',
+            'spi/spi.c',
+            'spi/v3s.c',
         ]
     elif platform=='raspi2':
         other=[
@@ -38,7 +40,8 @@ if arch=='arm':
             'i2c/bcm2836.c',
             'gpio/gpio.c',
             'gpio/bcm2836.c',
-
+            'spi/spi.c',
+            'spi/bcm2836.c',
             ]
 
     driver=[

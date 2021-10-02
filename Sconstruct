@@ -9,8 +9,14 @@ import math
 import platform 
 plt = platform.system()
 
+support_arm=['armv5','armv6','armv7','armv7-a']
+support_x86=['i386','x86_64']
+support_arch=support_x86
+
 # arch support x86 arm
-# arch='arm'
+# arch='armv7-a'
+# arch='armv7'
+# arch='armv5'
 arch='x86' 
 # arch='xtensa'
 
@@ -19,6 +25,8 @@ platform='intel'
 # platform='v3s'
 # platform='raspi2'
 # platform='esp32'
+# platform='stm32f4xx'
+
 
 DefaultEnvironment(tools=[])
 env = Environment(ENV = {}, tools=['gcc'])
@@ -35,8 +43,9 @@ elif plt=='Darwin':
 else:
     print('no support ^_^!')
 
-if arch=='arm':
+if arch in support_arm:
     cc_prefix='arm-none-eabi-'
+    support_arch=support_arm
 elif arch=='xtensa':
     cc_prefix='xtensa-esp32-elf-'
     cc_path='~/.espressif/tools/xtensa-esp32-elf/esp-2021r1-8.4.0/xtensa-esp32-elf/bin/'
@@ -65,7 +74,8 @@ env = Environment(
         LIBCFLAGS='-Ilibs/include/c/ -DLIBYC',
         # LIBC=['../../app/libmusl/lib/libc.a'],
         # LIBCFLAGS=' -Iapp/libmusl/include/ -Iapp/libmusl/obj/include/ -Iapp/libmusl/arch/generic/ -Iapp/libmusl/arch/arm/ ',
-        USER='--entry main -Tuser.ld'
+        USER='--entry main -Tuser.ld',
+        ARCHS=support_arch
         )
 
 if plt=='Linux':
@@ -73,17 +83,23 @@ if plt=='Linux':
     env['CFLAGS']= env['CFLAGS']+' -no-pie -fno-pic '
     pass
 
-if arch=='arm':
+if arch in support_arm:
     env['APP']=True
     env['USER']='--entry main -Tuser-arm.ld'
     env['MYLIB']= '/opt/local/lib/gcc/arm-none-eabi/9.2.0/libgcc.a'
-    env['CFLAGS']='-march=armv7-a  -mfloat-abi=softfp  -DARM -I. -I./include  -Ilibs/include -g -nostdlib -nostdinc -fno-builtin -c -std=c99 -std=gnu99 -w  -D'+platform.upper() # -DMALLOC_TRACE -mcpu=cortex-a7  -mtune=cortex-a7 -mfpu=vfpv4 -mfloat-abi=hard 
+    env['CFLAGS']='-march='+arch+' -D'+arch.upper().replace('-','_') + '  -DARM -I. -I./include  -Ilibs/include -g -nostdlib -nostdinc -fno-builtin -c -std=c99 -std=gnu99 -w  -D'+platform.upper() # -DMALLOC_TRACE -mcpu=cortex-a7  -mtune=cortex-a7 -mfpu=vfpv4 -mfloat-abi=hard -mfloat-abi=softfp
     #env['CFLAGS']= env['CFLAGS']+ ' -fno-omit-frame-pointer -mapcs -mno-sched-prolog ' #for debug backtrace
     if platform=='raspi2':   
         pass
     elif platform=='v3s':
         env['USER']='--entry main -Tuser-v3s.ld'
         env['LINKLD']='link-v3s.ld'
+    elif platform =='stm32f4xx':
+        env['CFLAGS']= env['CFLAGS']+ ' -mcpu=cortex-m4 -mthumb'
+        env['LINKLD']='link-stm32f4xx.ld'
+    else:
+        env['LINKLD']='link-'+platform+'.ld'
+
 elif arch=='xtensa':
     env['APP']=False
     env['CFLAGS']='-DXTENSA -I. -I./include  -Ilibs/include -g -nostdlib -nostdinc -fno-builtin -c -std=c99 -std=gnu99 -w  -D'+platform.upper()
@@ -147,12 +163,15 @@ SConscript(dirs=['libs/libkernel'], exports='env')
 SConscript(dirs=['drivers'], exports='env')
 kernel=SConscript(dirs=['init'], exports='env')
 
+if arch in support_arm:
+    boot=SConscript(dirs=['boot/arm'], exports='env')
+else:
+    boot=SConscript(dirs=['boot/'+arch], exports='env')
 
-boot=SConscript(dirs=['boot/'+arch], exports='env')
 Depends(boot, kernel)
 
 image=SConscript(dirs=['image'], exports='env')
-Depends(image, kernel)
+Depends(image, boot)
 
 
 SConscript(dirs=['libs/libc'], exports='env')

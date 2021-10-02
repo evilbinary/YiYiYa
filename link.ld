@@ -1,4 +1,4 @@
-ENTRY(_start)
+ENTRY(_kstart)
 K_VIR_ADDR = 0x100000;
 K_PHY_ADDR = 0x100000;
 PAGE_SIZE    = 0x100;

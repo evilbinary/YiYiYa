@@ -9,8 +9,11 @@
 
 #include "arch/arch.h"
 #include "memory.h"
+#include "config.h"
 
+#ifndef MAX_MODULES
 #define MAX_MODULES 256
+#endif
 
 typedef struct module{
     char* name;

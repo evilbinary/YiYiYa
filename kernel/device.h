@@ -7,6 +7,7 @@
 #define DEVICE_H
 
 #include "kernel/kernel.h"
+#include "config.h"
 
 enum {
   DEVICE_KEYBOARD = 0,
@@ -39,7 +40,9 @@ enum {
   DEVICE_TYPE_NET
 };
 
+#ifndef MAX_DEVICE
 #define MAX_DEVICE 256
+#endif
 
 typedef struct stat {
   size_t size;
