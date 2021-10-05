@@ -36,12 +36,28 @@ void timer_init(int hz);
 
 void interrutp_regist(u32 vec, interrupt_handler_t handler);
 
+#if defined(__WIN32__)
+
+#define interrupt_process(X) \
+  asm volatile(              \
+      "push %esp\n"          \
+      "call  _" #X            \
+      " \n"                  \
+      "add $4,%esp\n")
+#else
+
 #define interrupt_process(X) \
   asm volatile(              \
       "push %esp\n"          \
       "call  " #X            \
       " \n"                  \
       "add $4,%esp\n")
+
+#endif
+
+
+
+
 
 #define interrupt_entering_code(VEC, CODE) \
   asm volatile(                            \

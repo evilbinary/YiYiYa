@@ -7,7 +7,11 @@
 
 asm(".code16gcc\n");
 asm("cli\n");
+#if defined(__WIN32__)
+asm("jmpl $0x0000, $_init_boot\n");
+#else
 asm("jmpl $0x0000, $init_boot\n");
+#endif
 
 boot_info_t* boot_info = NULL;
 boot_info_t boot_data;
@@ -354,8 +358,14 @@ void init_boot() {
       "movl %0, %%esp\n"
       "mov %%esp,%%ebp\n"
       :
-      : "m"(kernel_stack_top));
+      : "m"(kernel_stack_top));\
+      
+#if defined(__WIN32__)      
+  asm("jmpl %0, $_start_kernel" ::"i"(GDT_ENTRY_32BIT_CS * GDT_SIZE));
+#else
   asm("jmpl %0, $start_kernel" ::"i"(GDT_ENTRY_32BIT_CS * GDT_SIZE));
+
+#endif
 
   for (;;)
     ;

@@ -34,3 +34,7 @@ app/**/**/target/**
 
 **.lo
 app/launcher/launcher
+
+.vscode/
+.sconsign.dblite
+

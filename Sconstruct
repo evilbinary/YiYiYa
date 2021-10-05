@@ -7,6 +7,7 @@
 import os
 import math
 import platform 
+import sys
 plt = platform.system()
 
 support_arm=['armv5','armv6','armv7','armv7-a']
@@ -31,7 +32,6 @@ platform='intel'
 DefaultEnvironment(tools=[])
 env = Environment(ENV = {}, tools=['gcc'])
 
-
 cc_path='/opt/local/bin/'
 cc_prefix='i386-elf-'
 
@@ -40,8 +40,12 @@ if plt=='Linux':
     cc_prefix=''
 elif plt=='Darwin':
     pass
+elif plt=='Windows':
+    cc_path=''
+    cc_prefix=''
+    pass
 else:
-    print('no support ^_^!')
+    print('no support ^_^! '+plt)
 
 if arch in support_arm:
     cc_prefix='arm-none-eabi-'
@@ -52,6 +56,7 @@ elif arch=='xtensa':
 
 gcc= cc_path+cc_prefix
 env = Environment(
+        ENV=os.environ,
         APP=True,
         CC = gcc+'gcc',
         LD=gcc+'ld',
@@ -82,6 +87,9 @@ if plt=='Linux':
     env['LINKFLAGS']= env['LINKFLAGS']+' -m32'
     env['CFLAGS']= env['CFLAGS']+' -no-pie -fno-pic '
     pass
+elif plt=='Windows':
+    env['CFLAGS']= env['CFLAGS']+' '
+   
 
 if arch in support_arm:
     env['APP']=True
@@ -174,8 +182,8 @@ image=SConscript(dirs=['image'], exports='env')
 Depends(image, boot)
 
 
-SConscript(dirs=['libs/libc'], exports='env')
-app=SConscript(dirs=['app'], exports='env')
+# SConscript(dirs=['libs/libc'], exports='env')
+# app=SConscript(dirs=['app'], exports='env')
 
 
 
