@@ -182,8 +182,8 @@ image=SConscript(dirs=['image'], exports='env')
 Depends(image, boot)
 
 
-# SConscript(dirs=['libs/libc'], exports='env')
-# app=SConscript(dirs=['app'], exports='env')
+SConscript(dirs=['libs/libc'], exports='env')
+app=SConscript(dirs=['app'], exports='env')
 
 
 
