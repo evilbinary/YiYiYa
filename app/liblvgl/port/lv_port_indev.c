@@ -61,10 +61,10 @@ lv_indev_t* indev_button;
 static int32_t encoder_diff;
 static lv_indev_state_t encoder_state;
 
-mouse_data_t mouse;
+static mouse_data_t mouse;
 screen_info_t* screen;
-u32 button_press;
-mouse_data_t current_mouse;
+static u32 button_press;
+static mouse_data_t current_mouse;
 /**********************
  *      MACROS
  **********************/

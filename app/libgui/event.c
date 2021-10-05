@@ -11,8 +11,8 @@ event_t null_event;
 
 aqueue_t queue;
 event_info_t event_info;
-mouse_data_t current_mouse;
-u32 button_press = 0;
+static mouse_data_t current_mouse;
+static u32 button_press = 0;
 
 u8 scan_code;
 u8 shf_p = 0;

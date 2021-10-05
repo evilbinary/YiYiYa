@@ -41,8 +41,12 @@ if env.get('APP'):
     SConscript(dirs=['gui'], exports='env')
     SConscript(dirs=['microui'], exports='env')
     #SConscript(dirs=['jpeg'], exports='env')
+
+
     SConscript(dirs=['file'], exports='env')
+    
     SConscript(dirs=['etk'], exports='env')
+
     SConscript(dirs=['test'], exports='env')
     SConscript(dirs=['bin'], exports='env')
     SConscript(dirs=['lvgl'], exports='env')

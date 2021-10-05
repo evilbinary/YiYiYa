@@ -66,7 +66,7 @@ env = Environment(
         RANLIB=gcc+'ranlib',
         OBJCOPY=gcc+'objcopy',
         AS=gcc+'as',
-        CFLAGS=' -DX86 -march=i486 -I. -I./include -Ilibs/include -g -nostdlib -nostdinc  -fno-builtin -m32 -c -std=c99 -std=gnu99 -w -D'+platform.upper(),
+        CFLAGS='-DDUCK -DX86 -march=i486 -I. -I./include -Ilibs/include -g -nostdlib -nostdinc  -fno-builtin -m32 -c -std=c99 -std=gnu99 -w -D'+platform.upper(),
         #PATH= os.environ['PATH'],
         LIBPATH=['.','../arch/','../driver','../libs/'],
         LINKFLAGS='-nostdlib -nostartfiles -e start  -g ',
@@ -88,8 +88,9 @@ if plt=='Linux':
     env['CFLAGS']= env['CFLAGS']+' -no-pie -fno-pic '
     pass
 elif plt=='Windows':
-    env['CFLAGS']= env['CFLAGS']+' '
-   
+    env['LINKFLAGS']='-nostdlib   ',
+    env['CFLAGS']= env['CFLAGS']+' -ffreestanding -nostdlib -fno-stack-check -fno-stack-protector -mno-stack-arg-probe '
+    env['USER']='--entry main -Tuser.ld   '
 
 if arch in support_arm:
     env['APP']=True

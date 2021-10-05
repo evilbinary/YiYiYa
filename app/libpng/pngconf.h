@@ -21,6 +21,14 @@
 #ifndef PNGCONF_H
 #define PNGCONF_H
 
+#ifdef DUCK
+#undef WIN32
+#undef _Windows
+#undef _WINDOWS
+#undef _WIN32
+#undef __WIN32__
+#endif
+
 #ifndef PNG_BUILDING_SYMBOL_TABLE /* else includes may cause problems */
 
 /* From libpng 1.6.0 libpng requires an ANSI X3.159-1989 ("ISOC90") compliant C

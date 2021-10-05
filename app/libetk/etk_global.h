@@ -27,7 +27,7 @@ struct EtkGlobal_t{
 	EtkInputMethodManager *input_method_manager;
 };
 
-EtkGlobal etkglobal;
+extern EtkGlobal etkglobal;
 
 
 #endif

@@ -203,3 +203,7 @@ void ya_exit(u32 ret){
 int ya_readdir(int fd,int index,struct dirent* dirent){
   return syscall3(SYS_READDIR, fd,index,dirent);
 }
+
+void __main(){
+  printf("main call\n");
+}

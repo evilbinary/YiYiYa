@@ -1,6 +1,15 @@
 #ifndef	_ETK_TYPE_H
 #define _ETK_TYPE_H
 
+#ifdef DUCK
+#undef WIN32
+#undef _Windows
+#undef _WINDOWS
+#undef _WIN32
+#undef __WIN32__
+#endif
+
+
 typedef char   e8;
 typedef short  e16;
 typedef int    e32;

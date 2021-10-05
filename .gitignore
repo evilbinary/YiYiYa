@@ -38,3 +38,5 @@ app/launcher/launcher
 .vscode/
 .sconsign.dblite
 
+**/**/*.exe
+

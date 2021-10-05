@@ -9,7 +9,9 @@
 #include <sys/time.h>
 #include "etk_event.h"
 
-#ifdef WIN32
+#ifdef DUCK
+
+#elif defined(WIN32)
 #include "etk_win32.h"
 #elif defined LINUX
 #include "etk_linux.h"
