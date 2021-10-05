@@ -42,12 +42,9 @@ https://user-images.githubusercontent.com/5143386/133922735-972ddceb-eab6-4102-b
 https://user-images.githubusercontent.com/5143386/121841338-acf76f80-cd10-11eb-98fe-f96cb78ba221.mp4
 
 
-<<<<<<< Updated upstream
 
 
 
-=======
->>>>>>> Stashed changes
 <img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/demo/lvgl-gui.png?raw=true" width="800px" />
       
 <img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/demo/lvgl2.png?raw=true" width="800px" />
