@@ -44,7 +44,6 @@ typedef struct vga_device {
   u32 bpp;
   u32 mode;
   u32* frambuffer;
-  u32* pframbuffer;
   u32 framebuffer_count;
   u32 framebuffer_index;
   u32 framebuffer_length;
@@ -52,6 +51,7 @@ typedef struct vga_device {
   write_pixel_fn write;
   flip_buffer_fn flip_buffer;
   u32* priv;
+  u32* pframbuffer;
 } vga_device_t;
 
 size_t vga_read(device_t* dev, void* buf, size_t len);

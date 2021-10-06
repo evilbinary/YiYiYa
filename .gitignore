@@ -40,3 +40,6 @@ app/launcher/launcher
 
 **/**/*.exe
 
+init/kernel
+
+kernel.map
