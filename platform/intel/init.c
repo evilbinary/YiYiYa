@@ -9,8 +9,8 @@ int com_is_send() { return io_read8(PORT_COM1 + 5) & 0x20; }
 int com_is_receive() { return io_read8(PORT_COM1 + 5) & 1; }
 
 void com_write(char a) {
-  while (is_send() == 0)
-    ;
+  // while (is_send() == 0)
+  //   ;
   io_write8(PORT_COM1, a);
 }
 
