@@ -43,3 +43,7 @@ app/launcher/launcher
 init/kernel
 
 kernel.map
+
+zdata/**
+
+image/disk.img

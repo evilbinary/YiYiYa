@@ -25,20 +25,18 @@ void do_shell_thread(void) {
   u32 col = 0;
   u32 row = 0;
   syscall1(SYS_PRINT, "#");
-
-  // move_cursor();
   char buf[2] = {0};
 #ifdef X86
   // int fd = syscall2(SYS_OPEN, "/dev/stdin", 0);
   // syscall2(SYS_EXEC,"/dev/sda/hello",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/gui.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/file.elf",NULL);
-  syscall2(SYS_EXEC, "/dev/sda/etk.elf", NULL);
+  // syscall2(SYS_EXEC, "/dev/sda/etk.elf", NULL);
   // syscall2(SYS_EXEC,"/dev/sda/launcher",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/track.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/test.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/microui.elf",NULL);
-  // syscall2(SYS_EXEC,"/dev/sda/lvgl",NULL);
+  syscall2(SYS_EXEC,"/dev/sda/lvgl",NULL);
   // kprintf("fd=>%d\n",fd);
 #else defined(ARM)
   // syscall2(SYS_EXEC,"/dev/sda/hello-rs",NULL);

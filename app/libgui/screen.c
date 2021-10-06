@@ -12,7 +12,6 @@
 #include "syscall.h"
 
 screen_info_t gscreen;
-u32 gfd;
 
 u8 SCREEN_ASCII[] = {
 
@@ -559,14 +558,13 @@ void screen_init() {
   int fd = open("/dev/fb", 0);
   printf("screen init fd:%d\n",fd);
   gscreen.fd = fd;
-  gfd = fd;
   ioctl(fd, IOC_READ_FRAMBUFFER_INFO, &(gscreen.fb),
         sizeof(framebuffer_info_t));
   gscreen.buffer = gscreen.fb.frambuffer;
   gscreen.width = gscreen.fb.width;
   gscreen.height = gscreen.fb.height;
   gscreen.bpp = gscreen.fb.bpp;
-  printf("screen init %dx%d bpp:%d\n",gscreen.width,gscreen.height,gscreen.fb.bpp);
+  printf("screen init %dx%d bpp:%d fb count:%d\n",gscreen.width,gscreen.height,gscreen.fb.bpp,gscreen.fb.framebuffer_count);
   event_init();
 }
 
@@ -583,7 +581,7 @@ void screen_flush() {
   gscreen.buffer = gscreen.fb.frambuffer + gscreen.width * gscreen.height *
                                                gscreen.fb.framebuffer_index;
 
-  ioctl(gfd, IOC_FLUSH_FRAMBUFFER, current_index);
+  ioctl(gscreen.fd, IOC_FLUSH_FRAMBUFFER, current_index);
 }
 
 void do_screen_thread(void) {

@@ -18,6 +18,7 @@ SECTIONS {
     . = ALIGN(4);
     *(.rodata)         /* .rodata sections (constants, strings, etc.) */
     *(.rodata*)        /* .rodata* sections (constants, strings, etc.) */
+    *(*SCREEN_ASCII)
     . = ALIGN(4);
   } > flash
 
