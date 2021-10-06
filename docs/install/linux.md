@@ -6,7 +6,7 @@ linux下开发环境比较简单，以ubuntu举例。
 
 ```bash
 
-pip install scons
+apt install scons
 
 ```
 
@@ -14,7 +14,7 @@ pip install scons
 
 ```bash
 
-apt-get install qemu
+apt install qemu
 
 ```
 
