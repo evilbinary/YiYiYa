@@ -15,7 +15,7 @@ source=[
     'sinclock.c',
     'mine.c',
     'terminal.c',
-    'light.c',
+    # 'light.c',
     'power.c',
     'temhum.c',
     'status.c',

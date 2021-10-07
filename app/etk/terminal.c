@@ -18,8 +18,8 @@ const char* prompt = "yiyiya$ ";
 bool running = true;
 bool cursor = true;
 bool focused = true;
-str_t* text_buf = NULL;
-str_t* input_buf = NULL;
+static str_t* g_text_buf = NULL;
+static str_t* g_input_buf = NULL;
 u32 last_time = 0;
 
 u32 fd_ptm;
@@ -65,7 +65,7 @@ void str_append(str_t* str, const char* text) {
 
     strncpy(new_buf, str->buf, str->buf_len);
     new_buf[str->buf_len] = 0;
-    free(str->buf);
+    // free(str->buf);
 
     str->buf = new_buf;
     str->buf_len = 2 * needed;
@@ -88,10 +88,26 @@ void send_input(str_t* input_buf) {
 
 void interpret_cmd(char* cmd) {
   fprintf(file_out, "interpret cmd: %s\n", cmd);
+  if(strlen(cmd)<=0){
+    return;
+  }
+
   if (!strcmp(cmd, "exit")) {
     running = false;
     return;
   }
+
+  if(strcmp("help",cmd)==0){
+    printf("welcome to yiyiya os,have fun! ^_^!!\n");
+    return;
+  }else if(strcmp("ls",cmd)==0){
+    printf("ls not support ^_^!!\n");
+    return;
+  }else{
+    printf("not support ^_^!!\n");
+    return;
+  }
+
   u32 n_args = 0;
   char** args = NULL;
   char* next = cmd;
@@ -115,18 +131,12 @@ void interpret_cmd(char* cmd) {
   int32_t ret = 0;
   char buf[128];
   sprintf(buf, "/dev/sda/%s", args[0]);
-  ret = execl(buf, args);
-  fprintf(file_out, "exec ret=%d\n", ret);
-  if (ret < 0) {
-    printf("exec error\n");
-  } else {
-    printf("\n");
-  }
-  // u32 cmdret = etk_terminal_get_cmd_result();
-  // if (cmdret > 0) {
-  //   // fprintf(file_out,"cmd ret:%d text:%s\n", cmdret, text_buf->buf);
-  // }else{
-  //     // fprintf(file_out,"cmd ret< 0 :%d text:%s\n", cmdret, text_buf->buf);
+  // ret = execl(buf, args);
+  // fprintf(file_out, "exec ret=%d\n", ret);
+  // if (ret < 0) {
+  //   printf("exec error\n");
+  // } else {
+  //   printf("\n");
   // }
 
   while (args && *args) {
@@ -236,7 +246,7 @@ Ret etk_terminal_paint(EtkWidget* thiz) {
   }
   // thiz->canvas->draw_rect(thiz->canvas, 0, 0, thiz->rect.width,
   //                         thiz->rect.height, 0x00353535);
-  redraw(thiz, text_buf, input_buf);
+  redraw(thiz, g_text_buf, g_input_buf);
 }
 
 int etk_terminal_get_cmd_result() {
@@ -251,17 +261,17 @@ int etk_terminal_get_cmd_result() {
       ret_buf[nread] = '\0';
       printf("read from ptm\n");
       // fprintf(file_out,"read from ptm size:%d result:%s\n", nread, ret_buf);
-      str_append(text_buf, "\n");
-      str_append(text_buf, ret_buf);
+      str_append(g_text_buf, "\n");
+      str_append(g_text_buf, ret_buf);
       anything_read = true;
       break;
     } else {
-      str_append(text_buf, "\n");
+      str_append(g_text_buf, "\n");
       break;
     }
   }
   if (anything_read) {
-    str_append(text_buf, prompt);
+    str_append(g_text_buf, prompt);
   }
   // fprintf(file_out,"get cmd result end\n");
   return anything_read;
@@ -304,31 +314,31 @@ static Ret etk_terminal_event(EtkWidget* thiz, EtkEvent* event) {
       switch (key) {
         case 0x0a:  // enter
         case 0x0d:
-          str_append(text_buf, input_buf->buf);
-          send_input(input_buf);
-          if (input_buf->len > 0) {
+          str_append(g_text_buf, g_input_buf->buf);
+          send_input(g_input_buf);
+          if (g_input_buf->len > 0) {
             u32 cmdret = etk_terminal_get_cmd_result();
             if (cmdret > 0) {
-              printf("cmd ret:%d text:%s\n", cmdret, text_buf->buf);
+              printf("cmd ret:%d text:%s\n", cmdret, g_text_buf->buf);
             }
           }
-          if (input_buf != NULL) {
-            input_buf->buf[0] = '\0';
-            input_buf->len = 0;
+          if (g_input_buf != NULL) {
+            g_input_buf->buf[0] = '\0';
+            g_input_buf->len = 0;
           }
 
           break;
         case 0x08:  // delete
-          if (input_buf->len) {
-            input_buf->buf[input_buf->len - 1] = '\0';
-            input_buf->len -= 1;
+          if (g_input_buf->len) {
+            g_input_buf->buf[g_input_buf->len - 1] = '\0';
+            g_input_buf->len -= 1;
           }
           break;
         default:
           if (key < 0xf0) {
             char str[2] = "\0\0";
             str[0] = key;
-            str_append(input_buf, str);
+            str_append(g_input_buf, str);
           }
           break;
       }
@@ -353,8 +363,8 @@ EtkWidget* etk_terminal(e32 x, e32 y, e32 width, e32 height) {
   thiz->event = etk_terminal_event;
   thiz->paint = etk_terminal_paint;
 
-  text_buf = str_new(prompt);
-  input_buf = str_new("");
+  g_text_buf = str_new(prompt);
+  g_input_buf = str_new("");
   cursor = true;
 
   max_col = twidth / char_width - 1;

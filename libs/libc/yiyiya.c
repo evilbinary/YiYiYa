@@ -57,7 +57,7 @@ void* ya_alloc(size_t size) {
     if (block->size >= size) {
       *head = block->next;
       void* addr=((char*)block) + sizeof(free_block_t);
-      memset(addr,0,s);
+      // memset(addr,0,s);
       return addr;
     }
     head = &(block->next);
@@ -68,7 +68,7 @@ void* ya_alloc(size_t size) {
   block->size = size;
 
   void* addr = ((char*)block) + sizeof(free_block_t);
-  memset(addr,0,s);
+  // memset(addr,0,s);
   return addr;
 }
 

@@ -9,7 +9,7 @@
 
 #define ISR_SYSCALL 0x30
 
-#ifdef ARM
+#if defined(ARM)|| defined(X86)
 enum {
   SYS_EXIT = 1,
   SYS_FORK = 2,
