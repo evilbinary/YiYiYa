@@ -56,7 +56,9 @@ void* ya_alloc(size_t size) {
   while (block != 0) {
     if (block->size >= size) {
       *head = block->next;
-      return ((char*)block) + sizeof(free_block_t);
+      void* addr=((char*)block) + sizeof(free_block_t);
+      memset(addr,0,s);
+      return addr;
     }
     head = &(block->next);
     block = block->next;
@@ -66,15 +68,14 @@ void* ya_alloc(size_t size) {
   block->size = size;
 
   void* addr = ((char*)block) + sizeof(free_block_t);
+  memset(addr,0,s);
   return addr;
 }
 
 void ya_free(void* ptr) {
   free_block_t* block = (free_block_t*)(((char*)ptr) - sizeof(free_block_t));
-  memset(ptr,0,block->size);
   block->next = free_block_list_head.next;
-  free_block_list_head.next = block;
-  
+  free_block_list_head.next = block;  
 }
 
 void* ya_valloc(void* addr, size_t size) {

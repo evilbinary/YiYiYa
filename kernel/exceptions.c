@@ -55,7 +55,7 @@ void exception_info(interrupt_context_t *context) {
       kprintf("interrupt %d", context->no);
     }
     if(current!=NULL){
-        kprintf(" tid %d",current->id);
+        kprintf("\ntid %d %s ",current->id,current->name);
     }
     kprintf("\n----------------------------\n");
     context_dump_interrupt(context);

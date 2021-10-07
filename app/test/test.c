@@ -263,7 +263,7 @@ int main(int argc, char* argv[]) {
   // test_syscall();
   // test_pc();
   // syscall0(12);
-  test_fork();
+  // test_fork();
   // test_pty();
   // test_dup();
   // test_dup2();

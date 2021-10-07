@@ -18,8 +18,8 @@ const char* prompt = "yiyiya$ ";
 bool running = true;
 bool cursor = true;
 bool focused = true;
-str_t* text_buf=NULL;
-str_t* input_buf=NULL;
+str_t* text_buf = NULL;
+str_t* input_buf = NULL;
 u32 last_time = 0;
 
 u32 fd_ptm;
@@ -77,6 +77,10 @@ void str_append(str_t* str, const char* text) {
 
 void send_input(str_t* input_buf) {
   char* cmd = input_buf->buf;
+  if (cmd == NULL) {
+    printf("input buf cmd is null\n");
+    return;
+  }
   printf("send ptm command %s\n", cmd);
   int len = strlen(cmd);
   write(fd_ptm, cmd, len);
@@ -112,7 +116,7 @@ void interpret_cmd(char* cmd) {
   char buf[128];
   sprintf(buf, "/dev/sda/%s", args[0]);
   ret = execl(buf, args);
-  fprintf(file_out,"exec ret=%d\n",ret);
+  fprintf(file_out, "exec ret=%d\n", ret);
   if (ret < 0) {
     printf("exec error\n");
   } else {
@@ -126,12 +130,12 @@ void interpret_cmd(char* cmd) {
   // }
 
   while (args && *args) {
-    free(*args);
+    // free(*args);
     args++;
-    fprintf(file_out,"free args\n");
+    fprintf(file_out, "free args\n");
   }
-  free(args);
-  fprintf(file_out,"cmd end\n");
+  // free(args);
+  fprintf(file_out, "cmd end\n");
 }
 
 char* scroll_view(char* str) {
@@ -170,7 +174,10 @@ void redraw(EtkWidget* thiz, str_t* text_buf, const str_t* input_buf) {
   EtkRect t = priv->head_rect;
   EtkCanvas* can = thiz->canvas;
   EtkRect r = thiz->rect;
-  etk_canvas_fill_rect(thiz->canvas, 0, t.height, r.width, r.height, bg_color);
+  if (thiz->canvas != NULL) {
+    etk_canvas_fill_rect(thiz->canvas, 0, t.height, r.width, r.height,
+                         bg_color);
+  }
 
   u32 y = 20;
   str_append(text_buf, input_buf->buf);
@@ -203,7 +210,6 @@ void redraw(EtkWidget* thiz, str_t* text_buf, const str_t* input_buf) {
       line_buf[max_col] = '\0';
       text_view += max_col;
     }
-
     // snow_draw_string(win->fb, line_buf, margin, y, text_color);
     etk_canvas_draw_string_with_color(can, margin, y, line_buf, text_color,
                                       bg_color);
@@ -225,8 +231,11 @@ void redraw(EtkWidget* thiz, str_t* text_buf, const str_t* input_buf) {
 }
 
 Ret etk_terminal_paint(EtkWidget* thiz) {
-  thiz->canvas->draw_rect(thiz->canvas, 0, 0, thiz->rect.width,
-                          thiz->rect.height, 0x00353535);
+  if (thiz->canvas == NULL || thiz->canvas->draw_rect == NULL) {
+    return;
+  }
+  // thiz->canvas->draw_rect(thiz->canvas, 0, 0, thiz->rect.width,
+  //                         thiz->rect.height, 0x00353535);
   redraw(thiz, text_buf, input_buf);
 }
 
@@ -237,7 +246,7 @@ int etk_terminal_get_cmd_result() {
   for (int i = 0; i < 1; i++) {
     // fprintf(file_out,"start read from ptm\n");
     printf("start read\n");
-    nread = read(fd_ptm, ret_buf, ret_buf_size - 1);
+    nread = read(fd_ptm, ret_buf, ret_buf_size);
     if (nread >= 0) {
       ret_buf[nread] = '\0';
       printf("read from ptm\n");
@@ -246,9 +255,9 @@ int etk_terminal_get_cmd_result() {
       str_append(text_buf, ret_buf);
       anything_read = true;
       break;
-    }else{
-       str_append(text_buf, "\n");
-       break;
+    } else {
+      str_append(text_buf, "\n");
+      break;
     }
   }
   if (anything_read) {
@@ -263,11 +272,11 @@ void etk_terminal_do_cmd() {
   u32 pts = ioctl(fd_ptm, IOC_SLAVE);
   char buf[256];
   u32 len = 256;
-  memset(buf,0,256);
+  memset(buf, 0, 256);
   sprintf(buf, "/dev/pts/%d", pts);
   fd_pts = open(buf, "r");
   if (fd_pts < 0) {
-    printf("error get pts %d\n",pts);
+    printf("error get pts %d\n", pts);
   }
   printf("ptm %d pts %d\n", fd_ptm, fd_pts);
   fd_out = dup(STDOUT_FILENO);
@@ -300,11 +309,13 @@ static Ret etk_terminal_event(EtkWidget* thiz, EtkEvent* event) {
           if (input_buf->len > 0) {
             u32 cmdret = etk_terminal_get_cmd_result();
             if (cmdret > 0) {
-              //printf("cmd ret:%d text:%s\n", cmdret, text_buf->buf);
+              printf("cmd ret:%d text:%s\n", cmdret, text_buf->buf);
             }
           }
-          input_buf->buf[0] = '\0';
-          input_buf->len = 0;
+          if (input_buf != NULL) {
+            input_buf->buf[0] = '\0';
+            input_buf->len = 0;
+          }
 
           break;
         case 0x08:  // delete
@@ -358,7 +369,7 @@ EtkWidget* etk_terminal(e32 x, e32 y, e32 width, e32 height) {
   pid = fork();
   if (pid != 0) {  // parent
     printf("fork parent\n");
-    // ioctl(fd_ptm, IOC_MASTER_READ_NOBLOCK);
+    ioctl(fd_ptm, IOC_MASTER_READ_NOBLOCK);
   } else {  //  child
     etk_terminal_do_cmd();
   }

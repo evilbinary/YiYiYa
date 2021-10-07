@@ -21,8 +21,8 @@ int etk_app_main(int argc, char* argv[]) {
   e32 i;
   e32 xsize, ysize, xspan, yspan, startx, starty, x, y;
 
-  e8 button_name[9][10] = {"视频", "终端", "温度",  "记事本",
-                           "照片",  "扫雷",  "时钟","状态","关于" };
+  e8 button_name[9][10] = {"视频", "终端", "温度", "记事本", "照片",
+                           "扫雷", "时钟", "状态", "关于"};
   manager = etk_get_wnd_manager();
   jpeg_decoder = etk_image_jpeg_decoder_create();
   bmp_decoder = etk_image_bmp_decoder_create();
@@ -138,33 +138,33 @@ int etk_app_main(int argc, char* argv[]) {
   etk_button_set_clicked_listener(buttons[i], button8_listener, buttons[i]);
   i++;
 
-
- {
+  {
     EtkSource* timer;
     wins[0] = etk_create_window(20, 120, 200, 150, ETK_WIDGET_WINDOW);
     timer = etk_source_timer_create(100, timer2_listener, wins[0]);
     etk_sources_manager_add(etk_default_sources_manager(), timer);
   }
 
-  // wins[1]=etk_power_create(300,200,250,200);
-	// etk_widget_append_child(desktop,wins[1]);
-  // wins[2]=etk_light_create(100,100,250,180);
-  // etk_widget_append_child(desktop,wins[2]);
+  // wins[1] = etk_power_create(300, 200, 250, 200);
+  // etk_widget_append_child(desktop, wins[1]);
+  // wins[2] = etk_light_create(100, 600, 250, 180);
+  // etk_widget_append_child(desktop, wins[2]);
 
-  wins[3]=etk_temhum_create(10,50,200,290);
-   etk_widget_append_child(desktop,wins[3]);
-	wins[4]=etk_status_create(200,100,200,150);
-   etk_widget_append_child(desktop,wins[4]);
+  wins[3] = etk_temhum_create(10, 50, 200, 290);
+  etk_widget_append_child(desktop, wins[3]);
+
+  wins[4] = etk_status_create(200, 400, 200, 150);
+  etk_widget_append_child(desktop, wins[4]);
 
   // clock
-  wins[6]=etk_app_clock(840, 40, 180, 180);
+  wins[6] = etk_app_clock(840, 40, 180, 180);
 
   // //mine
-  wins[7]=etk_game_mine(10, 30, 8, 8, 10);
+  wins[7] = etk_game_mine(10, 30, 8, 8, 10);
   // wins[7]=etk_game_mine(160, 230, 10, 10, 14);
   // etk_game_mine(340, 30, 16, 16, 20);
   EtkWidget* terminal = etk_terminal(340, 140, 420, 340);
-  wins[8]=terminal;
+  wins[8] = terminal;
 
   etk_wnd_manager_set_active_widget(etk_get_wnd_manager(), terminal);
 

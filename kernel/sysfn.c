@@ -139,7 +139,7 @@ void sys_exit(int status) {
   thread_t* current = thread_current();
   thread_exit(current, status);
   thread_dumps();
-  kprintf("sys exit tid %d status %d\n", current->id, status);
+  kprintf("sys exit tid %d %s status %d\n", current->id,current->name,status);
 }
 
 void* sys_vmap(void* addr, size_t size) {
