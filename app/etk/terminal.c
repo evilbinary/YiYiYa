@@ -18,8 +18,8 @@ const char* prompt = "yiyiya$ ";
 bool running = true;
 bool cursor = true;
 bool focused = true;
-str_t* text_buf;
-str_t* input_buf;
+str_t* text_buf=NULL;
+str_t* input_buf=NULL;
 u32 last_time = 0;
 
 u32 fd_ptm;
@@ -100,18 +100,19 @@ void interpret_cmd(char* cmd) {
     u32 n = (u32)strchrnul(next, ' ') - (u32)next;
     args[n_args - 1] = strndup(next, n);
     args[n_args] = NULL;
-    fprintf(file_out, "arg[%d]: %s", n_args - 1, args[n_args - 1]);
+    fprintf(file_out, "arg[%d]: %s\n", n_args - 1, args[n_args - 1]);
     next = strchrnul(next, ' ');
   }
 
   if (!args) {
+    fprintf(file_out, "no args\n");
     return;
   }
   int32_t ret = 0;
-  // ret = execl((uintptr_t)args[0], (uintptr_t)args);
   char buf[128];
   sprintf(buf, "/dev/sda/%s", args[0]);
   ret = execl(buf, args);
+  fprintf(file_out,"exec ret=%d\n",ret);
   if (ret < 0) {
     printf("exec error\n");
   } else {
@@ -119,14 +120,18 @@ void interpret_cmd(char* cmd) {
   }
   // u32 cmdret = etk_terminal_get_cmd_result();
   // if (cmdret > 0) {
-  //   printf("cmd ret:%d text:%s\n", cmdret, text_buf->buf);
+  //   // fprintf(file_out,"cmd ret:%d text:%s\n", cmdret, text_buf->buf);
+  // }else{
+  //     // fprintf(file_out,"cmd ret< 0 :%d text:%s\n", cmdret, text_buf->buf);
   // }
 
   while (args && *args) {
     free(*args);
     args++;
+    fprintf(file_out,"free args\n");
   }
   free(args);
+  fprintf(file_out,"cmd end\n");
 }
 
 char* scroll_view(char* str) {
@@ -229,20 +234,27 @@ int etk_terminal_get_cmd_result() {
   u32 nread;
   u8 anything_read = false;
   memset(ret_buf, 0, ret_buf_size);
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < 1; i++) {
+    // fprintf(file_out,"start read from ptm\n");
+    printf("start read\n");
     nread = read(fd_ptm, ret_buf, ret_buf_size - 1);
     if (nread >= 0) {
       ret_buf[nread] = '\0';
-      printf("read from ptm size:%d result:%s\n", nread, ret_buf);
+      printf("read from ptm\n");
+      // fprintf(file_out,"read from ptm size:%d result:%s\n", nread, ret_buf);
       str_append(text_buf, "\n");
       str_append(text_buf, ret_buf);
       anything_read = true;
       break;
+    }else{
+       str_append(text_buf, "\n");
+       break;
     }
   }
   if (anything_read) {
     str_append(text_buf, prompt);
   }
+  // fprintf(file_out,"get cmd result end\n");
   return anything_read;
 }
 
@@ -288,7 +300,7 @@ static Ret etk_terminal_event(EtkWidget* thiz, EtkEvent* event) {
           if (input_buf->len > 0) {
             u32 cmdret = etk_terminal_get_cmd_result();
             if (cmdret > 0) {
-              printf("cmd ret:%d text:%s\n", cmdret, text_buf->buf);
+              //printf("cmd ret:%d text:%s\n", cmdret, text_buf->buf);
             }
           }
           input_buf->buf[0] = '\0';

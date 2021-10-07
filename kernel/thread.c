@@ -324,9 +324,21 @@ void thread_dump(thread_t* thread) {
 }
 
 void thread_dumps() {
+  char *state_str[]={
+    "CREATE",
+    "RUNNING",
+    "RUNABLE",
+    "STOPPED",
+    "WAITING"
+    "SLEEP"
+  };
+  char* str="UNKNOW";
   kprintf("\n--------------dump all thread--------------\n");
   kprintf("tid state counter\n");
   for (thread_t* p = head_thread; p != NULL; p = p->next) {
-    kprintf("%d  %d %d\n", p->id, p->state, p->counter);
+    if(p->state<=THREAD_SLEEP){
+      str=state_str[p->state];
+    }
+    kprintf("%d  %s %d\n", p->id, str, p->counter);
   }
 }

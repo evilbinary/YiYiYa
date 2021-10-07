@@ -48,11 +48,16 @@ void exception_info(interrupt_context_t *context) {
   if (context->no != 14) {
     thread_t *current = thread_current();
     if (context->no < sizeof exception_msg) {
-      kprintf("exception %d: %s\n----------------------------\n", context->no,
+      kprintf("exception %d: %s", context->no,
               exception_msg[context->no]);
+   
     } else {
-      kprintf("interrupt %d\n----------------------------\n", context->no);
+      kprintf("interrupt %d", context->no);
     }
+    if(current!=NULL){
+        kprintf(" tid %d",current->id);
+    }
+    kprintf("\n----------------------------\n");
     context_dump_interrupt(context);
   }
 #endif

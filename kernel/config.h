@@ -12,7 +12,7 @@
 
 #define MAX_FD_NUMBER 200
 #define MAX_PHDR 16
-#define MAX_SHDR 24
+#define MAX_SHDR 28
 
 #define MAX_DEVICE 512
 

@@ -81,6 +81,9 @@ extern FILE *stdin;
 extern FILE *stdout;
 extern FILE *stderr;
 
+#define	STDIN_FILENO	0
+#define	STDOUT_FILENO	1
+#define	STDERR_FILENO	2
 
 void  clearerr(FILE *);
 char *ctermid(char *);
