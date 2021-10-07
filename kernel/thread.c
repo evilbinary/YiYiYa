@@ -351,17 +351,17 @@ void thread_dumps() {
                        "sleep"};
   char* str = "unkown";
   kprintf("\n--------------dump all thread--------------\n");
-  kprintf("tid name state counter\n");
+  kprintf("tid    name                 state    counter\n");
   for (thread_t* p = head_thread; p != NULL; p = p->next) {
     if (p->state <= THREAD_SLEEP) {
       str = state_str[p->state];
     }
-    kprintf("%d ", p->id);
+    kprintf("%-6d ", p->id);
     if (p->name != NULL) {
-      kprintf("%s ", p->name);
+      kprintf("%-20s ", p->name);
     } else {
       kprintf("   ");
     }
-    kprintf("%s %d\n", str, p->counter);
+    kprintf("%-8s %d\n", str, p->counter);
   }
 }
