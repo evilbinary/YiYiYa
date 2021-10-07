@@ -280,7 +280,7 @@ void do_page_fault(interrupt_context_t *context) {
     if (mode == USER_MODE) {
       vmemory_area_t *area = vmemory_area_find(current->vmm, fault_addr, 0);
       if (area == NULL) {
-        kprintf("tid: %d memory fault at %x\n", current->id, fault_addr);
+        kprintf("tid: %d %s memory fault at %x\n", current->id,current->name, fault_addr);
         dump_fault(context, fault_addr);
         thread_exit(current, -1);
         cpu_halt();
@@ -292,7 +292,7 @@ void do_page_fault(interrupt_context_t *context) {
         valloc(fault_addr, PAGE_SIZE);
       } else {
         // valloc(fault_addr, PAGE_SIZE);
-        kprintf("tid: %d phy: %x remap memory fault at %x\n", current->id, phy,
+        kprintf("tid: %d %s phy: %x remap memory fault at %x\n", current->id,current->name, phy,
                 fault_addr);
         dump_fault(context, fault_addr);
         // mmu_dump_page(current->context.page_dir,current->context.page_dir,0);
@@ -357,7 +357,7 @@ void do_page_fault(interrupt_context_t *context) {
     if (current != NULL) {
       vmemory_area_t *area = vmemory_area_find(current->vmm, fault_addr, 0);
       if (area == NULL) {
-        kprintf("\ntid: %d memory fault at %x\n", current->id, fault_addr);
+        kprintf("\ntid: %d %s memory fault at %x\n",current->id,current->name, fault_addr);
         dump_fault(context, fault_addr);
         thread_exit(current, -1);
         return;
@@ -370,7 +370,7 @@ void do_page_fault(interrupt_context_t *context) {
       if (phy == NULL) {
         valloc(fault_addr, PAGE_SIZE);
       } else {
-        kprintf("tid: %d phy remap memory fault at %x\n", current->id,
+        kprintf("tid: %d %s phy remap memory fault at %x\n", current->id,current->name,
                 fault_addr);
         dump_fault(context, fault_addr);
         thread_exit(current, -1);
