@@ -225,7 +225,7 @@ int sys_fork() {
   }
   thread_t* copy_thread = thread_clone(current, STACK_ADDR, THREAD_STACK_SIZE);
 
-  kprintf("-------dump current thread %d-------------\n", current->id);
+  kprintf("-------dump current thread %d %s-------------\n", current->id);
   thread_dump(current);
   kprintf("-------dump clone thread %d-------------\n", copy_thread->id);
   thread_dump(copy_thread);

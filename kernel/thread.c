@@ -329,6 +329,9 @@ void thread_dump_fd(thread_t* thread) {
 void thread_dump(thread_t* thread) {
   if (thread == NULL) return;
   kprintf("id       %d\n", thread->id);
+  if(thread->name!=NULL){
+    kprintf("name   %s\n", thread->name);
+  }
   kprintf("priority %d\n", thread->priority);
   kprintf("counter  %d\n", thread->counter);
   kprintf("state    %d\n", thread->state);
