@@ -387,3 +387,15 @@ int sys_rt_sigprocmask(int h, void *set, void* old_set){
   kprintf("sys sigprocmask not impl\n");
   return 0;
 }
+
+
+unsigned int sys_alarm(unsigned int seconds){
+  kprintf("sys alarm not impl\n");
+  return -1;
+}
+
+int sys_unlink(const char * pathname){
+  kprintf("sys unlink not impl %s\n",pathname);
+  return -1;
+}
+

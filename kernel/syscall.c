@@ -53,6 +53,9 @@ void syscall_init() {
   syscall_table[SYS_MPROTECT] = &sys_mprotect;
   syscall_table[SYS_RT_SIGPROCMASK] = &sys_rt_sigprocmask;
 
+  syscall_table[SYS_ALARM] = &sys_alarm;
+  syscall_table[SYS_UNLINK] = &sys_unlink;
+
   
   
 }

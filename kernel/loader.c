@@ -115,7 +115,7 @@ int load_elf(Elf32_Ehdr* elf_header, u32 fd, page_dir_t* page) {
   // data
   offset = elf_header->e_shoff;
   if (elf_header->e_shnum > MAX_SHDR) {
-    kprintf("shnum %d > MAX_SHDR\n", elf_header->e_shnum);
+    kprintf("shnum %d > MAX_SHDR %d\n", elf_header->e_shnum,MAX_SHDR);
     return -1;
   }
   Elf32_Shdr shdr[MAX_SHDR];

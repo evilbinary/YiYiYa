@@ -8,7 +8,7 @@
 
 #include "kernel.h"
 
-#ifdef ARM
+#if defined(ARM)|| defined(X86)
 enum {
   SYS_EXIT = 1,
   SYS_FORK = 2,
@@ -16,10 +16,12 @@ enum {
   SYS_WRITE = 4,
   SYS_OPEN = 5,
   SYS_CLOSE = 6,
+  SYS_UNLINK = 10,
   SYS_EXEC = 11,
   SYS_CHDIR= 12,
   SYS_SEEK = 19,
   SYS_GETPID = 20,
+  SYS_ALARM = 27,
   SYS_PIPE = 42,
   SYS_DUP = 41,
   SYS_BRK = 45,
@@ -141,5 +143,10 @@ void* sys_mmap2(void* addr, int length, int prot, int flags, int fd,
 int sys_mprotect(const void *start, size_t len, int prot);
 
 int sys_rt_sigprocmask(int, void *set, void* old_set);
+
+
+unsigned int sys_alarm(unsigned int seconds);
+
+int sys_unlink(const char * pathname);
 
 #endif
