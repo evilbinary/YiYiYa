@@ -29,6 +29,7 @@
 #endif
 typedef struct thread {
     u32 id;
+    u8* name;
     context_t context;
     int priority;
     int counter;
@@ -50,7 +51,11 @@ typedef struct thread {
 
 
 thread_t * thread_create(void* entry,void* data);
+thread_t * thread_create_name(char* name,void* entry,void* data);
 thread_t* thread_create_ex(void* entry, u32* stack0, u32* stack3, u32 size,
+                           void* data);
+
+thread_t* thread_create_ex_name(char* name,void* entry, u32* stack0, u32* stack3, u32 size,
                            void* data);
 
 void thread_sleep(thread_t * thread);

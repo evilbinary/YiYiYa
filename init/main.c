@@ -105,8 +105,8 @@ int kmain(int argc, char* argv[]) {
   module_regist(&hello_module);
 #endif
 
-  thread_t* t0 = thread_create((u32*)&do_serial_thread,NULL);
-  thread_t* t1 = thread_create((u32*)&do_shell_thread,NULL);
+  thread_t* t0 = thread_create_name("serial",(u32*)&do_serial_thread,NULL);
+  thread_t* t1 = thread_create_name("shell",(u32*)&do_shell_thread,NULL);
 
   kprintf("thread run\n");
   thread_run(t0);

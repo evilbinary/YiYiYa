@@ -14,12 +14,29 @@ thread_t* tail_thread = NULL;
 u32 thread_ids = 0;
 extern context_t* current_context;
 
+thread_t* thread_create_name(char* name, void* entry, void* data) {
+  thread_t* t = thread_create(entry, data);
+  char* kname = kmalloc(kstrlen(name));
+  kstrcpy(kname, name);
+  t->name = name;
+  return t;
+}
+
 thread_t* thread_create(void* entry, void* data) {
   u32 size = THREAD_STACK_SIZE;
   u8* stack0 = kmalloc(size);
-  u8* stack3 = kmalloc_alignment(size,PAGE_SIZE);
+  u8* stack3 = kmalloc_alignment(size, PAGE_SIZE);
   thread_t* thread = thread_create_ex(entry, stack0, stack3, data, size);
   return thread;
+}
+
+thread_t* thread_create_ex_name(char* name, void* entry, u32* stack0,
+                                u32* stack3, u32 size, void* data) {
+  thread_t* t = thread_create_ex(entry, stack0, stack3, size, data);
+  char* kname = kmalloc(kstrlen(name));
+  kstrcpy(kname, name);
+  t->name = name;
+  return t;
 }
 
 thread_t* thread_create_ex(void* entry, u32* stack0, u32* stack3, u32 size,
@@ -197,6 +214,7 @@ thread_t* thread_clone(thread_t* thread, u32* vstack3, u32 size) {
   copy->vmm = thread->vmm;
   copy->data = thread->data;
   copy->pid = thread->id;
+  copy->name = thread->name;
 
   // copy files
   copy->fd_size = thread->fd_size;
@@ -214,7 +232,7 @@ thread_t* thread_clone(thread_t* thread, u32* vstack3, u32 size) {
   kmemmove(copy_stack0, thread->stack0, size);
 
   // copy stack3
-  u8* copy_stack3 = kmalloc_alignment(size,PAGE_SIZE);
+  u8* copy_stack3 = kmalloc_alignment(size, PAGE_SIZE);
   u8* copy_stack3_top = copy_stack3 + size;
   copy->stack3_top = copy_stack3_top;
   copy->stack3 = copy_stack3;
@@ -233,7 +251,7 @@ thread_t* thread_clone(thread_t* thread, u32* vstack3, u32 size) {
   if (vstack3 != NULL) {
     // may ref by vmm area
     u32 offset = 0;
-    for (int i = 0; i < (size/PAGE_SIZE +1); i++) {
+    for (int i = 0; i < (size / PAGE_SIZE + 1); i++) {
       u8* p_thread_stack3 = (u8*)thread->stack3 + offset;
       p_thread_stack3 =
           virtual_to_physic(thread->context.page_dir, p_thread_stack3);
@@ -241,7 +259,8 @@ thread_t* thread_clone(thread_t* thread, u32* vstack3, u32 size) {
         kprintf("thread stack3 is null\n");
         continue;
       }
-      // kprintf("copy_stack3 %x p_thread_stack3 %x thread->stack3 %x\n",copy_stack3,p_thread_stack3,thread->stack3 );
+      // kprintf("copy_stack3 %x p_thread_stack3 %x thread->stack3
+      // %x\n",copy_stack3,p_thread_stack3,thread->stack3 );
       kmemmove(copy_stack3 + offset, p_thread_stack3, PAGE_SIZE);
       map_page_on(copy->context.page_dir, vstack3 + offset,
                   copy_stack3 + offset, PAGE_P | PAGE_USU | PAGE_RWW);
@@ -324,21 +343,22 @@ void thread_dump(thread_t* thread) {
 }
 
 void thread_dumps() {
-  char *state_str[]={
-    "CREATE",
-    "RUNNING",
-    "RUNABLE",
-    "STOPPED",
-    "WAITING"
-    "SLEEP"
-  };
-  char* str="UNKNOW";
+  char* state_str[] = {"create", "running", "runnable", "stopped",
+                       "waitting"
+                       "sleep"};
+  char* str = "unkown";
   kprintf("\n--------------dump all thread--------------\n");
-  kprintf("tid state counter\n");
+  kprintf("tid name state counter\n");
   for (thread_t* p = head_thread; p != NULL; p = p->next) {
-    if(p->state<=THREAD_SLEEP){
-      str=state_str[p->state];
+    if (p->state <= THREAD_SLEEP) {
+      str = state_str[p->state];
     }
-    kprintf("%d  %s %d\n", p->id, str, p->counter);
+    kprintf("%d ", p->id);
+    if (p->name != NULL) {
+      kprintf("%s ", p->name);
+    } else {
+      kprintf("   ");
+    }
+    kprintf("%s %d\n", str, p->counter);
   }
 }

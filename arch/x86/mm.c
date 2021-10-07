@@ -177,6 +177,7 @@ void* virtual_to_physic(u64* page_dir_ptr_tab, void* vaddr) {
     return NULL;
   }
   void* phyaddr = page_tab_ptr[pte_index] & ~0xFFF;
+  // kprintf("virtual_to_physic %x\n",phyaddr);
   return phyaddr;
 }
 
@@ -214,8 +215,8 @@ void page_clone(u32* old_page, u32* new_page) {
 }
 
 
-u32* page_alloc_clone(u32* kernel_page_dir){
+u32* page_alloc_clone(u32* old_page_dir){
   u32* page_dir_ptr_tab = kmalloc_alignment(sizeof(u64) * 4, 0x1000);
-  page_clone(kernel_page_dir, page_dir_ptr_tab);
+  page_clone(old_page_dir, page_dir_ptr_tab);
   return page_dir_ptr_tab;
 }
