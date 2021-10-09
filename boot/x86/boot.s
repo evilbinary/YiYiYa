@@ -23,9 +23,7 @@ bits 16
     mov bx,init_base
     call load_init
 
-    ; mov ax,0x0000
-    ; mov es,ax
-    mov si,0x200
+    mov si,load_init_success
     call print_string
 
     ;;跳转loader地址
@@ -52,8 +50,9 @@ dend:
 
 %include "boot/x86/util.s"
 
-boot db "boot duck",0
-disk_erro db "read boot disk erro",0
+boot db "boot duck",0x0a,0x0d,0
+disk_erro db "read boot disk erro",0x0a,0x0d,0
+load_init_success db "load init success",0x0a,0x0d,0
 
 times 510-($-$$)  db 0
 dw 0xaa55
