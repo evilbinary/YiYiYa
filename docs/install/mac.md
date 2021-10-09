@@ -5,7 +5,7 @@ mac可以使用port或者brew。
 ### 安装scons
 
 ```bash
-pip install qemu
+pip install scons
 ``` 
 
 ### 安装qemu
