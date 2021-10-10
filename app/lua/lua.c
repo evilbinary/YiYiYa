@@ -197,6 +197,7 @@ static int dochunk (lua_State *L, int status) {
 
 
 static int dofile (lua_State *L, const char *name) {
+  printf("dofile %s\n",name);
   return dochunk(L, luaL_loadfile(L, name));
 }
 
@@ -605,6 +606,11 @@ static int pmain (lua_State *L) {
   if(argv==NULL){
     printf("no args\n");
     return has_error;
+  }else{
+    printf('argc %d\n',argc);
+    for(int i=0;i<argc;i++){
+      printf("argv[%d]=%s\n",i,argv[i]);
+    }
   }
 
   int script;
@@ -660,8 +666,12 @@ int main (int argc, char **argv) {
   lua_pushcfunction(L, &pmain);  /* to call 'pmain' in protected mode */
   lua_pushinteger(L, argc);  /* 1st argument */
   lua_pushlightuserdata(L, argv); /* 2nd argument */
+  printf("call\n");
   status = lua_pcall(L, 2, 1, 0);  /* do the call */
+  printf("call status %d\n",status);
+
   result = lua_toboolean(L, -1);  /* get result */
+  printf("call ret %d\n",result);
   report(L, status);
   lua_close(L);
   return (result && status == LUA_OK) ? EXIT_SUCCESS : EXIT_FAILURE;
