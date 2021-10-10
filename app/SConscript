@@ -57,8 +57,8 @@ if env.get('APP'):
 
     SConscript(dirs=['launcher'], exports='env')
 
-    # SConscript(dirs=['liblua'], exports='env')
-    # SConscript(dirs=['lua'], exports='env')
+    SConscript(dirs=['liblua'], exports='env')
+    SConscript(dirs=['lua'], exports='env')
 
     
 

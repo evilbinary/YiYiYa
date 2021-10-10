@@ -399,3 +399,9 @@ int sys_unlink(const char * pathname){
   return -1;
 }
 
+
+int sys_rename(const char* old,const char* new){
+  kprintf("sys rename not impl %s\n",old);
+
+  return -1;
+}

@@ -11,16 +11,19 @@
 
 #if defined(ARM)|| defined(X86)
 enum {
-  SYS_EXIT = 1,
+ SYS_EXIT = 1,
   SYS_FORK = 2,
   SYS_READ = 3,
   SYS_WRITE = 4,
   SYS_OPEN = 5,
   SYS_CLOSE = 6,
+  SYS_UNLINK = 10,
   SYS_EXEC = 11,
   SYS_CHDIR= 12,
   SYS_SEEK = 19,
   SYS_GETPID = 20,
+  SYS_ALARM = 27,
+  SYS_RENAME=38,
   SYS_PIPE = 42,
   SYS_DUP = 41,
   SYS_BRK = 45,
@@ -42,6 +45,9 @@ enum {
   SYS_VALLOC = 508,
   SYS_VFREE = 509,
   SYS_VHEAP = 510,
+  SYS_MMAP2=192,
+  SYS_MPROTECT=125,
+  SYS_RT_SIGPROCMASK=175,
   
 
 };
@@ -74,6 +80,7 @@ enum {
   SYS_DUP,
   SYS_DUP2,
   SYS_READDIR,
+  SYS_RENAME,
   SYS_BRK,
   SYS_PRINT,
   SYS_PRINT_AT,

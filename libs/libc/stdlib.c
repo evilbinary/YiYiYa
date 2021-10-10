@@ -315,3 +315,12 @@ char *getenv(const char *name) {
       if (!strncmp(name, *e, l) && l[*e] == '=') return *e + l + 1;
   return 0;
 }
+
+int system(const char *cmd){
+  return execv(cmd, NULL);
+}
+
+
+int rename(const char *old, const char *new){
+  return ya_rename(old,new);
+}

@@ -205,6 +205,10 @@ int ya_readdir(int fd,int index,struct dirent* dirent){
   return syscall3(SYS_READDIR, fd,index,dirent);
 }
 
+int ya_rename(const char *old, const char *new){
+  return syscall2(SYS_RENAME,old,new);
+}
+
 void __main(){
   printf("main call\n");
 }

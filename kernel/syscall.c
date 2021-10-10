@@ -55,6 +55,8 @@ void syscall_init() {
 
   syscall_table[SYS_ALARM] = &sys_alarm;
   syscall_table[SYS_UNLINK] = &sys_unlink;
+  syscall_table[SYS_RENAME] = &sys_rename;
+
 
   
   

@@ -22,6 +22,7 @@ enum {
   SYS_SEEK = 19,
   SYS_GETPID = 20,
   SYS_ALARM = 27,
+  SYS_RENAME=38,
   SYS_PIPE = 42,
   SYS_DUP = 41,
   SYS_BRK = 45,

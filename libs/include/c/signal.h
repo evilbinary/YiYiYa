@@ -1,5 +1,9 @@
 #ifndef _SIGNAL_H
 #define _SIGNAL_H
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #define SIGABRT			1
 #define SIGALRM			2
@@ -40,11 +44,13 @@ typedef struct
 #endif
 
 
+typedef int sig_atomic_t;
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#define SIG_ERR  ((void (*)(int))-1)
+#define SIG_DFL  ((void (*)(int)) 0)
+#define SIG_IGN  ((void (*)(int)) 1)
+
 		
 
 int    raise(int);

@@ -23,7 +23,7 @@ if env.get('MYLIB'):
 
 
 source+=['../../app/liblua/liblua.a',
-        '../libmusl/lib/libm.a',
+        # '../libmusl/lib/libm.a',
         # '/opt/local/lib/gcc/arm-none-eabi/9.2.0/libgcc.a'
 
 ]+env['LIBC']

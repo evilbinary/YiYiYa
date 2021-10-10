@@ -8,6 +8,11 @@
 #include "stdint.h"
 #include "stddef.h"
 
+
+#define EXIT_FAILURE 1
+#define EXIT_SUCCESS 0
+
+
 typedef struct {
   int quot;
   int rem;

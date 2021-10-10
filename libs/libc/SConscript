@@ -32,6 +32,7 @@ source=[
     'ioctl.c',
     'dirent.c',
     'assert.c',
+    'locale.c',
 ]
 
 if env['ARCH'] in env['ARCHS']:
