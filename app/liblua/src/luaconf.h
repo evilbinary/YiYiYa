@@ -537,7 +537,7 @@
 #if defined(LLONG_MAX)		/* { */
 /* use ISO C99 stuff */
 
-#define LUA_INTEGER		long long
+#define LUA_INTEGER		int
 #define LUA_INTEGER_FRMLEN	"ll"
 
 #define LUA_MAXINTEGER		LLONG_MAX

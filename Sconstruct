@@ -85,7 +85,8 @@ env = Environment(
 
 if plt=='Linux':
     env['LINKFLAGS']= env['LINKFLAGS']+' -m32'
-    env['CFLAGS']= env['CFLAGS']+' -no-pie -fno-pic '
+    env['CFLAGS']= env['CFLAGS']+' -no-pie -fno-pic -Llibgcc.a '
+    #env['MYLIB']= ''
     pass
 elif plt=='Windows':
     env['LINKFLAGS']='-nostdlib   ',

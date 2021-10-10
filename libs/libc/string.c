@@ -10,6 +10,7 @@
 // #include "limits.h"
 // #include <stdlib.h>
 #include <string.h>
+#include "locale.h"
 
 void* memcpy(void* /* restrict */ s1, const void* /* restrict */ s2, size_t n) {
   char* cdest;
@@ -288,4 +289,11 @@ char* strchrnul(const char* s, int c) {
   for (; *s && *(unsigned char*)s != c; s++)
     ;
   return (char*)s;
+}
+
+
+int strcoll(const char *l, const char *r)
+{
+	// return __strcoll_l(l, r, CURRENT_LOCALE);
+  return strcmp(l, r);
 }

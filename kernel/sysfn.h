@@ -149,5 +149,6 @@ int sys_rt_sigprocmask(int, void *set, void* old_set);
 unsigned int sys_alarm(unsigned int seconds);
 
 int sys_unlink(const char * pathname);
+int sys_rename(const char* old,const char* new);
 
 #endif
