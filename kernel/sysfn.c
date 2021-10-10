@@ -202,10 +202,15 @@ u32 sys_exec(char* filename, char* const argv[], char* const envp[]) {
   vmemory_area_add(t->vmm, stack);
 
   // init data
+  int argc=0;
+  while (argv[argc]!=NULL){
+    argc++;
+  }
+  
   exec_t* data = kmalloc(sizeof(exec_t) + 4);
   kstrcpy(data->filename, filename);
   data->argv = argv;
-  data->argc = 1;
+  data->argc = argc;
   t->data = data;
 
   // init fds

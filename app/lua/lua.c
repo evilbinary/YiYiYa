@@ -268,6 +268,7 @@ static int handle_script (lua_State *L, char **argv) {
 static int collectargs (char **argv, int *first) {
   int args = 0;
   int i;
+
   for (i = 1; argv[i] != NULL; i++) {
     *first = i;
     if (argv[i][0] != '-')  /* not an option? */
@@ -600,6 +601,12 @@ static void doREPL (lua_State *L) {
 static int pmain (lua_State *L) {
   int argc = (int)lua_tointeger(L, 1);
   char **argv = (char **)lua_touserdata(L, 2);
+
+  if(argv==NULL){
+    printf("no args\n");
+    return has_error;
+  }
+
   int script;
   int args = collectargs(argv, &script);
   luaL_checkversion(L);  /* check that interpreter has correct version */
@@ -646,6 +653,9 @@ int main (int argc, char **argv) {
   if (L == NULL) {
     l_message(argv[0], "cannot create state: not enough memory");
     return EXIT_FAILURE;
+  }
+  for(int i=0;i<argc;i++){
+    printf("argv %s\n",argv[i]);
   }
   lua_pushcfunction(L, &pmain);  /* to call 'pmain' in protected mode */
   lua_pushinteger(L, argc);  /* 1st argument */
