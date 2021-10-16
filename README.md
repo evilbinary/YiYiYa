@@ -14,10 +14,12 @@ https://github.com/evilbinary/YiYiYa
 scons
 ```
 
+具体见文档：[安装文档](https://github.com/evilbinary/YiYiYa/tree/main/docs/install)
+
 ### 运行镜像
 
 ```
-scons --run=qemu
+scons -Q init && scons --run=qemu
 ```
 
 ### FAQ
