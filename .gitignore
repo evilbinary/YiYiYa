@@ -47,3 +47,9 @@ kernel.map
 zdata/**
 
 image/disk.img
+
+
+app/lua/lua
+app/lua/luac
+app/lua/luat
+app/rust/test/test-rs

@@ -20,7 +20,6 @@ source=[
     'support.c',
     'unistd.c',
     'fcntl.c',
-    'setjmp.c',
     'yiyiya.c',
     'time.c',
     'signal.c',
@@ -43,9 +42,12 @@ if env['ARCH'] in env['ARCHS']:
         'arm/setjmp.S'
     ]
 elif env['ARCH']=='x86':
-    source=source+[
-        'i386/longjmp.s',
-        'i386/setjmp.s'
+    # source=source+[
+    #     'i386/longjmp.s',
+    #     'i386/setjmp.s'
+    # ]
+    source=source+[    
+        'setjmp.c',
     ]
 
 if env.get('MYLIB'):

@@ -17,5 +17,12 @@
     "**/*.o": true,
     "**/*.a": true,
   },
-  "C_Cpp.errorSquiggles": "Disabled"
+  "C_Cpp.errorSquiggles": "Disabled",
+  "files.associations": {
+    "array": "cpp",
+    "string_view": "cpp",
+    "initializer_list": "cpp",
+    "utility": "cpp",
+    "sstream": "c"
+  }
 }

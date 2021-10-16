@@ -6,6 +6,7 @@
 # ********************************************************************
 import os
 import platform 
+import copy
 plt = platform.system()
 
 Import('env')
@@ -28,6 +29,13 @@ if env.get('ARCH')=='xtensa':
 
 if env.get('MYLIB'):
     libs.append(env.get('MYLIB'))
+
+def check_exit(apps):
+    new_list = copy.deepcopy(apps)
+    for app in new_list:
+        if os.path.exists(app)==False:
+            print('ignore app '+app)
+            apps.remove(app)
 
 if env.get('APP'):
     SConscript(dirs=['libjpeg'], exports='env')
@@ -68,7 +76,7 @@ if env.get('APP'):
             'file/file.elf',
             'etk/etk.elf',
             'test/test.elf',
-            # 'test/test-musl.elf',
+            'rust/test/test-rs',
             'lua/lua',
             'lua/luat',
             'lua/hello.lua',
@@ -77,6 +85,8 @@ if env.get('APP'):
             'track/track.elf',
             'launcher/launcher'
             ]
+    check_exit(apps)
+
     if plt=='Darwin':
         env.Command('copyhello', 
             apps,
@@ -86,7 +96,7 @@ if env.get('APP'):
     elif plt=='Linux':
         env.Command('copyhello', 
             apps,
-            ['sudo losetup /dev/loop10 image/disk.img && sudo mount /dev/loop10 /mnt && sudo cp ${SOURCES} /mnt && sudo umount /mnt && sudo losetup -d /dev/loop10'
+            ['sudo losetup /dev/loop10 image/disk.img && sudo mount /dev/loop10 /mnt && sudo cp  ${SOURCES} /mnt && sudo umount /mnt && sudo losetup -d /dev/loop10'
         ])
 else:
     pass

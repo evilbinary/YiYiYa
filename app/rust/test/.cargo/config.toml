@@ -1,0 +1,13 @@
+[target.armv7a-none-eabi]
+rustflags = [   "-C", "link-arg=-Tuser-arm.ld" ,
+                ]
+[target.i686-unknown-linux-musl]
+rustflags = [   "-C", "link-arg=-Tuser.ld",
+                "-C","link-args=-nostdlib",
+                "-C","link-args=-nostdinc",
+                "-C","link-args=-nostartfiles"
+                ]
+
+[build]
+#target = "armv7a-none-eabi"
+target = "i686-unknown-linux-musl"

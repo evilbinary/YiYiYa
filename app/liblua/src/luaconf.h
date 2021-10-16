@@ -11,6 +11,7 @@
 #include <limits.h>
 #include <stddef.h>
 
+#define LUAI_ASSERT 
 
 /*
 ** ===================================================================
@@ -771,7 +772,6 @@
 #define LUAI_MAXALIGN  lua_Number n; double u; void *s; lua_Integer i; long l
 
 /* }================================================================== */
-
 
 
 

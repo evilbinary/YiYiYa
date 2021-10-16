@@ -31,7 +31,10 @@ void do_shell_thread(void) {
   // syscall2(SYS_EXEC,"/dev/sda/hello",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/gui.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/file.elf",NULL);
-  syscall2(SYS_EXEC, "/dev/sda/etk.elf", NULL);
+  // syscall2(SYS_EXEC, "/dev/sda/luat", NULL);
+  // syscall2(SYS_EXEC, "/dev/sda/etk.elf", NULL);
+
+  syscall2(SYS_EXEC,"/dev/sda/test-rs",NULL);
   // char* argv[] = {
   //     "lua",
   //     "hello.lua",

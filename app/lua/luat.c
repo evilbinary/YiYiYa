@@ -3,14 +3,12 @@
 #include "lualib.h"
 
 lua_State *L;
-
 const char lua_src[] = {
     "print(\"hello lua!\")\n"
     };
 
 void lua_test(void) {
   printf("luat test\n");
-
   L = luaL_newstate();
   printf("luat test 1\n");
   luaL_openlibs(L);

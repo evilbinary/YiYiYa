@@ -111,6 +111,41 @@
             ],
             "preLaunchTask": "Build and run"
         },
+        {
+            "name": "lua with GDB",
+            "type": "cppdbg",
+            "request": "launch",
+            "miDebuggerServerAddress": "localhost:1234",
+            // "program": "${workspaceRoot}/app/hello/hello.elf",
+            "program": "${workspaceRoot}/app/lua/lua",
+            "cwd": "${workspaceRoot}",
+            "args": [],
+            "sourceFileMap": {
+                "<source-path>": "<target-path>"
+            },
+            "targetArchitecture": "x86",
+            "MIMode": "gdb",
+            "miDebuggerPath": "gdb",
+            "miDebuggerArgs": "",
+            "customLaunchSetupCommands": [
+                // {
+                //     "text": "target remote localhost:1234",
+                //     "description": "Connect to QEMU remote debugger"
+                // }
+            ],
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "text": "set architecture i386:intel ",
+                    "description": "set architecture i386"
+                },
+            ],
+            "preLaunchTask": "Build and run"
+        },
 {
             "name": "test with GDB",
             "type": "cppdbg",

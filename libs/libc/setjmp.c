@@ -1,6 +1,6 @@
 #include "setjmp.h"
 
-#ifdef __i386__
+#ifdef X86
 int setjmp(jmp_buf env) {
   asm volatile(
       "mov %0, %%eax\n"
