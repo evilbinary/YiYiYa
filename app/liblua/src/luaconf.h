@@ -47,6 +47,7 @@
 /*
 ** By default, Lua on Windows use (some) specific Windows features
 */
+#undef _WIN32
 #if !defined(LUA_USE_C89) && defined(_WIN32) && !defined(_WIN32_WCE)
 #define LUA_USE_WINDOWS  /* enable goodies for regular Windows */
 #endif
@@ -109,7 +110,7 @@
 
 
 /* Default configuration ('long long' and 'double', for 64-bit Lua) */
-#define LUA_INT_DEFAULT		LUA_INT_LONGLONG
+#define LUA_INT_DEFAULT		LUA_INT_INT
 #define LUA_FLOAT_DEFAULT	LUA_FLOAT_DOUBLE
 
 
@@ -537,7 +538,7 @@
 #if defined(LLONG_MAX)		/* { */
 /* use ISO C99 stuff */
 
-#define LUA_INTEGER		int
+#define LUA_INTEGER		long long
 #define LUA_INTEGER_FRMLEN	"ll"
 
 #define LUA_MAXINTEGER		LLONG_MAX
@@ -781,10 +782,4 @@
 ** Local configuration. You can use this space to add your redefinitions
 ** without modifying the main part of the file.
 */
-
-
-
-
-
 #endif
-
