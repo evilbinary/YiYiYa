@@ -184,7 +184,7 @@ void run_elf_thread() {
 #ifdef DEBUG
     kprintf("entry %x\n", entry);
 #endif
-    ret = entry(exec_data.argc, exec_data.argv);
+    ret = entry(exec_data.argc, exec_data.argv,exec_data.envp);
   }
   syscall1(SYS_EXIT, ret);
 }

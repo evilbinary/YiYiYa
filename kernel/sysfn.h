@@ -29,10 +29,11 @@ enum {
   SYS_IOCTL = 54,
   SYS_DUP2 = 63,
   SYS_GETPPID = 64,
+  SYS_READDIR=89,
   SYS_WRITEV=146,
   SYS_READV=145,
-  SYS_READDIR,
   SYS_YIELD = 158,
+  SYS_SET_THREAD_AREA=243,
   SYS_PRINT = 500,
   SYS_PRINT_AT = 501,
   SYS_DEV_READ = 502,
@@ -150,5 +151,7 @@ unsigned int sys_alarm(unsigned int seconds);
 
 int sys_unlink(const char * pathname);
 int sys_rename(const char* old,const char* new);
+
+int sys_set_thread_area(void* set);
 
 #endif

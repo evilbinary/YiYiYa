@@ -36,9 +36,10 @@ typedef struct exec{
     char filename[EXEC_FILE_NAME_LEN];
     int argc;
     char** argv;
+    char **envp;
 }exec_t;
 
-typedef int (*entry_fn)(int, char**);
+typedef int (*entry_fn)(int, char**,char**);
 
 void run_elf_thread();
 

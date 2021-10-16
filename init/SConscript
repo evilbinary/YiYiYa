@@ -10,7 +10,7 @@ plt = platform.system()
 
 Import('env')
 
-linkflags=' $LINKFLAGS -T'+env.get('LINKLD')
+linkflags=' $LINKFLAGS -Xlinker -Map=kernel.map -T'+env.get('LINKLD')
 
 libs=[
      '../drivers/libdriver.a',

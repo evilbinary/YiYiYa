@@ -8,6 +8,31 @@ rustflags = [   "-C", "link-arg=-Tuser.ld",
                 "-C","link-args=-nostartfiles"
                 ]
 
+[target.i586-unknown-linux-gnu]
+rustflags = [   "-C", "link-arg=-Tuser.ld",
+                "-C","link-args=-nostdlib",
+                "-C","link-args=-nostdinc",
+                "-C","link-args=-nostartfiles"
+                ]
+[target.i686-unknown-freebsd]
+rustflags = [   "-C", "link-arg=-Tuser.ld",
+                "-C","link-args=-nostdlib",
+                "-C","link-args=-nostdinc",
+                "-C","link-args=-nostartfiles"
+                ]
+
+[target.i686-unknown-haiku]
+rustflags = [   "-C", "link-arg=-Tuser.ld",
+                "-C","link-args=-nostdlib",
+                "-C","link-args=-nostdinc",
+                "-C","link-args=-nostartfiles"
+                ]
+
+
+
 [build]
 #target = "armv7a-none-eabi"
-target = "i686-unknown-linux-musl"
+# target = "i686-unknown-linux-musl"
+dtarget = "i586-unknown-linux-gnu"
+# target = "i686-unknown-freebsd"
+# target="i686-unknown-haiku"

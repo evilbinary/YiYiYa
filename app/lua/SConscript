@@ -33,12 +33,17 @@ source2=[
     '../../app/liblua/liblua.a',
     ]+env['LIBC']
 
+if env.get('MYLIB'):
+    source2.append(env.get('MYLIB'))
+
 
 source_luat=[
     'luat.c',
     '../../app/liblua/liblua.a',
     ]+env['LIBC']
 
+if env.get('MYLIB'):
+    source_luat.append(env.get('MYLIB'))
 
 
 env.Program('lua', source,

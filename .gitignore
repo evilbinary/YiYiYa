@@ -53,3 +53,5 @@ app/lua/lua
 app/lua/luac
 app/lua/luat
 app/rust/test/test-rs
+
+kernel.map

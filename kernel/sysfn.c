@@ -203,14 +203,15 @@ u32 sys_exec(char* filename, char* const argv[], char* const envp[]) {
 
   // init data
   int argc=0;
-  while (argv[argc]!=NULL){
+  while (argv!=NULL&&argv[argc]!=NULL){
     argc++;
   }
   
-  exec_t* data = kmalloc(sizeof(exec_t) + 4);
+  exec_t* data = kmalloc(sizeof(exec_t));
   kstrcpy(data->filename, filename);
   data->argv = argv;
   data->argc = argc;
+  data->envp = envp;
   t->data = data;
 
   // init fds
@@ -409,4 +410,10 @@ int sys_rename(const char* old,const char* new){
   kprintf("sys rename not impl %s\n",old);
 
   return -1;
+}
+
+
+int sys_set_thread_area(void* set){
+  kprintf("sys set thread area not impl \n");
+  return 1;
 }

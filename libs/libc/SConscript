@@ -22,6 +22,7 @@ source=[
     'fcntl.c',
     'yiyiya.c',
     'time.c',
+    'setjmp.c',
     'signal.c',
     'timeb.c',
     'strings.c',

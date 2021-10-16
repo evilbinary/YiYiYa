@@ -10,10 +10,10 @@
 #include "cpu.h"
 #include "gpio.h"
 
-#define PAGE_DIR_NUMBER 4096 * 4
+#define PAGE_DIR_NUMBER 4096 *1
 
 extern boot_info_t* boot_info;
-static u32 page_dir[PAGE_DIR_NUMBER] __attribute__((aligned(0x4000)));
+static u32 page_dir[PAGE_DIR_NUMBER] __attribute__((aligned(0x100)));
 
 void map_page_on(page_dir_t* l1, u32 virtualaddr, u32 physaddr, u32 flags) {
   u32 l1_index = virtualaddr >> 20;

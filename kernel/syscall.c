@@ -57,7 +57,9 @@ void syscall_init() {
   syscall_table[SYS_UNLINK] = &sys_unlink;
   syscall_table[SYS_RENAME] = &sys_rename;
 
+  syscall_table[SYS_RENAME] = &sys_rename;
 
+  syscall_table[SYS_SET_THREAD_AREA]=&sys_set_thread_area;
   
   
 }

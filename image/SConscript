@@ -45,7 +45,7 @@ if env.get('ARCH')=='x86':
   pass
 elif env.get('ARCH') in env['ARCHS']:
   if env['ARCH'] =='armv7':
-    run_qemu_cmd='qemu-system-gnuarmeclipse --board STM32F429I-Discovery --mcu STM32F429ZI   -rtc base=localtime -kernel init/kernel.elf  -serial stdio -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor  -D ./qemu.log  -d in_asm -d cpu_reset -d in_asm,int,mmu' #-drive if=sd,id=sd0,format=raw,file=image/disk.img #-d in_asm -d cpu_reset -d in_asm,int,mmu
+    run_qemu_cmd='qemu-system-gnuarmeclipse --board STM32F429I-Discovery --mcu STM32F429ZI   -rtc base=localtime -kernel init/kernel.elf  -serial stdio  -D ./qemu.log -d unimp,guest_errors --semihosting-config enable' #-d in_asm -d cpu_reset -d in_asm,int,mmu -d   -drive if=sd,id=sd0,format=raw,file=image/disk.img #-d in_asm -d cpu_reset -d in_asm,int,mmu
     debug_qemu_cmd = run_qemu_cmd
   else:
     run_qemu_cmd='qemu-system-arm -M raspi2  -rtc base=localtime -kernel image/duck.img  -serial stdio -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor  -D ./qemu.log -drive if=sd,id=sd0,format=raw,file=image/disk.img -d in_asm -d cpu_reset -d in_asm,int,mmu' #-d in_asm -d cpu_reset -d in_asm,int,mmu

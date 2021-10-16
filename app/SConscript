@@ -65,8 +65,8 @@ if env.get('APP'):
 
     SConscript(dirs=['launcher'], exports='env')
 
-    SConscript(dirs=['liblua'], exports='env')
-    SConscript(dirs=['lua'], exports='env')
+    # SConscript(dirs=['liblua'], exports='env')
+    # SConscript(dirs=['lua'], exports='env')
 
     
 
@@ -77,15 +77,15 @@ if env.get('APP'):
             'etk/etk.elf',
             'test/test.elf',
             'rust/test/test-rs',
-            'lua/lua',
-            'lua/luat',
+            # 'lua/lua',
+            # 'lua/luat',
             'lua/hello.lua',
             'bin/ls',
             'lvgl/lvgl',
             'track/track.elf',
             'launcher/launcher'
             ]
-    check_exit(apps)
+    #check_exit(apps)
 
     if plt=='Darwin':
         env.Command('copyhello', 

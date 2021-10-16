@@ -16,17 +16,17 @@ support_arch=support_x86
 
 # arch support x86 arm
 # arch='armv7-a'
-# arch='armv7'
+arch='armv7'
 # arch='armv5'
-arch='x86' 
+# arch='x86' 
 # arch='xtensa'
 
 # board select platform
-platform='intel'
+# platform='intel'
 # platform='v3s'
 # platform='raspi2'
 # platform='esp32'
-# platform='stm32f4xx'
+platform='stm32f4xx'
 
 
 DefaultEnvironment(tools=[])
@@ -79,41 +79,46 @@ env = Environment(
         LIBCFLAGS='-Ilibs/include/c/ -DLIBYC',
         # LIBC=['../../app/libmusl/lib/libc.a',],#'/opt/local/lib/gcc/i386-elf/9.2.0/libgcc.a'
         # LIBCFLAGS=' -Iapp/libmusl/include/ -Iapp/libmusl/obj/include/ -Iapp/libmusl/arch/generic/ -Iapp/libmusl/arch/arm/ ',
-        USER='--entry main -Tuser.ld',
+        USER='--entry main -Txlinker/user.ld',
         ARCHS=support_arch
         )
 
 if plt=='Linux':
-    env['LINKFLAGS']= env['LINKFLAGS']+' -m32'
+    if arch in support_arm:
+        pass
+    else:
+        env['LINKFLAGS']= env['LINKFLAGS']+' -m32'
     env['CFLAGS']= env['CFLAGS']+' -no-pie -fno-pic -Llibgcc.a '
     #env['MYLIB']= ''
     pass
 elif plt=='Windows':
     env['LINKFLAGS']='-nostdlib   ',
     env['CFLAGS']= env['CFLAGS']+' -ffreestanding -nostdlib -fno-stack-check -fno-stack-protector -mno-stack-arg-probe '
-    env['USER']='--entry main -Tuser.ld   '
+    env['USER']='--entry main -Txlinker/user.ld   '
 
 if arch in support_arm:
     env['APP']=True
-    env['USER']='--entry main -Tuser-arm.ld'
-    env['MYLIB']= '/opt/local/lib/gcc/arm-none-eabi/9.2.0/libgcc.a'
-    env['CFLAGS']='-march='+arch+' -D'+arch.upper().replace('-','_') + '  -DARM -I. -I./include  -Ilibs/include -g -nostdlib -nostdinc -fno-builtin -c -std=c99 -std=gnu99 -w  -D'+platform.upper() # -DMALLOC_TRACE -mcpu=cortex-a7  -mtune=cortex-a7 -mfpu=vfpv4 -mfloat-abi=hard -mfloat-abi=softfp
-    #env['CFLAGS']= env['CFLAGS']+ ' -fno-omit-frame-pointer -mapcs -mno-sched-prolog ' #for debug backtrace
+    env['USER']=' --entry main -Txlinker/user-arm.ld '
+    # env['MYLIB']= '/opt/local/lib/gcc/arm-none-eabi/9.2.0/libgcc.a'
+    env['MYLIB']='/lib/gcc/arm-none-eabi/9.2.1/libgcc.a'
+    env['CFLAGS']=' -march='+arch+' -D'+arch.upper().replace('-','_') + '  -DARM -I. -I./include  -Ilibs/include -g -nostdlib -nostdinc -fno-builtin -c -std=c99 -std=gnu99 -w  -D'+platform.upper() # -DMALLOC_TRACE -mcpu=cortex-a7  -mtune=cortex-a7 -mfpu=vfpv4 -mfloat-abi=hard -mfloat-abi=softfp
+
+    #env['CFLAGS']= env['CFLAGS']+ ' -fno-omit-fram e-pointer -mapcs -mno-sched-prolog ' #for debug backtrace
     if platform=='raspi2':   
         pass
     elif platform=='v3s':
-        env['USER']='--entry main -Tuser-v3s.ld'
-        env['LINKLD']='link-v3s.ld'
+        env['USER']='--entry main -Txlinker/user-v3s.ld'
+        env['LINKLD']='xlinker/link-v3s.ld'
     elif platform =='stm32f4xx':
         env['CFLAGS']= env['CFLAGS']+ ' -mcpu=cortex-m4 -mthumb'
-        env['LINKLD']='link-stm32f4xx.ld'
+        env['LINKLD']='xlinker/link-stm32f4xx.ld'
     else:
-        env['LINKLD']='link-'+platform+'.ld'
+        env['LINKLD']='xlinker/link-'+platform+'.ld'
 
 elif arch=='xtensa':
     env['APP']=False
     env['CFLAGS']='-DXTENSA -I. -I./include  -Ilibs/include -g -nostdlib -nostdinc -fno-builtin -c -std=c99 -std=gnu99 -w  -D'+platform.upper()
-    env['LINKLD']='link-esp32.ld'
+    env['LINKLD']='xlinker/link-esp32.ld'
     pass
 
 
@@ -182,6 +187,9 @@ Depends(boot, kernel)
 
 image=SConscript(dirs=['image'], exports='env')
 Depends(image, boot)
+Depends(image, kernel)
+
+
 
 
 SConscript(dirs=['libs/libc'], exports='env')

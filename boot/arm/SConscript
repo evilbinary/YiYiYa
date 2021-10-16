@@ -25,12 +25,11 @@ if env['PLATFORM']=='stm32f4xx':
     linkflags='-nostdlib -nostartfiles -T boot/arm/link-stm32f4xx.ld'
     source=['init.c']
 
-env.Program(target ='init.elf', source = source+[
-   
-    # 'test.o',
-    # 'kernel.c',
-    env.get('MYLIB')
-    ],
+
+if env.get('MYLIB'):
+    source.append(env.get('MYLIB'))
+
+env.Program(target ='init.elf', source = source,
     CFLAGS='$CFLAGS -I. -Iinclude',
     LINKFLAGS= linkflags)
 
