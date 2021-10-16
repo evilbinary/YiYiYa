@@ -1,0 +1,21 @@
+{
+
+"files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    //隐藏java 相关配置...
+    "**/target": true,
+    "**/.classpath": true,
+    "**/.project": true,
+    "**/.idea": true,
+    "**/.settings": true,
+    "**/.mvn": true,
+    "*.class": true,
+    "**/*.o": true,
+    "**/*.a": true,
+  },
+  "C_Cpp.errorSquiggles": "Disabled"
+}
