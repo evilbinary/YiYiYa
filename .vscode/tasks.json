@@ -33,7 +33,7 @@
                 "command": ""
             },
             "linux": {
-                "command": "qemu -S -s -fda floppy.img -boot a &sleep 1 &"
+                "command": "echo Starting QEMU & scons --run=debug"
             },
             // "osx":{
             //     "command": "echo Starting QEMU & qemu-system-i386  -S -s -bios /Volumes/android/u-boot/u-boot.rom -net nic -net user,tftp=/Users/evil/dev/c/duck-os/kernel,bootfile=kernel -monitor stdio -D ./qemu.log "

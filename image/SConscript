@@ -41,7 +41,7 @@ debug_qemu_cmd=''
 
 if env.get('ARCH')=='x86':
   run_qemu_cmd='qemu-system-i386 -rtc base=localtime,clock=host -boot a  -fda $SOURCE -serial stdio -D ./qemu.log  -drive id=disk,file=image/disk.img,format=raw,if=none -device ahci,id=ahci -device ide-hd,drive=disk,bus=ahci.0 -soundhw sb16 ' # -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor 
-  debug_qemu_cmd = 'qemu-system-i386 -rtc base=localtime -boot a -S -s -fda $SOURCE -serial stdio -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor  -D ./qemu.log  -drive id=disk,file=image/disk.img,format=raw,if=none -device ahci,id=ahci -device ide-hd,drive=disk,bus=ahci.0 -soundhw sb16'  #-d in_asm -d cpu_reset -d in_asm,int,mmu
+  debug_qemu_cmd = 'qemu-system-i386 -rtc base=localtime -boot a -S -s -fda $SOURCE -serial stdio  -D ./qemu.log  -drive id=disk,file=image/disk.img,format=raw,if=none -device ahci,id=ahci -device ide-hd,drive=disk,bus=ahci.0 -soundhw sb16'  #-d in_asm -d cpu_reset -d in_asm,int,mmu
   pass
 elif env.get('ARCH') in env['ARCHS']:
   if env['ARCH'] =='armv7':
