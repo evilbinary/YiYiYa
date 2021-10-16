@@ -9,7 +9,13 @@ MEMORY
 ENTRY(_start)
 SECTIONS
 {
-
+  .isr_vector :
+  {
+    . = ALIGN(4);
+    KEEP(*(.isr_vector))
+    . = ALIGN(4);
+  } >flash
+  
 .text : ALIGN(4) {
     *(.literal .literal.*)
     *(.text .text.*)

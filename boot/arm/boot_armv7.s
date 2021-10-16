@@ -6,20 +6,8 @@
 .global _start
 
 _start:
-    .word stack_top
-    .word init
-    .word halt
-    .word halt
-    .word halt
-    .word halt
-
-init:
-    mrs r0, cpsr
-    ldr r0,= stack_top
-    mov sp, r0
-    mov fp, r0
-
-bl kstart
+    movs  r1, #0
+    bl kstart
 
 halt:
     wfi
@@ -28,3 +16,21 @@ halt:
 .data
 stack: .space 1024
 stack_top:
+
+.section  .isr_vector,"a",%progbits
+  .word  stack_top
+  .word  _start
+  .word  _start
+  .word  _start
+  .word  _start
+  .word  _start
+  .word  _start
+  .word  0
+  .word  0
+  .word  0
+  .word  0
+  .word  _start
+  .word  _start
+  .word  0
+  .word  _start
+  .word  _start

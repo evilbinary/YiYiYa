@@ -73,7 +73,7 @@ env = Environment(
         OBJCOPYFLAGS='-S -g',
         ARCH=arch,
         PLATFORM=platform,
-        LINKLD='link.ld',
+        LINKLD='xlinker/link.ld',
         MYLIB=None,
         LIBC=['../../libs/libc/libc.a','../../libs/libalgorithm/libalgorithm.a'],
         LIBCFLAGS='-Ilibs/include/c/ -DLIBYC',
@@ -110,7 +110,8 @@ if arch in support_arm:
         env['USER']='--entry main -Txlinker/user-v3s.ld'
         env['LINKLD']='xlinker/link-v3s.ld'
     elif platform =='stm32f4xx':
-        env['CFLAGS']= env['CFLAGS']+ ' -mcpu=cortex-m4 -mthumb'
+        env['APP']=False
+        env['CFLAGS']= env['CFLAGS']+ ' -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16'
         env['LINKLD']='xlinker/link-stm32f4xx.ld'
     else:
         env['LINKLD']='xlinker/link-'+platform+'.ld'

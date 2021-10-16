@@ -43,6 +43,3 @@ env.Program('kernel.elf',kernel+libs,LINKFLAGS = linkflags)
 env.Objcopy('kernel','kernel.elf',OBJCOPYFLAGS='-S')
 env.Objcopy('kernel.dbg','kernel.elf',OBJCOPYFLAGS='--only-keep-debug')
 # env.Objcopy('kernel.bin','kernel',OBJCOPYFLAGS='-O binary')
-
-
-

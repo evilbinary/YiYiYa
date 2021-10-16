@@ -8,6 +8,14 @@ MEMORY
 ENTRY(_start)
 
 SECTIONS {
+
+  .isr_vector :
+  {
+    . = ALIGN(4);
+    KEEP(*(.isr_vector))
+    . = ALIGN(4);
+  } >flash
+
   .text : ALIGN(4) {
     *(.literal)
     *(.text .text.*)
@@ -21,7 +29,6 @@ SECTIONS {
     *(*SCREEN_ASCII)
     . = ALIGN(4);
   } > flash
-
 
   .bss : ALIGN(4) {
     _bss_start = ABSOLUTE(.);
