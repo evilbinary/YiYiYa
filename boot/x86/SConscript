@@ -22,7 +22,7 @@ Import('env')
 
 env.GenerateKernelSize('config.h',['../../init/kernel'])
 env.Program('init.elf', 
-    ['init.c',],
+    ['init.c','config.h'],
     CFLAGS='$CFLAGS -I. -Iinclude  -Iarch -std=c99 -std=gnu99 -w ',
     LINKFLAGS= '$LINKFLAGS -Ttext 0x0500')
 

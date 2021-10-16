@@ -12,6 +12,7 @@ FILE STDERROR;
 FILE *stdin = NULL;
 FILE *stdout = NULL;
 FILE *stderr = NULL;
+char printf_buffer[512];
 
 int putchar(int ch)
 {
@@ -30,52 +31,24 @@ int putchar(int ch)
 
 int printf(const char *format, ...)
 {
-  char **arg = (char **)&format;
-  u8 c;
-  char buf[20];
-
-  arg++;
-
-  while ((c = *format++) != 0)
-  {
-    if (c != '%')
-      putchar(c);
-    else
-    {
-      char *p;
-
-      c = *format++;
-      switch (c)
-      {
-      case 'd':
-      case 'u':
-      case 'x':
-        itoa(buf, c, *((int *)arg++));
-        p = buf;
-        goto string;
-        break;
-
-      case 's':
-        p = *arg++;
-        if (!p)
-          p = "(null)";
-
-      string:
-        while (*p)
-          putchar(*p++);
-        break;
-
-      default:
-        putchar(*((int *)arg++));
-        break;
-      }
-    }
+  memset(printf_buffer,0,512);
+  int i;
+	va_list args;
+	va_start(args, format);
+	i = vsprintf(printf_buffer, format, args);
+	va_end(args);
+  int len=strlen(printf_buffer);
+  for(int i=0;i<len;i++){
+    putchar(printf_buffer[i]);
   }
+  return 0;
 }
 
 int vfprintf(FILE *stream, const char *format, va_list arg)
 {
+  if(format==NULL) return 0;
   char buf[1024];
+  memset(buf,0,1024);
   int i = vsprintf(buf, format, arg);
   i = (fputs(buf, stream) < 0) ? 0 : i;
   return i;

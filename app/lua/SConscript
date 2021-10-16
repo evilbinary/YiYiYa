@@ -34,11 +34,21 @@ source2=[
     ]+env['LIBC']
 
 
+source_luat=[
+    'luat.c',
+    '../../app/liblua/liblua.a',
+    ]+env['LIBC']
+
+
 
 env.Program('lua', source,
     CFLAGS='$CFLAGS $LIBCFLAGS  -frounding-math -Iapp/liblua/src/',
     LINKFLAGS= '$LINKFLAGS $USER')
 
 env.Program('luac', source2,
+    CFLAGS='$CFLAGS $LIBCFLAGS -lgcc -Iapp/liblua/src/',
+    LINKFLAGS= '$LINKFLAGS $USER')
+
+env.Program('luat', source_luat,
     CFLAGS='$CFLAGS $LIBCFLAGS -lgcc -Iapp/liblua/src/',
     LINKFLAGS= '$LINKFLAGS $USER')

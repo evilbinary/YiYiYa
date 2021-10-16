@@ -70,6 +70,7 @@ if env.get('APP'):
             'test/test.elf',
             # 'test/test-musl.elf',
             'lua/lua',
+            'lua/luat',
             'lua/hello.lua',
             'bin/ls',
             'lvgl/lvgl',

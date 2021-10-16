@@ -16,6 +16,7 @@ env.Object('boot', ['boot.s'],ASFLAGS='')
 source = [
     'boot.o',
     'init.c',
+    'config.h'
     ]
 
 if env.get('MYLIB'):

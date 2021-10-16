@@ -18,6 +18,9 @@ void* memcpy(void* /* restrict */ s1, const void* /* restrict */ s2, size_t n) {
   uint32_t* ldest = (uint32_t*)s1;
   uint32_t* lsrc = (uint32_t*)s2;
 
+  if(ldest==NULL||lsrc==NULL){
+    return s1;
+  }
   while (n >= 4) {
     *ldest++ = *lsrc++;
     n -= 4;

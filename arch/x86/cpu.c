@@ -204,7 +204,7 @@ int context_get_mode(context_t* context) {
   return mode;
 }
 
-void backtrace(stack_frame_t* fp, void** buf, int size) {
+void cpu_backtrace(stack_frame_t* fp, void** buf, int size) {
   int i;
   for (i = 0; i < size && fp != NULL; fp = fp->prev, i++) {
     buf[i] = fp->return_addr;
@@ -246,6 +246,15 @@ void context_dump_interrupt(interrupt_context_t* context) {
   kprintf("Segment Registers:\n----------------------------\n");
   kprintf("ds:\t%x\tes:\t%x\n", ds, es);
   kprintf("fs:\t%x\tgs:\t%x\n", fs, gs);
+  // char* buf[10]; 
+  // stack_frame_t fp;
+  // fp.prev=context->eip;
+  // fp.return_addr=context->eip;
+  // cpu_backtrace(&fp,buf,10);
+  // kprintf("backtrace:\n");
+  // for(int i=0;i<10;i++){
+  //   kprintf("   %x\n",buf[i]);
+  // }
 }
 
 void context_clone(context_t* des, context_t* src, u32* stack0, u32* stack3,
