@@ -10,22 +10,9 @@ Import('env')
 
 plt=env['PLATFORM']
 
-src=[]
-
+source=[]
+source+= Glob(plt+'/*.c')
 if plt:
     env['CFLAGS']= """%s -Iplatform/%s  """%(env['CFLAGS'],plt)
-    if plt=='v3s':
-        src=[
-            plt+'/init.c',
-            plt+'/gic.c',
-            plt+'/timer.c',
-        ]
-        env.Library('platform', src)
-    else:
-        env.Library('platform', [
-            plt+'/init.c',
-            # plt+'/gic.c',
-            # plt+'/timer.c',
-            # plt+'/sys-dram.c',
-            # plt+'/sys-clock.c'
-            ],)
+
+env.Library('platform', source)

@@ -22,9 +22,9 @@ void interrupt_init() {
     interrutp_set(i);
   }
   u32 val = idt;
-  u32* vtor= VTOR;
-  *vtor=val<<6;
 
+  SCB->VTOR=val<<6;
+  
 }
 
 u32 read_cntv_tval(void) {

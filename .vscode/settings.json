@@ -24,6 +24,10 @@
     "initializer_list": "cpp",
     "utility": "cpp",
     "sstream": "c",
-    "*.in": "cpp"
+    "*.in": "cpp",
+    "random": "c",
+    "gpio.h": "c",
+    "stm32f4xx_usart.h": "c",
+    "stm32f4xx.h": "c"
   }
 }

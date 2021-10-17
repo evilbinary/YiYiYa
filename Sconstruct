@@ -34,6 +34,8 @@ env = Environment(ENV = {}, tools=['gcc'])
 
 cc_path='/opt/local/bin/'
 cc_prefix='i386-elf-'
+cc_lib_path='/lib/gcc/arm-none-eabi/9.2.1/' #or /opt/local/lib/gcc/arm-none-eabi/9.2.0/
+
 
 if plt=='Linux':
     cc_path='/usr/bin/'
@@ -99,9 +101,8 @@ elif plt=='Windows':
 if arch in support_arm:
     env['APP']=True
     env['USER']=' --entry main -Txlinker/user-arm.ld '
-    # env['MYLIB']= '/opt/local/lib/gcc/arm-none-eabi/9.2.0/libgcc.a'
-    env['MYLIB']='/lib/gcc/arm-none-eabi/9.2.1/libgcc.a'
-    env['CFLAGS']=' -march='+arch+' -D'+arch.upper().replace('-','_') + '  -DARM -I. -I./include  -Ilibs/include -g -nostdlib -nostdinc -fno-builtin -c -std=c99 -std=gnu99 -w  -D'+platform.upper() # -DMALLOC_TRACE -mcpu=cortex-a7  -mtune=cortex-a7 -mfpu=vfpv4 -mfloat-abi=hard -mfloat-abi=softfp
+    env['MYLIB']=cc_lib_path+'libgcc.a'
+    env['CFLAGS']=' -lgcc -march='+arch+' -D'+arch.upper().replace('-','_') + '  -DARM -I. -I./include  -Ilibs/include -g -c -std=c99 -std=gnu99 -w  -D'+platform.upper() # -nostdlib -nostdinc -fno-builtin -DMALLOC_TRACE -mcpu=cortex-a7  -mtune=cortex-a7 -mfpu=vfpv4 -mfloat-abi=hard -mfloat-abi=softfp
 
     #env['CFLAGS']= env['CFLAGS']+ ' -fno-omit-fram e-pointer -mapcs -mno-sched-prolog ' #for debug backtrace
     if platform=='raspi2':   
@@ -111,7 +112,7 @@ if arch in support_arm:
         env['LINKLD']='xlinker/link-v3s.ld'
     elif platform =='stm32f4xx':
         env['APP']=False
-        env['CFLAGS']= env['CFLAGS']+ ' -mcpu=cortex-m4 -mthumb-interwork -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16'
+        env['CFLAGS']= env['CFLAGS']+ ' -mcpu=cortex-m4 -mlittle-endian -ffreestanding -nostdlib -mthumb-interwork -mthumb  -mfpu=fpv4-sp-d16 -mfloat-abi=soft '#-mfloat-abi=hard
         env['LINKLD']='xlinker/link-stm32f4xx.ld'
     else:
         env['LINKLD']='xlinker/link-'+platform+'.ld'
