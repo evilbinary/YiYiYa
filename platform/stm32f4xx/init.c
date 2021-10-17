@@ -155,8 +155,7 @@ void platform_init() {
 
   //init uart
   uart_init();
+
+  uart_send('A');
   
-  while(1){
-    uart_send('A');
-  }
 }
