@@ -111,7 +111,7 @@ if arch in support_arm:
         env['LINKLD']='xlinker/link-v3s.ld'
     elif platform =='stm32f4xx':
         env['APP']=False
-        env['CFLAGS']= env['CFLAGS']+ ' -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16'
+        env['CFLAGS']= env['CFLAGS']+ ' -mcpu=cortex-m4 -mthumb-interwork -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16'
         env['LINKLD']='xlinker/link-stm32f4xx.ld'
     else:
         env['LINKLD']='xlinker/link-'+platform+'.ld'

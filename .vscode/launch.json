@@ -949,5 +949,41 @@
             ],
             "preLaunchTask": "Build and run vm"
         },
+
+
+        {
+            "name": "kernel stm32 with GDB",
+            "type": "cppdbg",
+            "request": "launch",
+            "miDebuggerServerAddress": "localhost:1234",
+            "program": "${workspaceRoot}/init/kernel.elf",
+            "cwd": "${workspaceRoot}",
+            "args": [],
+            "targetArchitecture": "arm",
+            "MIMode": "gdb",
+            "miDebuggerPath": "gdb-multiarch",
+            "miDebuggerArgs": "",
+            "externalConsole": false,
+            "debugServerPath":"",
+            // "customLaunchSetupCommands": [
+            //     {
+            //         "text": "target remote localhost:1234",
+            //         "description": "Connect to QEMU remote debugger"
+            //     }
+            // ],
+            // "setupCommands": [
+            //     {
+            //         "description": "Enable pretty-printing for gdb",
+            //         "text": "-enable-pretty-printing",
+            //         "ignoreFailures": true
+            //     },
+            //     { "text": "    -target-select   remote localhost:1234", 
+            //         "description": "connect to target",
+            //          "ignoreFailures": false
+            //     },
+
+            // ],
+            "preLaunchTask": "Build and run"
+        },
     ]
 }

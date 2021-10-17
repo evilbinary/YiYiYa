@@ -1,36 +1,56 @@
- .thumb
- 
+.syntax unified
+.cpu cortex-m4
+.fpu softvfp
+.thumb
+
 .section ".text.boot"
 
 .extern _kstart
 .global _start
-
 _start:
-    movs  r1, #0
+
+.section  .text.boot_reset_handler
+.weak  boot_reset_handler
+.type  boot_reset_handler, %function
+
+boot_reset_handler:  
+    movs r1,#0
+    mov r2,r1
+    mov r3,r1
     bl kstart
+boot_halt:
+    b boot_halt
 
-halt:
-    wfi
-    b halt
+boot_nmi_handler:
+    b boot_halt
 
-.data
-stack: .space 1024
-stack_top:
+boot_hardfault_handler:
+    b boot_halt
+
+boot_svc_handler:
+    b boot_halt
+
+boot_pendsv_handler:
+    b boot_halt
+
+boot_systick_handler:
+    b boot_halt
 
 .section  .isr_vector,"a",%progbits
-  .word  stack_top
-  .word  _start
-  .word  _start
-  .word  _start
-  .word  _start
-  .word  _start
-  .word  _start
+  .word  _estack
+  .word  boot_reset_handler
+  .word  boot_nmi_handler
+  .word  boot_hardfault_handler
+  .word  boot_reset_handler
+  .word  boot_reset_handler
+  .word  boot_reset_handler
   .word  0
   .word  0
   .word  0
   .word  0
-  .word  _start
-  .word  _start
+  .word  boot_svc_handler
+  .word  boot_halt
   .word  0
-  .word  _start
-  .word  _start
+  .word  boot_pendsv_handler
+  .word  boot_systick_handler
+  

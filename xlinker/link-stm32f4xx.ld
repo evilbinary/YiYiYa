@@ -1,9 +1,11 @@
 MEMORY
 {
   flash (rx): ORIGIN = 0x08000000, LENGTH = 1024K
-  ram (rwx) : ORIGIN = 0x20000000, LENGTH = 32K
+  ram (rwx) : ORIGIN = 0x20000000, LENGTH = 192K
   ccm (rwx) : ORIGIN = 0x10000000, LENGTH = 64K
 }
+
+_estack = 0x20020000;    /* end of 128K RAM on AHB bus*/
 
 ENTRY(_start)
 
@@ -16,9 +18,12 @@ SECTIONS {
     . = ALIGN(4);
   } >flash
 
-  .text : ALIGN(4) {
-    *(.literal)
+  .text : {
+    . = ALIGN(4);
+    *(.text.boot*)
     *(.text .text.*)
+    *(.literal)
+    . = ALIGN(4);
   } > flash
 
   .rodata :
