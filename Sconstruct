@@ -16,17 +16,17 @@ support_arch=support_x86
 
 # arch support x86 arm
 # arch='armv7-a'
-# arch='armv7'
+arch='armv7'
 # arch='armv5'
-arch='x86' 
+# arch='x86' 
 # arch='xtensa'
 
 # board select platform
-platform='intel'
+# platform='intel'
 # platform='v3s'
 # platform='raspi2'
 # platform='esp32'
-# platform='stm32f4xx'
+platform='stm32f4xx'
 
 
 DefaultEnvironment(tools=[])
@@ -34,7 +34,7 @@ env = Environment(ENV = {}, tools=['gcc'])
 
 cc_path='/opt/local/bin/'
 cc_prefix='i386-elf-'
-cc_lib_path='/lib/gcc/arm-none-eabi/9.2.1/' #or /opt/local/lib/gcc/arm-none-eabi/9.2.0/
+cc_lib_path='C:\\Program Files (x86)\\GNU Arm Embedded Toolchain\\10 2021.10\lib\gcc\\arm-none-eabi\\10.3.1\\' #or /opt/local/lib/gcc/arm-none-eabi/9.2.0/ /lib/gcc/arm-none-eabi/9.2.1/
 
 
 if plt=='Linux':
@@ -133,19 +133,22 @@ env.Append(BUILDERS={
                suffix='',)})
 
 def get_kernel_size(env,target,source):
-    file_name=str(source[0])
-    file_out=str(target[0])
-    if os.path.exists(file_name):
-        size=os.stat(file_name).st_size
-        env['KERNEL_SIZE'] = str(size)
-        env['KERNEL_BLOCK_SIZE'] = str(int(math.ceil(size/1024.0)))
-        print('kernel size:',env.get('KERNEL_SIZE'))
-    else :
-        print('file %s not exist'%(file_name))
+    if source:
+        file_name=str(source[0])
+        file_out=str(target[0])
+        if os.path.exists(file_name):
+            size=os.stat(file_name).st_size
+            env['KERNEL_SIZE'] = str(size)
+            env['KERNEL_BLOCK_SIZE'] = str(int(math.ceil(size/1024.0)))
+            print('kernel size:',env.get('KERNEL_SIZE'))
+        else :
+            print('file %s not exist'%(file_name))
+    else:
+      env['KERNEL_SIZE'] = str(1024)
+      env['KERNEL_BLOCK_SIZE'] = str(int(math.ceil(1024/1024.0)))
     return ''
 
 def generate_kernel_size(env,target,source):
-    file_name=str(source[0])
     file_out=str(target[0])
     get_kernel_size(env,target,source)
     kernel_header=file_out.upper().rsplit('/',1)[-1].replace('.','_')

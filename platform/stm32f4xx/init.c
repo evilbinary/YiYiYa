@@ -152,10 +152,10 @@ void timer_end() {}
 void platform_init() {
   //init system
   system_init();
-
+ 
   //init uart
   uart_init();
 
   uart_send('A');
-  
+
 }

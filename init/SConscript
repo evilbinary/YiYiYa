@@ -33,7 +33,8 @@ if env.get('ARCH')=='xtensa':
     # libs.append('../libs/libc/libc.a')
     pass
 elif env.get('ARCH')=='armv7':
-    kernel.append('../boot/arm/boot_armv7.s')
+    kernel.append('../boot/arm/boot_armv7.o')
+    kernel.append('../boot/arm/init_armv7.o')
 
 if env.get('MYLIB'):
     libs.append(env.get('MYLIB'))
@@ -42,4 +43,5 @@ env.Program('kernel.elf',kernel+libs,LINKFLAGS = linkflags)
 
 env.Objcopy('kernel','kernel.elf',OBJCOPYFLAGS='-S')
 env.Objcopy('kernel.dbg','kernel.elf',OBJCOPYFLAGS='--only-keep-debug')
-# env.Objcopy('kernel.bin','kernel',OBJCOPYFLAGS='-O binary')
+# env.Objcopy('kernel.hex','kernel.elf',OBJCOPYFLAGS='-S -O ihex')
+env.Objcopy('kernel.bin','kernel.elf',OBJCOPYFLAGS='-S -O binary')

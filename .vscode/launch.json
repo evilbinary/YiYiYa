@@ -950,9 +950,8 @@
             "preLaunchTask": "Build and run vm"
         },
 
-
         {
-            "name": "kernel stm32 with GDB",
+            "name": "kernel qemu stm32 with GDB",
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
@@ -961,7 +960,7 @@
             "args": [],
             "targetArchitecture": "arm",
             "MIMode": "gdb",
-            "miDebuggerPath": "gdb-multiarch",
+            "miDebuggerPath": "C:\\Program Files (x86)\\GNU Arm Embedded Toolchain\\10 2021.10\\bin\\arm-none-eabi-gdb.exe",
             "miDebuggerArgs": "",
             "externalConsole": false,
             "debugServerPath":"",
@@ -985,5 +984,55 @@
             // ],
             "preLaunchTask": "Build and run"
         },
+        {
+            "name": "kernel stm32 with GDB",
+            "type": "cppdbg",
+            "request": "launch",
+            "miDebuggerServerAddress": "localhost:2331",
+            "program": "${workspaceRoot}/init/kernel.elf",
+            "cwd": "${workspaceRoot}",
+            "args": [],
+            "targetArchitecture": "arm",
+            "MIMode": "gdb",
+            "miDebuggerPath": "C:\\Program Files (x86)\\GNU Arm Embedded Toolchain\\10 2021.10\\bin\\arm-none-eabi-gdb.exe",
+            "miDebuggerArgs": "",
+            "externalConsole": false,
+            "debugServerPath":"",
+            // "customLaunchSetupCommands": [
+            //     {
+            //         "text": "target remote localhost:1234",
+            //         "description": "Connect to QEMU remote debugger"
+            //     }
+            // ],
+            // "setupCommands": [
+            //     {
+            //         "description": "Enable pretty-printing for gdb",
+            //         "text": "-enable-pretty-printing",
+            //         "ignoreFailures": true
+            //     },
+            //     { "text": "    -target-select   remote localhost:1234", 
+            //         "description": "connect to target",
+            //          "ignoreFailures": false
+            //     },
+
+            // ],
+            "preLaunchTask": "Build and run"
+        },
+
+        {
+            "name": "STM32F401",
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "openocd",
+            "cwd": "${workspaceRoot}",
+            "executable": "${workspaceRoot}/init/kernel.elf",
+            "device": "STM32F405",
+            "svdFile": "${workspaceRoot}/xconfig/STM32F401.svd",
+            "configFiles": [
+              "interface/stlink.cfg",
+              "target/stm32f4x.cfg"
+            ],
+            "runToMain": true
+          }
     ]
 }

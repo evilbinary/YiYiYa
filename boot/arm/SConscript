@@ -8,12 +8,8 @@ import os
 
 Import('env')               
 
-
-env.GenerateKernelSize('config.h',['../../init/kernel'])
-
-env.Object('boot', ['boot_'+env['ARCH']+'.s'],ASFLAGS='')
-
 linkflags='-nostdlib -nostartfiles -T boot/arm/link.ld'
+cflags= '$CFLAGS -I. -Iinclude'
 
 source=[ 
     'boot.o',
@@ -21,16 +17,24 @@ source=[
     'config.h'
     ]
 
-if env['PLATFORM']=='stm32f4xx':
-    linkflags='-nostdlib -nostartfiles -T boot/arm/link-stm32f4xx.ld'
-    source=['init.c']
-
+boot_source= ['boot_'+env['ARCH']+'.s']
 
 if env.get('MYLIB'):
     source.append(env.get('MYLIB'))
 
-env.Program(target ='init.elf', source = source,
-    CFLAGS='$CFLAGS -I. -Iinclude',
-    LINKFLAGS= linkflags)
 
+if env['PLATFORM']=='stm32f4xx':
+    env.GenerateKernelSize('config.h',[])
+    linkflags='-nostdlib -nostartfiles -T boot/arm/link-stm32f4xx.ld'
+    source=['init_armv7.c']
+    boot_source=['boot_armv7.s',]
+    cflags+='-DKSTART'
+else:
+    env.GenerateKernelSize('config.h',['../../init/kernel'])
+
+env.Object('boot.o',boot_source,ASFLAGS='')
+
+env.Program(target ='init.elf', source = source,
+    CFLAGS=cflags,
+    LINKFLAGS= linkflags)
 env.Objcopy('init.bin','init.elf',OBJCOPYFLAGS='-O binary -S --strip-debug')
