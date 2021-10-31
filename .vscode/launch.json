@@ -1023,16 +1023,20 @@
             "name": "STM32F401",
             "type": "cortex-debug",
             "request": "launch",
-            "servertype": "openocd",
+            "servertype": "jlink",
             "cwd": "${workspaceRoot}",
             "executable": "${workspaceRoot}/init/kernel.elf",
-            "device": "STM32F405",
-            "svdFile": "${workspaceRoot}/xconfig/STM32F401.svd",
-            "configFiles": [
-              "interface/stlink.cfg",
-              "target/stm32f4x.cfg"
-            ],
-            "runToMain": true
+            "device": "STM32F401",
+            "interface":"swd",
+            // "armToolchainPath": "C:\\Program Files (x86)\\GNU Arm Embedded Toolchain\\10 2021.10\\bin\\arm-none-eabi-gdb.exe",
+            "gdbPath":   "C:\\Program Files (x86)\\GNU Arm Embedded Toolchain\\10 2021.10\\bin\\arm-none-eabi-gdb.exe",
+
+            // "svdFile": "${workspaceRoot}/xconfig/STM32F401.svd",
+            // "configFiles": [
+            //   "interface/stlink.cfg",
+            //   "target/stm32f4x.cfg"
+            // ],
+            // "runToMain": true
           }
     ]
 }

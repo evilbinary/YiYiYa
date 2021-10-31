@@ -33,9 +33,9 @@ if env.get('ARCH')=='xtensa':
     # libs.append('../libs/libc/libc.a')
     pass
 elif env.get('ARCH')=='armv7':
-    kernel.append('../boot/arm/boot_armv7.o')
-    kernel.append('../boot/arm/init_armv7.o')
-
+    kernel.append('../boot/arm/boot_armv7.s')
+    kernel.append('../boot/arm/init_armv7.c')
+    
 if env.get('MYLIB'):
     libs.append(env.get('MYLIB'))
 

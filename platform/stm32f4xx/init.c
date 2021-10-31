@@ -140,7 +140,7 @@ void system_init(){
 
   //enable fpu
  #if (__FPU_PRESENT == 1) && (__FPU_USED == 1)
-  scb->CPACR |= (3 << 20) | (3 << 22);
+  SCB->CPACR |= (3 << 20) | (3 << 22);
  #endif
 
 }

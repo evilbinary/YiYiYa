@@ -9,42 +9,13 @@
 .global _start
 _start:
 
-/* start address for the initialization values of the .data section. 
-defined in linker script */
-.word  _sidata
-/* start address for the .data section. defined in linker script */  
-.word  _sdata
-/* end address for the .data section. defined in linker script */
-.word  _edata
-/* start address for the .bss section. defined in linker script */
-.word  _sbss
-/* end address for the .bss section. defined in linker script */
-.word  _ebss
-/* stack used for SystemInit_ExtMemCtl; always internal RAM used */
-
 
 .section  .text.boot_reset_handler
 .weak  boot_reset_handler
 .type  boot_reset_handler, %function
 
 boot_reset_handler:  
-    ldr   sp, =_estack      /* set stack pointer */
-
-
-/* Zero fill the bss segment. */
-  ldr r2, =_sbss
-  ldr r4, =_ebss
-  movs r3, #0
-  b LoopFillZerobss
-
-FillZerobss:
-  str  r3, [r2]
-  adds r2, r2, #4
-
-LoopFillZerobss:
-  cmp r2, r4
-  bcc FillZerobss
-
+    ldr   sp, =_estack
     bl init_boot
     
 boot_halt:

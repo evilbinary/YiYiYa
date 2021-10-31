@@ -28,13 +28,13 @@ if env['PLATFORM']=='stm32f4xx':
     linkflags='-nostdlib -nostartfiles -T boot/arm/link-stm32f4xx.ld'
     source=['init_armv7.c']
     boot_source=['boot_armv7.s',]
-    cflags+='-DKSTART'
+    cflags+='-DNO_KSTART'
 else:
     env.GenerateKernelSize('config.h',['../../init/kernel'])
 
-env.Object('boot.o',boot_source,ASFLAGS='')
+    env.Object('boot.o',boot_source,ASFLAGS='')
 
-env.Program(target ='init.elf', source = source,
-    CFLAGS=cflags,
-    LINKFLAGS= linkflags)
-env.Objcopy('init.bin','init.elf',OBJCOPYFLAGS='-O binary -S --strip-debug')
+    env.Program(target ='init.elf', source = source,
+        CFLAGS=cflags,
+        LINKFLAGS= linkflags)
+    env.Objcopy('init.bin','init.elf',OBJCOPYFLAGS='-O binary -S --strip-debug')

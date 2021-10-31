@@ -1,0 +1,5 @@
+r
+speed 4000
+loadfile ./init/kernel.bin,0x08000000
+r
+exit
