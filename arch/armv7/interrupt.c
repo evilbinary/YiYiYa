@@ -12,7 +12,7 @@
 extern boot_info_t* boot_info;
 
 interrupt_handler_t* interrutp_handlers[IDT_NUMBER];
-u32 idt[IDT_NUMBER * 2] __attribute__((aligned(32)));
+u32 idt[IDT_NUMBER] __attribute__((aligned(32)));
 
 void interrupt_init() {
   kprintf("interrupt init\n");
