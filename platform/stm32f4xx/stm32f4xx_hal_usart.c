@@ -2716,6 +2716,14 @@ static HAL_StatusTypeDef USART_TransmitReceive_IT(USART_HandleTypeDef *husart)
   }
 }
 
+
+
+__INLINE static uint16_t UART_BRR_SAMPLING8(uint32_t _PCLK_, uint32_t _BAUD_)
+{
+    uint16_t Div = (_PCLK_ + _BAUD_/2)/_BAUD_;  
+    return ((Div & ~0x7)<<1 | (Div & 0x07));
+}  
+
 /**
   * @brief  Configures the USART peripheral.
   * @param  husart Pointer to a USART_HandleTypeDef structure that contains
@@ -2789,6 +2797,7 @@ static void USART_SetConfig(USART_HandleTypeDef *husart)
   {
     pclk = HAL_RCC_GetPCLK2Freq();
     husart->Instance->BRR = USART_BRR(pclk, husart->Init.BaudRate);
+    // husart->Instance->BRR=(pclk +  husart->Init.BaudRate/2)/ husart->Init.BaudRate;
   }
 #else
   if(husart->Instance == USART1)

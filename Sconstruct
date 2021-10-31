@@ -34,7 +34,7 @@ env = Environment(ENV = {}, tools=['gcc'])
 
 cc_path='/opt/local/bin/'
 cc_prefix='i386-elf-'
-cc_lib_path='D:\\Program Files\\gcc-arm-none-eabi-9\\lib\\gcc\\arm-none-eabi\\9.2.1\\' #or /opt/local/lib/gcc/arm-none-eabi/9.2.0/ /lib/gcc/arm-none-eabi/9.2.1/
+cc_lib_path='' #or /opt/local/lib/gcc/arm-none-eabi/9.2.0/ /lib/gcc/arm-none-eabi/9.2.1/
 
 
 if plt=='Linux':
@@ -94,15 +94,15 @@ if plt=='Linux':
     #env['MYLIB']= ''
     pass
 elif plt=='Windows':
-    env['LINKFLAGS']='-nostdlib   ',
-    env['CFLAGS']= env['CFLAGS']+' -ffreestanding -nostdlib -fno-stack-check -fno-stack-protector -mno-stack-arg-probe '
+    env['LINKFLAGS']='-nostdlib  ',
+    env['CFLAGS']= env['CFLAGS']+'  ' #-ffreestanding -nostdlib -fno-stack-check -fno-stack-protector -mno-stack-arg-probe
     env['USER']='--entry main -Txlinker/user.ld   '
 
 if arch in support_arm:
     env['APP']=True
     env['USER']=' --entry main -Txlinker/user-arm.ld '
-    env['MYLIB']=cc_lib_path+'libgcc.a'
-    env['CFLAGS']=' -march='+arch+' -D'+arch.upper().replace('-','_') + '  -DARM -I. -I./include  -Ilibs/include -g -c -std=c99 -std=gnu99 -w  -Wl,--gc-sections -fdata-sections -ffunction-sections   -D'+platform.upper() # -nostdlib -nostdinc -fno-builtin -DMALLOC_TRACE -mcpu=cortex-a7  -mtune=cortex-a7 -mfpu=vfpv4 -mfloat-abi=hard -mfloat-abi=softfp
+    # env['MYLIB']=cc_lib_path+'libgcc.a'
+    env['CFLAGS']=' -D'+arch.upper().replace('-','_') + '  -DARM -I. -I./include  -Ilibs/include -g -c -std=c99 -std=gnu99 -w  -D'+platform.upper() # -nostdlib -nostdinc -fno-builtin -DMALLOC_TRACE -mcpu=cortex-a7  -mtune=cortex-a7 -mfpu=vfpv4 -mfloat-abi=hard -mfloat-abi=softfp
 
     #env['CFLAGS']= env['CFLAGS']+ ' -fno-omit-fram e-pointer -mapcs -mno-sched-prolog ' #for debug backtrace
     if platform=='raspi2':   
@@ -112,10 +112,12 @@ if arch in support_arm:
         env['LINKLD']='xlinker/link-v3s.ld'
     elif platform =='stm32f4xx':
         env['APP']=False
-        env['CFLAGS']= env['CFLAGS']+ ' -nolibc -DSTM32F401xC -mcpu=cortex-m4 -mlittle-endian -ffreestanding -nostdlib -mthumb-interwork -mthumb  -mfpu=fpv4-sp-d16 -mfloat-abi=soft '#-mfloat-abi=hard -mfloat-abi=soft
+        env['CFLAGS']= env['CFLAGS']+ ' -specs=nosys.specs -mcpu=cortex-m4 -nolibc -nostdlib -nostdinc -fno-builtin -DUSE_HAL_DRIVER -DSTM32F401xC  -mthumb -mthumb-interwork  -mfloat-abi=soft -mfpu=vfpv4-d16 '# -Wl,--gc-sections -fdata-sections -ffunction-sections    -mfpu=fpv4-sp-d16  -mcpu=cortex-m4  -ffreestanding -nostdlib  -mfloat-abi=hard -mfpu=fpv4-sp-d16   # -mfloat-abi=hard -mfloat-abi=softfp  -mfloat-abi=softfp
         env['LINKLD']='xlinker/link-stm32f4xx.ld'
+        arch='armv7e-m'
     else:
         env['LINKLD']='xlinker/link-'+platform+'.ld'
+    env['CFLAGS']= ' -march='+arch+' '+env['CFLAGS']
 
 elif arch=='xtensa':
     env['APP']=False
