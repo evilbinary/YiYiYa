@@ -30,6 +30,7 @@
     "random": "c",
     "gpio.h": "c",
     "stm32f4xx_usart.h": "c",
-    "stm32f4xx.h": "c"
+    "stm32f4xx.h": "c",
+    "stm32f4xx_hal_def.h": "c"
   }
 }
