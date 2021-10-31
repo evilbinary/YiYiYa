@@ -7,13 +7,13 @@
 
 .extern _kstart
 .global _start
-_start:
+
 
 
 .section  .text.boot_reset_handler
 .weak  boot_reset_handler
 .type  boot_reset_handler, %function
-
+_start:
 boot_reset_handler:  
     ldr   sp, =_estack
     bl init_boot
