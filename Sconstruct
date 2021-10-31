@@ -117,7 +117,7 @@ if arch in support_arm:
         arch='armv7e-m'
     else:
         env['LINKLD']='xlinker/link-'+platform+'.ld'
-    env['CFLAGS']= ' -march='+arch+' '+env['CFLAGS']
+    #env['CFLAGS']= ' -march='+arch
 
 elif arch=='xtensa':
     env['APP']=False

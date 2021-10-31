@@ -32,42 +32,43 @@ void map_page(u32 virtualaddr, u32 physaddr, u32 flags) {
 }
 
 void mm_init_default() {
-  mm_test();
-  boot_info->pdt_base = page_dir;
-  kmemset(page_dir, 0, 4096 * 8);
+  kprintf("mem init default\n");
+  // mm_test();
+  // boot_info->pdt_base = page_dir;
+  // kmemset(page_dir, 0, 4096 * 8);
 
-  u32 address = 0;
-  kprintf("map %x - %x\n", address, 0x1000 * 1024 * 10);
-  for (int j = 0; j < 1024 * 10; j++) {
-    map_page(address, address, 0);
-    address += 0x1000;
-  }
-  address = boot_info->kernel_entry;
-  kprintf("map kernel %x ", address);
-  int i;
-  for (i = 0; i < (((u32)boot_info->kernel_size) / 0x1000 + 6); i++) {
-    map_page(address, address, L2_TEXT_1 | L2_CB);
-    address += 0x1000;
-  }
-  kprintf("- %x\n", address);
+  // u32 address = 0;
+  // kprintf("map %x - %x\n", address, 0x1000 * 1024 * 10);
+  // for (int j = 0; j < 1024 * 10; j++) {
+  //   map_page(address, address, 0);
+  //   address += 0x1000;
+  // }
+  // address = boot_info->kernel_entry;
+  // kprintf("map kernel %x ", address);
+  // int i;
+  // for (i = 0; i < (((u32)boot_info->kernel_size) / 0x1000 + 6); i++) {
+  //   map_page(address, address, L2_TEXT_1 | L2_CB);
+  //   address += 0x1000;
+  // }
+  // kprintf("- %x\n", address);
   
-  kprintf("map page end\n");
+  // kprintf("map page end\n");
 
-  // cpu_disable_page();
-  // cpu_icache_disable();
-  cp15_invalidate_icache();
-  cpu_invalid_tlb();
+  // // cpu_disable_page();
+  // // cpu_icache_disable();
+  // cp15_invalidate_icache();
+  // cpu_invalid_tlb();
 
-  cpu_set_domain(0x07070707);
-  // cpu_set_domain(0xffffffff);
-  // cpu_set_domain(0x55555555);
-  cpu_set_page(page_dir);
+  // cpu_set_domain(0x07070707);
+  // // cpu_set_domain(0xffffffff);
+  // // cpu_set_domain(0x55555555);
+  // cpu_set_page(page_dir);
 
-  // start_dump();
-  kprintf("enable page\n");
+  // // start_dump();
+  // kprintf("enable page\n");
 
-  cpu_enable_page();
-  kprintf("paging pae scucess\n");
+  // cpu_enable_page();
+  // kprintf("paging pae scucess\n");
 }
 
 void mm_test() {

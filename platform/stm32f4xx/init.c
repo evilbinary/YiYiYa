@@ -109,8 +109,8 @@ void system_init() {
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick.
    */
-  // HAL_Init();
-  HAL_MspInit();
+  HAL_Init();
+  // HAL_MspInit();
 
   /* Configure the system clock */
   system_init_clock();
@@ -177,7 +177,7 @@ void platform_init() {
   uart_init();
 
   // test_led();
-  for (;;) {
-    uart_send('d');
-  }
+  // for (;;) {
+  //   uart_send('d');
+  // }
 }

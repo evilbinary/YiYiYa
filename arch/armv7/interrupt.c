@@ -23,39 +23,8 @@ void interrupt_init() {
   }
   u32 val = idt;
 
-  SCB->VTOR=val<<6;
+  SCB->VTOR=val;
   
-}
-
-u32 read_cntv_tval(void) {
-  u32 val;
-  asm volatile("mrc p15, 0, %0, c14, c3, 0" : "=r"(val));
-  return val;
-}
-
-void write_cntv_tval(u32 val) {
-  asm volatile("mcr p15, 0, %0, c14, c3, 0" ::"r"(val));
-  return;
-}
-
-u32 read_cntfrq(void) {
-  u32 val;
-  asm volatile("mrc p15, 0, %0, c14, c0, 0" : "=r"(val));
-  return val;
-}
-
-void enable_cntv(u32 cntv_ctl) {
-  asm volatile("mcr p15, 0, %0, c14, c3, 1" ::"r"(cntv_ctl));  // write CNTV_CTL
-}
-
-void disable_cntv(u32 cntv_ctl) {
-  asm volatile("mcr p15, 0, %0, c14, c3, 1" ::"r"(cntv_ctl));  // write CNTV_CTL
-}
-
-uint64_t read_cntvct(void) {
-  uint64_t val;
-  asm volatile("mrrc p15, 1, %Q0, %R0, c14" : "=r"(val));
-  return (val);
 }
 
 void interrutp_regist(u32 vec, interrupt_handler_t handler) {
