@@ -8,7 +8,7 @@
 
 #include "arch/arch.h"
 
-#define PAGE_SIZE 0x1000
+
 
 #define MEMORY_FREE 0
 #define MEMORY_USE 1

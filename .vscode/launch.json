@@ -1018,6 +1018,40 @@
             // ],
             "preLaunchTask": "Build and run"
         },
+        {
+            "name": "qemu kernel stm32 with GDB",
+            "type": "cppdbg",
+            "request": "launch",
+            "miDebuggerServerAddress": "localhost:1234",
+            "program": "${workspaceRoot}/init/kernel.elf",
+            "cwd": "${workspaceRoot}",
+            "args": [],
+            "targetArchitecture": "arm",
+            "MIMode": "gdb",
+            "miDebuggerPath": "C:\\Program Files (x86)\\GNU Arm Embedded Toolchain\\10 2021.10\\bin\\arm-none-eabi-gdb.exe",
+            "miDebuggerArgs": "",
+            "externalConsole": false,
+            "debugServerPath":"",
+            // "customLaunchSetupCommands": [
+            //     {
+            //         "text": "target remote localhost:1234",
+            //         "description": "Connect to QEMU remote debugger"
+            //     }
+            // ],
+            // "setupCommands": [
+            //     {
+            //         "description": "Enable pretty-printing for gdb",
+            //         "text": "-enable-pretty-printing",
+            //         "ignoreFailures": true
+            //     },
+            //     { "text": "    -target-select   remote localhost:1234", 
+            //         "description": "connect to target",
+            //          "ignoreFailures": false
+            //     },
+
+            // ],
+            "preLaunchTask": "Build and run"
+        },
 
         {
             "name": "STM32F401",
