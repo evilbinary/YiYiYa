@@ -29,8 +29,8 @@ void do_serial_thread(void) {
   // syscall3(SYS_WRITE, DEVICE_SERIAL, test, kstrlen(test));
   // int fd = syscall2(SYS_OPEN, "/dev/sda/B.TXT", 0);
 
-  #ifdef ARMV7
-    asm("svc #0");
+#ifdef ARMV7
+    // asm("svc #0");
 #endif
   for (;;) {
     kprintf("B%d ",count);

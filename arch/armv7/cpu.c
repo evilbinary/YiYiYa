@@ -113,13 +113,6 @@ void tlbimva(unsigned long mva) {
 
 void cpu_set_page(u32 page_table) {
   // set ttbcr0
-  write_ttbr0(page_table);
-  isb();
-  write_ttbr1(page_table);
-  isb();
-  write_ttbcr(TTBCRN_16K);
-  isb();
-  dsb();
   // set all permission
   // cpu_set_domain(~0);
 }
@@ -327,14 +320,15 @@ void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
   interrupt_context_t* user = stack0;
   kmemset(user, 0, sizeof(interrupt_context_t));
   user->lr = entry;  // r14
-  user->lr += 4;
+  // user->lr += 1;
+  user->pc = user->lr;
   user->psr = cpsr.val;
   user->r0 = 0;
   user->r1 = 0x00010001;
   user->r2 = 0x00020002;
   user->r3 = 0x00030003;
   user->r4 = 0x00040004;
-  user->r5 = 0x00050006;
+  user->r5 = 0x00050005;
   user->r6 = 0x00060006;
   user->r7 = 0x00070007;
   user->r8 = 0x00080008;
@@ -354,7 +348,7 @@ void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
 #endif
 }
 
-// #define DEBUG 1
+#define DEBUG 1
 void context_switch(interrupt_context_t* context, context_t** current,
                     context_t* next_context) {
   context_t* current_context = *current;

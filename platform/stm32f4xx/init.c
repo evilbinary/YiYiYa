@@ -101,7 +101,10 @@ void system_init() {
 }
 
 void timer_init(int hz) { kprintf("timer init\n"); }
-void timer_end() {}
+void timer_end() {
+  HAL_IncTick();
+  kprintf("timer end\n");
+}
 
 #define LED_Pin GPIO_PIN_13
 #define LED_GPIO_Port GPIOC
