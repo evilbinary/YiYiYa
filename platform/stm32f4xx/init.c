@@ -25,34 +25,14 @@ void uart_init() {
   }
 }
 
-// USART_HandleTypeDef husart1;
-// void usart_init() {
-//   __HAL_RCC_USART1_CLK_ENABLE();
 
-//   GPIO_InitTypeDef GPIO_InitStruct;
-
-//   GPIO_InitStruct.Pin = GPIO_PIN_9 | GPIO_PIN_10;
-//   GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-//   GPIO_InitStruct.Pull = GPIO_NOPULL;
-//   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-//   GPIO_InitStruct.Alternate = GPIO_AF7_USART1;
-//   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-//   husart1.Instance = USART1;
-//   husart1.Init.BaudRate = 115200;
-//   husart1.Init.WordLength = USART_WORDLENGTH_8B;
-//   husart1.Init.StopBits = USART_STOPBITS_1;
-//   husart1.Init.Parity = USART_PARITY_NONE;
-//   husart1.Init.Mode = USART_MODE_TX_RX;
-//   husart1.Init.CLKPolarity = USART_POLARITY_LOW;
-//   husart1.Init.CLKPhase = USART_PHASE_1EDGE;
-//   husart1.Init.CLKLastBit = USART_LASTBIT_DISABLE;
-//   if (HAL_USART_Init(&husart1) != HAL_OK) {
-//     kprintf("error uart init\n");
-//   }
-// }
-
-void uart_send(unsigned int c) { HAL_UART_Transmit(&huart1, &c, 1, 1000); }
+void uart_send(unsigned int c) {
+  if (c == '\n') {
+    HAL_UART_Transmit(&huart1, &c, 1, 1000);
+    c = '\r';
+  }
+  HAL_UART_Transmit(&huart1, &c, 1, 1000);
+}
 
 void system_init_clock() {
   RCC_OscInitTypeDef RCC_OscInitStruct;

@@ -28,8 +28,12 @@ void do_serial_thread(void) {
   kmemset(buf, 1, 512);
   // syscall3(SYS_WRITE, DEVICE_SERIAL, test, kstrlen(test));
   // int fd = syscall2(SYS_OPEN, "/dev/sda/B.TXT", 0);
+
+  #ifdef ARMV7
+    asm("svc #0");
+#endif
   for (;;) {
-    // kprintf("B%d ",count);
+    kprintf("B%d ",count);
     // syscall1(SYS_PRINT, "2");
     // if(count%100==0){
     //   // syscall1(SYS_PRINT, "\n");
@@ -44,7 +48,10 @@ void do_serial_thread(void) {
     // syscall3(DEV_WRITE, DEVICE_SATA, buf, 512);
     // memset(buf, 0, 512);
     // syscall3(DEV_READ, DEVICE_SATA, buf, 512);
+
+
+    
     count++;
     if (i % 4 == 0) i = 0;
-  }
+  } 
 }

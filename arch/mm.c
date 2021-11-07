@@ -20,9 +20,9 @@ void mm_init() {
   kprintf("phy dump\n");
   mm_dump_phy();
   kprintf("alloc init\n");
-
   // mm init
   mm_alloc_init();
+  kprintf("mm init default\n");
   mm_init_default();
 }
 
@@ -88,7 +88,7 @@ void mm_dump_phy() {
     kprintf("base:%x %x lenght:%x %x type:%d\n", m->baseh, m->basel, m->lengthh,
             m->lengthl, m->type);
   }
-  kprintf("total memory %dm\n", boot_info->total_memory / 1024 / 1024);
+  kprintf("total memory %dm %dk\n", boot_info->total_memory / 1024 / 1024,boot_info->total_memory/1024);
 }
 
 void* mm_alloc(size_t size) {

@@ -50,14 +50,13 @@ typedef struct interrupt_context {
 
 #define interrupt_entering_code(VEC, CODE) \
   asm volatile(                            \
-      "mrs r0, psp\n"                      \
-      "mov r1, r0\n"                       \
+      "mrs r1, psp\n"                      \
+      "mov r0, sp\n"                       \
       "stmfd r0!,{r1}\n"                   \
       "stmfd r0!, {r4-r11}\n"              \
       "mov r1,%0\n"                        \
       "mov r2,%1\n"                        \
       "stmfd r0!, {r1,r2} \n"              \
-      "mov r0,sp\n"                        \
       :                                    \
       : "i"(VEC), "i"(CODE))
 
@@ -80,8 +79,9 @@ typedef struct interrupt_context {
       "ldmfd r0!,{r1,r2}\n"  \
       "ldmfd r0!,{r4-r11}\n" \
       "ldmfd r0!,{r1}\n"     \
+      "ldr lr,[r0,#20 ] \n"                    \
       "msr psp, r1\n"        \
-      "subs pc,lr,#4\n"      \
+      "adds lr,lr,#4\n"       \
       "bx lr\n"              \
       :                      \
       :)

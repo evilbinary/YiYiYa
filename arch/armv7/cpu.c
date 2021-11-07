@@ -316,16 +316,10 @@ void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
     // kernel mode
     cpsr.Z = 1;
     cpsr.C = 1;
-    cpsr.A = 1;
-    cpsr.I = 0;
-    cpsr.F = 1;
-    cpsr.M = 0x1f;
     interrupt_context_t* c = stack0;
   } else if (level == 3) {
-    cpsr.I = 0;
-    cpsr.F = 0;
-    cpsr.T = 0;  // arm
-    cpsr.M = 0x10;
+    cpsr.Z = 1;
+    cpsr.C = 1;
   } else {
     kprintf("not suppport level %d\n", level);
   }
@@ -429,12 +423,8 @@ void context_clone(context_t* des, context_t* src, u32* stack0, u32* stack3,
     cpsr.val = 0;
     cpsr.Z = 1;
     cpsr.C = 1;
-    cpsr.A = 1;
-    cpsr.I = 1;
-    cpsr.F = 1;
     cpsr.T =0;
 
-    cpsr.M = 0x13;
     d0->psr = cpsr.val;
     d0->sp=stack3;
     des->esp=stack3;

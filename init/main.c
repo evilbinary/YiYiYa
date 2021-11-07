@@ -68,7 +68,7 @@ int kmain(int argc, char* argv[]) {
 #ifdef ARM 
 
 #ifdef ARMV7
-  module_regist(&hello_module);
+  // module_regist(&hello_module);
 #else
   module_regist(&serial_module);
   module_regist(&i2c_module);

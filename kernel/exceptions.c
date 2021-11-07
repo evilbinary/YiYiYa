@@ -7,6 +7,8 @@
 
 #include "thread.h"
 
+extern context_t* current_context;
+
 interrupt_handler_t *exception_handlers[IDT_NUMBER];
 void exception_regist(u32 vec, interrupt_handler_t handler) {
   exception_handlers[vec] = handler;
@@ -14,6 +16,19 @@ void exception_regist(u32 vec, interrupt_handler_t handler) {
 
 void exception_info(interrupt_context_t *context) {
 #ifdef ARM
+#ifdef ARMV7
+  static const char *exception_msg[] = {
+      "NONE", "RESET", "NONE", "NONE", "NONE", "NONE", "NONE",       "NONE",
+      "NONE", "NONE",  "NONE", "SVC",  "NONE", "NONE", "SYS PENDSV", "SYS TICK",
+  };
+  if (context->no < sizeof exception_msg) {
+    kprintf("exception %d: %s\n----------------------------\n", context->no,
+            exception_msg[context->no]);
+  } else {
+    kprintf("exception %d:\n----------------------------\n", context->no);
+  }
+
+#else
   static const char *exception_msg[] = {"RESET",      "UNDEFINED",  "SVC",
                                         "PREF ABORT", "DATA ABORT", "NOT USE",
                                         "IRQ",        "FIQ"};
@@ -31,6 +46,7 @@ void exception_info(interrupt_context_t *context) {
           read_dfar());
   kprintf("pc: %x\n", read_pc());
   context_dump_interrupt(context);
+#endif
 
 #elif defined(X86)
   static const char *exception_msg[] = {
@@ -48,14 +64,13 @@ void exception_info(interrupt_context_t *context) {
   if (context->no != 14) {
     thread_t *current = thread_current();
     if (context->no < sizeof exception_msg) {
-      kprintf("exception %d: %s", context->no,
-              exception_msg[context->no]);
-   
+      kprintf("exception %d: %s", context->no, exception_msg[context->no]);
+
     } else {
       kprintf("interrupt %d", context->no);
     }
-    if(current!=NULL){
-        kprintf("\ntid %d %s ",current->id,current->name);
+    if (current != NULL) {
+      kprintf("\ntid %d %s ", current->id, current->name);
     }
     kprintf("\n----------------------------\n");
     context_dump_interrupt(context);
@@ -187,21 +202,21 @@ INTERRUPT_SERVICE
 void svc_handler() {
   interrupt_entering_code(2, 0);
   interrupt_process(exception_info);
-  cpu_halt();
+  interrupt_exit();
 }
 
 INTERRUPT_SERVICE
 void sys_tick_handler() {
   interrupt_entering_code(2, 0);
-  interrupt_process(exception_info);
-  cpu_halt();
+  interrupt_process(do_schedule);
+  interrupt_exit_context(current_context);
 }
 
 INTERRUPT_SERVICE
 void sys_pendsv_handler() {
   interrupt_entering_code(2, 0);
   interrupt_process(exception_info);
-  cpu_halt();
+  interrupt_exit();
 }
 
 #else
@@ -280,7 +295,8 @@ void do_page_fault(interrupt_context_t *context) {
     if (mode == USER_MODE) {
       vmemory_area_t *area = vmemory_area_find(current->vmm, fault_addr, 0);
       if (area == NULL) {
-        kprintf("tid: %d %s memory fault at %x\n", current->id,current->name, fault_addr);
+        kprintf("tid: %d %s memory fault at %x\n", current->id, current->name,
+                fault_addr);
         dump_fault(context, fault_addr);
         thread_exit(current, -1);
         cpu_halt();
@@ -292,8 +308,8 @@ void do_page_fault(interrupt_context_t *context) {
         valloc(fault_addr, PAGE_SIZE);
       } else {
         // valloc(fault_addr, PAGE_SIZE);
-        kprintf("tid: %d %s phy: %x remap memory fault at %x\n", current->id,current->name, phy,
-                fault_addr);
+        kprintf("tid: %d %s phy: %x remap memory fault at %x\n", current->id,
+                current->name, phy, fault_addr);
         dump_fault(context, fault_addr);
         // mmu_dump_page(current->context.page_dir,current->context.page_dir,0);
         thread_exit(current, -1);
@@ -357,7 +373,8 @@ void do_page_fault(interrupt_context_t *context) {
     if (current != NULL) {
       vmemory_area_t *area = vmemory_area_find(current->vmm, fault_addr, 0);
       if (area == NULL) {
-        kprintf("\ntid: %d %s memory fault at %x\n",current->id,current->name, fault_addr);
+        kprintf("\ntid: %d %s memory fault at %x\n", current->id, current->name,
+                fault_addr);
         dump_fault(context, fault_addr);
         thread_exit(current, -1);
         return;
@@ -370,8 +387,8 @@ void do_page_fault(interrupt_context_t *context) {
       if (phy == NULL) {
         valloc(fault_addr, PAGE_SIZE);
       } else {
-        kprintf("tid: %d %s phy remap memory fault at %x\n", current->id,current->name,
-                fault_addr);
+        kprintf("tid: %d %s phy remap memory fault at %x\n", current->id,
+                current->name, fault_addr);
         dump_fault(context, fault_addr);
         thread_exit(current, -1);
       }

@@ -67,7 +67,7 @@ void do_shell_thread(void) {
   int count = 0;
   for (;;) {
     int ret = 0;
-    // kprintf("A%d ",count);
+    kprintf("A%d ",count);
     // syscall1(SYS_PRINT, "1");
     // if(count%100==0){
     //   syscall1(SYS_PRINT, "\n");

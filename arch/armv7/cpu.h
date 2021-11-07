@@ -24,17 +24,13 @@ typedef struct context_t {
 typedef struct cpsr {
   union {
     struct {
-      u32 M : 5;
-      u32 T : 1;
-      u32 F : 1;
-      u32 I : 1;
-      u32 A : 1;
-      u32 E : 1;
-      u32 RESERVED2 : 6;
+      u32 NO : 9;
+      u32 RESERVED0 : 1;
+      u32 TI : 6;
       u32 GE : 4;
       u32 RESERVED1 : 4;
-      u32 J : 1;
-      u32 Res : 2;
+      u32 T : 1;
+      u32 TI2 : 2;
       u32 Q : 1;
       u32 V : 1;
       u32 C : 1;
@@ -64,6 +60,7 @@ typedef u32 (*sys_call_fn)(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5,
 #define context_ret(context) context->r0
 
 #define context_restore(duck_context) \
+  cpu_sti();\
   interrupt_exit_context(duck_context);
 
 
