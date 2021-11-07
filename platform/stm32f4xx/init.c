@@ -25,7 +25,6 @@ void uart_init() {
   }
 }
 
-
 void uart_send(unsigned int c) {
   if (c == '\n') {
     HAL_UART_Transmit(&huart1, &c, 1, 1000);
@@ -41,7 +40,8 @@ void system_init_clock() {
   /** Configure the main internal regulator output voltage
    */
   __HAL_RCC_PWR_CLK_ENABLE();
-
+  __HAL_RCC_SYSCFG_CLK_ENABLE();
+  __HAL_RCC_HSI_ENABLE();
   // __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE2);
   /** Initializes the RCC Oscillators according to the specified parameters
    * in the RCC_OscInitTypeDef structure.
@@ -64,7 +64,8 @@ void system_init_clock() {
    */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK |
                                 RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
+  RCC_ClkInitStruct.SYSCLKSource =
+      RCC_SYSCLKSOURCE_HSI;  // RCC_SYSCLKSOURCE_PLLCLK
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
@@ -104,6 +105,17 @@ void timer_init(int hz) { kprintf("timer init\n"); }
 void timer_end() {
   HAL_IncTick();
   kprintf("timer end\n");
+
+  // HAL_SYSTICK_Config(SystemCoreClock / (1000U / uwTickFreq));
+  // SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk | SysTick_CTRL_TICKINT_Msk |
+  //                 SysTick_CTRL_ENABLE_Msk;
+
+  // asm("CPSIE f\n");
+  // asm("CPSIE i\n");
+  // __set_FAULTMASK(0);
+  // __enable_irq();
+  // HAL_NVIC_EnableIRQ(SysTick_IRQn);
+  // HAL_NVIC_ClearPendingIRQ(SysTick_IRQn);
 }
 
 #define LED_Pin GPIO_PIN_13

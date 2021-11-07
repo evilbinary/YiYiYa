@@ -16,17 +16,17 @@ support_arch=support_x86
 
 # arch support x86 arm
 # arch='armv7-a'
-arch='armv7'
+# arch='armv7'
 # arch='armv5'
-# arch='x86' 
+arch='x86' 
 # arch='xtensa'
 
 # board select platform
-# platform='intel'
+platform='intel'
 # platform='v3s'
 # platform='raspi2'
 # platform='esp32'
-platform='stm32f4xx'
+# platform='stm32f4xx'
 
 
 DefaultEnvironment(tools=[])
@@ -95,7 +95,7 @@ if plt=='Linux':
     pass
 elif plt=='Windows':
     env['LINKFLAGS']='-nostdlib  ',
-    env['CFLAGS']= env['CFLAGS']+'  ' #-ffreestanding -nostdlib -fno-stack-check -fno-stack-protector -mno-stack-arg-probe
+    env['CFLAGS']= env['CFLAGS']+' -fno-stack-protector -mno-stack-arg-probe ' #-ffreestanding -nostdlib  
     env['USER']='--entry main -Txlinker/user.ld   '
 
 if arch in support_arm:
@@ -112,7 +112,7 @@ if arch in support_arm:
         env['LINKLD']='xlinker/link-v3s.ld'
     elif platform =='stm32f4xx':
         env['APP']=False
-        env['CFLAGS']= env['CFLAGS']+ ' -specs=nosys.specs -mcpu=cortex-m4 -nolibc -nostdlib -nostdinc -fno-builtin -DUSE_HAL_DRIVER -DSTM32F401xC  -mthumb -mthumb-interwork  -mfloat-abi=soft -mfpu=vfpv4-d16 '# -Wl,--gc-sections -fdata-sections -ffunction-sections    -mfpu=fpv4-sp-d16  -mcpu=cortex-m4  -ffreestanding -nostdlib  -mfloat-abi=hard -mfpu=fpv4-sp-d16   # -mfloat-abi=hard -mfloat-abi=softfp  -mfloat-abi=softfp
+        env['CFLAGS']= env['CFLAGS']+ ' -specs=nosys.specs -mcpu=cortex-m4 -nolibc -nostdlib -nostdinc -fno-builtin -DUSE_HAL_DRIVER   -mthumb -mthumb-interwork  -mfloat-abi=soft -mfpu=vfpv4-d16 -DSTM32F401xC'# -DSTM32F401xC  -Wl,--gc-sections -fdata-sections -ffunction-sections    -mfpu=fpv4-sp-d16  -mcpu=cortex-m4  -ffreestanding -nostdlib  -mfloat-abi=hard -mfpu=fpv4-sp-d16   # -mfloat-abi=hard -mfloat-abi=softfp  -mfloat-abi=softfp
         env['LINKLD']='xlinker/link-stm32f4xx.ld'
         arch='armv7e-m'
     else:
@@ -199,8 +199,8 @@ Depends(image, kernel)
 
 
 
-SConscript(dirs=['libs/libc'], exports='env')
-app=SConscript(dirs=['app'], exports='env')
+# SConscript(dirs=['libs/libc'], exports='env')
+# app=SConscript(dirs=['app'], exports='env')
 
 
 

@@ -32,6 +32,8 @@
     "stm32f4xx_usart.h": "c",
     "stm32f4xx.h": "c",
     "stm32f4xx_hal_def.h": "c",
-    "types.h": "c"
+    "types.h": "c",
+    "math.h": "c",
+    "stm32f429xx.h": "c"
   }
 }

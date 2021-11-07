@@ -29,11 +29,12 @@ void do_serial_thread(void) {
   // syscall3(SYS_WRITE, DEVICE_SERIAL, test, kstrlen(test));
   // int fd = syscall2(SYS_OPEN, "/dev/sda/B.TXT", 0);
 
-#ifdef ARMV7
-    // asm("svc #0");
-#endif
+
+
   for (;;) {
-    kprintf("B%d ",count);
+    #ifdef ARMV7
+    kprintf("A%d ",count);
+    #endif
     // syscall1(SYS_PRINT, "2");
     // if(count%100==0){
     //   // syscall1(SYS_PRINT, "\n");

@@ -16,7 +16,6 @@
 _start:
 boot_reset_handler:  
     ldr   sp, =_estack
-    cpsid i
     bl init_boot
     
 boot_halt:

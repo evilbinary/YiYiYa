@@ -69,43 +69,6 @@ u32 read_fp() {
   return val;
 }
 
-static inline u32 read_ttbcr(void) {
-  u32 val = 0;
-  asm volatile("mrc p15, 0, %0, c2, c0, 2" : "=r"(val));
-  return val;
-}
-
-static inline void write_ttbcr(u32 val) {
-  asm volatile("mcr p15, 0, %0, c2, c0, 2" : : "r"(val) : "memory");
-}
-
-static inline void write_ttbr0(u32 val) {
-  asm volatile("mcr p15, 0, %0, c2, c0, 0" : : "r"(val) : "memory");
-}
-
-static inline u32 read_ttbr0() {
-  u32 val = 0;
-  asm volatile("mrc p15, 0, %0, c2, c0, 0" : "=r"(val));
-  return val;
-}
-
-static inline void write_ttbr1(u32 val) {
-  asm volatile("mcr p15, 0, %0, c2, c0, 1" : : "r"(val) : "memory");
-}
-
-static inline u32 read_ttbr1() {
-  u32 val = 0;
-  asm volatile("mrc p15, 0, %0, c2, c0, 1" : "=r"(val));
-  return val;
-}
-
-u32 cpu_set_domain(u32 val) {
-  u32 old;
-  asm volatile("mrc p15, 0, %0, c3, c0,0\n" : "=r"(old));
-  asm volatile("mcr p15, 0, %0, c3, c0,0\n" : : "r"(val) : "memory");
-  return old;
-}
-
 /* invalidate unified TLB by MVA and ASID */
 void tlbimva(unsigned long mva) {
   asm volatile("mcr p15, 0, %0, c8, c7, 1" : : "r"(mva) : "memory");
@@ -304,15 +267,15 @@ void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
   context->esp0 = stack0;
   u32 cs, ds;
   cpsr_t cpsr;
-  cpsr.val = 0;
+  cpsr.val = 0x1000000;
   if (level == 0) {
     // kernel mode
-    cpsr.Z = 1;
-    cpsr.C = 1;
+    cpsr.Z = 0;
+    cpsr.C = 0;
     interrupt_context_t* c = stack0;
   } else if (level == 3) {
-    cpsr.Z = 1;
-    cpsr.C = 1;
+    cpsr.Z = 0;
+    cpsr.C = 0;
   } else {
     kprintf("not suppport level %d\n", level);
   }
@@ -415,8 +378,8 @@ void context_clone(context_t* des, context_t* src, u32* stack0, u32* stack3,
   if (stack3 != NULL) {
     cpsr_t cpsr;
     cpsr.val = 0;
-    cpsr.Z = 1;
-    cpsr.C = 1;
+    cpsr.Z = 0;
+    cpsr.C = 0;
     cpsr.T =0;
 
     d0->psr = cpsr.val;
