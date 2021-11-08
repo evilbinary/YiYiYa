@@ -15,8 +15,8 @@ void init_memory() {
   memory_info_t* ptr = _boot_info->memory;
   _boot_info->total_memory = 0;
  
-  ptr->length=1024*32;//32k
-  ptr->base  =&_estack-ptr->length; 
+  ptr->length=64*1024-(&_ebss - &_sdata);//64k
+  ptr->base  =&_ebss; 
   ptr->type=1;
   _boot_info->total_memory += ptr->length;
   ptr++;

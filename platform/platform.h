@@ -33,7 +33,12 @@
 #ifdef X86
 #define IDT_NUMBER 512
 #else
+
+#ifdef ARMV7
+#define IDT_NUMBER 64
+#else
 #define IDT_NUMBER 256
+#endif
 #endif
 
 #endif

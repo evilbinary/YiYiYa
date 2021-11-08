@@ -267,15 +267,15 @@ void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
   context->esp0 = stack0;
   u32 cs, ds;
   cpsr_t cpsr;
-  cpsr.val = 0x1000000;
+  cpsr.val = 0x21000000;
   if (level == 0) {
     // kernel mode
-    cpsr.Z = 0;
-    cpsr.C = 0;
+    // cpsr.Z = 0;
+    // cpsr.C = 0;
     interrupt_context_t* c = stack0;
   } else if (level == 3) {
-    cpsr.Z = 0;
-    cpsr.C = 0;
+    // cpsr.Z = 0;
+    // cpsr.C = 0;
   } else {
     kprintf("not suppport level %d\n", level);
   }

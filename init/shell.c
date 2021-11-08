@@ -4,6 +4,7 @@
  * 邮箱: rootdebug@163.com
  ********************************************************************/
 #include "main.h"
+#include "gpio.h"
 
 void test_cpu_speed() {
   int* p = 0x70100000;
@@ -69,6 +70,8 @@ void do_shell_thread(void) {
     int ret = 0;
     #ifdef ARMV7
     kprintf("B%d ",count);
+
+    kprintf("=>load: %d val: %d ctl: %x\n", SysTick->LOAD,SysTick->VAL,SysTick->CTRL);
     #endif
     // syscall1(SYS_PRINT, "1");
     // if(count%100==0){

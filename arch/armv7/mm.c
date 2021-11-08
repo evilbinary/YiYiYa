@@ -10,7 +10,7 @@
 #include "cpu.h"
 #include "gpio.h"
 
-#define PAGE_DIR_NUMBER 4096 *1
+#define PAGE_DIR_NUMBER 1024 *1
 
 extern boot_info_t* boot_info;
 static u32 page_dir[PAGE_DIR_NUMBER] __attribute__((aligned(0x100)));
