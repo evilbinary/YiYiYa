@@ -70,8 +70,7 @@ void do_shell_thread(void) {
     int ret = 0;
     #ifdef ARMV7
     kprintf("B%d ",count);
-
-    kprintf("=>load: %d val: %d ctl: %x\n", SysTick->LOAD,SysTick->VAL,SysTick->CTRL);
+    // kprintf("=>load: %d val: %d ctl: %x\n", SysTick->LOAD,SysTick->VAL,SysTick->CTRL);
     #endif
     // syscall1(SYS_PRINT, "1");
     // if(count%100==0){

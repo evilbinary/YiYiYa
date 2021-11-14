@@ -51,24 +51,23 @@ typedef struct interrupt_context {
 #define interrupt_entering_code(VEC, CODE) \
   asm volatile(                            \
       "mrs r1, psp\n"                      \
-      "mov r0, sp\n"                       \
-      "stmfd r0!,{r1}\n"                   \
-      "stmfd r0!, {r4-r11}\n"              \
+      "stmfd sp!,{r1}\n"                   \
+      "stmfd sp!, {r4-r11}\n"              \
       "mov r1,%0\n"                        \
       "mov r2,%1\n"                        \
-      "stmfd r0!, {r1,r2} \n"              \
+      "stmfd sp!, {r1,r2} \n"              \
+      "mov r0,sp\n"                        \
       :                                    \
       : "i"(VEC), "i"(CODE))
 
 #define interrupt_exit_context(duck_context)   \
   asm volatile(                              \ 
-      "ldr r0,%0 \n"                           \
-      "ldmfd r0!,{r1,r2}\n"                    \
-      "ldmfd r0!,{r4-r11}\n"                   \
-      "ldmfd r0!,{r1}\n"                       \
-      "ldr lr,[r0,#20 ]\n"                     \
-      "orr lr,lr,#4 \n"                        \
+      "ldr sp,%0 \n"                           \
+      "ldmfd sp!,{r1,r2}\n"                    \
+      "ldmfd sp!,{r4-r11}\n"                   \
+      "ldmfd sp!,{r1}\n"                       \
       "msr psp, r1\n"                          \
+      "ldr lr,[sp,#20 ]\n"                     \
       "bx lr\n"                                \
                                              : \
                                              : "m"(duck_context->esp0))
@@ -77,12 +76,11 @@ typedef struct interrupt_context {
 
 #define interrupt_exit()     \
   asm volatile(              \
-      "ldmfd r0!,{r1,r2}\n"  \
-      "ldmfd r0!,{r4-r11}\n" \
-      "ldmfd r0!,{r1}\n"     \
-      "ldr lr,[r0,#20 ]\n"   \
+      "ldmfd sp!,{r1,r2}\n"  \
+      "ldmfd sp!,{r4-r11}\n" \
+      "ldmfd sp!,{r1}\n"     \
       "msr psp, r1\n"        \
-      "orr lr,lr,#4\n"      \
+      "ldr lr,[sp,#20 ]\n"   \
       "bx lr\n"              \
       :                      \
       :)

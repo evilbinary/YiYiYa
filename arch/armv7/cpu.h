@@ -61,7 +61,21 @@ typedef u32 (*sys_call_fn)(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5,
 
 #define context_restore(duck_context) \
   cpu_sti();\
-  interrupt_exit_context(duck_context);
+  asm volatile(                              \ 
+      "ldr r0,%0 \n"                           \
+      "ldmfd r0!,{r1,r2}\n"                    \
+      "ldmfd r0!,{r4-r11}\n"                   \
+      "ldmfd r0!,{r1}\n"                       \
+      "ldr lr,[r0,#20 ]\n"                     \
+      "ldr r3,[r0,#24 ]\n"                     \
+      "msr psp, r1\n"                          \
+      "mov r0, #3\n"                          \
+      "msr control, r0\n"                      \
+      "bx r3\n"                                \
+                                             : \
+                                             : "m"(duck_context->esp0))
+    //interrupt_exit_context(duck_context)
+   
 
 
 void context_clone(context_t* context, context_t* src, u32* stack0, u32* stack3,

@@ -282,9 +282,9 @@ void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
 
   interrupt_context_t* user = stack0;
   kmemset(user, 0, sizeof(interrupt_context_t));
-  user->lr = entry;  // r14
-  // user->lr += 1;
-  user->pc = user->lr;
+  user->lr = 0xFFFFFFFD;
+  // user->lr =entry;
+  user->pc = entry;
   user->psr = cpsr.val;
   user->r0 = 0;
   user->r1 = 0x00010001;
@@ -311,7 +311,7 @@ void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
 #endif
 }
 
-#define DEBUG 1
+// #define DEBUG 1
 void context_switch(interrupt_context_t* context, context_t** current,
                     context_t* next_context) {
   context_t* current_context = *current;
@@ -321,7 +321,7 @@ void context_switch(interrupt_context_t* context, context_t** current,
 #endif
   current_context->esp0 = context;
   current_context->esp = context->sp;
-  current_context->eip = context->lr;
+  current_context->eip = context->pc;
   *current = next_context;
   context_switch_page(next_context->page_dir);
 #if DEBUG

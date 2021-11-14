@@ -106,7 +106,7 @@ void timer_end() {
   HAL_IncTick();
   kprintf("timer end\n");
 
-  kprintf("load: %d val: %d ctl: %x SCB->VTOR %x\n", SysTick->LOAD,SysTick->VAL,SysTick->CTRL,SCB->VTOR);
+  //kprintf("load: %d val: %d ctl: %x SCB->VTOR %x\n", SysTick->LOAD,SysTick->VAL,SysTick->CTRL,SCB->VTOR);
 
   // HAL_SYSTICK_Config(SystemCoreClock / (1000U / uwTickFreq));
   // SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk | SysTick_CTRL_TICKINT_Msk |
