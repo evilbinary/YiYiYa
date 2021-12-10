@@ -16,17 +16,17 @@ support_arch=support_x86
 
 # arch support x86 arm
 # arch='armv7-a'
-# arch='armv7'
+arch='armv7'
 # arch='armv5'
-arch='x86' 
+# arch='x86' 
 # arch='xtensa'
 
 # board select platform
-platform='intel'
+# platform='intel'
 # platform='v3s'
 # platform='raspi2'
 # platform='esp32'
-# platform='stm32f4xx'
+platform='stm32f4xx'
 
 
 DefaultEnvironment(tools=[])

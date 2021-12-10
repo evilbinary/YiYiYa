@@ -68,6 +68,7 @@ typedef struct interrupt_context {
       "ldmfd sp!,{r1}\n"                       \
       "msr psp, r1\n"                          \
       "ldr lr,[sp,#20 ]\n"                     \
+      "isb\n"                                  \
       "bx lr\n"                                \
                                              : \
                                              : "m"(duck_context->esp0))

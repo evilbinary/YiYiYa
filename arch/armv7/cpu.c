@@ -267,7 +267,7 @@ void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
   context->esp0 = stack0;
   u32 cs, ds;
   cpsr_t cpsr;
-  cpsr.val = 0x21000000;
+  cpsr.val = 0x1000000;
   if (level == 0) {
     // kernel mode
     // cpsr.Z = 0;
@@ -280,10 +280,9 @@ void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
     kprintf("not suppport level %d\n", level);
   }
 
-  interrupt_context_t* user = stack0;
+  interrupt_context_t* user = stack3;
   kmemset(user, 0, sizeof(interrupt_context_t));
-  user->lr = 0xFFFFFFFD;
-  // user->lr =entry;
+  user->lr =entry;
   user->pc = entry;
   user->psr = cpsr.val;
   user->r0 = 0;
@@ -300,8 +299,31 @@ void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
   user->r11 = 0x00110011;  // fp
   user->r12 = 0x00120012;  // ip
   user->sp = stack3;       // r13
+  stack3= stack3+ sizeof(interrupt_context_t)-0x20;
+
+  interrupt_context_t* kernel = stack0;
+  kmemset(kernel, 0, sizeof(interrupt_context_t));
+  kernel->lr = 0xFFFFFFFC;
+  // user->lr =entry;
+  kernel->pc = entry;
+  kernel->psr = cpsr.val;
+  kernel->r0 = 0;
+  kernel->r1 = 0x00010001;
+  kernel->r2 = 0x00020002;
+  kernel->r3 = 0x00030003;
+  kernel->r4 = 0x00040004;
+  kernel->r5 = 0x00050005;
+  kernel->r6 = 0x00060006;
+  kernel->r7 = 0x00070007;
+  kernel->r8 = 0x00080008;
+  kernel->r9 = 0x00090009;
+  kernel->r10 = 0x00100010;
+  kernel->r11 = 0x00110011;  // fp
+  kernel->r12 = 0x00120012;  // ip
+  kernel->sp = stack3;       // r13
   context->esp = stack3;
   context->esp0 = stack0;
+  
 
   ulong addr = (ulong)boot_info->pdt_base;
   context->kernel_page_dir = addr;
@@ -311,7 +333,7 @@ void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
 #endif
 }
 
-// #define DEBUG 1
+#define DEBUG 1
 void context_switch(interrupt_context_t* context, context_t** current,
                     context_t* next_context) {
   context_t* current_context = *current;

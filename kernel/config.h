@@ -62,7 +62,7 @@
 
 #define KERNEL_THREAD_STACK_SIZE 1024*2
 #define THREAD_STACK_SIZE 4096
-#define PAGE_SIZE 0x1000sssssssss
+#define PAGE_SIZE 0x1000
 
 #endif
 
