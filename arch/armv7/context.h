@@ -24,8 +24,6 @@ typedef struct interrupt_context {
   u32 r10;
   u32 r11;  // fp
 
-  u32 sp;  // r13
-
   // auto push
   u32 r0;
   u32 r1;
@@ -50,38 +48,35 @@ typedef struct interrupt_context {
 
 #define interrupt_entering_code(VEC, CODE) \
   asm volatile(                            \
-      "mrs r1, psp\n"                      \
-      "stmfd sp!,{r1}\n"                   \
-      "stmfd sp!, {r4-r11}\n"              \
+      "mrs r0, psp\n"                      \
+      "stmfd r0!, {r4-r11}\n"              \ 
       "mov r1,%0\n"                        \
       "mov r2,%1\n"                        \
-      "stmfd sp!, {r1,r2} \n"              \
-      "mov r0,sp\n"                        \
+      "stmfd r0!, {r1,r2} \n"              \
       :                                    \
       : "i"(VEC), "i"(CODE))
 
 #define interrupt_exit_context(duck_context)   \
   asm volatile(                              \ 
-      "ldr sp,%0 \n"                           \
-      "ldmfd sp!,{r1,r2}\n"                    \
-      "ldmfd sp!,{r4-r11}\n"                   \
-      "ldmfd sp!,{r1}\n"                       \
-      "msr psp, r1\n"                          \
-      "ldr lr,[sp,#20 ]\n"                     \
+      "ldr r0,%0 \n"                           \
+      "ldmfd r0!,{r1,r2}\n"                    \
+      "ldmfd r0!,{r4-r11}\n"                   \
+      "msr psp, r0\n"                          \
+      "mov lr,#0xFFFFFFFD\n"                     \
       "isb\n"                                  \
       "bx lr\n"                                \
                                              : \
-                                             : "m"(duck_context->esp0))
+                                             : "m"(duck_context->esp))
 
 #define interrupt_entering(VEC) interrupt_entering_code(VEC, 0)
 
 #define interrupt_exit()     \
   asm volatile(              \
-      "ldmfd sp!,{r1,r2}\n"  \
-      "ldmfd sp!,{r4-r11}\n" \
-      "ldmfd sp!,{r1}\n"     \
-      "msr psp, r1\n"        \
-      "ldr lr,[sp,#20 ]\n"   \
+      "ldmfd r0!,{r1,r2}\n"  \
+      "ldmfd r0!,{r4-r11}\n" \
+      "msr psp, r0\n"        \
+      "ldr lr,[r0,#20 ]\n"   \
+      "isb\n"                \
       "bx lr\n"              \
       :                      \
       :)

@@ -24,7 +24,11 @@ thread_t* thread_create_name(char* name, void* entry, void* data) {
 
 thread_t* thread_create(void* entry, void* data) {
   u32 size = THREAD_STACK_SIZE;
-  u8* stack0 = kmalloc(size);
+#ifdef NO_THREAD_STACK0
+  u8* stack0 = NULL;
+#else
+    u8* stack0 = kmalloc(size);
+#endif
   u8* stack3 = kmalloc_alignment(size, PAGE_SIZE);
   thread_t* thread = thread_create_ex(entry, stack0, stack3, data, size);
   return thread;

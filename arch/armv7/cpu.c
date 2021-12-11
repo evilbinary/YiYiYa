@@ -282,7 +282,7 @@ void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
 
   interrupt_context_t* user = stack3;
   kmemset(user, 0, sizeof(interrupt_context_t));
-  user->lr =entry;
+  user->lr = 0xFFFFFFFD;
   user->pc = entry;
   user->psr = cpsr.val;
   user->r0 = 0;
@@ -298,29 +298,7 @@ void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
   user->r10 = 0x00100010;
   user->r11 = 0x00110011;  // fp
   user->r12 = 0x00120012;  // ip
-  user->sp = stack3;       // r13
-  stack3= stack3+ sizeof(interrupt_context_t)-0x20;
 
-  interrupt_context_t* kernel = stack0;
-  kmemset(kernel, 0, sizeof(interrupt_context_t));
-  kernel->lr = 0xFFFFFFFC;
-  // user->lr =entry;
-  kernel->pc = entry;
-  kernel->psr = cpsr.val;
-  kernel->r0 = 0;
-  kernel->r1 = 0x00010001;
-  kernel->r2 = 0x00020002;
-  kernel->r3 = 0x00030003;
-  kernel->r4 = 0x00040004;
-  kernel->r5 = 0x00050005;
-  kernel->r6 = 0x00060006;
-  kernel->r7 = 0x00070007;
-  kernel->r8 = 0x00080008;
-  kernel->r9 = 0x00090009;
-  kernel->r10 = 0x00100010;
-  kernel->r11 = 0x00110011;  // fp
-  kernel->r12 = 0x00120012;  // ip
-  kernel->sp = stack3;       // r13
   context->esp = stack3;
   context->esp0 = stack0;
   
@@ -333,7 +311,7 @@ void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
 #endif
 }
 
-#define DEBUG 1
+#define DEBUG 0
 void context_switch(interrupt_context_t* context, context_t** current,
                     context_t* next_context) {
   context_t* current_context = *current;
@@ -341,14 +319,15 @@ void context_switch(interrupt_context_t* context, context_t** current,
   kprintf("-----switch dump current------\n");
   context_dump(current_context);
 #endif
-  current_context->esp0 = context;
-  current_context->esp = context->sp;
+  current_context->esp = (u32)context;
   current_context->eip = context->pc;
   *current = next_context;
+  
   context_switch_page(next_context->page_dir);
 #if DEBUG
   kprintf("-----switch dump next------\n");
   context_dump(next_context);
+  kprintf("\n");
   kprintf("\n");
 #endif
 }
@@ -361,13 +340,13 @@ void context_dump(context_t* c) {
   kprintf("page_dir: %x\n", c->page_dir);
   kprintf("kernel page_dir: %x\n", c->kernel_page_dir);
   kprintf("--interrupt context--\n");
-  interrupt_context_t* context = c->esp0;
+  interrupt_context_t* context = c->esp;
   context_dump_interrupt(context);
 }
 
 void context_dump_interrupt(interrupt_context_t* context) {
   kprintf("lr:  %x cpsr:%x\n", context->lr, context->psr);
-  kprintf("sp:  %x\n", context->sp);
+  kprintf("sp:  %x\n", context);
   kprintf("r0:  %x\n", context->r0);
   kprintf("r1:  %x\n", context->r1);
   kprintf("r2:  %x\n", context->r2);
@@ -405,7 +384,6 @@ void context_clone(context_t* des, context_t* src, u32* stack0, u32* stack3,
     cpsr.T =0;
 
     d0->psr = cpsr.val;
-    d0->sp=stack3;
     des->esp=stack3;
   }
   des->page_dir =src->page_dir;
