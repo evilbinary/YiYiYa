@@ -46,20 +46,35 @@ void system_init_clock() {
   /** Initializes the RCC Oscillators according to the specified parameters
    * in the RCC_OscInitTypeDef structure.
    */
-  RCC_OscInitStruct.OscillatorType =
-      RCC_OSCILLATORTYPE_HSE | RCC_OSCILLATORTYPE_LSE;
-  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
-  RCC_OscInitStruct.LSEState = RCC_LSE_ON;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-  RCC_OscInitStruct.PLL.PLLM = 15;
-  RCC_OscInitStruct.PLL.PLLN = 144;
-  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
-  RCC_OscInitStruct.PLL.PLLQ = 5;
-  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
-    kprintf("errro\n");
-    return;
+  // RCC_OscInitStruct.OscillatorType =
+  //     RCC_OSCILLATORTYPE_HSE | RCC_OSCILLATORTYPE_LSE;
+  // RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  // RCC_OscInitStruct.LSEState = RCC_LSE_ON;
+  // RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  // RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  // RCC_OscInitStruct.PLL.PLLM = 15;
+  // RCC_OscInitStruct.PLL.PLLN = 144;
+  // RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
+  // RCC_OscInitStruct.PLL.PLLQ = 5;
+  // if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
+  //   kprintf("errro\n");
+  //   return;
+  // }
+
+__HAL_RCC_PWR_CLK_ENABLE();
+  // __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE2);
+  /** Initializes the RCC Oscillators according to the specified parameters
+  * in the RCC_OscInitTypeDef structure.
+  */
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+     kprintf("errro\n");
   }
+
   /** Initializes the CPU, AHB and APB buses clocks
    */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK |
@@ -101,23 +116,11 @@ void system_init() {
   uart_init();
 }
 
-void timer_init(int hz) { kprintf("timer init\n"); }
+void timer_init(int hz) {
+  kprintf("timer init\n");
+}
 void timer_end() {
   HAL_IncTick();
-  kprintf("timer end\n");
-
-  //kprintf("load: %d val: %d ctl: %x SCB->VTOR %x\n", SysTick->LOAD,SysTick->VAL,SysTick->CTRL,SCB->VTOR);
-
-  // HAL_SYSTICK_Config(SystemCoreClock / (1000U / uwTickFreq));
-  // SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk | SysTick_CTRL_TICKINT_Msk |
-  //                 SysTick_CTRL_ENABLE_Msk;
-
-  // asm("CPSIE f\n");
-  // asm("CPSIE i\n");
-  // __set_FAULTMASK(0);
-  // __enable_irq();
-  // HAL_NVIC_EnableIRQ(SysTick_IRQn);
-  // HAL_NVIC_ClearPendingIRQ(SysTick_IRQn);
 }
 
 #define LED_Pin GPIO_PIN_13
