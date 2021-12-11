@@ -4,6 +4,7 @@
  * 邮箱: rootdebug@163.com
  ********************************************************************/
 #include "st7735.h"
+
 #include "lcd.h"
 #include "platform/stm32f4xx/gpio.h"
 
@@ -21,20 +22,23 @@ void lcd_fill(u16 xsta, u16 ysta, u16 xend, u16 yend, u16 color) {
   lcd_address_set(xsta, ysta, xend - 1, yend - 1);  //设置显示范围
   for (i = ysta; i < yend; i++) {
     for (j = xsta; j < xend; j++) {
-      lcd_write_data(color);
+      st7735_write_data(color, sizeof(color));
     }
   }
 }
 
 void lcd_address_set(u16 x1, u16 y1, u16 x2, u16 y2) {
-  lcd_write_cmd(0x2a);
-  lcd_write_data_word(x1);
-  lcd_write_data_word(x2);
+  st7735_write_cmd(0x2a);
+  uint8_t data[] = {0x00, x1, 0x00, x2};
+  st7735_write_data(data, sizeof(data));
 
-  lcd_write_cmd(0x2b);
-  lcd_write_data_word(y1);
-  lcd_write_data_word(y2);
-  lcd_write_cmd(0x2C);
+  st7735_write_cmd(0x2b);
+  data[1] = y1;
+  data[3] = y2;
+
+  st7735_write_data(data, sizeof(data));
+
+  st7735_write_cmd(0x2C);
 }
 
 void st7735_select() {
@@ -56,9 +60,9 @@ void st7735_write_cmd(u8 cmd) {
   spi_dev->write(spi_dev, &cmd, sizeof(cmd));
 }
 
-void st7735_write_data(u8 cmd) {
+void st7735_write_data(u8 cmd, int size) {
   gpio_output(ST7735_DC_GPIO_Port, ST7735_DC_Pin, GPIO_PIN_RESET);
-  spi_dev->write(spi_dev, &cmd, sizeof(cmd));
+  spi_dev->write(spi_dev, &cmd, size);
 }
 
 void st7735_init() {
@@ -74,75 +78,75 @@ void st7735_init() {
   // init lcd
   // set horiztional
   st7735_write_cmd(0x36);
-  st7735_write_data(0x00);
+  st7735_write_data(0x00,sizeof(u8));
 
   //
   st7735_write_cmd(0x3A);
-  st7735_write_data(0x05);
+  st7735_write_data(0x05,sizeof(u8));
 
   st7735_write_cmd(0xB2);
-  st7735_write_data(0x0C);
-  st7735_write_data(0x0C);
-  st7735_write_data(0x00);
-  st7735_write_data(0x33);
-  st7735_write_data(0x33);
+  st7735_write_data(0x0C,sizeof(u8));
+  st7735_write_data(0x0C,sizeof(u8));
+  st7735_write_data(0x00,sizeof(u8));
+  st7735_write_data(0x33,sizeof(u8));
+  st7735_write_data(0x33,sizeof(u8));
 
   st7735_write_cmd(0xB7);
-  st7735_write_data(0x35);
+  st7735_write_data(0x35,sizeof(u8));
 
   st7735_write_cmd(0xBB);
-  st7735_write_data(0x19);
+  st7735_write_data(0x19,sizeof(u8));
 
   st7735_write_cmd(0xC0);
-  st7735_write_data(0x2C);
+  st7735_write_data(0x2C,sizeof(u8));
 
   st7735_write_cmd(0xC2);
-  st7735_write_data(0x01);
+  st7735_write_data(0x01,sizeof(u8));
 
   st7735_write_cmd(0xC3);
-  st7735_write_data(0x12);
+  st7735_write_data(0x12,sizeof(u8));
 
   st7735_write_cmd(0xC4);
-  st7735_write_data(0x20);
+  st7735_write_data(0x20,sizeof(u8));
 
   st7735_write_cmd(0xC6);
-  st7735_write_data(0x0F);
+  st7735_write_data(0x0F,sizeof(u8));
 
   st7735_write_cmd(0xD0);
-  st7735_write_data(0xA4);
-  st7735_write_data(0xA1);
+  st7735_write_data(0xA4,sizeof(u8));
+  st7735_write_data(0xA1,sizeof(u8));
 
   st7735_write_cmd(0xE0);
-  st7735_write_data(0xD0);
-  st7735_write_data(0x04);
-  st7735_write_data(0x0D);
-  st7735_write_data(0x11);
-  st7735_write_data(0x13);
-  st7735_write_data(0x2B);
-  st7735_write_data(0x3F);
-  st7735_write_data(0x54);
-  st7735_write_data(0x4C);
-  st7735_write_data(0x18);
-  st7735_write_data(0x0D);
-  st7735_write_data(0x0B);
-  st7735_write_data(0x1F);
-  st7735_write_data(0x23);
+  st7735_write_data(0xD0,sizeof(u8));
+  st7735_write_data(0x04,sizeof(u8));
+  st7735_write_data(0x0D,sizeof(u8));
+  st7735_write_data(0x11,sizeof(u8));
+  st7735_write_data(0x13,sizeof(u8));
+  st7735_write_data(0x2B,sizeof(u8));
+  st7735_write_data(0x3F,sizeof(u8));
+  st7735_write_data(0x54,sizeof(u8));
+  st7735_write_data(0x4C,sizeof(u8));
+  st7735_write_data(0x18,sizeof(u8));
+  st7735_write_data(0x0D,sizeof(u8));
+  st7735_write_data(0x0B,sizeof(u8));
+  st7735_write_data(0x1F,sizeof(u8));
+  st7735_write_data(0x23,sizeof(u8));
 
   st7735_write_cmd(0xE1);
-  st7735_write_data(0xD0);
-  st7735_write_data(0x04);
-  st7735_write_data(0x0C);
-  st7735_write_data(0x11);
-  st7735_write_data(0x13);
-  st7735_write_data(0x2C);
-  st7735_write_data(0x3F);
-  st7735_write_data(0x44);
-  st7735_write_data(0x51);
-  st7735_write_data(0x2F);
-  st7735_write_data(0x1F);
-  st7735_write_data(0x1F);
-  st7735_write_data(0x20);
-  st7735_write_data(0x23);
+  st7735_write_data(0xD0,sizeof(u8));
+  st7735_write_data(0x04,sizeof(u8));
+  st7735_write_data(0x0C,sizeof(u8));
+  st7735_write_data(0x11,sizeof(u8));
+  st7735_write_data(0x13,sizeof(u8));
+  st7735_write_data(0x2C,sizeof(u8));
+  st7735_write_data(0x3F,sizeof(u8));
+  st7735_write_data(0x44,sizeof(u8));
+  st7735_write_data(0x51,sizeof(u8));
+  st7735_write_data(0x2F,sizeof(u8));
+  st7735_write_data(0x1F,sizeof(u8));
+  st7735_write_data(0x1F,sizeof(u8));
+  st7735_write_data(0x20,sizeof(u8));
+  st7735_write_data(0x23,sizeof(u8));
   st7735_write_cmd(0x21);
 
   st7735_write_cmd(0x29);
@@ -154,8 +158,6 @@ void st7735_init() {
 
   st7735_unselect();
 }
-
-
 
 int lcd_init_mode(vga_device_t *vga, int mode) {
   if (mode == VGA_MODE_80x25) {

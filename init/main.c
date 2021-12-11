@@ -9,6 +9,9 @@
 
 #ifdef ARMV7
 extern module_t hello_module;
+extern module_t lcd_module;
+extern module_t gpio_module;
+extern module_t spi_module;
 #else
 
 extern module_t gpu_module;
@@ -68,7 +71,10 @@ int kmain(int argc, char* argv[]) {
 #ifdef ARM 
 
 #ifdef ARMV7
+  module_regist(&gpio_module);
+  module_regist(&spi_module);
   // module_regist(&hello_module);
+  module_regist(&lcd_module);
 #else
   module_regist(&serial_module);
   module_regist(&i2c_module);

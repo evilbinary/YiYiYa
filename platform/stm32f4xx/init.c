@@ -91,11 +91,7 @@ __HAL_RCC_PWR_CLK_ENABLE();
   }
 }
 
-void gpio_init() {
-  __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOC_CLK_ENABLE();
-  __HAL_RCC_GPIOH_CLK_ENABLE();
-}
+ 
 
 void system_init() {
 // enable fpu
@@ -112,7 +108,9 @@ void system_init() {
   system_init_clock();
 
   /* Initialize all configured peripherals */
-  gpio_init();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOH_CLK_ENABLE();
   uart_init();
 }
 

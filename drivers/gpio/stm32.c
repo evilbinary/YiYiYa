@@ -19,7 +19,7 @@ void gpio_pull(u32 gpio, u32 pin, u32 val) {
   GPIO_InitTypeDef GPIO_InitStruct;
   GPIO_InitStruct.Pin  = pin;   
   GPIO_InitStruct.Mode = val;
-  GPIO_Init(gpio, &GPIO_InitStruct);
+  HAL_GPIO_Init(gpio, &GPIO_InitStruct);
 }
 
 void gpio_output(u32 gpio, u32 pin, u32 val) {
