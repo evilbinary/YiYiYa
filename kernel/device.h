@@ -28,7 +28,7 @@ enum {
   DEVICE_SATA6,
   DEVICE_I2C,
   DEVICE_GPIO,
-
+  DEVICE_SPI,
 };
 
 enum {

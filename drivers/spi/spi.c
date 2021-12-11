@@ -45,7 +45,7 @@ int spi_init(void) {
   dev->read = spi_read;
   dev->write = spi_write;
   dev->ioctl = spi_ioctl;
-  dev->id = DEVICE_I2C;
+  dev->id = DEVICE_SPI;
   dev->type = DEVICE_TYPE_CHAR;
   device_add(dev);
 

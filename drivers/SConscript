@@ -43,7 +43,17 @@ if arch in env['ARCHS']:
             'spi/spi.c',
             'spi/bcm2836.c',
             ]
-
+    elif platform=='stm32f4xx':
+            other=[
+                'gpio/gpio.c',
+                'gpio/stm32.c',
+                'i2c/i2c.c',
+                'i2c/stm32.c',
+                'spi/spi.c',
+                'spi/stm32.c',
+                'lcd/lcd.c',
+                'lcd/st7735.c',
+                ]
     driver=[
         'fat/fat.c',
         'fat/byteordering.c',

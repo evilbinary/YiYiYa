@@ -34,6 +34,12 @@
     "stm32f4xx_hal_def.h": "c",
     "types.h": "c",
     "math.h": "c",
-    "stm32f429xx.h": "c"
+    "stm32f429xx.h": "c",
+    "thread.h": "c",
+    "config.h": "c",
+    "v3s.h": "c",
+    "spi.h": "c",
+    "lcd.h": "c",
+    "vga.h": "c"
   }
 }
