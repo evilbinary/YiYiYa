@@ -5,6 +5,7 @@ extern char _edata;
 extern char _sbss;
 extern char _ebss;
 extern char _estack;
+extern char _sidata;
 
 boot_info_t *_boot_info = NULL;
 boot_info_t _boot_data;
@@ -30,6 +31,12 @@ void init_boot() {
   char *dst = NULL;
   char *src = NULL;
 
+  //copy _sidata from flash to sram
+  for(src=&_sidata,dst=&_sdata; dst< &_edata;src++,dst++){
+    *dst=*src;
+  }
+
+  //init bss
   for (dst = &_sbss; dst < &_ebss; dst++) {
     *dst = 0;
   }
