@@ -12,6 +12,7 @@
 
 enum VGA_MODE {
   VGA_MODE_80x25 = 1,
+  VGA_MODE_128x128x16,
   VGA_MODE_320x200x256 ,
   VGA_MODE_480x272x24,
   VGA_MODE_480x272x32,
@@ -34,7 +35,7 @@ enum VGA_MODE {
 
 typedef struct vga_device vga_device_t;
 
-typedef void (*write_pixel_fn)(vga_device_t* vga, u32 x, u32 y, u32 c);
+typedef void (*write_pixel_fn)(vga_device_t* vga, void* buf,u32 len);
 typedef void (*flip_buffer_fn)(vga_device_t* vga,u32 index);
 
 

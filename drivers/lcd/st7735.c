@@ -8,44 +8,50 @@
 #include "lcd.h"
 #include "platform/stm32f4xx/gpio.h"
 
-#define RED    0xf800
-#define GREEN  0x07e0
-#define BLUE   0x001f
-#define YELLOW 0xffe0
-#define WHITE  0xffff
-#define BLACK  0x0000
-#define PURPLE 0xf81f
+#define BLACK 0x0000
+#define WHITE 0xFFFF
 
+#define RED 0x001F
+#define BLUE 0xF800
+#define GREEN 0x00F
+#define YELLOW 0x07FF
+#define MAGENTA 0xF81F
+#define CYAN 0xFFE0
 
-device_t *spi_dev = NULL;
+device_t* spi_dev = NULL;
 
 void delay(int n) {
   for (int i = 0; i < 1000 * n; i++) {
   }
 }
 
-void lcd_fill(u16 xsta, u16 ysta, u16 xend, u16 yend, u16 color) {
+void st7735_fill(u16 xsta, u16 ysta, u16 xend, u16 yend, u16 color) {
   u16 i, j;
-  lcd_address_set(xsta, ysta, xend - 1, yend - 1);  //设置显示范围
+  st7735_address_set(xsta, ysta, xend - 1, yend - 1);  //设置显示范围
   for (i = ysta; i < yend; i++) {
     for (j = xsta; j < xend; j++) {
-      st7735_write_data_size(color,sizeof(color));
+      st7735_write_data_size(color, 2);
     }
   }
 }
 
-void lcd_address_set(u16 x1, u16 y1, u16 x2, u16 y2) {
+void st7735_set_pixel(u16 x, u16 y, u16 color) {
+  st7735_address_set(x, y, x + 1, y + 1);
+  st7735_write_data_size(color, 2);
+}
+
+void st7735_address_set(u16 x1, u16 y1, u16 x2, u16 y2) {
   st7735_write_cmd(0x2a);
   st7735_write_data(0x00);
-  st7735_write_data(x1+2);
+  st7735_write_data(x1 + 2);
   st7735_write_data(0x00);
-  st7735_write_data(x2+2);
+  st7735_write_data(x2 + 2);
 
   st7735_write_cmd(0x2b);
   st7735_write_data(0x00);
-  st7735_write_data(y1+3);
+  st7735_write_data(y1 + 3);
   st7735_write_data(0x00);
-  st7735_write_data(y2+3);
+  st7735_write_data(y2 + 3);
 
   st7735_write_cmd(0x2C);
 }
@@ -201,20 +207,28 @@ void st7735_init() {
   st7735_write_cmd(0xF6);  // Disable ram power save mode
   st7735_write_data(0x00);
 
-  st7735_write_cmd(0x3A);  // 65k mode
-  st7735_write_data(0x05);
+  st7735_write_cmd(0x3A);   // 65k mode
+  st7735_write_data(0x05);  // RGB 5-6-5-bit Input
 
   st7735_write_cmd(0x29);  // turn display on
 
   kprintf("lcd end\n");
-  for (;;) {
-    lcd_fill(0, 0, 128, 128, GREEN);
-  }
-
-  st7735_unselect();
+  // for (;;) {
+  //   lcd_fill(0, 0, 128, 128, GREEN);
+  // }
+  // st7735_unselect();
 }
 
-int lcd_init_mode(vga_device_t *vga, int mode) {
+int st7735_write_pixel(vga_device_t* vga, const void* buf, size_t len) {
+  u16* color = buf;
+  int i=0;
+  for (i = 0; i < len / 6; i += 3) {
+    st7735_set_pixel(color[i], color[i + 1], color[i + 2]);
+  }
+  return i;
+}
+
+int lcd_init_mode(vga_device_t* vga, int mode) {
   if (mode == VGA_MODE_80x25) {
     vga->width = 80;
     vga->height = 25;
@@ -245,7 +259,7 @@ int lcd_init_mode(vga_device_t *vga, int mode) {
     kprintf("no support mode %x\n");
   }
   vga->mode = mode;
-  vga->write = NULL;
+  vga->write = st7735_write_pixel;
   // vga->flip_buffer=gpu_flush;
 
   vga->framebuffer_index = 0;

@@ -18,7 +18,11 @@ size_t lcd_write(device_t* dev, const void* buf, size_t len) {
     kprintf("not found lcd\n");
     return ret;
   }
-  kstrncpy(vga->frambuffer, (const char*)buf, len);
+  if(vga->frambuffer!=NULL){
+    kstrncpy(vga->frambuffer, (const char*)buf, len);
+  }else{
+    vga->write(vga,buf,len);
+  }
   return ret;
 }
 
@@ -54,8 +58,7 @@ void lcd_init_device(device_t* dev) {
   vga_device_t* vga = kmalloc(sizeof(vga_device_t));
   vga->frambuffer = 0;
   dev->data = vga;
-  lcd_init_mode(vga, VGA_MODE_480x272x32);
-  // lcd_init_mode(vga, VGA_MODE_1024x768x32);
+  lcd_init_mode(vga, VGA_MODE_128x128x16);
   kprintf("lcd_init_device end\n");
 }
 
