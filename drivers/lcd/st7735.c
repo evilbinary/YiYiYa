@@ -229,34 +229,11 @@ int st7735_write_pixel(vga_device_t* vga, const void* buf, size_t len) {
 }
 
 int lcd_init_mode(vga_device_t* vga, int mode) {
-  if (mode == VGA_MODE_80x25) {
-    vga->width = 80;
-    vga->height = 25;
-  } else if (mode == VGA_MODE_320x200x256) {
+  if (mode == VGA_MODE_128x128x16) {
     vga->width = 320;
     vga->height = 256;
-  } else if (mode == VGA_MODE_640x480x24) {
-    vga->width = 640;
-    vga->height = 480;
-    vga->bpp = 24;
-  } else if (mode == VGA_MODE_480x272x24) {
-    vga->width = 480;
-    vga->height = 272;
-    vga->bpp = 24;
-  } else if (mode == VGA_MODE_480x272x32) {
-    vga->width = 480;
-    vga->height = 272;
-    vga->bpp = 32;
-  } else if (mode == VGA_MODE_480x272x18) {
-    vga->width = 480;
-    vga->height = 272;
-    vga->bpp = 18;
-  } else if (mode == VGA_MODE_1024x768x32) {
-    vga->width = 1024;
-    vga->height = 768;
-    vga->bpp = 32;
   } else {
-    kprintf("no support mode %x\n");
+    kprintf("lcd no support mode %x\n");
   }
   vga->mode = mode;
   vga->write = st7735_write_pixel;
