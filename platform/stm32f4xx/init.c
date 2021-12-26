@@ -61,7 +61,6 @@ void system_init_clock() {
   //   return;
   // }
 
-__HAL_RCC_PWR_CLK_ENABLE();
   // __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE2);
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
@@ -102,13 +101,14 @@ void system_init() {
   /* Reset of all peripherals, Initializes the Flash interface and the Systick.
    */
   HAL_Init();
-  // HAL_MspInit();
+  HAL_MspInit();
 
   /* Configure the system clock */
   system_init_clock();
 
   /* Initialize all configured peripherals */
   __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE();
   uart_init();

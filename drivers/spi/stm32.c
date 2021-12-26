@@ -32,18 +32,15 @@ u32 stm32_spi_write(spi_t* spi, u32* data, u32 count) {
   return count;
 }
 
-int spi_init_device(device_t* dev) {
-  spi_t* spi = kmalloc(sizeof(spi_t));
-  dev->data = spi;
 
-  spi->inited = 0;
-  spi->read = stm32_spi_read;
-  spi->write = stm32_spi_write;
+void stm32_spi_init(){
+      /* Peripheral clock enable */
+  __HAL_RCC_SPI1_CLK_ENABLE();
 
-  /* SPI1 parameter configuration*/
+ /* SPI1 parameter configuration*/
   hspi1.Instance = SPI1;
   hspi1.Init.Mode = SPI_MODE_MASTER;
-  hspi1.Init.Direction = SPI_DIRECTION_1LINE;
+  hspi1.Init.Direction = SPI_DIRECTION_2LINES;
   hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
   hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
@@ -55,7 +52,21 @@ int spi_init_device(device_t* dev) {
   hspi1.Init.CRCPolynomial = 10;
   if (HAL_SPI_Init(&hspi1) != HAL_OK) {
     kprintf("spi init error\n");
+  } else {
+    kprintf("spi init success\n");
   }
+}
+
+int spi_init_device(device_t* dev) {
+  spi_t* spi = kmalloc(sizeof(spi_t));
+  dev->data = spi;
+
+  spi->inited = 0;
+  spi->read = stm32_spi_read;
+  spi->write = stm32_spi_write;
+
+  stm32_spi_init();
+ 
 
   return 0;
 }

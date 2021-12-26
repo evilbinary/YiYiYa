@@ -7,7 +7,7 @@
 #include "platform/stm32f4xx/gpio.h"
 
 void gpio_config(u32 gpio, u32 pin, u32 val) {
-  GPIO_InitTypeDef GPIO_InitStruct;
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
   GPIO_InitStruct.Pin = pin;
   GPIO_InitStruct.Mode = val;
   GPIO_InitStruct.Pull = GPIO_NOPULL;

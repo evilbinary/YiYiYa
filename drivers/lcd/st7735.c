@@ -8,7 +8,14 @@
 #include "lcd.h"
 #include "platform/stm32f4xx/gpio.h"
 
-#define RED 0xF800
+#define RED    0xf800
+#define GREEN  0x07e0
+#define BLUE   0x001f
+#define YELLOW 0xffe0
+#define WHITE  0xffff
+#define BLACK  0x0000
+#define PURPLE 0xf81f
+
 
 device_t *spi_dev = NULL;
 
@@ -22,21 +29,23 @@ void lcd_fill(u16 xsta, u16 ysta, u16 xend, u16 yend, u16 color) {
   lcd_address_set(xsta, ysta, xend - 1, yend - 1);  //设置显示范围
   for (i = ysta; i < yend; i++) {
     for (j = xsta; j < xend; j++) {
-      st7735_write_data(color, sizeof(color));
+      st7735_write_data_size(color,sizeof(color));
     }
   }
 }
 
 void lcd_address_set(u16 x1, u16 y1, u16 x2, u16 y2) {
   st7735_write_cmd(0x2a);
-  uint8_t data[] = {0x00, x1, 0x00, x2};
-  st7735_write_data(data, sizeof(data));
+  st7735_write_data(0x00);
+  st7735_write_data(x1+2);
+  st7735_write_data(0x00);
+  st7735_write_data(x2+2);
 
   st7735_write_cmd(0x2b);
-  data[1] = y1;
-  data[3] = y2;
-
-  st7735_write_data(data, sizeof(data));
+  st7735_write_data(0x00);
+  st7735_write_data(y1+3);
+  st7735_write_data(0x00);
+  st7735_write_data(y2+3);
 
   st7735_write_cmd(0x2C);
 }
@@ -51,109 +60,155 @@ void st7735_unselect() {
 
 void st7735_reset() {
   gpio_output(ST7735_RES_GPIO_Port, ST7735_RES_Pin, GPIO_PIN_RESET);
+  st7735_select();
   delay(5);
   gpio_output(ST7735_RES_GPIO_Port, ST7735_RES_Pin, GPIO_PIN_SET);
 }
 
 void st7735_write_cmd(u8 cmd) {
   gpio_output(ST7735_DC_GPIO_Port, ST7735_DC_Pin, GPIO_PIN_RESET);
+  st7735_select();
   spi_dev->write(spi_dev, &cmd, sizeof(cmd));
+  st7735_unselect();
 }
 
-void st7735_write_data(u8 cmd, int size) {
-  gpio_output(ST7735_DC_GPIO_Port, ST7735_DC_Pin, GPIO_PIN_RESET);
+void st7735_write_data_size(u8 cmd, int size) {
+  st7735_select();
+  gpio_output(ST7735_DC_GPIO_Port, ST7735_DC_Pin, GPIO_PIN_SET);
   spi_dev->write(spi_dev, &cmd, size);
+  st7735_unselect();
+}
+
+void st7735_write_data(u8 cmd) {
+  gpio_output(ST7735_DC_GPIO_Port, ST7735_DC_Pin, GPIO_PIN_SET);
+  st7735_select();
+  spi_dev->write(spi_dev, &cmd, 1);
+  st7735_unselect();
 }
 
 void st7735_init() {
   gpio_config(ST7735_DC_GPIO_Port, ST7735_DC_Pin, GPIO_MODE_OUTPUT_PP);
-  gpio_config(ST7735_DC_GPIO_Port, ST7735_RES_Pin, GPIO_MODE_OUTPUT_PP);
-  gpio_config(ST7735_DC_GPIO_Port, ST7735_CS_Pin, GPIO_MODE_OUTPUT_PP);
+  gpio_config(ST7735_RES_GPIO_Port, ST7735_RES_Pin, GPIO_MODE_OUTPUT_PP);
+  gpio_config(ST7735_CS_GPIO_Port, ST7735_CS_Pin, GPIO_MODE_OUTPUT_PP);
 
-  st7735_select();
-  st7735_reset();
   // init spi
   spi_dev = device_find(DEVICE_SPI);
 
   // init lcd
-  // set horiztional
-  st7735_write_cmd(0x36);
-  st7735_write_data(0x00,sizeof(u8));
+  st7735_reset();
 
-  //
-  st7735_write_cmd(0x3A);
-  st7735_write_data(0x05,sizeof(u8));
+  st7735_write_cmd(0x11);  // Sleep exit
+  delay(12);
+
+  // frmame rate
+  st7735_write_cmd(0xB1);
+  st7735_write_data(0x01);
+  st7735_write_data(0x2c);
+  st7735_write_data(0x2d);
 
   st7735_write_cmd(0xB2);
-  st7735_write_data(0x0C,sizeof(u8));
-  st7735_write_data(0x0C,sizeof(u8));
-  st7735_write_data(0x00,sizeof(u8));
-  st7735_write_data(0x33,sizeof(u8));
-  st7735_write_data(0x33,sizeof(u8));
+  st7735_write_data(0x01);
+  st7735_write_data(0x2C);
+  st7735_write_data(0x2D);
 
-  st7735_write_cmd(0xB7);
-  st7735_write_data(0x35,sizeof(u8));
+  st7735_write_cmd(0xB3);
+  st7735_write_data(0x01);
+  st7735_write_data(0x2C);
+  st7735_write_data(0x2D);
+  st7735_write_data(0x01);
+  st7735_write_data(0x2C);
+  st7735_write_data(0x2D);
 
-  st7735_write_cmd(0xBB);
-  st7735_write_data(0x19,sizeof(u8));
+  st7735_write_cmd(0xB4);  // Column inversion
+  st7735_write_data(0x07);
 
+  // ST7735R Power Sequence
   st7735_write_cmd(0xC0);
-  st7735_write_data(0x2C,sizeof(u8));
+  st7735_write_data(0xA2);
+  st7735_write_data(0x02);
+  st7735_write_data(0x84);
+  st7735_write_cmd(0xC1);
+  st7735_write_data(0xC5);
 
   st7735_write_cmd(0xC2);
-  st7735_write_data(0x01,sizeof(u8));
+  st7735_write_data(0x0A);
+  st7735_write_data(0x00);
 
   st7735_write_cmd(0xC3);
-  st7735_write_data(0x12,sizeof(u8));
-
+  st7735_write_data(0x8A);
+  st7735_write_data(0x2A);
   st7735_write_cmd(0xC4);
-  st7735_write_data(0x20,sizeof(u8));
+  st7735_write_data(0x8A);
+  st7735_write_data(0xEE);
 
-  st7735_write_cmd(0xC6);
-  st7735_write_data(0x0F,sizeof(u8));
+  st7735_write_cmd(0xC5);  // VCOM
+  st7735_write_data(0x0E);
 
-  st7735_write_cmd(0xD0);
-  st7735_write_data(0xA4,sizeof(u8));
-  st7735_write_data(0xA1,sizeof(u8));
+  st7735_write_cmd(0x36);  // MX, MY, RGB mode
+  st7735_write_data(0xC8);
 
-  st7735_write_cmd(0xE0);
-  st7735_write_data(0xD0,sizeof(u8));
-  st7735_write_data(0x04,sizeof(u8));
-  st7735_write_data(0x0D,sizeof(u8));
-  st7735_write_data(0x11,sizeof(u8));
-  st7735_write_data(0x13,sizeof(u8));
-  st7735_write_data(0x2B,sizeof(u8));
-  st7735_write_data(0x3F,sizeof(u8));
-  st7735_write_data(0x54,sizeof(u8));
-  st7735_write_data(0x4C,sizeof(u8));
-  st7735_write_data(0x18,sizeof(u8));
-  st7735_write_data(0x0D,sizeof(u8));
-  st7735_write_data(0x0B,sizeof(u8));
-  st7735_write_data(0x1F,sizeof(u8));
-  st7735_write_data(0x23,sizeof(u8));
+  // ST7735R Gamma Sequence
+  st7735_write_cmd(0xe0);
+  st7735_write_data(0x0f);
+  st7735_write_data(0x1a);
+  st7735_write_data(0x0f);
+  st7735_write_data(0x18);
+  st7735_write_data(0x2f);
+  st7735_write_data(0x28);
+  st7735_write_data(0x20);
+  st7735_write_data(0x22);
+  st7735_write_data(0x1f);
+  st7735_write_data(0x1b);
+  st7735_write_data(0x23);
+  st7735_write_data(0x37);
+  st7735_write_data(0x00);
+  st7735_write_data(0x07);
+  st7735_write_data(0x02);
+  st7735_write_data(0x10);
 
-  st7735_write_cmd(0xE1);
-  st7735_write_data(0xD0,sizeof(u8));
-  st7735_write_data(0x04,sizeof(u8));
-  st7735_write_data(0x0C,sizeof(u8));
-  st7735_write_data(0x11,sizeof(u8));
-  st7735_write_data(0x13,sizeof(u8));
-  st7735_write_data(0x2C,sizeof(u8));
-  st7735_write_data(0x3F,sizeof(u8));
-  st7735_write_data(0x44,sizeof(u8));
-  st7735_write_data(0x51,sizeof(u8));
-  st7735_write_data(0x2F,sizeof(u8));
-  st7735_write_data(0x1F,sizeof(u8));
-  st7735_write_data(0x1F,sizeof(u8));
-  st7735_write_data(0x20,sizeof(u8));
-  st7735_write_data(0x23,sizeof(u8));
-  st7735_write_cmd(0x21);
+  st7735_write_cmd(0xe1);
+  st7735_write_data(0x0f);
+  st7735_write_data(0x1b);
+  st7735_write_data(0x0f);
+  st7735_write_data(0x17);
+  st7735_write_data(0x33);
+  st7735_write_data(0x2c);
+  st7735_write_data(0x29);
+  st7735_write_data(0x2e);
+  st7735_write_data(0x30);
+  st7735_write_data(0x30);
+  st7735_write_data(0x39);
+  st7735_write_data(0x3f);
+  st7735_write_data(0x00);
+  st7735_write_data(0x07);
+  st7735_write_data(0x03);
+  st7735_write_data(0x10);
 
-  st7735_write_cmd(0x29);
+  st7735_write_cmd(0x2a);
+  st7735_write_data(0x00);
+  st7735_write_data(0x00);
+  st7735_write_data(0x00);
+  st7735_write_data(0x7f);
+
+  st7735_write_cmd(0x2b);
+  st7735_write_data(0x00);
+  st7735_write_data(0x00);
+  st7735_write_data(0x00);
+  st7735_write_data(0x9f);
+
+  st7735_write_cmd(0xF0);  // Enable test command
+  st7735_write_data(0x01);
+  st7735_write_cmd(0xF6);  // Disable ram power save mode
+  st7735_write_data(0x00);
+
+  st7735_write_cmd(0x3A);  // 65k mode
+  st7735_write_data(0x05);
+
+  st7735_write_cmd(0x29);  // turn display on
 
   kprintf("lcd end\n");
   for (;;) {
-    lcd_fill(0, 0, 240, 240, RED);
+    lcd_fill(0, 0, 128, 128, GREEN);
   }
 
   st7735_unselect();

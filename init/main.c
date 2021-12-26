@@ -73,7 +73,6 @@ int kmain(int argc, char* argv[]) {
 #ifdef ARMV7
   module_regist(&gpio_module);
   module_regist(&spi_module);
-  // module_regist(&hello_module);
   module_regist(&lcd_module);
 #else
   module_regist(&serial_module);
