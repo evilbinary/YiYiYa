@@ -17,6 +17,7 @@ typedef struct spi {
   spi_read_data_fn read;
   spi_write_data_fn write;
   spi_cs_fn cs;
+  void* data;
 } spi_t;
 
 

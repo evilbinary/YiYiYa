@@ -6,9 +6,9 @@
 #include "platform/stm32f4xx/gpio.h"
 #include "spi.h"
 
-SPI_HandleTypeDef hspi1;
+static SPI_HandleTypeDef hspi1;
 
-u32 stm32_spi_read(spi_t* spi, u32* data, u32 count) {
+static u32 stm32_spi_read(spi_t* spi, u32* data, u32 count) {
   if (data == NULL || count <= 0) {
     return 0;
   }
@@ -20,7 +20,7 @@ u32 stm32_spi_read(spi_t* spi, u32* data, u32 count) {
   return count;
 }
 
-u32 stm32_spi_write(spi_t* spi, u32* data, u32 count) {
+static u32 stm32_spi_write(spi_t* spi, u32* data, u32 count) {
   if (data == NULL || count <= 0) {
     return 0;
   }
@@ -33,7 +33,7 @@ u32 stm32_spi_write(spi_t* spi, u32* data, u32 count) {
 }
 
 
-void stm32_spi_init(){
+static void stm32_spi_init(){
       /* Peripheral clock enable */
   __HAL_RCC_SPI1_CLK_ENABLE();
 
@@ -66,7 +66,6 @@ int spi_init_device(device_t* dev) {
   spi->write = stm32_spi_write;
 
   stm32_spi_init();
- 
-
+  spi->inited = 1;
   return 0;
 }

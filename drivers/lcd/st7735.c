@@ -212,11 +212,11 @@ void st7735_init() {
 
   st7735_write_cmd(0x29);  // turn display on
 
+
+  st7735_fill(0, 0, 128, 128, RED);
+  st7735_unselect();
   kprintf("lcd end\n");
-  // for (;;) {
-  //   st7735_fill(0, 0, 128, 128, RED);
-  // }
-  // st7735_unselect();
+
 }
 
 int st7735_write_pixel(vga_device_t* vga, const void* buf, size_t len) {
