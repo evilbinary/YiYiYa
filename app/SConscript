@@ -80,7 +80,7 @@ if env.get('APP'):
             # 'lua/lua',
             # 'lua/luat',
             'lua/hello.lua',
-            'bin/ls',
+            # 'bin/ls',
             'lvgl/lvgl',
             'track/track.elf',
             'launcher/launcher'
@@ -98,6 +98,13 @@ if env.get('APP'):
             apps,
             ['sudo losetup /dev/loop10 image/disk.img && sudo mount /dev/loop10 /mnt && sudo cp  ${SOURCES} /mnt && sudo umount /mnt && sudo losetup -d /dev/loop10'
         ])
+    elif plt=='Windows':
+        print('please manual copy %s files to image/disk.img'%(apps))
+        # env.Command('copyhello', 
+        #     apps,
+        #     ['wsl.exe sudo losetup /dev/loop10 image/disk.img &&  mount /dev/loop10 /mnt &&  cp  ${SOURCES} /mnt &&  umount /mnt &&  losetup -d /dev/loop10'
+        # ])
+        pass
 else:
     pass
 
