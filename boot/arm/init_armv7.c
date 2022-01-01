@@ -1,11 +1,12 @@
 #include "init.h"
 
-extern char _sdata;
-extern char _edata;
-extern char _sbss;
-extern char _ebss;
-extern char _estack;
-extern char _sidata;
+extern int _sdata;
+extern int _edata;
+extern int _sbss;
+extern int _ebss;
+extern int _estack;
+extern int _sidata;
+extern int __bss_start__,__bss_end__;
 
 boot_info_t *_boot_info = NULL;
 boot_info_t _boot_data;
@@ -28,16 +29,16 @@ void init_memory() {
 }
 
 void init_boot() {
-  char *dst = NULL;
-  char *src = NULL;
+  unsigned *dst = NULL;
+  unsigned *src = NULL;
 
-  //copy _sidata from flash to sram
+  // copy _sidata from flash to sram
   for(src=&_sidata,dst=&_sdata; dst< &_edata;src++,dst++){
     *dst=*src;
   }
 
   //init bss
-  for (dst = &_sbss; dst < &_ebss; dst++) {
+  for (dst = &__bss_start__; dst < &__bss_end__; dst++) {
     *dst = 0;
   }
 

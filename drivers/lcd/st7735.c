@@ -214,7 +214,7 @@ void st7735_init() {
 
   kprintf("lcd end\n");
   // for (;;) {
-  //   lcd_fill(0, 0, 128, 128, GREEN);
+  //   st7735_fill(0, 0, 128, 128, RED);
   // }
   // st7735_unselect();
 }

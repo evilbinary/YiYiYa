@@ -106,6 +106,8 @@ void system_init() {
   /* Configure the system clock */
   system_init_clock();
 
+  HAL_NVIC_SetPriority(PendSV_IRQn, TICK_INT_PRIORITY+1,0U);
+
   /* Initialize all configured peripherals */
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
