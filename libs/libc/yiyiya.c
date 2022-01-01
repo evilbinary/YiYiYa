@@ -210,5 +210,5 @@ int ya_rename(const char *old, const char *new){
 }
 
 void __main(){
-  printf("main call\n");
+  //printf("main call\n");
 }

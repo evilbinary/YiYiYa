@@ -15,8 +15,8 @@ support_x86=['i386','x86_64']
 support_arch=support_x86
 
 # arch support x86 arm
-# arch='armv7-a'
-arch='armv7'
+arch='armv7-a'
+# arch='armv7'
 # arch='armv5'
 # arch='x86' 
 # arch='xtensa'
@@ -24,9 +24,9 @@ arch='armv7'
 # board select platform
 # platform='intel'
 # platform='v3s'
-# platform='raspi2'
+platform='raspi2'
 # platform='esp32'
-platform='stm32f4xx'
+# platform='stm32f4xx'
 
 
 DefaultEnvironment(tools=[])
@@ -45,6 +45,7 @@ elif plt=='Darwin':
 elif plt=='Windows':
     cc_path=''
     cc_prefix=''
+    cc_lib_path='D:\\Program Files\\gcc-arm-none-eabi-9\\lib\\gcc\\arm-none-eabi\\9.2.1\\'
     pass
 else:
     print('no support ^_^! '+plt)
@@ -97,17 +98,19 @@ elif plt=='Windows':
     env['LINKFLAGS']='-nostdlib  ',
     env['CFLAGS']= env['CFLAGS']+' -fno-stack-protector -mno-stack-arg-probe ' #-ffreestanding -nostdlib  
     env['USER']='--entry main -Txlinker/user.ld   '
+    env['MYLIB']=cc_lib_path+'libgcc.a'
 
 if arch in support_arm:
     env['APP']=True
     env['USER']=' --entry main -Txlinker/user-arm.ld '
-    # env['MYLIB']=cc_lib_path+'libgcc.a'
     env['CFLAGS']=' -D'+arch.upper().replace('-','_') + '  -DARM -I. -I./include  -Ilibs/include -g -c -std=c99 -std=gnu99 -w  -D'+platform.upper() # -nostdlib -nostdinc -fno-builtin -DMALLOC_TRACE -mcpu=cortex-a7  -mtune=cortex-a7 -mfpu=vfpv4 -mfloat-abi=hard -mfloat-abi=softfp
 
     #env['CFLAGS']= env['CFLAGS']+ ' -fno-omit-fram e-pointer -mapcs -mno-sched-prolog ' #for debug backtrace
-    if platform=='raspi2':   
+    if platform=='raspi2': 
+        env['CFLAGS']= env['CFLAGS']+ ' -mcpu=cortex-a7  -mtune=cortex-a7 -mfpu=vfpv4  -mfloat-abi=softfp '
         pass
     elif platform=='v3s':
+        env['CFLAGS']= env['CFLAGS']+ ' -mcpu=cortex-a7  -mtune=cortex-a7 -mfpu=vfpv4  -mfloat-abi=softfp '
         env['USER']='--entry main -Txlinker/user-v3s.ld'
         env['LINKLD']='xlinker/link-v3s.ld'
     elif platform =='stm32f4xx':

@@ -51,7 +51,7 @@
 #else
 
 #define MAX_FD_NUMBER 50
-#define MAX_PHDR 10
+#define MAX_PHDR 12
 #define MAX_SHDR 20
 
 #define MAX_DEVICE 20

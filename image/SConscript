@@ -5,6 +5,9 @@
 # * 邮箱: rootdebug@163.com
 # ********************************************************************
 import os
+import platform 
+plt = platform.system()
+
 Import('env')
 
 AddOption(
@@ -48,7 +51,9 @@ elif env.get('ARCH') in env['ARCHS']:
     run_qemu_cmd='qemu-system-gnuarmeclipse --verbose --verbose --board STM32F429I-Discovery --mcu STM32F429ZITx   -rtc base=localtime -kernel init/kernel.elf  -serial stdio  -D ./qemu.log -d unimp,guest_errors --semihosting-config enable -d in_asm,int,mmu,cpu_reset' #-d in_asm -d cpu_reset -d in_asm,int,mmu -d   -drive if=sd,id=sd0,format=raw,file=image/disk.img #-d in_asm -d cpu_reset -d in_asm,int,mmu
     debug_qemu_cmd = run_qemu_cmd+ ' -S -s'
   else:
-    run_qemu_cmd='qemu-system-arm -M raspi2  -rtc base=localtime -kernel image/duck.img  -serial stdio -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor  -D ./qemu.log -drive if=sd,id=sd0,format=raw,file=image/disk.img -d in_asm -d cpu_reset -d in_asm,int,mmu' #-d in_asm -d cpu_reset -d in_asm,int,mmu
+    run_qemu_cmd='qemu-system-arm -M raspi2  -rtc base=localtime -kernel image/duck.img  -serial stdio   -D ./qemu.log -drive if=sd,id=sd0,format=raw,file=image/disk.img -d in_asm -d cpu_reset -d in_asm,int,mmu' #-d in_asm -d cpu_reset -d in_asm,int,mmu
+    if not plt=='Windows':
+      run_qemu_cmd =run_qemu_cmd+' -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor'
     debug_qemu_cmd = run_qemu_cmd +' -S -s'
 elif env.get('ARCH')=='xtensa':
   run_qemu_cmd='flash_image.bin','~/dev/c/esp/qemu/build/qemu-system-xtensa -nographic -M esp32 -drive file=image/flash_image.bin,if=mtd,format=raw -s -serial stdio -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor  -D ./qemu.log -drive if=sd,id=sd0,format=raw,file=image/disk.img -d in_asm -d cpu_reset -d in_asm,int,mmu' #-d in_asm -d cpu_reset -d in_asm,int,mmu

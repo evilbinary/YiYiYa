@@ -345,3 +345,7 @@ char * tmpnam(char * buf){
 	sprintf(path, "%s/tmpnam_%d", "/tmp", rand());
 	return strcpy(buf ? buf : internal, path);
 }
+
+int puts(const char *s){
+  return printf("%s",s);
+}
