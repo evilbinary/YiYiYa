@@ -6,6 +6,8 @@
 #include "platform/stm32f4xx/gpio.h"
 #include "spi.h"
 
+#define SPI_DMA 1
+
 static SPI_HandleTypeDef hspi1;
 
 static u32 stm32_spi_read(spi_t* spi, u32* data, u32 count) {
@@ -32,19 +34,17 @@ static u32 stm32_spi_write(spi_t* spi, u32* data, u32 count) {
   return count;
 }
 
-
-static void stm32_spi_init(){
-
+static void stm32_spi_init() {
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
-  gpio_config(GPIOA, GPIO_PIN_11, GPIO_MODE_OUTPUT_PP);
-  gpio_config(GPIOB, GPIO_PIN_6|GPIO_PIN_7, GPIO_MODE_OUTPUT_PP);
+  gpio_config(GPIOB, GPIO_PIN_11, GPIO_MODE_OUTPUT_PP);
+  gpio_config(GPIOB, GPIO_PIN_6 | GPIO_PIN_7, GPIO_MODE_OUTPUT_PP);
 
-      /* Peripheral clock enable */
+  /* Peripheral clock enable */
   __HAL_RCC_SPI1_CLK_ENABLE();
 
- /* SPI1 parameter configuration*/
+  /* SPI1 parameter configuration*/
   hspi1.Instance = SPI1;
   hspi1.Init.Mode = SPI_MODE_MASTER;
   hspi1.Init.Direction = SPI_DIRECTION_2LINES;

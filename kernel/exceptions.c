@@ -9,7 +9,7 @@
 
 extern context_t* current_context;
 
-interrupt_handler_t *exception_handlers[IDT_NUMBER];
+interrupt_handler_t *exception_handlers[EXCEPTION_NUMBER];
 void exception_regist(u32 vec, interrupt_handler_t handler) {
   exception_handlers[vec] = handler;
 }
