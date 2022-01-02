@@ -37,7 +37,7 @@
 
 #ifdef ARMV7
 #define IDT_NUMBER 256
-#define EXCEPTION_NUMBER 12
+#define EXCEPTION_NUMBER 32
 #else
 #define IDT_NUMBER 256
 #define EXCEPTION_NUMBER 256
