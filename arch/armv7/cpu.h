@@ -57,7 +57,7 @@ typedef u32 (*sys_call_fn)(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5,
 #define context_switch_page(page_dir) \
   cpu_set_page(page_dir)  // asm volatile("mov %0, %%cr3" : : "r" (page_dir))
 
-#define context_fn(context) context->r7
+#define context_fn(context) context->r6
 #define context_ret(context) context->r0
 
 #define context_restore(duck_context)          \

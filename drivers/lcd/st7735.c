@@ -27,7 +27,6 @@ device_t* spi_dev = NULL;
 static uint8_t st7735_buf[ST77XX_BUF_SIZE];
 static uint16_t st7735_buf_index = 0;
 
-
 static void st77xx_write_buffer(u8* buff, size_t buff_size) {
   while (buff_size--) {
     st7735_buf[st7735_buf_index++] = *buff++;

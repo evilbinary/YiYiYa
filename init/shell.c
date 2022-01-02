@@ -47,6 +47,8 @@ void do_shell_thread(void) {
   // syscall2(SYS_EXEC,"/dev/sda/mcroui.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/lvgl",NULL);
   // kprintf("fd=>%d\n",fd);
+#elif defined(ARMV7)
+
 #else defined(ARM)
   // syscall2(SYS_EXEC,"/dev/sda/hello-rs",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/test-rs",NULL);

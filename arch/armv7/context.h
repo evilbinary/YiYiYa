@@ -62,7 +62,7 @@ typedef struct interrupt_context {
       "ldmfd r0!,{r1,r2}\n"                    \
       "ldmfd r0!,{r4-r11}\n"                   \
       "msr psp, r0\n"                          \
-      "mov lr,#0xFFFFFFFD\n"                     \
+      "mov lr,#0xFFFFFFFD\n"                   \
       "isb\n"                                  \
       "bx lr\n"                                \
                                              : \
@@ -76,6 +76,7 @@ typedef struct interrupt_context {
       "ldmfd r0!,{r4-r11}\n" \
       "msr psp, r0\n"        \
       "ldr lr,[r0,#20 ]\n"   \
+      "mov lr,#0xFFFFFFFD\n" \
       "isb\n"                \
       "bx lr\n"              \
       :                      \

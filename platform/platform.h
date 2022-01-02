@@ -21,6 +21,12 @@
 #define ISR_MOUSE 0x2c
 
 
+#elif defined(STM32F4XX)
+#define ISR_TIMER 50
+#define ISR_KEYBOARD 0x21
+#define ISR_SYSCALL 11
+#define ISR_MOUSE 0x2c
+
 #else defined(V3S)
 #define ISR_TIMER 50
 #define ISR_KEYBOARD 0x21
