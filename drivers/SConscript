@@ -53,6 +53,7 @@ if arch in env['ARCHS']:
                 'spi/stm32.c',
                 'lcd/lcd.c',
                 'lcd/st7735.c',
+                'serial/stm32.c',
                 ]
     driver=[
         'fat/fat.c',

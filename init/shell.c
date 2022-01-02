@@ -3,30 +3,38 @@
  * 作者: evilbinary on 01/01/20
  * 邮箱: rootdebug@163.com
  ********************************************************************/
-#include "main.h"
 #include "gpio.h"
+#include "main.h"
 
-void test_cpu_speed() {
-  int* p = 0x70100000;
-  for (;;) {
-    for (int i = 0; i < 480; i++) {
-      for (int j = 0; j < 272; j++) {
-        // *p++=0xffffff;
-      }
-    }
-    kprintf("flush=>\n");
+const char* logo =
+    " _  _  _ _  _  _      \n"
+    "| || || | || || |     \n"
+    "| \\| |/ | \\| |/ __  __\n"
+    " \\_   _/ \\_   _/  \\/ /\n"
+    "   | |     | |( ()  < \n"
+    "   |_|     |_| \\__/\\_\\\n"
+    "\nWelcom to YiYiYa Os ^_^! \n\n";
+
+void print_string(char* str) { syscall1(SYS_PRINT, str); }
+
+void print_logo() { print_string(logo); }
+
+void print_promot() { print_string("$"); }
+
+void print_help() { print_string("hello,world help cmd\n"); }
+
+void do_shell_cmd(char* cmd, int count) {
+  print_string("\n");
+  if (kstrncmp(cmd, "help", count) == 0) {
+    print_help();
+  } else {
+    syscall3(SYS_DEV_WRITE, DEVICE_SERIAL, cmd, count);
+    print_string(" command not support\n");
   }
 }
 
 void do_shell_thread(void) {
-  u8 scan_code;
-  u8 shf_p = 0;
-  u8 ctl_p = 0;
-  u8 alt_p = 0;
-  u32 col = 0;
-  u32 row = 0;
-  syscall1(SYS_PRINT, "#");
-  char buf[2] = {0};
+  print_logo();
 #ifdef X86
   // int fd = syscall2(SYS_OPEN, "/dev/stdin", 0);
   // syscall2(SYS_EXEC,"/dev/sda/hello",NULL);
@@ -58,7 +66,7 @@ void do_shell_thread(void) {
   //  syscall2(SYS_EXEC,"/dev/sda/test.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/hello",NULL);
   // syscall2(SYS_EXEC, "/dev/sda/lvgl", NULL);
-  syscall2(SYS_EXEC,"/dev/sda/launcher",NULL);
+  syscall2(SYS_EXEC, "/dev/sda/launcher", NULL);
 
   // syscall2(SYS_EXEC,"/dev/sda/track.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/gui.elf",NULL);
@@ -68,35 +76,19 @@ void do_shell_thread(void) {
 // test_cpu_speed();
 #endif
   int count = 0;
+  char buf[32];
+  int ret = 0;
+  print_promot();
   for (;;) {
-    int ret = 0;
-    #ifdef ARMV7
-    kprintf("B%d ",count);
-    st7735_test();
-    // kprintf("=>load: %d val: %d ctl: %x\n", SysTick->LOAD,SysTick->VAL,SysTick->CTRL);
-    #endif
-    // syscall1(SYS_PRINT, "1");
-    // if(count%100==0){
-    //   syscall1(SYS_PRINT, "\n");
-    // }
-    // read key
-    // ret = syscall3(SYS_READ,fd, &scan_code, 1);
-    // if (ret >= 1) {
-    //   // kprintf("ret=%d %x", ret,scan_code);
-    //   if (scan_code & 0x80) continue;
-    //   buf[0] = key_map[scan_code & 0x7f][shf_p];
-    //   // set_cursor(col, row);
-    //   // kprintf("%x",key_map[scan_code & 0x7f][shf_p]);
-    //   syscall3(SYS_PRINT_AT, buf, col, row);
-    //   if (scan_code == 0x1c) {
-    //     row++;
-    //     col = 0;
-    //     syscall1(SYS_PRINT, "#");
-    //   }
-    //   move_cursor();
-    //   scan_code = 0;
-    //   col++;
-    // }
-    count++;
+    int ch = 0;
+    ret = syscall3(SYS_DEV_READ, DEVICE_SERIAL, &ch, 1);
+    if (ch == '\r' || ch == '\n') {
+      do_shell_cmd(buf, count);
+      count = 0;
+      print_promot();
+    } else {
+      syscall3(SYS_DEV_WRITE, DEVICE_SERIAL, &ch, 1);
+      buf[count++] = ch;
+    }
   }
 }

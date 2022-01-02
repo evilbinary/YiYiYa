@@ -5,13 +5,15 @@
  ********************************************************************/
 #include "main.h"
 
-#ifdef ARM 
+#ifdef ARM
 
 #ifdef ARMV7
 extern module_t hello_module;
 extern module_t lcd_module;
 extern module_t gpio_module;
 extern module_t spi_module;
+extern module_t devfs_module;
+extern module_t serial_module;
 #else
 
 extern module_t gpu_module;
@@ -45,7 +47,7 @@ extern module_t sb16_module;
 #elif defined(XTENSA)
 extern module_t hello_module;
 
-#else 
+#else
 extern module_t hello_module;
 
 #endif
@@ -68,13 +70,16 @@ int kmain(int argc, char* argv[]) {
 
   kprintf("module regist\n");
 
-#ifdef ARM 
+#ifdef ARM
 
 #ifdef ARMV7
   module_regist(&gpio_module);
+  module_regist(&serial_module);
   // module_regist(&hello_module);
   module_regist(&spi_module);
   module_regist(&lcd_module);
+  module_regist(&devfs_module);
+
 #else
   module_regist(&serial_module);
   module_regist(&i2c_module);
@@ -88,7 +93,7 @@ int kmain(int argc, char* argv[]) {
   // module_regist(&fat32_module);
   // module_regist(&hello_module);
 
-  #endif
+#endif
 
 #elif defined(X86)
   module_regist(&pci_module);
@@ -107,12 +112,12 @@ int kmain(int argc, char* argv[]) {
 #elif defined(XTENSA)
   module_regist(&hello_module);
 
-#else 
+#else
   module_regist(&hello_module);
 #endif
 
-  thread_t* t0 = thread_create_name("serial",(u32*)&do_serial_thread,NULL);
-  thread_t* t1 = thread_create_name("shell",(u32*)&do_shell_thread,NULL);
+  thread_t* t0 = thread_create_name("serial", (u32*)&do_serial_thread, NULL);
+  thread_t* t1 = thread_create_name("shell", (u32*)&do_shell_thread, NULL);
 
   kprintf("thread run\n");
   thread_run(t0);

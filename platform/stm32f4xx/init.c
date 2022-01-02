@@ -33,6 +33,12 @@ void uart_send(unsigned int c) {
   HAL_UART_Transmit(&huart1, &c, 1, 1000);
 }
 
+unsigned int uart_receive() {
+  unsigned int c;
+  HAL_UART_Receive(&huart1, &c, 1, 1000);
+  return c;
+}
+
 void system_init_clock() {
   __HAL_RCC_SYSCFG_CLK_ENABLE();
   __HAL_RCC_PWR_CLK_ENABLE();

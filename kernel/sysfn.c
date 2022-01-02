@@ -15,8 +15,8 @@
 
 int sys_print(char* s) {
   thread_t* current = thread_current();
-  kprintf("sys print %d %s\n", current->id, s);
-  // kprintf("%s", s);
+  // kprintf("sys print %d %s\n", current->id, s);
+  kprintf("%s", s);
   return 0;
 }
 
