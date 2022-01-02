@@ -67,29 +67,27 @@ void st7735_unselect() {
 void st7735_reset() {
   gpio_output(ST7735_RES_GPIO_Port, ST7735_RES_Pin, GPIO_PIN_RESET);
   st7735_select();
-  delay(100);
+  delay(200);
   gpio_output(ST7735_RES_GPIO_Port, ST7735_RES_Pin, GPIO_PIN_SET);
+  delay(200);
 }
 
 void st7735_write_cmd(u8 cmd) {
   gpio_output(ST7735_DC_GPIO_Port, ST7735_DC_Pin, GPIO_PIN_RESET);
-  st7735_select();
   spi_dev->write(spi_dev, &cmd, sizeof(cmd));
-  st7735_unselect();
+  // st7735_unselect();
 }
 
 void st7735_write_data_size(u8 cmd, int size) {
-  st7735_select();
   gpio_output(ST7735_DC_GPIO_Port, ST7735_DC_Pin, GPIO_PIN_SET);
   spi_dev->write(spi_dev, &cmd, size);
-  st7735_unselect();
+  // st7735_unselect();
 }
 
 void st7735_write_data(u8 cmd) {
   gpio_output(ST7735_DC_GPIO_Port, ST7735_DC_Pin, GPIO_PIN_SET);
-  st7735_select();
   spi_dev->write(spi_dev, &cmd, 1);
-  st7735_unselect();
+  // st7735_unselect();
 }
 
 void st7735_init() {
@@ -215,10 +213,9 @@ void st7735_init() {
 
   kprintf("lcd end\n");
 
-  for(;;){
-    
-    st7735_fill(0, 0, 128, 128, RED);
-  }
+  // for(;;){
+  //   st7735_fill(0, 0, 128, 128, GREEN);
+  // }
   // st7735_unselect();
 
 }
