@@ -13,7 +13,7 @@ const char* logo =
     " \\_   _/ \\_   _/  \\/ /\n"
     "   | |     | |( ()  < \n"
     "   |_|     |_| \\__/\\_\\\n"
-    "\nWelcom to YiYiYa Os ^_^! \n\n";
+    "\nWelcome to YiYiYa Os ^_^! \n\n";
 
 void print_string(char* str) { syscall1(SYS_PRINT, str); }
 
