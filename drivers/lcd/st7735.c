@@ -21,7 +21,7 @@
 device_t* spi_dev = NULL;
 
 void delay(int n) {
-  for (int i = 0; i < 1000 * n; i++) {
+  for (int i = 0; i < 10000 * n; i++) {
   }
 }
 
@@ -67,7 +67,7 @@ void st7735_unselect() {
 void st7735_reset() {
   gpio_output(ST7735_RES_GPIO_Port, ST7735_RES_Pin, GPIO_PIN_RESET);
   st7735_select();
-  delay(5);
+  delay(100);
   gpio_output(ST7735_RES_GPIO_Port, ST7735_RES_Pin, GPIO_PIN_SET);
 }
 
@@ -96,6 +96,7 @@ void st7735_init() {
   gpio_config(ST7735_DC_GPIO_Port, ST7735_DC_Pin, GPIO_MODE_OUTPUT_PP);
   gpio_config(ST7735_RES_GPIO_Port, ST7735_RES_Pin, GPIO_MODE_OUTPUT_PP);
   gpio_config(ST7735_CS_GPIO_Port, ST7735_CS_Pin, GPIO_MODE_OUTPUT_PP);
+  delay(20);
 
   // init spi
   spi_dev = device_find(DEVICE_SPI);
@@ -104,7 +105,7 @@ void st7735_init() {
   st7735_reset();
 
   st7735_write_cmd(0x11);  // Sleep exit
-  delay(12);
+  delay(40);
 
   // frmame rate
   st7735_write_cmd(0xB1);
@@ -212,10 +213,13 @@ void st7735_init() {
 
   st7735_write_cmd(0x29);  // turn display on
 
-
-  st7735_fill(0, 0, 128, 128, RED);
-  st7735_unselect();
   kprintf("lcd end\n");
+
+  for(;;){
+    
+    st7735_fill(0, 0, 128, 128, RED);
+  }
+  // st7735_unselect();
 
 }
 

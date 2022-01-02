@@ -122,7 +122,7 @@ void* mm_alloc(size_t size) {
         block_alloc_tail = new_block;
       }
       count++;
-      kprintf("alloc count:%d: addr:%x size:%d\n", count, new_block->addr,new_block->size);
+      //kprintf("alloc count:%d: addr:%x size:%d\n", count, new_block->addr,new_block->size);
       if (new_block->addr == 0) {
         mm_dump();
       }
