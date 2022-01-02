@@ -8,17 +8,43 @@
 #include "lcd.h"
 #include "platform/stm32f4xx/gpio.h"
 
+#define USE_BUFF 1
+
 #define BLACK 0x0000
 #define WHITE 0xFFFF
 
-#define RED 0x001F
-#define BLUE 0xF800
-#define GREEN 0x00F
-#define YELLOW 0x07FF
+#define RED 0xf800
+#define BLUE 0x001f
+#define GREEN 0x07e0
+#define YELLOW 0xffe0
 #define MAGENTA 0xF81F
 #define CYAN 0xFFE0
 
 device_t* spi_dev = NULL;
+
+#ifdef USE_BUFF
+#define ST77XX_BUF_SIZE 512
+static uint8_t st7735_buf[ST77XX_BUF_SIZE];
+static uint16_t st7735_buf_index = 0;
+
+
+static void st77xx_write_buffer(u8* buff, size_t buff_size) {
+  while (buff_size--) {
+    st7735_buf[st7735_buf_index++] = *buff++;
+    if (st7735_buf_index == ST77XX_BUF_SIZE) {
+      spi_dev->write(spi_dev, st7735_buf, st7735_buf_index);
+      st7735_buf_index = 0;
+    }
+  }
+}
+
+static void st77xx_flush_buffer(void) {
+  if (st7735_buf_index > 0) {
+    spi_dev->write(spi_dev, st7735_buf, st7735_buf_index);
+    st7735_buf_index = 0;
+  }
+}
+#endif
 
 void delay(int n) {
   for (int i = 0; i < 10000 * n; i++) {
@@ -28,11 +54,20 @@ void delay(int n) {
 void st7735_fill(u16 xsta, u16 ysta, u16 xend, u16 yend, u16 color) {
   u16 i, j;
   st7735_address_set(xsta, ysta, xend - 1, yend - 1);  //设置显示范围
+  gpio_output(ST7735_DC_GPIO_Port, ST7735_DC_Pin, GPIO_PIN_SET);
   for (i = ysta; i < yend; i++) {
     for (j = xsta; j < xend; j++) {
-      st7735_write_data_size(color, 2);
+// st7735_write_data_size(color, 2);
+#ifdef USE_BUFF
+      st77xx_write_buffer((uint8_t*)&color, 2);
+#else
+      spi_dev->write(spi_dev, &color, 2);
+#endif
     }
   }
+#ifdef USE_BUFF
+  st77xx_flush_buffer();
+#endif
 }
 
 void st7735_set_pixel(u16 x, u16 y, u16 color) {
@@ -90,6 +125,15 @@ void st7735_write_data(u8 cmd) {
   // st7735_unselect();
 }
 
+void st7735_test() {
+  for (;;) {
+    // st7735_fill(0, 0, 128, 128, YELLOW);
+    st7735_fill(0, 0, 128, 128, GREEN);
+    st7735_fill(0, 0, 128, 128, RED);
+    kprintf("lcd end\n");
+  }
+}
+
 void st7735_init() {
   gpio_config(ST7735_DC_GPIO_Port, ST7735_DC_Pin, GPIO_MODE_OUTPUT_PP);
   gpio_config(ST7735_RES_GPIO_Port, ST7735_RES_Pin, GPIO_MODE_OUTPUT_PP);
@@ -105,106 +149,29 @@ void st7735_init() {
   st7735_write_cmd(0x11);  // Sleep exit
   delay(40);
 
-  // frmame rate
-  st7735_write_cmd(0xB1);
-  st7735_write_data(0x01);
-  st7735_write_data(0x2c);
-  st7735_write_data(0x2d);
+  st7735_write_cmd(0xB1);  //帧率
+  st7735_write_data(0x05);
+  st7735_write_data(0x3C);
+  st7735_write_data(0x3C);
 
-  st7735_write_cmd(0xB2);
-  st7735_write_data(0x01);
-  st7735_write_data(0x2C);
-  st7735_write_data(0x2D);
+  st7735_write_cmd(0xB2);  //帧率
+  st7735_write_data(0x05);
+  st7735_write_data(0x3C);
+  st7735_write_data(0x3C);
 
-  st7735_write_cmd(0xB3);
-  st7735_write_data(0x01);
-  st7735_write_data(0x2C);
-  st7735_write_data(0x2D);
-  st7735_write_data(0x01);
-  st7735_write_data(0x2C);
-  st7735_write_data(0x2D);
+  st7735_write_cmd(0xB3);  //帧率
+  st7735_write_data(0x05);
+  st7735_write_data(0x3C);
+  st7735_write_data(0x3C);
+  st7735_write_data(0x05);
+  st7735_write_data(0x3C);
+  st7735_write_data(0x3C);
 
   st7735_write_cmd(0xB4);  // Column inversion
   st7735_write_data(0x07);
 
-  // ST7735R Power Sequence
-  st7735_write_cmd(0xC0);
-  st7735_write_data(0xA2);
-  st7735_write_data(0x02);
-  st7735_write_data(0x84);
-  st7735_write_cmd(0xC1);
-  st7735_write_data(0xC5);
-
-  st7735_write_cmd(0xC2);
-  st7735_write_data(0x0A);
-  st7735_write_data(0x00);
-
-  st7735_write_cmd(0xC3);
-  st7735_write_data(0x8A);
-  st7735_write_data(0x2A);
-  st7735_write_cmd(0xC4);
-  st7735_write_data(0x8A);
-  st7735_write_data(0xEE);
-
-  st7735_write_cmd(0xC5);  // VCOM
-  st7735_write_data(0x0E);
-
   st7735_write_cmd(0x36);  // MX, MY, RGB mode
   st7735_write_data(0xC8);
-
-  // ST7735R Gamma Sequence
-  st7735_write_cmd(0xe0);
-  st7735_write_data(0x0f);
-  st7735_write_data(0x1a);
-  st7735_write_data(0x0f);
-  st7735_write_data(0x18);
-  st7735_write_data(0x2f);
-  st7735_write_data(0x28);
-  st7735_write_data(0x20);
-  st7735_write_data(0x22);
-  st7735_write_data(0x1f);
-  st7735_write_data(0x1b);
-  st7735_write_data(0x23);
-  st7735_write_data(0x37);
-  st7735_write_data(0x00);
-  st7735_write_data(0x07);
-  st7735_write_data(0x02);
-  st7735_write_data(0x10);
-
-  st7735_write_cmd(0xe1);
-  st7735_write_data(0x0f);
-  st7735_write_data(0x1b);
-  st7735_write_data(0x0f);
-  st7735_write_data(0x17);
-  st7735_write_data(0x33);
-  st7735_write_data(0x2c);
-  st7735_write_data(0x29);
-  st7735_write_data(0x2e);
-  st7735_write_data(0x30);
-  st7735_write_data(0x30);
-  st7735_write_data(0x39);
-  st7735_write_data(0x3f);
-  st7735_write_data(0x00);
-  st7735_write_data(0x07);
-  st7735_write_data(0x03);
-  st7735_write_data(0x10);
-
-  st7735_write_cmd(0x2a);
-  st7735_write_data(0x00);
-  st7735_write_data(0x00);
-  st7735_write_data(0x00);
-  st7735_write_data(0x7f);
-
-  st7735_write_cmd(0x2b);
-  st7735_write_data(0x00);
-  st7735_write_data(0x00);
-  st7735_write_data(0x00);
-  st7735_write_data(0x9f);
-
-  st7735_write_cmd(0xF0);  // Enable test command
-  st7735_write_data(0x01);
-  st7735_write_cmd(0xF6);  // Disable ram power save mode
-  st7735_write_data(0x00);
 
   st7735_write_cmd(0x3A);   // 65k mode
   st7735_write_data(0x05);  // RGB 5-6-5-bit Input
@@ -213,16 +180,13 @@ void st7735_init() {
 
   kprintf("lcd end\n");
 
-  // for(;;){
-  //   st7735_fill(0, 0, 128, 128, GREEN);
-  // }
-  // st7735_unselect();
-
+  st7735_fill(0, 0, 128, 128, GREEN);
+  // st7735_test();
 }
 
 int st7735_write_pixel(vga_device_t* vga, const void* buf, size_t len) {
   u16* color = buf;
-  int i=0;
+  int i = 0;
   for (i = 0; i < len / 6; i += 3) {
     st7735_set_pixel(color[i], color[i + 1], color[i + 2]);
   }

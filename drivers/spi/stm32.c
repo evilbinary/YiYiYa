@@ -34,6 +34,13 @@ static u32 stm32_spi_write(spi_t* spi, u32* data, u32 count) {
 
 
 static void stm32_spi_init(){
+
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+
+  gpio_config(GPIOA, GPIO_PIN_11, GPIO_MODE_OUTPUT_PP);
+  gpio_config(GPIOB, GPIO_PIN_6|GPIO_PIN_7, GPIO_MODE_OUTPUT_PP);
+
       /* Peripheral clock enable */
   __HAL_RCC_SPI1_CLK_ENABLE();
 

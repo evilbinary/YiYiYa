@@ -42,7 +42,7 @@ void system_init_clock() {
   /** Configure the main internal regulator output voltage
    */
   __HAL_RCC_PWR_CLK_ENABLE();
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE2);
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
   /** Initializes the RCC Oscillators according to the specified parameters
    * in the RCC_OscInitTypeDef structure.
    */
@@ -51,19 +51,20 @@ void system_init_clock() {
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-  RCC_OscInitStruct.PLL.PLLM = 8;
-  RCC_OscInitStruct.PLL.PLLN = 72;
+  RCC_OscInitStruct.PLL.PLLM = 16;
+  RCC_OscInitStruct.PLL.PLLN = 144;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
-  RCC_OscInitStruct.PLL.PLLQ = 4;
+  RCC_OscInitStruct.PLL.PLLQ = 2;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
     kprintf("errro\n");
     return;
   }
   /** Initializes the CPU, AHB and APB buses clocks
    */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;// RCC_SYSCLKSOURCE_HSI
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK |
+                                RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.SYSCLKSource =
+      RCC_SYSCLKSOURCE_PLLCLK;  // RCC_SYSCLKSOURCE_HSI
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
@@ -72,9 +73,14 @@ void system_init_clock() {
     kprintf("errro\n");
     return;
   }
-}
 
- 
+  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC;
+  PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK) {
+    kprintf("errro\n");
+  }
+}
 
 void system_init() {
 // enable fpu
@@ -86,7 +92,6 @@ void system_init() {
    */
   HAL_Init();
   HAL_MspInit();
-
   /* Configure the system clock */
   system_init_clock();
 
@@ -100,12 +105,8 @@ void system_init() {
   uart_init();
 }
 
-void timer_init(int hz) {
-  kprintf("timer init\n");
-}
-void timer_end() {
-  HAL_IncTick();
-}
+void timer_init(int hz) { kprintf("timer init\n"); }
+void timer_end() { HAL_IncTick(); }
 
 #define LED_Pin GPIO_PIN_13
 #define LED_GPIO_Port GPIOC
