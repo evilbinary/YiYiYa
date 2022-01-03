@@ -6,7 +6,7 @@
 #include "gpio.h"
 #include "main.h"
 
-#define VERSION "1.0"
+#define VERSION "1.1"
 
 const char* logo =
     " _  _  _ _  _  _      \n"
@@ -31,20 +31,48 @@ void print_logo() {
 
 void print_promot() { print_string("yiyiya$"); }
 
-void print_help() { print_string("hello,world help cmd\n"); }
+void print_help() { print_string("supports help ps command\n"); }
+
+void ps_command(){
+   syscall0(SYS_DUMPS);
+}
 
 void do_shell_cmd(char* cmd, int count) {
   print_string("\n");
   if (kstrncmp(cmd, "help", count) == 0) {
     print_help();
+  } else if (kstrncmp(cmd, "ps", count) == 0) {
+    ps_command();
   } else {
     syscall3(SYS_DEV_WRITE, DEVICE_SERIAL, cmd, count);
     print_string(" command not support\n");
   }
 }
 
+void pre_launch();
+
 void do_shell_thread(void) {
   print_logo();
+  pre_launch();
+  int count = 0;
+  char buf[32];
+  int ret = 0;
+  print_promot();
+  for (;;) {
+    int ch = 0;
+    ret = syscall3(SYS_DEV_READ, DEVICE_SERIAL, &ch, 1);
+    if (ch == '\r' || ch == '\n') {
+      do_shell_cmd(buf, count);
+      count = 0;
+      print_promot();
+    } else {
+      syscall3(SYS_DEV_WRITE, DEVICE_SERIAL, &ch, 1);
+      buf[count++] = ch;
+    }
+  }
+}
+
+void pre_launch() {
 #ifdef X86
   // int fd = syscall2(SYS_OPEN, "/dev/stdin", 0);
   // syscall2(SYS_EXEC,"/dev/sda/hello",NULL);
@@ -85,20 +113,4 @@ void do_shell_thread(void) {
 //  syscall2(SYS_EXEC,"/dev/sda/microui.elf",NULL);
 // test_cpu_speed();
 #endif
-  int count = 0;
-  char buf[32];
-  int ret = 0;
-  print_promot();
-  for (;;) {
-    int ch = 0;
-    ret = syscall3(SYS_DEV_READ, DEVICE_SERIAL, &ch, 1);
-    if (ch == '\r' || ch == '\n') {
-      do_shell_cmd(buf, count);
-      count = 0;
-      print_promot();
-    } else {
-      syscall3(SYS_DEV_WRITE, DEVICE_SERIAL, &ch, 1);
-      buf[count++] = ch;
-    }
-  }
 }

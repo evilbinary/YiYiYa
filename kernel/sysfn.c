@@ -28,6 +28,11 @@ void sys_test() {
   thread_dump(current);
 }
 
+void sys_dumps() {
+  thread_t* current = thread_current();
+  thread_dumps();
+}
+
 int sys_print_at(char* s, u32 x, u32 y) {
   set_cursor(x, y);
   kprintf("%s", s);

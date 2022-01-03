@@ -45,9 +45,11 @@ enum {
   SYS_VALLOC = 508,
   SYS_VFREE = 509,
   SYS_VHEAP = 510,
+  SYS_DUMPS=511,
   SYS_MMAP2=192,
   SYS_MPROTECT=125,
   SYS_RT_SIGPROCMASK=175,
+
 };
 
 #else
@@ -85,6 +87,7 @@ enum {
   SYS_READV,
   SYS_MMAP2,
   SYS_MPROTECT,
+  SYS_DUMPS,
   SYS_RT_SIGPROCMASK
 };
 #endif
@@ -153,5 +156,7 @@ int sys_unlink(const char * pathname);
 int sys_rename(const char* old,const char* new);
 
 int sys_set_thread_area(void* set);
+
+void sys_dumps();
 
 #endif
