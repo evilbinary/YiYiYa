@@ -10,24 +10,41 @@ import platform
 import sys
 plt = platform.system()
 
-support_arm=['armv5','armv6','armv7','armv7-a']
-support_x86=['i386','x86_64']
-support_arch=support_x86
 
-# arch support x86 arm
-# arch='armv7-a'
-arch='armv7'
-# arch='armv5'
-# arch='x86' 
-# arch='xtensa'
+supports_archs={
+    'arm': ['armv5','armv6','armv7','armv7-a'],
+    'x86': ['i386','x86_64'],
+    'xtensa':  ['lx6']
+}
+
+support_platform={
+    'stm32f4xx':'armv7',
+    'pc':'i386',
+    'raspi2':'armv7-a',
+    'esp32':'xl6',
+    'v3s':'armv7-a'
+}
+
+def get_arch(arch):
+    archs={}
+    for k,v in supports_archs.items():
+        for i in v:
+            archs[i]=k
+    return archs[arch]   
 
 # board select platform
-# platform='intel'
+# platform='pc'
 # platform='v3s'
 # platform='raspi2'
 # platform='esp32'
 platform='stm32f4xx'
 
+arch=support_platform[platform]
+arch_type=get_arch(arch)
+archs=supports_archs[arch_type]
+
+print('welcome to yiyiya os build')
+print('your select platform: %s arch: %s  support archs: %s'%(platform,arch, archs))
 
 DefaultEnvironment(tools=[])
 env = Environment(ENV = {}, tools=['gcc'])
@@ -50,10 +67,9 @@ elif plt=='Windows':
 else:
     print('no support ^_^! '+plt)
 
-if arch in support_arm:
+if arch_type == 'arm':
     cc_prefix='arm-none-eabi-'
-    support_arch=support_arm
-elif arch=='xtensa':
+elif arch_type=='xtensa':
     cc_prefix='xtensa-esp32-elf-'
     cc_path='~/.espressif/tools/xtensa-esp32-elf/esp-2021r1-8.4.0/xtensa-esp32-elf/bin/'
 
@@ -83,11 +99,12 @@ env = Environment(
         # LIBC=['../../app/libmusl/lib/libc.a',],#'/opt/local/lib/gcc/i386-elf/9.2.0/libgcc.a'
         # LIBCFLAGS=' -Iapp/libmusl/include/ -Iapp/libmusl/obj/include/ -Iapp/libmusl/arch/generic/ -Iapp/libmusl/arch/arm/ ',
         USER='--entry main -Txlinker/user.ld',
-        ARCHS=support_arch
+        ARCHS=archs,
+        ARCHTYPE=arch_type
         )
 
 if plt=='Linux':
-    if arch in support_arm:
+    if arch in archs:
         pass
     else:
         env['LINKFLAGS']= env['LINKFLAGS']+' -m32'
@@ -100,7 +117,7 @@ elif plt=='Windows':
     env['USER']='--entry main -Txlinker/user.ld   '
     env['MYLIB']=cc_lib_path+'libgcc.a'
 
-if arch in support_arm:
+if arch_type == 'arm':
     env['APP']=True
     env['USER']=' --entry main -Txlinker/user-arm.ld '
     env['CFLAGS']=' -D'+arch.upper().replace('-','_') + '  -DARM -I. -I./include  -Ilibs/include -g -c -std=c99 -std=gnu99 -w  -D'+platform.upper() # -nostdlib -nostdinc -fno-builtin -DMALLOC_TRACE -mcpu=cortex-a7  -mtune=cortex-a7 -mfpu=vfpv4 -mfloat-abi=hard -mfloat-abi=softfp
@@ -122,7 +139,7 @@ if arch in support_arm:
         env['LINKLD']='xlinker/link-'+platform+'.ld'
     #env['CFLAGS']= ' -march='+arch
 
-elif arch=='xtensa':
+elif arch_type=='xtensa':
     env['APP']=False
     env['CFLAGS']='-DXTENSA -I. -I./include  -Ilibs/include -g -nostdlib -nostdinc -fno-builtin -c -std=c99 -std=gnu99 -w  -D'+platform.upper()
     env['LINKLD']='xlinker/link-esp32.ld'
@@ -188,7 +205,7 @@ SConscript(dirs=['libs/libkernel'], exports='env')
 SConscript(dirs=['drivers'], exports='env')
 kernel=SConscript(dirs=['init'], exports='env')
 
-if arch in support_arm:
+if arch_type in 'arm':
     boot=SConscript(dirs=['boot/arm'], exports='env')
 else:
     boot=SConscript(dirs=['boot/'+arch], exports='env')

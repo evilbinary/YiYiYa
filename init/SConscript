@@ -28,14 +28,16 @@ kernel=[
     ]
 
 
-if env.get('ARCH')=='xtensa':
+if env.get('ARCHTYPE')=='xtensa':
     # libs.append('../app/libgui/libgui.a')
     # libs.append('../libs/libc/libc.a')
     pass
-elif env.get('ARCH')=='armv7':
-    kernel.append('../boot/arm/boot_armv7.s')
-    kernel.append('../boot/arm/init_armv7.c')
-    
+elif env.get('ARCHTYPE')=='arm':
+    if env.get('ARCH')=='armv7':
+        kernel.append('../boot/arm/boot_armv7.s')
+        kernel.append('../boot/arm/init_armv7.c')
+    else:
+        pass
 if env.get('MYLIB'):
     libs.append(env.get('MYLIB'))
 

@@ -26,7 +26,7 @@ env.Program('test.elf', source,
     CFLAGS='$CFLAGS $LIBCFLAGS',
     LINKFLAGS= '$LINKFLAGS $USER')
 
-if env.get('ARCH')=='arm':
+if env.get('ARCHTYPE')=='arm':
     source= [
         'test-musl.c',
         ]+env['LIBC']

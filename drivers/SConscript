@@ -8,13 +8,13 @@ import os
 
 Import('env')
 
-arch=env['ARCH']
+arch_type=env['ARCHTYPE']
 
 platform=env['PLATFORM']
 
 driver=[]
 other=[]
-if arch in env['ARCHS']:
+if arch_type =='arm':
     if platform=='v3s':
         other=[
             'gpu/v3s.c',
@@ -69,7 +69,7 @@ if arch in env['ARCHS']:
         'pty/pty.c'
     ]+other
 
-elif arch=='x86':
+elif arch_type=='x86':
     driver=['pci.c',
     'pic/pic.c',
     'ahci/ahci.c',
@@ -94,7 +94,7 @@ elif arch=='x86':
 
     'sound/sb16.c',]
 
-elif arch=='xtensa':
+elif arch_type=='xtensa':
      driver=[
           'hello/hello.c',
         ]

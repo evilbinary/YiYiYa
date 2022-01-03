@@ -42,11 +42,11 @@ env.KernelSize(['size'],['../init/kernel'])
 run_qemu_cmd=''
 debug_qemu_cmd=''
 
-if env.get('ARCH')=='x86':
+if env.get('ARCHTYPE')=='x86':
   run_qemu_cmd='qemu-system-i386 -rtc base=localtime,clock=host -boot a  -fda $SOURCE -serial stdio -D ./qemu.log  -drive id=disk,file=image/disk.img,format=raw,if=none -device ahci,id=ahci -device ide-hd,drive=disk,bus=ahci.0 -soundhw sb16 ' # -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor 
   debug_qemu_cmd = 'qemu-system-i386 -rtc base=localtime -boot a -S -s -fda $SOURCE -serial stdio  -D ./qemu.log  -drive id=disk,file=image/disk.img,format=raw,if=none -device ahci,id=ahci -device ide-hd,drive=disk,bus=ahci.0 -soundhw sb16'  #-d in_asm -d cpu_reset -d in_asm,int,mmu
   pass
-elif env.get('ARCH') in env['ARCHS']:
+elif env.get('ARCHTYPE') =='arm':
   if env['ARCH'] =='armv7':
     run_qemu_cmd='qemu-system-gnuarmeclipse --verbose --verbose --board STM32F429I-Discovery --mcu STM32F429ZITx   -rtc base=localtime -kernel init/kernel.elf  -serial stdio  -D ./qemu.log -d unimp,guest_errors --semihosting-config enable -d in_asm,int,mmu,cpu_reset' #-d in_asm -d cpu_reset -d in_asm,int,mmu -d   -drive if=sd,id=sd0,format=raw,file=image/disk.img #-d in_asm -d cpu_reset -d in_asm,int,mmu
     debug_qemu_cmd = run_qemu_cmd+ ' -S -s'
@@ -55,14 +55,14 @@ elif env.get('ARCH') in env['ARCHS']:
     if not plt=='Windows':
       run_qemu_cmd =run_qemu_cmd+' -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor'
     debug_qemu_cmd = run_qemu_cmd +' -S -s'
-elif env.get('ARCH')=='xtensa':
+elif env.get('ARCHTYPE')=='xtensa':
   run_qemu_cmd='flash_image.bin','~/dev/c/esp/qemu/build/qemu-system-xtensa -nographic -M esp32 -drive file=image/flash_image.bin,if=mtd,format=raw -s -serial stdio -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor  -D ./qemu.log -drive if=sd,id=sd0,format=raw,file=image/disk.img -d in_asm -d cpu_reset -d in_asm,int,mmu' #-d in_asm -d cpu_reset -d in_asm,int,mmu
   debug_qemu_cmd = run_qemu_cmd +' -S -s'
 else:
   print('no support run')
 
 def build_duck_image():
-  if env.get('ARCH')=='x86':
+  if env.get('ARCHTYPE')=='x86':
     env.Command('duck.img', 
       [
       ''
@@ -75,7 +75,7 @@ def build_duck_image():
         'dd if=${SOURCES[1]} bs=512 count=11 seek=1  conv=notrunc of=$TARGET',
         'dd if=${SOURCES[2]} bs=512 count=%s seek=12  conv=notrunc of=$TARGET'%(env.get('KERNEL_SIZE'))
     ])
-  elif env.get('ARCH') in env['ARCHS']:
+  elif env.get('ARCHTYPE') =='arm':
       if env.get('PLATFORM')=='v3s':
         env.Command('duck.img',[
           ''
@@ -91,13 +91,10 @@ def build_duck_image():
         env.Command('duck.img', 
         [
         ''
-        '../boot/arm/init.bin',
         '../init/kernel' 
         ],
         [
-          'dd if=/dev/zero bs=512 count=2880 conv=notrunc of=$TARGET',
-          'dd if=${SOURCES[0]} bs=512 count=11 seek=0 conv=notrunc of=$TARGET',
-          'dd if=${SOURCES[1]} bs=512 count=%s seek=12  conv=notrunc of=$TARGET'%(env.get('KERNEL_SIZE'))
+         
       ])
       else:
         env.Command('duck.img', 
@@ -111,7 +108,7 @@ def build_duck_image():
           'dd if=${SOURCES[0]} bs=512 count=11 seek=0 conv=notrunc of=$TARGET',
           'dd if=${SOURCES[1]} bs=512 count=%s seek=12  conv=notrunc of=$TARGET'%(env.get('KERNEL_SIZE'))
       ])
-  elif env.get('ARCH')=='xtensa':
+  elif env.get('ARCHTYPE')=='xtensa':
     env.Command('esp32', 
     [ '../boot/xtensa/init.elf',
       '../init/kernel'
@@ -123,7 +120,7 @@ def build_duck_image():
   ])
 
 def build_duck_fit():
-  if env.get('ARCH') in env['ARCHS']:
+  if env.get('ARCHTYPE') =='arm':
     env.Command('duck.fit', 
     ['kernel-'+env.get('PLATFORM')+'.its',
     '../init/kernel.elf', 
@@ -131,7 +128,7 @@ def build_duck_fit():
     ],
     ['mkimage -f ${SOURCES[0]} $TARGET'
   ])
-  elif env.get('ARCH')=='x86':
+  elif env.get('ARCHTYPE')=='x86':
     env.Command('duck.fit', 
       ['kernel.its',
       '../init/kernel.bin', 
@@ -151,12 +148,12 @@ def debug_duck():
   env.Command('qemu','duck.img',debug_qemu_cmd)
 
 if env.get('build')=='uImage':
-  if env.get('ARCH')=='x86':
+  if env.get('ARCHTYPE')=='x86':
     env.Command('uImage.img', 
       ['../init/kernel' ],
       ['mkimage -n YiYiYa -A x86 -O u-boot -T kernel -C none -a 0x30008000 -e 0x30008000 -d ${SOURCES[0]} $TARGET'
     ])
-  elif env.get('ARCH') in env['ARCHS']:
+  elif env.get('ARCHTYPE') =='arm':
     env.Command('uImage.img', 
       ['../init/kernel' ],
       ['mkimage -n YiYiYa -A arm -O u-boot -T kernel -C none -a 0x41000000 -e 0x1000000 -d ${SOURCES[0]} $TARGET'

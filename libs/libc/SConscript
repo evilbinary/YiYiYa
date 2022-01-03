@@ -37,12 +37,12 @@ source=[
 
 source+= Glob('math/*.c')
 
-if env['ARCH'] in env['ARCHS']:
+if env['ARCHTYPE'] =='arm':
     source=source+[
         'arm/longjmp.S',
         'arm/setjmp.S'
     ]
-elif env['ARCH']=='x86':
+elif env['ARCHTYPE']=='x86':
     # source=source+[
     #     'i386/longjmp.s',
     #     'i386/setjmp.s'

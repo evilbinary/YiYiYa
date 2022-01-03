@@ -22,7 +22,7 @@ libs=[
     '../libs/libkernel/libkernel.a'
 ]
 
-if env.get('ARCH')=='xtensa':
+if env.get('ARCHTYPE')=='xtensa':
     # libs.append('../app/libgui/libgui.a')
     # libs.append('../libs/libc/libc.a')
     pass
