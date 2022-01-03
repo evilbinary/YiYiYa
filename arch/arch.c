@@ -22,6 +22,7 @@ void arch_init(boot_info_t* boot) {
     display_init();
     mm_init();
     interrupt_init();
+    platform_end();
   } else {
     for (;;){}
   }

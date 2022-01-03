@@ -101,7 +101,6 @@ void system_init() {
   /* Configure the system clock */
   system_init_clock();
 
-  // MX_DMA_Init();
   // HAL_NVIC_SetPriority(SysTick_IRQn, 0,0U);
 
   /* Initialize all configured peripherals */
@@ -170,3 +169,5 @@ void platform_init() {
 
   // test_led();
 }
+
+void platform_end() { MX_DMA_Init(); }

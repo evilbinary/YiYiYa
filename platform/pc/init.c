@@ -47,3 +47,6 @@ void platform_init() {
   com_serial_init();
   io_add_write_channel(com_write);
 }
+
+void platform_end(){
+ }

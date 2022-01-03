@@ -134,3 +134,6 @@ void platform_init() {
   cpu_clock_init();
   // sys_dram_init();
 }
+
+void platform_end(){
+ }

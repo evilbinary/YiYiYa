@@ -24,7 +24,7 @@
 #include "gpio.h"
 #include "stm32f4xx_hal.h"
 
-// #define HAL_DMA 1
+#define HAL_DMA 1
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
@@ -72,8 +72,6 @@ void HAL_MspInit(void) {
   /* USER CODE BEGIN MspInit 0 */
 
   /* USER CODE END MspInit 0 */
-  kprintf("HAL_MspInit\n");
-
   __HAL_RCC_SYSCFG_CLK_ENABLE();
   __HAL_RCC_PWR_CLK_ENABLE();
 
@@ -97,7 +95,6 @@ void dma2_stream3_irq_handler(void) {
   /* USER CODE END DMA2_Stream3_IRQn 1 */
 }
 
-
 INTERRUPT_SERVICE
 void dma2_stream3_excetpion_handler() {
   interrupt_entering_code(0, 0);
@@ -108,17 +105,19 @@ void dma2_stream3_excetpion_handler() {
  * Enable DMA controller clock
  */
 void MX_DMA_Init(void) {
+#ifdef HAL_DMA
   /* DMA controller clock enable */
   __HAL_RCC_DMA2_CLK_ENABLE();
 
+  interrutp_regist(DMA2_Stream3_IRQn+16, dma2_stream3_excetpion_handler);
+  
   /* DMA interrupt init */
   /* DMA2_Stream3_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA2_Stream3_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA2_Stream3_IRQn);
 
-  interrutp_regist(213, dma2_stream3_excetpion_handler);
+#endif
 }
-
 
 /**
  * @brief SPI MSP Initialization
@@ -127,8 +126,6 @@ void MX_DMA_Init(void) {
  * @retval None
  */
 void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi) {
-  kprintf("HAL_SPI_MspInit\n");
-
 #ifdef HAL_DMA
   GPIO_InitTypeDef GPIO_InitStruct = {0};
   if (hspi->Instance == SPI1) {
@@ -163,9 +160,9 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi) {
     hdma_spi1_tx.Init.Priority = DMA_PRIORITY_LOW;
     hdma_spi1_tx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
     if (HAL_DMA_Init(&hdma_spi1_tx) != HAL_OK) {
-      // Error_Handler();
+      kprintf("dma init error\n");
     }
-
+    // __HAL_DMA_ENABLE_IT(&hdma_spi1_tx,DMA_IT_TC|DMA_IT_TE);
     __HAL_LINKDMA(hspi, hdmatx, hdma_spi1_tx);
   }
 #else

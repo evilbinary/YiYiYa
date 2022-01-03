@@ -39,6 +39,7 @@ void ps_command(){
 
 void do_shell_cmd(char* cmd, int count) {
   print_string("\n");
+  if(count==0) return;
   if (kstrncmp(cmd, "help", count) == 0) {
     print_help();
   } else if (kstrncmp(cmd, "ps", count) == 0) {
@@ -94,7 +95,7 @@ void pre_launch() {
   // syscall2(SYS_EXEC,"/dev/sda/lvgl",NULL);
   // kprintf("fd=>%d\n",fd);
 #elif defined(ARMV7)
-
+//  st7735_test();
 #else defined(ARM)
   // syscall2(SYS_EXEC,"/dev/sda/hello-rs",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/test-rs",NULL);

@@ -14,8 +14,13 @@ static u32 stm32_spi_read(spi_t* spi, u32* data, u32 count) {
   if (data == NULL || count <= 0) {
     return 0;
   }
+#ifdef SPI_DMA
+  HAL_StatusTypeDef errorcode =
+      HAL_SPI_Receive_DMA(&hspi1, data, count);
+#else
   HAL_StatusTypeDef errorcode =
       HAL_SPI_Receive(&hspi1, data, count, HAL_MAX_DELAY);
+#endif
   if (errorcode != HAL_OK) {
     return -1;
   }
@@ -26,8 +31,13 @@ static u32 stm32_spi_write(spi_t* spi, u32* data, u32 count) {
   if (data == NULL || count <= 0) {
     return 0;
   }
+#ifdef SPI_DMA
+  HAL_StatusTypeDef errorcode =
+      HAL_SPI_Transmit_DMA(&hspi1, data, count);
+#else
   HAL_StatusTypeDef errorcode =
       HAL_SPI_Transmit(&hspi1, data, count, HAL_MAX_DELAY);
+#endif
   if (errorcode != HAL_OK) {
     return -1;
   }

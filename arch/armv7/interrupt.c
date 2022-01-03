@@ -34,5 +34,5 @@ void interrutp_regist(u32 vec, interrupt_handler_t handler) {
 
 void interrutp_set(int i) {
   u32 base = (u32)interrutp_handlers[i];
-  idt[i] = base;
+    idt[i] = base;
 }

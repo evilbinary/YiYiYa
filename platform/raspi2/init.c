@@ -49,3 +49,6 @@ void timer_end() {
 void platform_init(){
     
 }
+
+void platform_end(){
+}

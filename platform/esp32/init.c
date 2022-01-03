@@ -24,3 +24,6 @@ void timer_end() {
 void platform_init(){
     // kprintf("platform_init\n");
 }
+
+void platform_end(){
+ }
