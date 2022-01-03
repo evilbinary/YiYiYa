@@ -6,20 +6,30 @@
 #include "gpio.h"
 #include "main.h"
 
+#define VERSION "1.0"
+
 const char* logo =
     " _  _  _ _  _  _      \n"
     "| || || | || || |     \n"
     "| \\| |/ | \\| |/ __  __\n"
     " \\_   _/ \\_   _/  \\/ /\n"
     "   | |     | |( ()  < \n"
-    "   |_|     |_| \\__/\\_\\\n"
-    "\nWelcome to YiYiYa Os ^_^! \n\n";
+    "   |_|     |_| \\__/\\_\\\n\n"
+    "2021 - 2080 Copyright by evilbinary \n";
+
+const char* build_str = "version " VERSION " " __DATE__ " " __TIME__ "\n";
+
+const char* welcome = "\nWelcome to YiYiYa Os ^_^! \n\n";
 
 void print_string(char* str) { syscall1(SYS_PRINT, str); }
 
-void print_logo() { print_string(logo); }
+void print_logo() {
+  print_string(logo);
+  print_string(build_str);
+  print_string(welcome);
+}
 
-void print_promot() { print_string("$"); }
+void print_promot() { print_string("yiyiya$"); }
 
 void print_help() { print_string("hello,world help cmd\n"); }
 

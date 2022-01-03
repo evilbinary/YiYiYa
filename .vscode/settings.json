@@ -41,6 +41,7 @@
     "spi.h": "c",
     "lcd.h": "c",
     "vga.h": "c",
-    "stdio.h": "c"
+    "stdio.h": "c",
+    "serial.h": "c"
   }
 }
