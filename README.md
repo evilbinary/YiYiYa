@@ -6,7 +6,8 @@ https://github.com/evilbinary/YiYiYa
 ## 使用
 
 ### 编译
-提前安装 scons、qemu 
+
+提前安装 scons、qemu [安装文档](https://github.com/evilbinary/YiYiYa/tree/main/docs/install)
 
 编译
 
@@ -14,15 +15,17 @@ https://github.com/evilbinary/YiYiYa
 scons
 ```
 
-具体见文档：[安装文档](https://github.com/evilbinary/YiYiYa/tree/main/docs/install)
-
-### 运行镜像
+### 运行
 
 ```
 scons -Q init && scons --run=qemu
 ```
 
-### FAQ
+
+## 开发
+
+具体见文档：[开发文档](https://github.com/evilbinary/YiYiYa/tree/main/docs/develop)
+## FAQ
 
 1、在linux下如果运行黑屏失败，修改根目录Sconstruct `env['CC']='/usr/bin/gcc-9'` gcc 改成9版本。
 
