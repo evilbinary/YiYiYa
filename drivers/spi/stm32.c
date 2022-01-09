@@ -6,7 +6,7 @@
 #include "platform/stm32f4xx/gpio.h"
 #include "spi.h"
 
-#define SPI_DMA 1
+// #define SPI_DMA 1
 
 static SPI_HandleTypeDef hspi1;
 

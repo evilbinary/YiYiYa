@@ -26,6 +26,7 @@ kernel=[
     'module.c',
     'shell.c',
     'monitor.c',
+    'test.c'
     ]
 
 

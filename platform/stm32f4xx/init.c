@@ -72,7 +72,7 @@ void system_init_clock() {
   RCC_ClkInitStruct.SYSCLKSource =
       RCC_SYSCLKSOURCE_PLLCLK;  // RCC_SYSCLKSOURCE_HSI
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK) {
@@ -112,7 +112,9 @@ void system_init() {
 }
 
 void timer_init(int hz) { kprintf("timer init\n"); }
-void timer_end() { HAL_IncTick(); }
+void timer_end() {
+  HAL_IncTick();
+}
 
 #define LED_Pin GPIO_PIN_13
 #define LED_GPIO_Port GPIOC

@@ -24,7 +24,7 @@
 #include "gpio.h"
 #include "stm32f4xx_hal.h"
 
-#define HAL_DMA 1
+// #define HAL_DMA 1
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
@@ -88,7 +88,9 @@ void HAL_MspInit(void) {
 void dma2_stream3_irq_handler(void) {
   /* USER CODE BEGIN DMA2_Stream3_IRQn 0 */
   /* USER CODE END DMA2_Stream3_IRQn 0 */
+  // kprintf("dma2_stream3_irq_handler\n");
   HAL_DMA_IRQHandler(&hdma_spi1_tx);
+    // kprintf("dma2_stream3_irq_handler=========>\n");
   /* USER CODE BEGIN DMA2_Stream3_IRQn 1 */
 
   /* USER CODE END DMA2_Stream3_IRQn 1 */
@@ -112,7 +114,7 @@ void MX_DMA_Init(void) {
   
   /* DMA interrupt init */
   /* DMA2_Stream3_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA2_Stream3_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(DMA2_Stream3_IRQn, 16, 0);
   HAL_NVIC_EnableIRQ(DMA2_Stream3_IRQn);
 
 #endif
@@ -156,7 +158,7 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi) {
     hdma_spi1_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
     hdma_spi1_tx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
     hdma_spi1_tx.Init.Mode = DMA_NORMAL;
-    hdma_spi1_tx.Init.Priority = DMA_PRIORITY_MEDIUM;
+    hdma_spi1_tx.Init.Priority = DMA_PRIORITY_LOW;
     hdma_spi1_tx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
     if (HAL_DMA_Init(&hdma_spi1_tx) != HAL_OK) {
       kprintf("dma init error\n");
