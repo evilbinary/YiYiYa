@@ -9,8 +9,6 @@
 void do_monitor_thread(void) {
   u32 i = 0;
   u32 count = 0;
-  st7735_test();
-
   for (;;) {
     count++;
     if (i % 4 == 0) i = 0;

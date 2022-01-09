@@ -87,7 +87,6 @@ void HAL_MspInit(void) {
  */
 void dma2_stream3_irq_handler(void) {
   /* USER CODE BEGIN DMA2_Stream3_IRQn 0 */
-  kprintf("dma2_stream3_irq_handler\n");
   /* USER CODE END DMA2_Stream3_IRQn 0 */
   HAL_DMA_IRQHandler(&hdma_spi1_tx);
   /* USER CODE BEGIN DMA2_Stream3_IRQn 1 */
