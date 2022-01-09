@@ -192,8 +192,9 @@ int st7735_write_pixel(vga_device_t* vga, const void* buf, size_t len) {
 
 int lcd_init_mode(vga_device_t* vga, int mode) {
   if (mode == VGA_MODE_128x128x16) {
-    vga->width = 320;
-    vga->height = 256;
+    vga->width = 128;
+    vga->height = 128;
+    vga->bpp=16;
   } else {
     kprintf("lcd no support mode %x\n");
   }

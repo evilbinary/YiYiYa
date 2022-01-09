@@ -42,6 +42,8 @@
     "lcd.h": "c",
     "vga.h": "c",
     "stdio.h": "c",
-    "serial.h": "c"
+    "serial.h": "c",
+    "main.h": "c",
+    "kernel.h": "c"
   }
 }
