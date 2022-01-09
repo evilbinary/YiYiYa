@@ -23,8 +23,9 @@ libs=[
 
 kernel=[
     'main.c',
+    'module.c',
     'shell.c',
-    'serial.c',
+    'monitor.c',
     ]
 
 

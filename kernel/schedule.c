@@ -31,6 +31,9 @@ thread_t* schedule_get_next() {
       next = v;
     }
   }
+  if(next ==NULL ){
+    next= head_thread;
+  }
   next->counter++;
   return next;
 }

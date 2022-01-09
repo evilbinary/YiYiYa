@@ -369,3 +369,12 @@ void thread_dumps() {
     kprintf("%-8s %d\n", str, p->counter);
   }
 }
+
+
+
+void thread_run_all() {
+  thread_t* v = head_thread;
+  for (; v; v = v->next) {
+    thread_run(v);
+  }
+}

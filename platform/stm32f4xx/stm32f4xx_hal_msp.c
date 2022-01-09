@@ -157,13 +157,14 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi) {
     hdma_spi1_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
     hdma_spi1_tx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
     hdma_spi1_tx.Init.Mode = DMA_NORMAL;
-    hdma_spi1_tx.Init.Priority = DMA_PRIORITY_LOW;
+    hdma_spi1_tx.Init.Priority = DMA_PRIORITY_MEDIUM;
     hdma_spi1_tx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
     if (HAL_DMA_Init(&hdma_spi1_tx) != HAL_OK) {
       kprintf("dma init error\n");
     }
     // __HAL_DMA_ENABLE_IT(&hdma_spi1_tx,DMA_IT_TC|DMA_IT_TE);
     __HAL_LINKDMA(hspi, hdmatx, hdma_spi1_tx);
+    kprintf("spi dma init end\n");
   }
 #else
 

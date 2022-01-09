@@ -126,7 +126,7 @@ void st7735_write_data(u8 cmd) {
 
 void st7735_test() {
   for (;;) {
-    // st7735_fill(0, 0, 128, 128, YELLOW);
+    st7735_fill(0, 0, 128, 128, YELLOW);
     st7735_fill(0, 0, 128, 128, GREEN);
     st7735_fill(0, 0, 128, 128, RED);
     kprintf("lcd end\n");

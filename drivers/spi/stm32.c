@@ -81,7 +81,6 @@ int spi_init_device(device_t* dev) {
   spi->inited = 0;
   spi->read = stm32_spi_read;
   spi->write = stm32_spi_write;
-
   stm32_spi_init();
   spi->inited = 1;
   return 0;
