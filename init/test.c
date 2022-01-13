@@ -78,12 +78,13 @@ void test_gui() {
 #define IOC_READ_OFFSET _IOW(IOC_AHCI_MAGIC, 3, int)
 #define IOC_WRITE_OFFSET _IOW(IOC_AHCI_MAGIC, 4, int)
 
+#define memset kmemset
 void test_SYS_DEV_READ_write() {
   char* test = "hello,do serial thread\n";
   char wheel[] = {'\\', '|', '/', '-'};
   char buf[512];
   int count = 0, i = 0;
-  kmemset(buf, 1, 512);
+  memset(buf, 1, 512);
   // syscall3(SYS_WRITE, DEVICE_SERIAL, test, kstrlen(test));
   syscall1(SYS_PRINT, "2");
   if (count % 100 == 0) {

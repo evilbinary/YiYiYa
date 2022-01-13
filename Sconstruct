@@ -11,21 +11,21 @@ import sys
 plt = platform.system()
 
 # board select platform 选择你要编译的平台
-# platform='pc'
+platform='pc'
 # platform='v3s'
 # platform='raspi2'
 # platform='esp32'
-platform='stm32f4xx'
+# platform='stm32f4xx'
 
 supports_archs={
     'arm': ['armv5','armv6','armv7','armv7-a'],
-    'x86': ['i386','x86_64'],
+    'x86': ['x86','x86_64'],
     'xtensa':  ['lx6']
 }
 
 support_platform={
     'stm32f4xx':'armv7',
-    'pc':'i386',
+    'pc':'x86',
     'raspi2':'armv7-a',
     'esp32':'xl6',
     'v3s':'armv7-a'
