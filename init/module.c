@@ -48,7 +48,7 @@ extern module_t hello_module;
 
 #endif
 
-void do_module_thread(void) {
+void driver_init(void) {
   u32 i = 0;
   u32 count = 0;
 
@@ -100,10 +100,4 @@ void do_module_thread(void) {
   module_regist(&hello_module);
 #endif
 
-  kprintf("thread run all\n");
-  thread_run_all();
-  for (;;) {
-    count++;
-    if (i % 4 == 0) i = 0;
-  }
 }
