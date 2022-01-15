@@ -18,6 +18,13 @@ void uart_send(unsigned int c) {
   io_write32(UART0_DR,c);
 }
 
+unsigned int uart_receive() {
+  unsigned int c;
+  while(io_read32(UART0_FR) & 0x10 ){}
+  c=io_read32(UART0_DR);
+  return c;
+}
+
 u32 read_core0timer_pending(void) {
   u32 tmp;
   tmp = io_read32(CORE0_IRQ_SOURCE);

@@ -113,6 +113,5 @@ void pre_launch() {
 //  syscall2(SYS_EXEC,"/dev/sda/test.elf",NULL);
 //  syscall2(SYS_EXEC,"/dev/sda/microui.elf",NULL);
 // test_cpu_speed();
-  for(;;);
 #endif
 }

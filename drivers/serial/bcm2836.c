@@ -11,7 +11,7 @@ void serial_write(char a) {
 }
 
 char serial_read() {
-  
+  return uart_receive();
 }
 
 void serial_printf(char* fmt, ...) {
