@@ -103,9 +103,7 @@ env = Environment(
         )
 
 if plt=='Linux':
-    if arch in archs:
-        pass
-    else:
+    if arch =='x86':
         env['LINKFLAGS']= env['LINKFLAGS']+' -m32'
     env['CFLAGS']= env['CFLAGS']+' -no-pie -fno-pic -Llibgcc.a '
     #env['MYLIB']= ''

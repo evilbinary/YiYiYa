@@ -11,9 +11,7 @@ extern u32 write_channel_number;
 
 void arch_init(boot_info_t* boot) {
   if (boot_info == NULL) {
-    if(boot!=NULL){
-      kmemmove(&boot_data,boot,sizeof(boot_info_t));
-    }
+    kmemmove(&boot_data,boot,sizeof(boot_info_t));
     boot_info = &boot_data;
     write_channel_number = 0;
     platform_init();
