@@ -106,7 +106,7 @@ void pre_launch() {
   // syscall2(SYS_EXEC,"/dev/sda/hello",NULL);
   // syscall2(SYS_EXEC, "/dev/sda/lvgl", NULL);
   syscall2(SYS_EXEC, "/dev/sda/launcher", NULL);
-
+  for(;;);
   // syscall2(SYS_EXEC,"/dev/sda/track.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/gui.elf",NULL);
 // syscall2(SYS_EXEC,"/dev/sda/etk.elf",NULL);

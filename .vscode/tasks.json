@@ -30,7 +30,7 @@
             "type": "shell",
             "isBackground": true,
             "windows": {
-                "command": ""
+                "command": "echo 'Starting QEMU' ;scons --run=debug"
             },
             "linux": {
                 "command": "echo Starting QEMU & scons --run=debug"

@@ -40,7 +40,7 @@ void exception_info(interrupt_context_t *context) {
   }
   thread_t *current = thread_current();
   if (current != NULL) {
-    kprintf("tid:%d\n", current->id);
+    kprintf("tid:%d %s\n", current->id,current->name);
   }
   kprintf("ifsr: %x dfsr: %x dfar: %x\n", read_ifsr(), read_dfsr(),
           read_dfar());
