@@ -52,11 +52,14 @@ typedef struct thread {
 
 thread_t * thread_create(void* entry,void* data);
 thread_t * thread_create_name(char* name,void* entry,void* data);
+
+thread_t* thread_create_name_level(char* name, void* entry, void* data,u32 level);
+
 thread_t* thread_create_ex(void* entry, u32* stack0, u32* stack3, u32 size,
-                           void* data);
+                           void* data,u32 level);
 
 thread_t* thread_create_ex_name(char* name,void* entry, u32* stack0, u32* stack3, u32 size,
-                           void* data);
+                           void* data,u32 level);
 
 void thread_sleep(thread_t * thread);
 

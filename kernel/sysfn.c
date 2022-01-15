@@ -189,7 +189,7 @@ u32 sys_exec(char* filename, char* const argv[], char* const envp[]) {
   u8* stack3 = kmalloc_alignment(THREAD_STACK_SIZE,PAGE_SIZE);
   u8* vstack3 = STACK_ADDR;
   thread_t* t = thread_create_ex_name(filename,(u32*)&run_elf_thread, stack0, vstack3,
-                                 THREAD_STACK_SIZE, NULL);
+                                 THREAD_STACK_SIZE, NULL,USER_MODE);
 
   t->context.page_dir = current->context.page_dir;
   #ifdef PAGE_CLONE

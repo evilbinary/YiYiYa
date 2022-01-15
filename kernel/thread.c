@@ -14,6 +14,18 @@ thread_t* tail_thread = NULL;
 u32 thread_ids = 0;
 extern context_t* current_context;
 
+thread_t* thread_create_level(void* entry, void* data,u32 level) {
+  u32 size = THREAD_STACK_SIZE;
+#ifdef NO_THREAD_STACK0
+  u8* stack0 = NULL;
+#else
+    u8* stack0 = kmalloc(size);
+#endif
+  u8* stack3 = kmalloc_alignment(size, PAGE_SIZE);
+  thread_t* thread = thread_create_ex(entry, stack0, stack3, data, size,level);
+  return thread;
+}
+
 thread_t* thread_create_name(char* name, void* entry, void* data) {
   thread_t* t = thread_create(entry, data);
   char* kname = kmalloc(kstrlen(name));
@@ -22,21 +34,21 @@ thread_t* thread_create_name(char* name, void* entry, void* data) {
   return t;
 }
 
-thread_t* thread_create(void* entry, void* data) {
-  u32 size = THREAD_STACK_SIZE;
-#ifdef NO_THREAD_STACK0
-  u8* stack0 = NULL;
-#else
-    u8* stack0 = kmalloc(size);
-#endif
-  u8* stack3 = kmalloc_alignment(size, PAGE_SIZE);
-  thread_t* thread = thread_create_ex(entry, stack0, stack3, data, size);
-  return thread;
+thread_t* thread_create_name_level(char* name, void* entry, void* data,u32 level) {
+  thread_t* t = thread_create_level(entry, data,level);
+  char* kname = kmalloc(kstrlen(name));
+  kstrcpy(kname, name);
+  t->name = name;
+  return t;
+}
+
+thread_t* thread_create(void* entry, void* data){
+  return thread_create_level(entry,data,USER_MODE);
 }
 
 thread_t* thread_create_ex_name(char* name, void* entry, u32* stack0,
-                                u32* stack3, u32 size, void* data) {
-  thread_t* t = thread_create_ex(entry, stack0, stack3, size, data);
+                                u32* stack3, u32 size, void* data,u32 level) {
+  thread_t* t = thread_create_ex(entry, stack0, stack3, size, data,level);
   char* kname = kmalloc(kstrlen(name));
   kstrcpy(kname, name);
   t->name = name;
@@ -44,7 +56,7 @@ thread_t* thread_create_ex_name(char* name, void* entry, u32* stack0,
 }
 
 thread_t* thread_create_ex(void* entry, u32* stack0, u32* stack3, u32 size,
-                           void* data) {
+                           void* data,u32 level) {
   thread_t* thread = kmalloc(sizeof(thread_t));
   thread->lock = 0;
   thread->data = data;
@@ -59,7 +71,7 @@ thread_t* thread_create_ex(void* entry, u32* stack0, u32* stack3, u32 size,
   // thread->fds[STDSELF]=3;
   thread->fd_number = 3;
 
-  thread_init(thread, entry, stack0, stack3, size);
+  thread_init(thread, entry, stack0, stack3, size,level);
   return thread;
 }
 
@@ -89,7 +101,7 @@ void thread_wake(thread_t* thread) {
 }
 
 void thread_init(thread_t* thread, void* entry, u32* stack0, u32* stack3,
-                 u32 size) {
+                 u32 size,u32 level) {
   u8* stack0_top = stack0;
   stack0_top += size;
   u8* stack3_top = stack3;
@@ -104,7 +116,7 @@ void thread_init(thread_t* thread, void* entry, u32* stack0, u32* stack3,
   thread->stack0_top = stack0_top;
   thread->stack3_top = stack3_top;
   context_init(&thread->context, (u32*)entry, stack0_top, stack3_top,
-               USER_MODE);
+               level);
 }
 
 void thread_add(thread_t* thread) {

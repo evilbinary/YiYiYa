@@ -34,7 +34,9 @@ void com_write(char a) {
   while (com_is_send() == 0 || i < 100) {
     i++;
   }
-  io_write8(PORT_COM1, a);
+  if(i<=0){
+    io_write8(PORT_COM1, a);
+  }
 }
 
 char com_read() {

@@ -23,10 +23,9 @@ void kstart(int argc, char* argv[], char** envp) {
 int kmain(int argc, char* argv[]) {
   kernel_init();
 
-  thread_t* t0 = thread_create_name("module", (u32*)&do_module_thread, NULL);
+  thread_t* t0 = thread_create_name_level("module", (u32*)&do_module_thread, NULL,KERNEL_MODE);
   thread_t* t1 = thread_create_name("monitor", (u32*)&do_monitor_thread, NULL);
   thread_t* t2 = thread_create_name("shell", (u32*)&do_shell_thread, NULL);
-
   kprintf("thread run\n");
   thread_run(t0);
   thread_add(t1);
