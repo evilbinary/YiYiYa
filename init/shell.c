@@ -103,15 +103,16 @@ void pre_launch() {
   // syscall2(SYS_EXEC,"/dev/sda/test-musl",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/ls",NULL);
   //  syscall2(SYS_EXEC,"/dev/sda/test.elf",NULL);
-  syscall2(SYS_EXEC,"/dev/sda/hello",NULL);
+  // syscall2(SYS_EXEC,"/dev/sda/hello",NULL);
   // syscall2(SYS_EXEC, "/dev/sda/lvgl", NULL);
-  // syscall2(SYS_EXEC, "/dev/sda/launcher", NULL);
-  for(;;);
+  syscall2(SYS_EXEC, "/dev/sda/launcher", NULL);
+
   // syscall2(SYS_EXEC,"/dev/sda/track.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/gui.elf",NULL);
 // syscall2(SYS_EXEC,"/dev/sda/etk.elf",NULL);
 //  syscall2(SYS_EXEC,"/dev/sda/test.elf",NULL);
 //  syscall2(SYS_EXEC,"/dev/sda/microui.elf",NULL);
 // test_cpu_speed();
+  for(;;);
 #endif
 }

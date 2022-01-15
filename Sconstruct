@@ -11,9 +11,9 @@ import sys
 plt = platform.system()
 
 # board select platform 选择你要编译的平台
-platform='pc'
+# platform='pc'
 # platform='v3s'
-# platform='raspi2'
+platform='raspi2'
 # platform='esp32'
 # platform='stm32f4xx'
 
@@ -113,6 +113,7 @@ elif plt=='Windows':
     env['CFLAGS']= env['CFLAGS']+' -fno-stack-protector -mno-stack-arg-probe ' #-ffreestanding -nostdlib  
     env['USER']='--entry main -Txlinker/user.ld   '
     env['MYLIB']=cc_lib_path+'libgcc.a'
+    env['PROGSUFFIX'] = ''
 
 if arch_type == 'arm':
     env['APP']=True
