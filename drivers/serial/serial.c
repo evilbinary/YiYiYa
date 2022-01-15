@@ -10,14 +10,18 @@ static int is_send() { return io_read8(PORT_COM1 + 5) & 0x20; }
 static int is_receive() { return io_read8(PORT_COM1 + 5) & 1; }
 
 void serial_write(char a) {
-  while (is_send() == 0)
-    ;
+  int i=0;
+  while (is_send() == 0||i>1000){
+    i++;
+  }
   io_write8(PORT_COM1, a);
 }
 
 char serial_read() {
-  while (is_receive() == 0)
-    ;
+  int i=0;
+  while (is_receive() == 0||i>1000){
+    i++;
+  }
   return io_read8(PORT_COM1);
 }
 

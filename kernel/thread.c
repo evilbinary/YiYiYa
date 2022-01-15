@@ -65,14 +65,22 @@ thread_t* thread_create_ex(void* entry, u32* stack0, u32* stack3, u32 size,
   thread->fds = kmalloc(sizeof(fd_t) * thread->fd_size);
 
   // file description
+  thread_fill_fd(thread);
+  
+  thread_init(thread, entry, stack0, stack3, size,level);
+  return thread;
+}
+
+void thread_fill_fd(thread_t* thread){
   thread->fds[STDIN] = fd_find(STDIN);
   thread->fds[STDOUT] = fd_find(STDOUT);
   thread->fds[STDERR] = fd_find(STDERR);
   // thread->fds[STDSELF]=3;
-  thread->fd_number = 3;
-
-  thread_init(thread, entry, stack0, stack3, size,level);
-  return thread;
+  for(int i=STDIN;i<=STDERR;i++){
+    if(thread->fds[STDIN]!=NULL){
+      thread->fd_number++;
+    }
+  }
 }
 
 void thread_sleep(thread_t* thread) {
@@ -288,6 +296,9 @@ thread_t* thread_clone(thread_t* thread, u32* vstack3, u32 size) {
 }
 
 int thread_find_fd_name(thread_t* thread, u8* name) {
+  if(thread->fd_number==0){
+      thread_fill_fd(thread);
+  }
   if (thread->fd_number > thread->fd_size) {
     kprintf("thread find fd name limit\n");
     return -1;

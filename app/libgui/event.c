@@ -10,7 +10,7 @@ event_t null_event;
 #include "algorithm/array_queue.h"
 
 aqueue_t queue;
-event_info_t event_info;
+event_info_t event_info={0};
 static mouse_data_t current_mouse;
 static u32 button_press = 0;
 

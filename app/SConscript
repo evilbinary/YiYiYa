@@ -76,7 +76,7 @@ if env.get('APP'):
             'file/file.elf',
             'etk/etk.elf',
             'test/test.elf',
-            'rust/test/test-rs',
+            #'rust/test/test-rs',
             # 'lua/lua',
             # 'lua/luat',
             'lua/hello.lua',
