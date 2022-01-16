@@ -49,28 +49,26 @@ void do_shell_cmd(char* cmd, int count) {
 
 void pre_launch();
 
-int fdstdin = 0;
-int fdstdout = 1;
-
+int series;
+ 
 void do_shell_thread(void) {
   print_logo();
-  pre_launch();
   int count = 0;
   char buf[64];
   int ret = 0;
   print_promot();
-  fdstdin = syscall2(SYS_OPEN, "/dev/stdin", 0);
-  fdstdout = syscall2(SYS_OPEN, "/dev/stdout", 0);
+  series = syscall2(SYS_OPEN, "/dev/series", 0);
+  pre_launch();
   for (;;) {
     int ch = 0;
-    ret = syscall3(SYS_READ, fdstdin, &ch, 1);
+    ret = syscall3(SYS_READ, series, &ch, 1);
     if (ret > 0) {
       if (ch == '\r' || ch == '\n') {
         do_shell_cmd(buf, count);
         count = 0;
         print_promot();
       } else {
-        syscall3(SYS_WRITE, fdstdout, &ch, 1);
+        syscall3(SYS_WRITE, series, &ch, 1);
         buf[count++] = ch;
       }
     }
@@ -111,7 +109,7 @@ void pre_launch() {
   //  syscall2(SYS_EXEC,"/dev/sda/test.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/hello",NULL);
   // syscall2(SYS_EXEC, "/dev/sda/lvgl", NULL);
-  // syscall2(SYS_EXEC, "/dev/sda/launcher", NULL);
+  syscall2(SYS_EXEC, "/dev/sda/launcher", NULL);
 
   // syscall2(SYS_EXEC,"/dev/sda/track.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/gui.elf",NULL);

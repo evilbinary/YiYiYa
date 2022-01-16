@@ -43,18 +43,25 @@ int devfs_init(void) {
   vnode_t *stdout = vfs_create("stdout", V_FILE);
   vfs_mount(NULL, "/dev", stdin);
   vfs_mount(NULL, "/dev", stdout);
-
-  stdin->device = device_find(DEVICE_KEYBOARD);
-  stdout->device = device_find(DEVICE_SERIAL);
-  if (stdin->device == NULL) {
-    stdin->device = device_find(DEVICE_SERIAL);
-  }
-  if (stdout->device == NULL) {
-    stdout->device = device_find(DEVICE_VGA);
-  }
-
   stdin->read = device_read;
   stdout->write = device_write;
+  stdin->device = device_find(DEVICE_KEYBOARD);
+  stdout->device = device_find(DEVICE_VGA);
+
+  if (stdin->device == NULL) {
+    stdin->device = device_find(DEVICE_VGA_QEMU);
+  }
+  if (stdout->device == NULL) {
+    stdout->device = device_find(DEVICE_SERIAL);
+  }
+
+  // series
+  vnode_t *series = vfs_create("series", V_FILE);
+  vfs_mount(NULL, "/dev", series);
+  series->device = device_find(DEVICE_SERIAL);
+
+  series->read = device_read;
+  series->write = device_write;
 
   // frambuffer
   device_t *fb_dev = device_find(DEVICE_VGA);
