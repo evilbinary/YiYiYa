@@ -3,15 +3,17 @@
  * 作者: evilbinary on 01/01/20
  * 邮箱: rootdebug@163.com
  ********************************************************************/
+#include "gpio.h"
 #include "serial.h"
 
-
-void serial_write(char a) {
-  uart_send(a);
-}
+void serial_write(char a) { uart_send(a); }
 
 char serial_read() {
-  return uart_receive();
+  if (io_read32(UART0_FR) & 0x10) {
+    return 0;
+  }
+  char c = io_read32(UART0_DR);
+  return c;
 }
 
 void serial_printf(char* fmt, ...) {
@@ -27,9 +29,13 @@ void serial_printf(char* fmt, ...) {
 }
 
 static size_t read(device_t* dev, void* buf, size_t len) {
-  u32 ret = len;
+  u32 ret = 0;
   for (int i = 0; i < len; i++) {
-    ((char*)buf)[i] = serial_read();
+    char c = serial_read();
+    if (c != 0) {
+      ret++;
+      ((char*)buf)[i] = c;
+    }
   }
   return ret;
 }

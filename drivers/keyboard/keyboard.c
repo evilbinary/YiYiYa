@@ -12,7 +12,7 @@
 
 
 #define MAX_CHARCODE_BUFFER 32
-static u8 scan_code_buffer[MAX_CHARCODE_BUFFER];
+static u8 scan_code_buffer[MAX_CHARCODE_BUFFER]={0};
 static u32 scan_code_index=0;
 
 static size_t read(device_t* dev, void* buf, size_t len) {

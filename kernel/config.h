@@ -50,15 +50,15 @@
 
 #else
 
-#define MAX_FD_NUMBER 50
+#define MAX_FD_NUMBER 64
 #define MAX_PHDR 12
 #define MAX_SHDR 25
 
-#define MAX_DEVICE 20
+#define MAX_DEVICE 40
 
 #define EXEC_FILE_NAME_LEN 256
 
-#define MAX_MODULES 10
+#define MAX_MODULES 20
 
 #define SYSCALL_NUMBER 512
 

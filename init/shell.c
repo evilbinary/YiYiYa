@@ -32,42 +32,47 @@ void print_promot() { print_string("yiyiya$"); }
 
 void print_help() { print_string("supports help ps command\n"); }
 
-void ps_command(){
-   syscall0(SYS_DUMPS);
-}
+void ps_command() { syscall0(SYS_DUMPS); }
 
 void do_shell_cmd(char* cmd, int count) {
   print_string("\n");
-  if(count==0) return;
+  if (count == 0) return;
   if (kstrncmp(cmd, "help", count) == 0) {
     print_help();
   } else if (kstrncmp(cmd, "ps", count) == 0) {
     ps_command();
   } else {
-    syscall3(SYS_DEV_WRITE, DEVICE_SERIAL, cmd, count);
+    print_string(cmd);
     print_string(" command not support\n");
   }
 }
 
 void pre_launch();
 
+int fdstdin = 0;
+int fdstdout = 1;
+
 void do_shell_thread(void) {
   print_logo();
   pre_launch();
   int count = 0;
-  char buf[32];
+  char buf[64];
   int ret = 0;
   print_promot();
+  fdstdin = syscall2(SYS_OPEN, "/dev/stdin", 0);
+  fdstdout = syscall2(SYS_OPEN, "/dev/stdout", 0);
   for (;;) {
     int ch = 0;
-    ret = syscall3(SYS_DEV_READ, DEVICE_SERIAL, &ch, 1);
-    if (ch == '\r' || ch == '\n') {
-      do_shell_cmd(buf, count);
-      count = 0;
-      print_promot();
-    } else {
-      syscall3(SYS_DEV_WRITE, DEVICE_SERIAL, &ch, 1);
-      buf[count++] = ch;
+    ret = syscall3(SYS_READ, fdstdin, &ch, 1);
+    if (ret > 0) {
+      if (ch == '\r' || ch == '\n') {
+        do_shell_cmd(buf, count);
+        count = 0;
+        print_promot();
+      } else {
+        syscall3(SYS_WRITE, fdstdout, &ch, 1);
+        buf[count++] = ch;
+      }
     }
   }
 }
@@ -79,9 +84,8 @@ void pre_launch() {
   // syscall2(SYS_EXEC,"/dev/sda/gui.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/file.elf",NULL);
   // syscall2(SYS_EXEC, "/dev/sda/luat", NULL);
-  
+
   syscall2(SYS_EXEC, "/dev/sda/etk.elf", NULL);
-  for(;;);
   // syscall2(SYS_EXEC,"/dev/sda/test-rs",NULL);
   // char* argv[] = {
   //     "lua",
@@ -94,6 +98,8 @@ void pre_launch() {
   // syscall2(SYS_EXEC,"/dev/sda/mcroui.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/lvgl",NULL);
   // kprintf("fd=>%d\n",fd);
+  for (;;)
+    ;
 #elif defined(ARMV7)
   test_lcd();
 #else defined(ARM)
@@ -105,13 +111,20 @@ void pre_launch() {
   //  syscall2(SYS_EXEC,"/dev/sda/test.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/hello",NULL);
   // syscall2(SYS_EXEC, "/dev/sda/lvgl", NULL);
-  syscall2(SYS_EXEC, "/dev/sda/launcher", NULL);
+  // syscall2(SYS_EXEC, "/dev/sda/launcher", NULL);
 
   // syscall2(SYS_EXEC,"/dev/sda/track.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/gui.elf",NULL);
-// syscall2(SYS_EXEC,"/dev/sda/etk.elf",NULL);
-//  syscall2(SYS_EXEC,"/dev/sda/test.elf",NULL);
-//  syscall2(SYS_EXEC,"/dev/sda/microui.elf",NULL);
+  // syscall2(SYS_EXEC,"/dev/sda/etk.elf",NULL);
+  //  syscall2(SYS_EXEC,"/dev/sda/test.elf",NULL);
+  //  syscall2(SYS_EXEC,"/dev/sda/microui.elf",NULL);
+
+  // char* argv[] = {
+  //     "lua",
+  //     "hello.lua",
+  // };
+  // syscall2(SYS_EXEC, "/dev/sda/lua", argv);
+
 // test_cpu_speed();
 #endif
 }

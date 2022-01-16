@@ -20,7 +20,7 @@ void uart_send(unsigned int c) {
 
 unsigned int uart_receive() {
   unsigned int c;
-  while(io_read32(UART0_FR) & 0x10 ){}
+  while(io_read32(UART0_FR) & 0x10){}
   c=io_read32(UART0_DR);
   return c;
 }
