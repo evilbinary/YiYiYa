@@ -68,7 +68,9 @@ if env.get('APP'):
     # SConscript(dirs=['liblua'], exports='env')
     # SConscript(dirs=['lua'], exports='env')
 
-    
+    # SConscript(dirs=['libncurses'], exports='env')
+    SConscript(dirs=['libchez'], exports='env')
+
 
     apps=['hello/hello',
             'gui/gui.elf',
@@ -102,7 +104,7 @@ if env.get('APP'):
         try:
             env.Command('copyhello', 
             apps,
-            ['py -m cp ${SOURCES} image/disk.img'])
+            ['py -m cp  ${SOURCES} image/disk.img'])
         except:
             print('please manual copy %s files to image/disk.img'%(apps))
         pass
