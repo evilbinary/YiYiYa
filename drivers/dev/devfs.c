@@ -48,8 +48,8 @@ int devfs_init(void) {
   stdin->device = device_find(DEVICE_KEYBOARD);
   stdout->device = device_find(DEVICE_VGA);
 
-  if (stdin->device == NULL) {
-    stdin->device = device_find(DEVICE_VGA_QEMU);
+  if (stdout->device == NULL) {
+    stdout->device = device_find(DEVICE_VGA_QEMU);
   }
   if (stdout->device == NULL) {
     stdout->device = device_find(DEVICE_SERIAL);
