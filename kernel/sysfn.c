@@ -143,7 +143,7 @@ size_t sys_yeild() { thread_yield(); }
 void sys_exit(int status) {
   thread_t* current = thread_current();
   thread_exit(current, status);
-  thread_dumps();
+  // thread_dumps();
   kprintf("sys exit tid %d %s status %d\n", current->id,current->name,status);
 }
 

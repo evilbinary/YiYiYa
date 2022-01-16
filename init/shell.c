@@ -34,6 +34,13 @@ void print_help() { print_string("supports help ps command\n"); }
 
 void ps_command() { syscall0(SYS_DUMPS); }
 
+int do_exec(char* cmd, int count) {
+  char buf[64];
+  cmd[count]=0;
+  sprintf(buf, "/dev/sda/%s", cmd);
+  return syscall2(SYS_EXEC, buf, NULL);
+}
+
 void do_shell_cmd(char* cmd, int count) {
   print_string("\n");
   if (count == 0) return;
@@ -42,15 +49,18 @@ void do_shell_cmd(char* cmd, int count) {
   } else if (kstrncmp(cmd, "ps", count) == 0) {
     ps_command();
   } else {
-    print_string(cmd);
-    print_string(" command not support\n");
+    int ret = do_exec(cmd, count);
+    if (ret < 0) {
+      print_string(cmd);
+      print_string(" command not support\n");
+    }
   }
 }
 
 void pre_launch();
 
 int series;
- 
+
 void do_shell_thread(void) {
   print_logo();
   int count = 0;
@@ -59,16 +69,24 @@ void do_shell_thread(void) {
   print_promot();
   series = syscall2(SYS_OPEN, "/dev/series", 0);
   pre_launch();
+
+  if (syscall2(SYS_DUP2, series, 1) < 0) {
+    print_string("err in dup2\n");
+  }
+  if (syscall2(SYS_DUP2, series, 0) < 0) {
+    print_string("err in dup2\n");
+  }
+
   for (;;) {
     int ch = 0;
-    ret = syscall3(SYS_READ, series, &ch, 1);
+    ret = syscall3(SYS_READ, 0, &ch, 1);
     if (ret > 0) {
       if (ch == '\r' || ch == '\n') {
         do_shell_cmd(buf, count);
         count = 0;
         print_promot();
       } else {
-        syscall3(SYS_WRITE, series, &ch, 1);
+        syscall3(SYS_WRITE, 1, &ch, 1);
         buf[count++] = ch;
       }
     }
@@ -106,10 +124,10 @@ void pre_launch() {
   // syscall2(SYS_EXEC,"/dev/sda/test-musl.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/test-musl",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/ls",NULL);
-  //  syscall2(SYS_EXEC,"/dev/sda/test.elf",NULL);
+  syscall2(SYS_EXEC, "/dev/sda/test.elf", NULL);
   // syscall2(SYS_EXEC,"/dev/sda/hello",NULL);
   // syscall2(SYS_EXEC, "/dev/sda/lvgl", NULL);
-  syscall2(SYS_EXEC, "/dev/sda/launcher", NULL);
+  // syscall2(SYS_EXEC, "/dev/sda/launcher", NULL);
 
   // syscall2(SYS_EXEC,"/dev/sda/track.elf",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/gui.elf",NULL);
