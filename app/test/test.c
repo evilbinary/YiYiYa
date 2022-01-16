@@ -258,6 +258,12 @@ void test_syscall() {
 #endif
 }
 
+void test_scanf(){
+  int i=0;
+  scanf("%d",&i);
+  printf("i=%d\n",i);
+}
+
 int main(int argc, char* argv[]) {
   printf(buf);
   // test_syscall();
@@ -272,5 +278,6 @@ int main(int argc, char* argv[]) {
   // test_dup_pty();
   // test_read_write();
   // test_malloc_free();
+  test_scanf();
   return 0;
 }
