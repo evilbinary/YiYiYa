@@ -1,0 +1,40 @@
+# coding:utf-8
+# *******************************************************************
+# * Copyright 2021-2080 evilbinary
+# * 作者: evilbinary on 01/01/20
+# * 邮箱: rootdebug@163.com
+# ********************************************************************
+import os
+
+Import('env')
+
+
+source=[
+    'main.c',
+    '../libchez/libchez.a',
+    '../libzlib/libzlib.a',
+    '../liblz4/liblz4.a',
+    '../libuuid/libuuid.a',
+    ]+env['LIBC']
+
+if env.get('MYLIB'):
+    source.append(env.get('MYLIB'))
+
+
+type='a6le'
+cflags=''
+
+if env['ARCHTYPE']=='arm':
+    type='arm32le'
+    cflags ='-DINLINES -DGC_MACROS -DARMV6 -DMB_LEN_MAX=8 -D_LARGEFILE64_SOURCE -DHAVE_HIDDEN'
+else:
+    print('not support')
+
+env.Program('scheme', source,
+    CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libchez/'+type+' -I. '+cflags,
+    LINKFLAGS= '$LINKFLAGS $USER')
+
+# env.Objcopy('etk.elf','etk',OBJCOPYFLAGS='-S')
+# env.Objcopy('etk.dbg','etk',OBJCOPYFLAGS='--only-keep-debug')
+
+
