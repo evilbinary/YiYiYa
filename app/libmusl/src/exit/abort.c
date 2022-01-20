@@ -26,5 +26,5 @@ _Noreturn void abort(void)
 	/* Beyond this point should be unreachable. */
 	a_crash();
 	raise(SIGKILL);
-	_Exit(127);
+	//_Exit(127);
 }

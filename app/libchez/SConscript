@@ -55,4 +55,6 @@ if env.get('MYLIB'):
 
 env.Library('chez', source+[
         '../libzlib/libzlib.a',
-]+env['LIBC'],CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libzlib -Iapp/libchez/'+type+' -I. '+cflags )
+        '../liblz4/liblz4.a',
+        '../libuuid/libuuid.a',
+]+env['LIBC'],CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libuuid -Iapp/liblz4/lib -Iapp/libzlib -Iapp/libchez/'+type+' -I. '+cflags )

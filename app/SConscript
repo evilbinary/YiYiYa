@@ -68,7 +68,9 @@ if env.get('APP'):
     # SConscript(dirs=['liblua'], exports='env')
     # SConscript(dirs=['lua'], exports='env')
 
-    # SConscript(dirs=['libncurses'], exports='env')
+    SConscript(dirs=['libncurses'], exports='env')
+    SConscript(dirs=['libuuid'], exports='env')
+    SConscript(dirs=['liblz4'], exports='env')
     SConscript(dirs=['libchez'], exports='env')
 
 
@@ -85,7 +87,9 @@ if env.get('APP'):
             # 'bin/ls',
             'lvgl/lvgl',
             'track/track.elf',
-            'launcher/launcher'
+            'launcher/launcher',
+            # 'launcher/launcher'
+
             ]
     #check_exit(apps)
 
