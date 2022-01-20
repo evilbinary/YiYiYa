@@ -196,7 +196,7 @@ EXPORT void Sscheme_deinit PROTO((void));
 
 /* Features. */
 #define FEATURE_ICONV
-#define FEATURE_EXPEDITOR
+// #define FEATURE_EXPEDITOR
 
 /* Locking macros. */
 #define INITLOCK(addr)     \
@@ -258,4 +258,4 @@ EXPORT void Sscheme_deinit PROTO((void));
                         "moveq %0, #1\n\t"\
                         : "=&r" (ret)\
                         : "r" (addr)\
-                        : "cc", "memory", "r12", "r11")
+                        : "cc", "memory", "r12")
