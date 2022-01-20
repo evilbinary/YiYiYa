@@ -44,6 +44,12 @@
     "stdio.h": "c",
     "serial.h": "c",
     "main.h": "c",
-    "kernel.h": "c"
+    "kernel.h": "c",
+    "stat.h": "c",
+    "system.h": "c",
+    "externs.h": "c",
+    "shlobj.h": "c",
+    "dirent.h": "c",
+    "version.h": "c"
   }
 }

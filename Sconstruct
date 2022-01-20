@@ -93,10 +93,10 @@ env = Environment(
         PLATFORM=platform,
         LINKLD='xlinker/link.ld',
         MYLIB=None,
-        LIBC=['../../libs/libc/libc.a','../../libs/libalgorithm/libalgorithm.a'],
-        LIBCFLAGS='-Ilibs/include/c/ -DLIBYC',
-        # LIBC=['../../app/libmusl/lib/libc.a',],#'/opt/local/lib/gcc/i386-elf/9.2.0/libgcc.a'
-        # LIBCFLAGS=' -Iapp/libmusl/include/ -Iapp/libmusl/obj/include/ -Iapp/libmusl/arch/generic/ -Iapp/libmusl/arch/arm/ ',
+        # LIBC=['../../libs/libc/libc.a','../../libs/libalgorithm/libalgorithm.a'],
+        # LIBCFLAGS='-Ilibs/include/c/ -DLIBYC',
+        LIBC=['../../app/libmusl/lib/libc.a',],#'/opt/local/lib/gcc/i386-elf/9.2.0/libgcc.a'
+        LIBCFLAGS=' -Iapp/libmusl/include/ -Iapp/libmusl/obj/include/ -Iapp/libmusl/arch/generic/ -Iapp/libmusl/arch/arm/ ',
         USER='--entry main -Txlinker/user.ld',
         ARCHS=archs,
         ARCHTYPE=arch_type
@@ -122,7 +122,7 @@ if arch_type == 'arm':
 
     #env['CFLAGS']= env['CFLAGS']+ ' -fno-omit-fram e-pointer -mapcs -mno-sched-prolog ' #for debug backtrace
     if platform=='raspi2': 
-        env['CFLAGS']= env['CFLAGS']+ ' -mcpu=cortex-a7  -mtune=cortex-a7 -mfpu=vfpv4  -mfloat-abi=softfp '
+        env['CFLAGS']= env['CFLAGS']+ ' --specs=nosys.specs -mcpu=cortex-a7  -mtune=cortex-a7 -mfpu=vfpv4  -mfloat-abi=softfp '
         pass
     elif platform=='v3s':
         env['CFLAGS']= env['CFLAGS']+ ' -mcpu=cortex-a7  -mtune=cortex-a7 -mfpu=vfpv4  -mfloat-abi=softfp '

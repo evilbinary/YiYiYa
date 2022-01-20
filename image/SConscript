@@ -51,7 +51,7 @@ elif env.get('ARCHTYPE') =='arm':
     run_qemu_cmd='qemu-system-gnuarmeclipse --verbose --verbose --board STM32F429I-Discovery --mcu STM32F429ZITx   -rtc base=localtime -kernel init/kernel.elf  -serial stdio  -D ./qemu.log -d unimp,guest_errors --semihosting-config enable -d in_asm,int,mmu,cpu_reset' #-d in_asm -d cpu_reset -d in_asm,int,mmu -d   -drive if=sd,id=sd0,format=raw,file=image/disk.img #-d in_asm -d cpu_reset -d in_asm,int,mmu
     debug_qemu_cmd = run_qemu_cmd+ ' -S -s'
   else:
-    run_qemu_cmd='qemu-system-arm -M raspi2  -rtc base=localtime -kernel image/duck.img  -serial stdio   -D ./qemu.log -drive if=sd,id=sd0,format=raw,file=image/disk.img ' #-d in_asm -d cpu_reset -d in_asm,int,mmu
+    run_qemu_cmd='qemu-system-arm -M raspi2b  -rtc base=localtime -kernel image/duck.img  -serial stdio   -D ./qemu.log -drive if=sd,id=sd0,format=raw,file=image/disk.img ' #-d in_asm -d cpu_reset -d in_asm,int,mmu
     if not plt=='Windows':
       run_qemu_cmd =run_qemu_cmd+' -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor'
     debug_qemu_cmd = run_qemu_cmd +' -S -s'

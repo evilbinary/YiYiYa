@@ -740,8 +740,8 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            // "program": "${workspaceRoot}/init/kernel.elf",
-            "program": "${workspaceRoot}/app/launcher/launcher",
+            "program": "${workspaceRoot}/init/kernel.elf",
+            // "program": "${workspaceRoot}/app/launcher/launcher",
 
             // "program": "${workspaceRoot}/app/hello/hello.elf",
             // "program": "${workspaceRoot}/app/gui/gui.elf",
