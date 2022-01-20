@@ -159,13 +159,19 @@ obj/%.lo: $(srcdir)/%.c $(GENH) $(IMPH)
 	$(CC_CMD)
 
 lib/libc.so: $(LOBJS) $(LDSO_OBJS)
+	@echo $^ >temp2.txt
 	$(CC) $(CFLAGS_ALL) $(LDFLAGS_ALL) -nostdlib -shared \
-	-Wl,-e,_dlstart -o $@ $(LOBJS) $(LDSO_OBJS) $(LIBCC)
+	-Wl,-e,_dlstart -o $@ <temp2.txt $(LIBCC)
+	#$(CC) $(CFLAGS_ALL) $(LDFLAGS_ALL) -nostdlib -shared \
+	#-Wl,-e,_dlstart -o $@ $(LOBJS) $(LDSO_OBJS) $(LIBCC)
 
 lib/libc.a: $(AOBJS)
 	rm -f $@
-	$(AR) rc $@ $(AOBJS)
-	$(RANLIB) $@
+	@echo $^ >temp.txt
+	$(AR) rc $@ <temp.txt
+	$(RANLIB) $@  <temp.txt
+	# $(AR) rc $@ $(AOBJS)
+	#$(RANLIB) $@
 
 $(EMPTY_LIBS):
 	rm -f $@
