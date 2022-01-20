@@ -1,0 +1,320 @@
+#!/bin/bash
+
+[ -f testing.sh ] && . testing.sh
+
+#testing "name" "command" "result" "infile" "stdin"
+
+# For reproducibility: UTC and umask 0002
+
+OLDTZ="$TZ"
+export TZ=utc
+OLDUMASK=$(umask)
+umask 0002
+
+# 255 bytes, longest VFS name
+LONG=0123456789abcdef0123456789abcdef
+LONG=$LONG$LONG$LONG$LONG$LONG$LONG$LONG$LONG
+LONG=${LONG:1:255}
+
+# Reproducible tarballs: override ownership and timestamp.
+TAR='tar c --owner root --group root --mtime @1234567890'
+
+# Different tars add variable trailing NUL padding (1024 bytes is just minimum)
+# so look at first N 512-byte frames when analyzing header content.
+function SUM()
+{
+  tee save.dat | head -c $(($1*512)) | sha1sum | sed "s/ .*//"
+}
+
+function LST()
+{
+  tar tv "$@" | sed 's/[ \t][ \t]*/ /g'
+}
+
+touch file
+testing "create file" "$TAR file | SUM 3" \
+  "fecaecba936e604bb115627a6ef4db7c7a3a8f81\n" "" ""
+
+testing "pass file" "$TAR file | LST" \
+  "-rw-rw-r-- root/root 0 2009-02-13 23:31 file\n" "" ""
+
+# The kernel has two hardwired meaningful UIDs: 0 (root) and 65534 (nobody).
+# (Technically changeable via /proc/sys/*/overflowuid but nobody ever does)
+skipnot id nobody >/dev/null
+testing "pass user" "tar -c --owner nobody --group root --mtime @0 file | LST" \
+  "-rw-rw-r-- nobody/root 0 1970-01-01 00:00 file\n" "" ""
+# (We assume that if we have the nobody user, we also have the group, in the
+# absence of a good portable way to test for the existence of a named group.)
+skipnot id nobody >/dev/null
+testing "pass group" "tar c --owner root --group nobody --mtime @0 file | LST" \
+  "-rw-rw-r-- root/nobody 0 1970-01-01 00:00 file\n" "" ""
+
+# Historically we output a "base 256" format that _we_ could decode but that
+# GNU tar choked on, so check the exact bytes with SUM, not a LST round trip.
+testing "huge values" "tar c --owner 9999999 --group 8888888 --mtime @0 file | SUM 3" \
+  "396b07fd2f80eeb312462e3bfb7dc1325dc6bcfb\n" "" ""
+
+touch -t 198701231234.56 file
+testing "pass mtime" \
+  "tar c --owner root --group root file | LST --full-time" \
+  "-rw-rw-r-- root/root 0 1987-01-23 12:34:56 file\n" "" ""
+
+testing "adjust mode" \
+  "tar c --owner root --group root --mode a+x file | LST --full-time" \
+  "-rwxrwxr-x root/root 0 1987-01-23 12:34:56 file\n" "" ""
+
+mkdir dir
+testing "create dir" "$TAR dir | SUM 3" \
+  "05739c423d7d4a7f12b3dbb7c94149acb2bb4f8d\n" "" ""
+
+testing "pass dir" "$TAR dir | LST" \
+  "drwxrwxr-x root/root 0 2009-02-13 23:31 dir/\n" "" ""
+
+# note: does _not_ include dir entry in archive, just file
+touch dir/file
+testing "create file in dir" "$TAR dir/file | SUM 3" \
+  "2d7b96c7025987215f5a41f10eaa84311160afdb\n" "" ""
+
+# Tests recursion without worrying about content order
+testing "create dir and dir/file" "$TAR dir | SUM 3" \
+  "0bcc8005a3e07eb63c9b735267aecc5b774795d7\n" "" ""
+
+testing "pass dir/file" "$TAR dir | LST" \
+  "drwxrwxr-x root/root 0 2009-02-13 23:31 dir/\n-rw-rw-r-- root/root 0 2009-02-13 23:31 dir/file\n" "" ""
+
+echo boing > dir/that
+testing "tar C" "$TAR -C dir that | SUM 3" \
+  "f0deff71bf4858eb0c5f49d99d052f12f1831feb\n" "" ""
+
+# / and .. only stripped from name, not symlink target.
+ln -s ../name.././.. dir/link
+testing "create symlink" "$TAR dir/link | SUM 3" \
+  "7324cafbd9aeec5036b6efc54d741f11528aeb10\n" "" ""
+
+# Also two explicit targets
+ln dir/file dir/hardlink
+testing "create hardlink" "$TAR dir/file dir/hardlink | SUM 3" \
+  "c5383651f8c03ec0fe15e8a9e28a4e8e5273990d\n" "" ""
+
+ln dir/link dir/hlink
+testing "create hardlink to symlink" "$TAR dir/link dir/hlink | SUM 3" \
+  "3bc16f8fb6fc8b05f691da8caf989a70ee99284a\n" "" ""
+
+skipnot mkfifo dir/fifo 2>/dev/null
+testing "create dir/fifo" "$TAR dir/fifo | SUM 3" \
+  "bd1365db6e8ead4c813333f9666994c1899924d9\n" "" ""
+
+# test L and K records
+
+# 4+96=100 (biggest short name), 4+97=101 (shortest long name)
+touch dir/${LONG:1:96} dir/${LONG:1:97}
+testing "create long fname" "$TAR dir/${LONG:1:97} dir/${LONG:1:96} | SUM 3" \
+  "99348686fe9c9bf80f5740f1fc0c6f32f2021e3d\n" "" ""
+
+ln -s dir/${LONG:1:96} dir/lshort
+ln -s dir/${LONG:1:97} dir/llong
+testing "create long symlnk" "$TAR dir/lshort dir/llong | SUM 3" \
+  "8a5d652dc85f252a2e3b3f47d1ecd699e98a5f4b\n" "" ""
+
+ln -s $LONG dir/${LONG:5}
+testing "create long->long" "$TAR dir/${LONG:5} | SUM 7" \
+  "543116b8e690a116a559ab5b673f9b6d6601c925\n" "" ""
+# absolute and relative link names, broken and not
+
+ln -s file dir/linkok
+testing "create symlink" "$TAR dir/linkok | SUM 3" \
+  "55652846506cf0a9d43b3ef03ccf9e98123befaf\n" "" ""
+
+ln -s /dev/null dir/linknull
+testing "pass absolute symlink" "$TAR dir/linknull | LST" \
+  "lrwxrwxrwx root/root 0 2009-02-13 23:31 dir/linknull -> /dev/null\n" "" ""
+
+ln -s rel/broken dir/relbrok
+testing "pass broken symlink" "$TAR dir/relbrok | LST" \
+  "lrwxrwxrwx root/root 0 2009-02-13 23:31 dir/relbrok -> rel/broken\n" "" ""
+
+ln -s /does/not/exist dir/linkabsbrok
+testing "pass broken absolute symlink" "$TAR dir/linkabsbrok | LST" \
+  "lrwxrwxrwx root/root 0 2009-02-13 23:31 dir/linkabsbrok -> /does/not/exist\n" \
+  "" ""
+
+# this expects devtmpfs values
+
+testing "pass /dev/null" \
+  "tar c --mtime @0 /dev/null 2>/dev/null | LST" \
+  "crw-rw-rw- root/root 1,3 1970-01-01 00:00 dev/null\n" "" ""
+testing "--absolute-names" \
+  "tar c --mtime @0 --absolute-names /dev/null 2>/dev/null | LST" \
+  "crw-rw-rw- root/root 1,3 1970-01-01 00:00 /dev/null\n" "" ""
+
+# compression types
+testing "autodetect gzip" 'LST -f "$FILES"/tar/tar.tgz' \
+  "drwxr-x--- enh/eng 0 2017-05-13 01:05 dir/\n-rw-r----- enh/eng 12 2017-05-13 01:05 dir/file\n" \
+  "" ""
+
+testing "manually specify bz2" 'LST -jf "$FILES"/tar/tar.tbz2' \
+  "drwxr-x--- enh/eng 0 2017-05-13 01:05 dir/\n-rw-r----- enh/eng 12 2017-05-13 01:05 dir/file\n" \
+  "" ""
+
+# -I
+testing "-I gzip c" "$TAR -Igzip file | file - | grep -o 'gzip compressed'" \
+  "gzip compressed\n" "" ""
+testing "-I gzip t" 'LST -Igzip -f "$FILES"/tar/tar.tgz' \
+  "drwxr-x--- enh/eng 0 2017-05-13 01:05 dir/\n-rw-r----- enh/eng 12 2017-05-13 01:05 dir/file\n" \
+  "" ""
+
+skipnot mknod dir/char c 12 34 2>/dev/null
+testing "character special" "tar --mtime @0 -cf test.tar dir/char && rm -f dir/char && tar xf test.tar && ls -l dir/char" \
+  "crw-rw---- 1 root root 12,  34 1970-01-01 00:00 dir/char\n" "" ""
+
+skipnot mknod dir/block b 23 45 2>/dev/null
+testing "block special" "tar --mtime @0 -cf test.tar dir/block && rm -f dir/block && tar xf test.tar && ls -l dir/block" \
+  "brw-rw---- 1 root root 23,  45 1970-01-01 00:00 dir/block\n" "" ""
+
+skipnot chown nobody dir/file 2>/dev/null
+testing "ownership" "$TAR dir/file | SUM 3" \
+  "2d7b96c7025987215f5a41f10eaa84311160afdb\n" "" ""
+
+mkdir -p dd/sub/blah &&
+tar cf test.tar dd/sub/blah &&
+rm -rf dd/sub &&
+ln -s ../.. dd/sub || SKIPNEXT=1
+toyonly testing "symlink out of cwd" \
+  "tar xf test.tar 2> /dev/null || echo yes ; [ ! -e dd/sub/blah ] && echo yes" \
+  "yes\nyes\n" "" ""
+
+# If not root can't preserve ownership, so don't try yet.
+
+testing "extract dir/file from tar" \
+  "tar xvCf dd $FILES/tar/tar.tar && stat -c '%A %Y %n' dd/dir dd/dir/file" \
+  "dir/\ndir/file\ndrwxr-x--- 1494637555 dd/dir\n-rw-r----- 1494637555 dd/dir/file\n" \
+  "" ""
+
+testing "extract dir/file from tgz (autodetect)" \
+  "tar xvCf dd $FILES/tar/tar.tgz && stat -c '%A %Y %n' dd/dir dd/dir/file" \
+  "dir/\ndir/file\ndrwxr-x--- 1494637555 dd/dir\n-rw-r----- 1494637555 dd/dir/file\n" \
+  "" ""
+
+toyonly testing "cat tgz | extract dir/file (autodetect)" \
+  "cat $FILES/tar/tar.tgz | tar xvC dd && stat -c '%A %Y %n' dd/dir dd/dir/file" \
+  "dir/\ndir/file\ndrwxr-x--- 1494637555 dd/dir\n-rw-r----- 1494637555 dd/dir/file\n" \
+  "" ""
+
+testing "extract dir/file from tbz2 (autodetect)" \
+  "tar xvCf dd $FILES/tar/tar.tbz2 && stat -c '%A %Y %n' dd/dir dd/dir/file" \
+  "dir/\ndir/file\ndrwxr-x--- 1494637555 dd/dir\n-rw-r----- 1494637555 dd/dir/file\n" \
+  "" ""
+
+toyonly testing "cat tbz | extract dir/file (autodetect)" \
+  "cat $FILES/tar/tar.tbz2 | tar xvC dd && stat -c '%A %Y %n' dd/dir dd/dir/file" \
+  "dir/\ndir/file\ndrwxr-x--- 1494637555 dd/dir\n-rw-r----- 1494637555 dd/dir/file\n" \
+  "" ""
+
+yes | (dd bs=$((1<<16)) count=1 status=none; dd bs=8192 seek=14 count=1 status=none; dd bs=4096 seek=64 count=5 status=none) > fweep
+testing "sparse without overflow" "$TAR --sparse fweep | SUM 3" \
+  "e1560110293247934493626d564c8f03c357cec5\n" "" ""
+
+rm fweep
+for i in 1 3 5 7 9 14 27 36 128 256 300 304
+do
+  dd if=/dev/zero of=fweep bs=65536 seek=$i count=1 2>/dev/null
+done
+
+testing "sparse single overflow" "$TAR --sparse fweep | SUM 6" \
+  "063fc6519ea2607763bc591cc90dd15ac2b43eb8\n" "" ""
+
+rm fweep
+for i in $(seq 8 3 200)
+do
+  dd if=/dev/zero of=fweep bs=65536 seek=$i count=1 2>/dev/null
+  dd if=/dev/zero of=fweep2 bs=65536 seek=$i count=1 2>/dev/null
+done
+truncate -s 20m fweep2
+
+testing "sparse double overflow" "$TAR --sparse fweep | SUM 7" \
+  "f1fe57f8313a9d682ec9013a80f3798910b6ff51\n" "" ""
+
+tar c --sparse fweep > fweep.tar
+rm fweep
+testing "sparse extract" "tar xf fweep.tar && $TAR --sparse fweep | SUM 4" \
+  "38dc57b8b95632a287db843c214b5c96d1cfe415\n" "" ""
+testing "sparse tvf" "tar tvf fweep.tar | grep -wq 13172736 && echo right size"\
+  "right size\n" "" ""
+rm fweep fweep.tar
+
+tar c --sparse fweep2 > fweep2.tar
+rm fweep2
+testing "sparse extract hole at end" \
+  "tar xf fweep2.tar && $TAR --sparse fweep2 | SUM 4" \
+  "791060574c569e5c059e2b90c1961a3575898f97\n" "" ""
+rm fweep2 fweep2.tar
+
+testcmd "longname" "tf $FILES/tar/long_path.tar" \
+  "$(printf 'long file name%86cTRAILING' ' ' | tr ' ' _)\n" "" ""
+
+mkdir -p links
+touch links/orig
+ln links/{orig,link1}
+ln links/{orig,link2}
+testcmd 'links' '-cf test.tar links' '' '' ''
+rm -rf links
+
+mkdir links
+for i in {0..12}; do touch links/orig$i; ln links/{orig,link}$i; done
+testcmd 'links2' '-cf test.tar links' '' '' ''
+rm -rf links
+
+install -m 000 -d folder/skip/oof &&
+testcmd 'exclude' '--exclude skip -cvf tar.tar folder && echo yes' \
+  'folder/\nyes\n' '' ''
+rm -rf folder tar.tar
+
+mkdir -p one/two; echo hello > one/two/three; tar czf test.tar one/two/three
+rm one/two/three; mkdir one/two/three
+testcmd 'replace dir with file' '-xf test.tar && cat one/two/three' \
+  'hello\n' '' ''
+rm -rf one test.tar
+
+if false
+then
+
+chmod 700 dir
+tar cpf tar.tgz dir/file
+#chmod 700 dir
+#tar xpf file
+#ls -ld dir/file
+
+# restore ownership of file, dir, and symlink
+
+# merge add_to_tar and write_longname,
+# filter, incl or excl and anchored/wildcards
+
+# extract file not under cwd
+# exclusion defaults to --no-anchored and --wildcards-match-slash
+#  both incl and excl
+
+# catch symlink overwrite
+# add dir with no trailing slash
+# don't allow hardlink target outside cwd
+# extract dir/file without dir in tarball
+# create with and without each flag
+# --owner --group --numeric-owner
+# extract with and without each flag
+# --owner 0 --group 0
+# set symlink owner
+# >256 hardlink inodes
+#   // remove leading / and any .. entries from saved name
+#  // exclusion defaults to --no-anchored and --wildcards-match-slash
+# //bork blah../thing blah/../thing blah/../and/../that blah/.. ../blah
+# tar tv --owner --group --mtime
+# extract file within dir date correct
+# name ending in /.. or just ".." as a name
+
+
+fi
+
+TZ="$OLDTZ"
+umask $OLDUMASK
+unset LONG TAR SUM OLDUMASK OLDTZ
+unset -f LST
+rm save.dat

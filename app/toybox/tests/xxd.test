@@ -1,0 +1,53 @@
+#!/bin/bash
+
+[ -f testing.sh ] && . testing.sh
+
+#testing "name" "command" "result" "infile" "stdin"
+
+echo "this is some text" > file1
+echo -n > file2
+
+# Note that the xxd in vim-common on Ubuntu 14 uses %07x for the file offset.
+
+testing "file1" "xxd file1" \
+    "00000000: 7468 6973 2069 7320 736f 6d65 2074 6578  this is some tex\n00000010: 740a                                     t.\n" \
+    "" ""
+testing "file1 -l" "xxd -l 2 file1" \
+    "00000000: 7468                                     th\n" \
+    "" ""
+testing "-" "xxd -" \
+    "00000000: 6865 6c6c 6f                             hello\n" "" "hello"
+testing "xxd" "xxd" \
+    "00000000: 776f 726c 64                             world\n" "" "world"
+testing "-c 8 -g 4 file1" "xxd -c 8 -g 4 file1" \
+    "00000000: 74686973 20697320  this is \n00000008: 736f6d65 20746578  some tex\n00000010: 740a               t.\n" "" ""
+testing "-c 8 -g 3 file1" "xxd -c 8 -g 3 file1" \
+    "00000000: 746869 732069 7320 this is \n00000008: 736f6d 652074 6578 some tex\n00000010: 740a               t.\n" "" ""
+
+testing "-i" "cat file1 | xxd -i -" "  0x74, 0x68, 0x69, 0x73, 0x20, 0x69, 0x73, 0x20, 0x73, 0x6f, 0x6d, 0x65,\n  0x20, 0x74, 0x65, 0x78, 0x74, 0x0a\n" "" ""
+
+testing "-o 0x8000" "xxd -o 0x8000 file1" "00008000: 7468 6973 2069 7320 736f 6d65 2074 6578  this is some tex\n00008010: 740a                                     t.\n" "" ""
+
+testing "-p" "xxd -p file1" "7468697320697320736f6d6520746578740a\n" "" ""
+
+testing "-s" "xxd -s 13 file1" "0000000d: 7465 7874 0a                             text.\n" "" ""
+
+testing "-r" "echo -e '    00000000: 7468 6973 2069 7320 736f 6d65 2074 6578  this is some tex\n00000010: 740a                                     t.' | xxd -r" "this is some text\n" "" ""
+toyonly testing "-r -i" "echo -e '0x74, 0x68, 0x69, 0x73, 0x20, 0x69, 0x73, 0x20, 0x73, 0x6f, 0x6d, 0x65,\n  0x20, 0x74, 0x65, 0x78, 0x74, 0x0a' | xxd -ri" "this is some text\n" "" ""
+testing "-r -p" "echo 7468697320697320736f6d6520746578740a | xxd -r -p" "this is some text\n" "" ""
+
+testing "-r garbage" "echo '0000: 68 65 6c6c 6fxxxx' | xxd -r -" "hello" "" ""
+
+# -r will only read -c bytes (default 16) before skipping to the next line,
+# ignoring the rest.
+testing "-r long" \
+    "echo '0000: 40404040404040404040404040404040404040404040404040404040404040404040404040404040' | xxd -r -" \
+    "@@@@@@@@@@@@@@@@" "" ""
+
+# -r -p ignores the usual -p 30-byte/line limit (or any limit set by -c) and
+# will take as many bytes as you give it.
+testing "-r -p long" \
+    "echo '40404040404040404040404040404040404040404040404040404040404040404040404040404040' | xxd -r -p -" \
+    "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" "" ""
+
+rm file1 file2

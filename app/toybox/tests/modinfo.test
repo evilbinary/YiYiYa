@@ -1,0 +1,50 @@
+#!/bin/bash
+
+[ -f testing.sh ] && . testing.sh
+
+#testing "name" "command" "result" "infile" "stdin"
+
+# Android keeps its modules (if any) on the vendor partition.
+MODULE_ROOT=""
+[ -d /vendor/lib/modules ] && MODULE_ROOT="/vendor"
+
+if [[ ! -e /proc/modules || ! -d $MODULE_ROOT/lib/modules ]]; then
+  echo "$SHOWSKIP: modinfo (no modules)"
+  return 2>/dev/null
+  exit
+fi
+
+testcmd "missing" "missing 2>&1" "modinfo: missing: not found\n" "" ""
+
+# Find some modules to work with.
+MODULE_PATH1=$(find $MODULE_ROOT/lib/modules -name *.ko | head -1 2>/dev/null)
+MODULE1=$(basename -s .ko $MODULE_PATH1)
+MODULE_PATH2=$(find $MODULE_ROOT/lib/modules -name *.ko | head -2 | tail -1 2>/dev/null)
+MODULE2=$(basename -s .ko $MODULE_PATH2)
+DASH_MODULE=$(basename -s .ko \
+  $(find $MODULE_ROOT/lib/modules -name *-*.ko | tail -1 2>/dev/null))
+BAR_MODULE=$(basename -s .ko \
+  $(find $MODULE_ROOT/lib/modules -name *_*.ko | tail -1 2>/dev/null))
+
+# modinfo does not need to output fields in a specified order.
+# Instead, there are labelled fields.  We can use sort to make up for this.
+# Other issues to beware of are the volatile nature of srcversion and vermagic,
+# which change from kernel to kernel and can be disabled. 
+# We grep to remove these.
+
+skipnot [ -n "$DASH_MODULE" ]
+testing "treats - and _ as equivalent" "modinfo $DASH_MODULE > dash-dash &&
+  modinfo ${DASH_MODULE/-/_} > dash-bar && diff -u dash-dash dash-bar" "" "" ""
+skipnot [ -n "$BAR_MODULE" ]
+testing "treats _ and - as equivalent" "modinfo $BAR_MODULE > bar-bar &&
+  modinfo ${BAR_MODULE/_/-} > bar-dash && diff -u bar-bar bar-dash" "" "" ""
+
+# Output of -F filename should be an absolute path to the module.
+# Otherwise, initrd generating scripts will break.
+
+testing "-F filename gets absolute path" "modinfo -F filename $MODULE1" \
+  "$MODULE_PATH1\n" "" ""
+
+skipnot [ "$MODULE1" != "$MODULE2" ]
+testing "supports multiple modules" "modinfo -F filename $MODULE1 $MODULE2" \
+  "$MODULE_PATH1\n$MODULE_PATH2\n" "" ""

@@ -1,0 +1,113 @@
+#!/bin/bash
+
+[ -f testing.sh ] && . testing.sh
+
+#testing "name" "command" "result" "infile" "stdin"
+
+testcmd '0 args' '; echo $?'  '1\n' '' ''
+testcmd '1 arg' '== ; echo $?' '0\n' '' ''
+testcmd '2 args' '-e == ; echo $?' '1\n' '' ''
+testcmd '3 args' '-e == -e ; echo $?' '0\n' '' ''
+testcmd '' '\( == \) ; echo $?' '1\n' '' ''
+testcmd '' '\( == \( ; echo $?' '0\n' '' ''
+
+# TODO: Should also have device and socket files
+
+mkdir d
+touch f
+ln -s /dev/null L
+echo nonempty > s
+mkfifo p
+
+type_test()
+{
+  for i in d f L s p n
+  do
+    "$C" $* $i && echo -n $i
+  done
+}
+
+testing "-b" "type_test -b" "" "" ""
+testing "-c" "type_test -c" "L" "" ""
+testing "-d" "type_test -d" "d" "" ""
+testing "-f" "type_test -f" "fs" "" ""
+testing "-h" "type_test -h" "L" "" ""
+testing "-L" "type_test -L" "L" "" ""
+testing "-s" "type_test -s" "ds" "" ""
+testing "-S" "type_test -S" "" "" ""
+testing "-p" "type_test -p" "p" "" ""
+testing "-e" "type_test -e" "dfLsp" "" ""
+testing "! -e" 'type_test ! -e' "n" "" ""
+
+rm f L s p
+rmdir d
+
+# test -rwx each bit position and failure
+touch walrus
+MASK=111
+for i in x w r k g u; do
+  [ $i == k ] && MASK=1000
+  # test everything off produces "off"
+  chmod 000 walrus
+  testcmd "-$i 0" "-$i walrus || echo yes" "yes\n" "" ""
+  chmod $((7777-$MASK)) walrus
+  testcmd "-$i inverted" "-$i walrus || echo yes" "yes\n" "" ""
+  MASK=$(($MASK<<1))
+done
+unset MASK
+# Test setuid setgid sticky enabled
+for i in uu+s gg+s k+t; do
+  chmod 000 walrus
+  chmod ${i:1}+s walrus
+  testcmd "-${i:0:1}" "-${i:0:1} walrus && echo yes" "yes\n" "" ""
+done
+# test each ugo+rwx bit position individually
+for i in 1 10 100; do for j in x w r; do
+  chmod $i walrus
+  testcmd "-$j $i" "-$j walrus && echo yes" "yes\n" "" ""
+  i=$((i<<1))
+done; done
+rm -f walrus
+
+testcmd "" "'' || echo yes" "yes\n" "" ""
+testcmd "" "a && echo yes" "yes\n" "" ""
+testcmd "-n" "-n '' || echo yes" "yes\n" "" ""
+testcmd "-n2" "-n a && echo yes" "yes\n" "" ""
+testcmd "-z" "-z '' && echo yes" "yes\n" "" ""
+testcmd "-z2" "-z a || echo yes" "yes\n" "" ""
+testcmd "" "a = b || echo yes" "yes\n" "" ""
+testcmd "" "'' = '' && echo yes" "yes\n" "" ""
+testcmd "a != b" "a != b && echo yes" "yes\n" "" ""
+testcmd "a != b" "a != a || echo yes" "yes\n" "" ""
+
+arith_test()
+{
+  $C -1 $1 1 && echo -n l
+  $C 0 $1 0 && echo -n e
+  $C -3 $1 -5 && echo -n g
+}
+
+testing "-eq" "arith_test -eq" "e" "" ""
+testing "-ne" "arith_test -ne" "lg" "" ""
+testing "-gt" "arith_test -gt" "g" "" ""
+testing "-ge" "arith_test -ge" "eg" "" ""
+testing "-lt" "arith_test -lt" "l" "" ""
+testing "-le" "arith_test -le" "le" "" ""
+
+# test ! = -o a
+# test ! \( = -o a \)
+# test \( ! = \) -o a
+# test \( \)
+
+#testing "" "[ -a -eq -a ] && echo yes" "yes\n" "" ""
+
+# -e == -a
+# -e == -a -o -d != -o
+# \( "x" \) -a \) == \)
+# \( ! ! ! -e \) \)
+
+#  // () -a (() -a () -o ()) -o ()
+#  // x -a ( x -o x ) -a x
+#  // x -o ( x -a x ) -a x -o x
+
+# trailing ! and (
