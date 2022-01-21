@@ -56,7 +56,7 @@ if env.get('APP'):
     SConscript(dirs=['etk'], exports='env')
 
     SConscript(dirs=['test'], exports='env')
-    SConscript(dirs=['bin'], exports='env')
+    SConscript(dirs=['cmd'], exports='env')
     SConscript(dirs=['lvgl'], exports='env')
 
     SConscript(dirs=['track'], exports='env')
@@ -86,33 +86,35 @@ if env.get('APP'):
             # 'lua/lua',
             # 'lua/luat',
             # 'lua/hello.lua',
-            # 'bin/ls',
+            'cmd/ls',
             'lvgl/lvgl',
             'track/track.elf',
             'launcher/launcher',
-            # 'scheme/scheme',
-            # 'scheme/petite.boot',
-            # 'scheme/scheme.boot'
+            'scheme/scheme',
+            'scheme/petite.boot',
+            'scheme/scheme.boot'
 
             ]
     #check_exit(apps)
 
     if plt=='Darwin':
-        env.Command('copyhello', 
+        env.Command('copyapp', 
             apps,
             ['hdid  image/disk.img &&  cp ${SOURCES} /Volumes/NO\ NAME/ && hdiutil eject /Volumes/NO\ NAME/'
         ])
         pass
     elif plt=='Linux':
-        env.Command('copyhello', 
+        env.Command('copyapp', 
             apps,
             ['sudo losetup /dev/loop10 image/disk.img && sudo mount /dev/loop10 /mnt && sudo cp  ${SOURCES} /mnt && sudo umount /mnt && sudo losetup -d /dev/loop10'
         ])
     elif plt=='Windows':
         try:
-            env.Command('copyhello', 
+
+            env.Command('copyapp', 
             apps,
-            ['py -m cp  ${SOURCES} image/disk.img',
+            [
+                'cp ${SOURCES} app/bin/ & mcopy.exe -nmov  -i image/disk.img app/bin/* ::'
             ])
         except:
             print('please manual copy %s files to image/disk.img'%(apps))

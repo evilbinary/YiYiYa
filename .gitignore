@@ -55,3 +55,4 @@ app/lua/luat
 app/rust/test/test-rs
 
 kernel.map
+app/bin/**
