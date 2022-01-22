@@ -228,14 +228,14 @@ vnode_t *vfs_open(vnode_t *root, u8 *name, u32 attr) {
     root = root_node;
   }
   vnode_t *node = vfind(root, name);
-  char *last = kstrrstr(name, node->name);
-  if (last != NULL) {
-    last += kstrlen(node->name);
-    if (last[0] == '/') last++;
-  }
   vnode_t *file = node;
   if (file == NULL) {
     if (attr & O_CREAT == O_CREAT) {
+      char *last = kstrrstr(name, root->name);
+      if (last != NULL) {
+        last += kstrlen(node->name);
+        if (last[0] == '/') last++;
+      }
       file = vfs_create(last, V_FILE);
       file->device = node->device;
       file->data = node->data;

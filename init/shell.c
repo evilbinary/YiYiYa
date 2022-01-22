@@ -70,7 +70,6 @@ void do_shell_thread(void) {
   if(series<0){
     kprintf("error open series\n");
   }
-  pre_launch();
 
   if (syscall2(SYS_DUP2, series, 1) < 0) {
     print_string("err in dup2\n");
@@ -78,6 +77,7 @@ void do_shell_thread(void) {
   if (syscall2(SYS_DUP2, series, 0) < 0) {
     print_string("err in dup2\n");
   }
+  pre_launch();
 
   for (;;) {
     int ch = 0;
@@ -98,8 +98,8 @@ void do_shell_thread(void) {
 //must init global for armv7-a
 char* argv[] = {
         "/scheme",
-        "-h",
-        "/",
+        "-b",
+        "/scheme.boot",
         NULL
 };
 void pre_launch() {
