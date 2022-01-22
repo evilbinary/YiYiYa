@@ -346,8 +346,8 @@ void fat_init(void) {
   file_info->fs = fs;
   file_info->dd = dd;
   node->data = file_info;
-  //why malloc?
-  kmalloc(1024*2);
+  // todo why malloc?
+  kmalloc(1024*4);
   kprintf("fat init end\n");
 }
 

@@ -146,8 +146,8 @@ void pre_launch() {
   // };
   // syscall2(SYS_EXEC, "/dev/sda/lua", argv);
 
-  syscall2(SYS_EXEC,"/test-musl",NULL);
-  // syscall2(SYS_EXEC, "/dev/sda/scheme", argv);
+  // syscall2(SYS_EXEC,"/test-musl",NULL);
+  syscall2(SYS_EXEC, "/scheme", argv);
 
 
 // test_cpu_speed();

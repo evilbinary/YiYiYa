@@ -228,16 +228,12 @@ vnode_t *vfs_open(vnode_t *root, u8 *name, u32 attr) {
     root = root_node;
   }
   vnode_t *node = vfind(root, name);
-  if (node == NULL) {
-    kprintf("open first %s failed \n", name);
-    return NULL;
-  }
   char *last = kstrrstr(name, node->name);
   if (last != NULL) {
     last += kstrlen(node->name);
     if (last[0] == '/') last++;
   }
-  vnode_t *file = vfind(node, last);
+  vnode_t *file = node;
   if (file == NULL) {
     if (attr & O_CREAT == O_CREAT) {
       file = vfs_create(last, V_FILE);
@@ -249,7 +245,6 @@ vnode_t *vfs_open(vnode_t *root, u8 *name, u32 attr) {
       return NULL;
     }
   }
-  file->parent = node;
   u32 ret = vopen(file);
   if (ret < 0) {
     kprintf("open third %s failed \n", name);
