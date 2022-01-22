@@ -36,7 +36,7 @@ void ps_command() { syscall0(SYS_DUMPS); }
 
 int do_exec(char* cmd, int count) {
   char buf[64];
-  cmd[count]=0;
+  cmd[count] = 0;
   sprintf(buf, "/%s", cmd);
   return syscall2(SYS_EXEC, buf, NULL);
 }
@@ -59,7 +59,6 @@ void do_shell_cmd(char* cmd, int count) {
 
 void pre_launch();
 
-
 void do_shell_thread(void) {
   print_logo();
   int count = 0;
@@ -67,7 +66,7 @@ void do_shell_thread(void) {
   int ret = 0;
   print_promot();
   int series = syscall2(SYS_OPEN, "/dev/series", 0);
-  if(series<0){
+  if (series < 0) {
     kprintf("error open series\n");
   }
 
@@ -95,13 +94,14 @@ void do_shell_thread(void) {
   }
 }
 
-//must init global for armv7-a
-char* argv[] = {
-        "/scheme",
-        "-b",
-        "/scheme.boot",
-        NULL
+// must init global for armv7-a
+char* scm_argv[] = {"/scheme", "-b", "/scheme.boot", NULL};
+char* lua_argv[] = {
+    "/lua",
+    "hello.lua",
+    NULL
 };
+
 void pre_launch() {
 #ifdef X86
   // int fd = syscall2(SYS_OPEN, "/dev/stdin", 0);
@@ -142,14 +142,10 @@ void pre_launch() {
   //  syscall2(SYS_EXEC,"/test",NULL);
   //  syscall2(SYS_EXEC,"/microui",NULL);
 
-  // char* argv[] = {
-  //     "lua",
-  //     "hello.lua",
-  // };
-  // syscall2(SYS_EXEC, "/lua", argv);
+  // syscall2(SYS_EXEC, "/lua", lua_argv);
 
   // syscall2(SYS_EXEC,"/test-musl",NULL);
-  syscall2(SYS_EXEC, "/scheme", argv);
+  // syscall2(SYS_EXEC, "/scheme", scm_argv);
 // test_cpu_speed();
 #endif
 }

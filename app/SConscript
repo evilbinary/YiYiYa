@@ -55,7 +55,6 @@ if env.get('APP'):
     
     SConscript(dirs=['etk'], exports='env')
 
-    SConscript(dirs=['test'], exports='env')
     SConscript(dirs=['cmd'], exports='env')
     SConscript(dirs=['lvgl'], exports='env')
 
@@ -69,12 +68,8 @@ if env.get('APP'):
     # SConscript(dirs=['liblua'], exports='env')
     # SConscript(dirs=['lua'], exports='env')
 
-
-    SConscript(dirs=['libncurses'], exports='env')
-    SConscript(dirs=['libuuid'], exports='env')
     SConscript(dirs=['liblz4'], exports='env')
-    SConscript(dirs=['libchez'], exports='env')
-    SConscript(dirs=['scheme'], exports='env')
+
 
     apps=['hello/hello',
             'gui/gui',
@@ -83,19 +78,28 @@ if env.get('APP'):
             'etk/etk',
             'test/test',
             #'rust/test/test-rs',
-            # 'lua/lua',
-            # 'lua/luat',
-            # 'lua/hello.lua',
+            'lua/lua',
+            'lua/luat',
+            'lua/hello.lua',
             'cmd/ls',
             'lvgl/lvgl',
             'track/track',
             'launcher/launcher',
+            ]
+    
+    if env.get('DEFAULT_LIBC')=='libmusl':
+        SConscript(dirs=['libuuid'], exports='env')
+        SConscript(dirs=['libncurses'], exports='env')
+        SConscript(dirs=['libchez'], exports='env')
+        SConscript(dirs=['scheme'], exports='env')
+        SConscript(dirs=['test'], exports='env')
+
+        apps+=[
             'scheme/scheme',
             'scheme/petite.boot',
             'scheme/scheme.boot',
             'test/test-musl'
             ]
-    #check_exit(apps)
 
     if plt=='Darwin':
         env.Command('copyapp', 

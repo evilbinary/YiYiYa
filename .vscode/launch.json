@@ -787,7 +787,60 @@
             ],
             "preLaunchTask": "Build and run"
         },
-        
+        {
+            "name": "lua arm with GDB",
+            "type": "cppdbg",
+            "request": "launch",
+            "miDebuggerServerAddress": "localhost:1234",
+            "program": "${workspaceRoot}/app/lua/lua",
+            "cwd": "${workspaceRoot}",
+            "args": [],
+            "sourceFileMap": {
+                "<source-path>": "<target-path>"
+            },
+            // "logging": {
+            //     "engineLogging": true
+            // },
+            // "targetArchitecture": "arm",
+            "MIMode": "gdb",
+            "miDebuggerPath": "C:\\Program Files (x86)\\GNU Arm Embedded Toolchain\\10 2021.10\\bin\\arm-none-eabi-gdb.exe",
+            // "miDebuggerPath": "D:\\Program Files\\gcc-arm-none-eabi-9\\bin\\arm-none-eabi-gdb.exe",
+            "miDebuggerArgs": "",
+            "customLaunchSetupCommands": [
+                // {
+                //     "text": "target remote localhost:1234",
+                //     "description": "Connect to QEMU remote debugger"
+                // }
+            ],
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                // {
+                //     "text": "set architecture i386:intel ",
+                //     "description": "set architecture i386"
+                // },
+                // {
+                //     "text": "target remote :1234",
+                //     "description": "connect the port"
+                // },
+                // {
+                //     "text": "file ./boot/x86/setup.bin",
+                //     "description": "file on setup."
+                // },
+                // {
+                //     "text": "break _start",
+                //     "description": "Break on exception handler."
+                // },
+                // {
+                //     "text": "break start",
+                //     "description": "Break on exception handler."
+                // },
+            ],
+            "preLaunchTask": "Build and run"
+        },
         {
             "name": "kernel arm with GDB",
             "type": "cppdbg",

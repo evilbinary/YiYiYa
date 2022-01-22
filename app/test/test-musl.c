@@ -1,7 +1,7 @@
+#include <dirent.h>
 #include <math.h>
 
 #include "stdio.h"
-#include <dirent.h>
 
 void test_malloc() {
   for (int i = 0; i < 100; i++) {
@@ -38,12 +38,31 @@ void test_read_root() {
   closedir(dir);
 }
 
+static char get_u8(int fd) {
+  char buf[1]={0xff};
+  printf("get fd %d\n", fd);
+  if (read(fd, &buf, 1) != 1) return -1;
+  printf("  ret=>%x\n", buf[0]);
+  return buf[0];
+}
+
+void test_read_byte() {
+  char* path = "scheme.boot";
+  int fd = open(path, 0);
+  if (get_u8(fd) != 0 || get_u8(fd) != 0 || get_u8(fd) != 0 ||
+      get_u8(fd) != 0 || get_u8(fd) != 'c' || get_u8(fd) != 'h' ||
+      get_u8(fd) != 'e' || get_u8(fd) != 'z') {
+    printf("malformed fasl-object header in %s\n", path);
+  }
+}
+
 int main(int argc, char* argv[]) {
   printf("hello musl\n");
   // test_malloc();
   // test_float();
   // test_getenv();
-  test_read_root();
+  // test_read_root();
+  test_read_byte();
 
   return 0;
 }

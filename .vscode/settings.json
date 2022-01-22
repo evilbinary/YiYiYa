@@ -50,6 +50,10 @@
     "externs.h": "c",
     "shlobj.h": "c",
     "dirent.h": "c",
-    "version.h": "c"
+    "version.h": "c",
+    "typeinfo": "c",
+    "atomic": "c",
+    "*.tcc": "c",
+    "fstream": "c"
   }
 }
