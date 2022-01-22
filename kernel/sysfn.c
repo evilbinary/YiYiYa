@@ -144,7 +144,7 @@ void sys_exit(int status) {
   thread_t* current = thread_current();
   thread_exit(current, status);
   // thread_dumps();
-  kprintf("sys exit tid %d %s status %d\n", current->id,current->name,status);
+  kprintf("sys exit tid %d %s status %d\n", current->id, current->name, status);
 }
 
 void* sys_vmap(void* addr, size_t size) {
@@ -186,16 +186,18 @@ u32 sys_exec(char* filename, char* const argv[], char* const envp[]) {
   sys_close(fd);
   thread_t* current = thread_current();
   u8* stack0 = kmalloc(KERNEL_THREAD_STACK_SIZE);
-  u8* stack3 = kmalloc_alignment(THREAD_STACK_SIZE,PAGE_SIZE);
+  u8* stack3 = kmalloc_alignment(THREAD_STACK_SIZE, PAGE_SIZE);
   u8* vstack3 = STACK_ADDR;
-  thread_t* t = thread_create_ex_name(filename,(u32*)&run_elf_thread, stack0, vstack3,
-                                 THREAD_STACK_SIZE, NULL,USER_MODE);
+  thread_t* t =
+      thread_create_ex_name(filename, (u32*)&run_elf_thread, stack0, vstack3,
+                            THREAD_STACK_SIZE, NULL, USER_MODE, 0);
 
-  t->context.page_dir = current->context.page_dir;
-  #ifdef PAGE_CLONE
-  t->context.page_dir = page_alloc_clone(current->context.page_dir);
-  #endif
   t->context.kernel_page_dir = current->context.kernel_page_dir;
+#ifdef PAGE_CLONE
+  t->context.page_dir = page_alloc_clone(current->context.page_dir);
+#else
+  t->context.page_dir = current->context.page_dir;
+#endif
 
   // init vmm
   t->vmm = vmemory_area_create(HEAP_ADDR, MEMORY_CREATE_SIZE, MEMORY_HEAP);
@@ -207,17 +209,17 @@ u32 sys_exec(char* filename, char* const argv[], char* const envp[]) {
   vmemory_area_add(t->vmm, stack);
 
   // init data
-  int argc=0;
-  while (argv!=NULL&&argv[argc]!=NULL){
+  int argc = 0;
+  while (argv != NULL && argv[argc] != NULL) {
     argc++;
   }
-  
+
   exec_t* data = kmalloc(sizeof(exec_t));
-  kstrcpy(data->filename, filename);
+  data->filename = filename;
   data->argv = argv;
   data->argc = argc;
   data->envp = envp;
-  t->data = data;
+  t->exec = data;
 
   // init fds
   for (int i = 0; i < 3; i++) {
@@ -377,7 +379,7 @@ int sys_chdir(const char* path) {
 void* sys_mmap2(void* addr, int length, int prot, int flags, int fd,
                 int pgoffset) {
   int ret = 0;
-  ret=addr;
+  ret = addr;
   if (fd >= 0 || pgoffset > 0) {
     kprintf("mmap2 system call : fd = %d, prot = %x, pgoffset = %d\n", fd, prot,
             pgoffset);
@@ -394,31 +396,28 @@ int sys_mprotect(const void* start, size_t len, int prot) {
   return ret;
 }
 
-int sys_rt_sigprocmask(int h, void *set, void* old_set){
+int sys_rt_sigprocmask(int h, void* set, void* old_set) {
   kprintf("sys sigprocmask not impl\n");
   return 0;
 }
 
-
-unsigned int sys_alarm(unsigned int seconds){
+unsigned int sys_alarm(unsigned int seconds) {
   kprintf("sys alarm not impl\n");
   return -1;
 }
 
-int sys_unlink(const char * pathname){
-  kprintf("sys unlink not impl %s\n",pathname);
+int sys_unlink(const char* pathname) {
+  kprintf("sys unlink not impl %s\n", pathname);
   return -1;
 }
 
-
-int sys_rename(const char* old,const char* new){
-  kprintf("sys rename not impl %s\n",old);
+int sys_rename(const char* old, const char* new) {
+  kprintf("sys rename not impl %s\n", old);
 
   return -1;
 }
 
-
-int sys_set_thread_area(void* set){
+int sys_set_thread_area(void* set) {
   kprintf("sys set thread area not impl \n");
   return 1;
 }

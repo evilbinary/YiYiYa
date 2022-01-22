@@ -77,23 +77,23 @@ if env.get('APP'):
     SConscript(dirs=['scheme'], exports='env')
 
     apps=['hello/hello',
-            'gui/gui.elf',
-            'microui/microui.elf',
-            'file/file.elf',
-            'etk/etk.elf',
-            'test/test.elf',
+            'gui/gui',
+            'microui/microui',
+            'file/file',
+            'etk/etk',
+            'test/test',
             #'rust/test/test-rs',
             # 'lua/lua',
             # 'lua/luat',
             # 'lua/hello.lua',
             'cmd/ls',
             'lvgl/lvgl',
-            'track/track.elf',
+            'track/track',
             'launcher/launcher',
             'scheme/scheme',
             'scheme/petite.boot',
-            'scheme/scheme.boot'
-
+            'scheme/scheme.boot',
+            'test/test-musl'
             ]
     #check_exit(apps)
 

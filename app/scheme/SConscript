@@ -34,7 +34,5 @@ env.Program('scheme', source,
     CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libchez/'+type+' -I. '+cflags,
     LINKFLAGS= '$LINKFLAGS $USER')
 
-# env.Objcopy('etk.elf','etk',OBJCOPYFLAGS='-S')
-# env.Objcopy('etk.dbg','etk',OBJCOPYFLAGS='--only-keep-debug')
 
 

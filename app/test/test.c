@@ -226,7 +226,7 @@ void test_exec() {
       "/etc/passwd",
   };
   // execv("/bin/ls", argv);
-  execv("/dev/sda/hello.elf", argv);
+  execv("/dev/sda/hello", argv);
 }
 
 void test_malloc_free() {

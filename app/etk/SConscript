@@ -28,11 +28,11 @@ if env.get('MYLIB'):
     source.append(env.get('MYLIB'))
 
 
-env.Program('etk.elf', source,
+env.Program('etk', source,
     CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libgui/ -Iapp/libjpeg/ -Iapp/libetk/',
     LINKFLAGS= '$LINKFLAGS $USER')
 
-# env.Objcopy('etk.elf','etk',OBJCOPYFLAGS='-S')
+# env.Objcopy('etk','etk',OBJCOPYFLAGS='-S')
 # env.Objcopy('etk.dbg','etk',OBJCOPYFLAGS='--only-keep-debug')
 
 

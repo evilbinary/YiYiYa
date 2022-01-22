@@ -40,6 +40,7 @@ typedef struct thread {
     void* stack3_top;
     struct thread_s * next;
     void* data;
+    void* exec;
     vmemory_area_t* vmm;
     u32 pid;
     u32** fds;
@@ -56,10 +57,10 @@ thread_t * thread_create_name(char* name,void* entry,void* data);
 thread_t* thread_create_name_level(char* name, void* entry, void* data,u32 level);
 
 thread_t* thread_create_ex(void* entry, u32* stack0, u32* stack3, u32 size,
-                           void* data,u32 level);
+                           void* data,u32 level,u32 page);
 
 thread_t* thread_create_ex_name(char* name,void* entry, u32* stack0, u32* stack3, u32 size,
-                           void* data,u32 level);
+                           void* data,u32 level,u32 page);
 
 void thread_sleep(thread_t * thread);
 

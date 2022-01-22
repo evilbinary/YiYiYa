@@ -22,7 +22,7 @@ thread_t* thread_create_level(void* entry, void* data,u32 level) {
     u8* stack0 = kmalloc(size);
 #endif
   u8* stack3 = kmalloc_alignment(size, PAGE_SIZE);
-  thread_t* thread = thread_create_ex(entry, stack0, stack3, data, size,level);
+  thread_t* thread = thread_create_ex(entry, stack0, stack3, data, size,level,1);
   return thread;
 }
 
@@ -47,8 +47,8 @@ thread_t* thread_create(void* entry, void* data){
 }
 
 thread_t* thread_create_ex_name(char* name, void* entry, u32* stack0,
-                                u32* stack3, u32 size, void* data,u32 level) {
-  thread_t* t = thread_create_ex(entry, stack0, stack3, size, data,level);
+                                u32* stack3, u32 size, void* data,u32 level,u32 page) {
+  thread_t* t = thread_create_ex(entry, stack0, stack3, size, data,level,page);
   char* kname = kmalloc(kstrlen(name));
   kstrcpy(kname, name);
   t->name = name;
@@ -56,7 +56,7 @@ thread_t* thread_create_ex_name(char* name, void* entry, u32* stack0,
 }
 
 thread_t* thread_create_ex(void* entry, u32* stack0, u32* stack3, u32 size,
-                           void* data,u32 level) {
+                           void* data,u32 level,u32 page) {
   thread_t* thread = kmalloc(sizeof(thread_t));
   thread->lock = 0;
   thread->data = data;
@@ -68,6 +68,10 @@ thread_t* thread_create_ex(void* entry, u32* stack0, u32* stack3, u32 size,
   thread_fill_fd(thread);
   
   thread_init(thread, entry, stack0, stack3, size,level);
+  if(page==1){
+    thread->context.page_dir = page_alloc_clone(thread->context.page_dir);
+  }
+
   return thread;
 }
 

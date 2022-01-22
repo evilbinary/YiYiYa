@@ -22,7 +22,7 @@ source= [
 if env.get('MYLIB'):
     source.append(env.get('MYLIB'))
 
-env.Program('test.elf', source,
+env.Program('test', source,
     CFLAGS='$CFLAGS $LIBCFLAGS',
     LINKFLAGS= '$LINKFLAGS $USER')
 
@@ -33,7 +33,7 @@ if env.get('ARCHTYPE')=='arm':
     if env.get('MYLIB'):
         source.append(env.get('MYLIB'))
 
-    env.Program('test-musl.elf', source,
+    env.Program('test-musl', source,
         CFLAGS='$CFLAGS $LIBCFLAGS',
         LINKFLAGS= '$LINKFLAGS $USER')
 

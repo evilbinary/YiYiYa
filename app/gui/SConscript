@@ -20,9 +20,9 @@ source=[
 if env.get('MYLIB'):
     source.append(env.get('MYLIB'))
 
-env.Program('gui.elf', source,
+env.Program('gui', source,
     CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libgui/ -Iapp/libjpeg',
     LINKFLAGS= '$LINKFLAGS $USER')
 
-# env.Objcopy('gui.elf','gui',OBJCOPYFLAGS='-S --strip-all')
-#env.Objcopy('gui.dbg','gui.elf',OBJCOPYFLAGS='--only-keep-debug')
+# env.Objcopy('gui','gui',OBJCOPYFLAGS='-S --strip-all')
+#env.Objcopy('gui.dbg','gui',OBJCOPYFLAGS='--only-keep-debug')

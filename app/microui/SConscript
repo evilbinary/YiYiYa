@@ -25,11 +25,11 @@ if env.get('MYLIB'):
     source.append(env.get('MYLIB'))
 
 
-env.Program('microui.elf',source,
+env.Program('microui',source,
     CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libgui/',
     LINKFLAGS= '$LINKFLAGS $USER')
 
-# env.Objcopy('microui.elf','microui',OBJCOPYFLAGS='-S')
-# env.Objcopy('microui.dbg','microui.elf',OBJCOPYFLAGS='--only-keep-debug')
+# env.Objcopy('microui','microui',OBJCOPYFLAGS='-S')
+# env.Objcopy('microui.dbg','microui',OBJCOPYFLAGS='--only-keep-debug')
 
 

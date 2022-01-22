@@ -33,7 +33,7 @@
 #endif
 
 typedef struct exec{
-    char filename[EXEC_FILE_NAME_LEN];
+    char* filename;
     int argc;
     char** argv;
     char **envp;

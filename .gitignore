@@ -56,3 +56,13 @@ app/rust/test/test-rs
 
 kernel.map
 app/bin/**
+
+app/file/file
+app/gui/gui
+app/microui/microui
+app/scheme/scheme
+app/test/test
+app/test/test-musl
+app/track/track
+app/etk/etk
+image/disk.img

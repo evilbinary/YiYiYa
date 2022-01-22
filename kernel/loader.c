@@ -153,10 +153,11 @@ int load_elf(Elf32_Ehdr* elf_header, u32 fd, page_dir_t* page) {
 void run_elf_thread() {
   Elf32_Ehdr elf;
   thread_t* current = thread_current();
-  exec_t exec_data;
-  exec_t* exec = current->data;
-  kmemmove(&exec_data, exec, sizeof(exec_t));
+  exec_t* exec = current->exec;
+  kprintf("argv==>%s\n",exec->argv[0]);
   u32 fd = syscall2(SYS_OPEN, exec->filename, 0);
+  kprintf("argv2==>%s\n",exec->argv[0]);
+
   kprintf("load elf %s fd:%d tid:%d\n", exec->filename, fd, current->id);
   if (fd < 0) {
     kprintf("open elf %s error\n", exec->filename);
@@ -164,6 +165,8 @@ void run_elf_thread() {
     return;
   }
   u32 nbytes = syscall3(SYS_READ, fd, &elf, sizeof(Elf32_Ehdr));
+  kprintf("argv3==>%s nbytes=%d\n",exec->argv[0],nbytes);
+
   Elf32_Ehdr* elf_header = (Elf32_Ehdr*)&elf;
   entry_fn entry = NULL;
   if (elf_header->e_ident[0] == ELFMAG0 || elf_header->e_ident[1] == ELFMAG1) {
@@ -173,18 +176,14 @@ void run_elf_thread() {
     kprintf("load faild not elf %s\n", exec->filename);
     entry = NULL;
   }
-  // current->context.eip=entry;
-  // interrupt_context_t* user = current->context.esp0;
-  // user->lr=entry;
-
-  // map_page_on(current->context.page_dir,current->context.esp,current->context.esp,PAGE_P
-  // | PAGE_USU | PAGE_RWW);
   u32 ret = -1;
   if (entry != NULL) {
 #ifdef DEBUG
     kprintf("entry %x\n", entry);
 #endif
-    ret = entry(exec_data.argc, exec_data.argv,exec_data.envp);
+  kprintf("argv4====%x\n",exec->argv);
+  kprintf("argv4==>%s\n",exec->argv[0]);
+    ret = entry(exec->argc, exec->argv,exec->envp);
   }
   syscall1(SYS_EXIT, ret);
 }

@@ -15,11 +15,22 @@ int test_float(void) {
   return 0;
 }
 
+void test_getenv() {
+  char* p;
+  if ((p = getenv("USER"))) printf("USER =%s\n", p);
+  setenv("USER", "test", 1);
+  printf("USER=%s\n", getenv("USER"));
+  unsetenv("USER");
+  printf("USER=%s\n", getenv("USER"));
+
+  //return USER = root　USER = test　USER = (null)
+}
 
 int main(int argc, char* argv[]) {
   printf("hello musl\n");
-  test_malloc();
+  // test_malloc();
   // test_float();
+  test_getenv();
 
   return 0;
 }

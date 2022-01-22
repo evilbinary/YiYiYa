@@ -35,7 +35,7 @@ cflags=' -Iapp/liblvgl/ -Iapp/libgui/ -Iapp/libjpeg -DLV_LVGL_H_INCLUDE_SIMPLE=1
 if env.get('MYLIB'):
     source.append(env.get('MYLIB'))
 
-env.Program('track.elf', source,
+env.Program('track', source,
     CFLAGS='$CFLAGS $LIBCFLAGS '+cflags,
     LINKFLAGS= '$LINKFLAGS $USER')
 

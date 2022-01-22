@@ -59,7 +59,6 @@ void do_shell_cmd(char* cmd, int count) {
 
 void pre_launch();
 
-int series;
 
 void do_shell_thread(void) {
   print_logo();
@@ -67,7 +66,10 @@ void do_shell_thread(void) {
   char buf[64];
   int ret = 0;
   print_promot();
-  series = syscall2(SYS_OPEN, "/dev/series", 0);
+  int series = syscall2(SYS_OPEN, "/dev/series", 0);
+  if(series<0){
+    kprintf("error open series\n");
+  }
   pre_launch();
 
   if (syscall2(SYS_DUP2, series, 1) < 0) {
@@ -93,15 +95,20 @@ void do_shell_thread(void) {
   }
 }
 
+//must init global for armv7-a
+char* argv[] = {
+        "/dev/sda/scheme",
+        NULL
+};
 void pre_launch() {
 #ifdef X86
   // int fd = syscall2(SYS_OPEN, "/dev/stdin", 0);
   // syscall2(SYS_EXEC,"/dev/sda/hello",NULL);
-  // syscall2(SYS_EXEC,"/dev/sda/gui.elf",NULL);
-  // syscall2(SYS_EXEC,"/dev/sda/file.elf",NULL);
+  // syscall2(SYS_EXEC,"/dev/sda/gui",NULL);
+  // syscall2(SYS_EXEC,"/dev/sda/file",NULL);
   // syscall2(SYS_EXEC, "/dev/sda/luat", NULL);
 
-  syscall2(SYS_EXEC, "/dev/sda/etk.elf", NULL);
+  syscall2(SYS_EXEC, "/dev/sda/etk", NULL);
   // syscall2(SYS_EXEC,"/dev/sda/test-rs",NULL);
   // char* argv[] = {
   //     "lua",
@@ -109,9 +116,9 @@ void pre_launch() {
   // };
   // syscall2(SYS_EXEC, "/dev/sda/lua", argv);
   // syscall2(SYS_EXEC,"/dev/sda/launcher",NULL);
-  // syscall2(SYS_EXEC,"/dev/sda/track.elf",NULL);
-  // syscall2(SYS_EXEC,"/dev/sda/test.elf",NULL);
-  // syscall2(SYS_EXEC,"/dev/sda/mcroui.elf",NULL);
+  // syscall2(SYS_EXEC,"/dev/sda/track",NULL);
+  // syscall2(SYS_EXEC,"/dev/sda/test",NULL);
+  // syscall2(SYS_EXEC,"/dev/sda/mcroui",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/lvgl",NULL);
   // kprintf("fd=>%d\n",fd);
   for (;;)
@@ -121,26 +128,28 @@ void pre_launch() {
 #else defined(ARM)
   // syscall2(SYS_EXEC,"/dev/sda/hello-rs",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/test-rs",NULL);
-  // syscall2(SYS_EXEC,"/dev/sda/test-musl.elf",NULL);
+  // syscall2(SYS_EXEC,"/dev/sda/test-musl",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/test-musl",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/ls",NULL);
-  // syscall2(SYS_EXEC, "/dev/sda/test.elf", NULL);
+  // syscall2(SYS_EXEC, "/dev/sda/test", NULL);
   // syscall2(SYS_EXEC,"/dev/sda/hello",NULL);
   // syscall2(SYS_EXEC, "/dev/sda/lvgl", NULL);
-  syscall2(SYS_EXEC, "/dev/sda/launcher", NULL);
-  // syscall2(SYS_EXEC, "/dev/sda/scheme", NULL);
+  // syscall2(SYS_EXEC, "/dev/sda/launcher", NULL);
 
-  // syscall2(SYS_EXEC,"/dev/sda/track.elf",NULL);
-  // syscall2(SYS_EXEC,"/dev/sda/gui.elf",NULL);
-  // syscall2(SYS_EXEC,"/dev/sda/etk.elf",NULL);
-  //  syscall2(SYS_EXEC,"/dev/sda/test.elf",NULL);
-  //  syscall2(SYS_EXEC,"/dev/sda/microui.elf",NULL);
+  // syscall2(SYS_EXEC,"/dev/sda/track",NULL);
+  // syscall2(SYS_EXEC,"/dev/sda/gui",NULL);
+  // syscall2(SYS_EXEC,"/dev/sda/etk",NULL);
+  //  syscall2(SYS_EXEC,"/dev/sda/test",NULL);
+  //  syscall2(SYS_EXEC,"/dev/sda/microui",NULL);
 
   // char* argv[] = {
   //     "lua",
   //     "hello.lua",
   // };
   // syscall2(SYS_EXEC, "/dev/sda/lua", argv);
+
+  syscall2(SYS_EXEC, "/dev/sda/scheme", argv);
+
 
 // test_cpu_speed();
 #endif
