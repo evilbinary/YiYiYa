@@ -9,7 +9,7 @@ void test_read() {
   char* buffer = malloc(512);
   memset(buffer, 0, 512);
   FILE* fp;
-  fp = fopen("/dev/sda/duck.jpg", "r+");
+  fp = fopen("/duck.jpg", "r+");
   printf("fd=%d\n", *fp);
   int offset = 0;
   for (;;) {
@@ -32,7 +32,7 @@ void test_read() {
 }
 
 void test_write() {
-  FILE* fp= fopen("/dev/sda/kaka.txt", "w+");
+  FILE* fp= fopen("/kaka.txt", "w+");
   fseek(fp, 0, SEEK_SET);
   fwrite("ABCDEF",strlen("ABCDEF"),1,fp);
   fclose(fp);
@@ -42,7 +42,7 @@ void test_read_dir(){
     DIR * dir;
     struct dirent * ptr;
     int i;
-    dir = opendir("/dev/sda/hello");
+    dir = opendir("/hello");
     while((ptr = readdir(dir)) != NULL){
         printf("name : %s type: %d\n", ptr->d_name,ptr->d_type);
     }

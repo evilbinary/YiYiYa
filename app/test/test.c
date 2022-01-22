@@ -192,7 +192,7 @@ void test_pipe() {
 }
 
 void test_dup() {
-  FILE* fp = fopen("/dev/sda/testdup.txt", "w");
+  FILE* fp = fopen("/testdup.txt", "w");
   printf("open fp %x\n", fp);
   int fno = fileno(fp);
   fno = STDOUT_FILENO;
@@ -207,7 +207,7 @@ void test_dup() {
 
 void test_dup2() {
   int fd;
-  fd = open("/dev/sda/testdup2.txt", "w");
+  fd = open("/testdup2.txt", "w");
   if (fd < 0) {
     printf("open error\n");
     exit(-1);
@@ -226,7 +226,7 @@ void test_exec() {
       "/etc/passwd",
   };
   // execv("/bin/ls", argv);
-  execv("/dev/sda/hello", argv);
+  execv("/hello", argv);
 }
 
 void test_malloc_free() {

@@ -14,7 +14,7 @@ Ret etk_init(int argc, char* argv[]) {
 
   // font init
   if (etkglobal.font == NULL) {
-    etkglobal.font = etk_font_default_create("/dev/sda/zmrom.bin");
+    etkglobal.font = etk_font_default_create("/zmrom.bin");
   }
 
   return RET_OK;

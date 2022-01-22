@@ -3,7 +3,7 @@
 
 
 //#define MINE_DEBUG
-#define RES_PATH(res) "/dev/sda/"res
+#define RES_PATH(res) "/"res
 
 //window title bar property
 #define MINE_WINDOW_TITLE_HEIGHT				20

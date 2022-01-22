@@ -21,8 +21,8 @@ int etk_app_main(int argc, char* argv[]) {
   e32 i;
   e32 xsize, ysize, xspan, yspan, startx, starty, x, y;
 
-  e8 button_name[9][10] = {"ÊÓÆµ", "ÖÕ¶Ë", "ÎÂ¶È", "¼ÇÊÂ±¾", "ÕÕÆ¬",
-                           "É¨À×", "Ê±ÖÓ", "×´Ì¬", "¹ØÓÚ"};
+  e8 button_name[9][10] = {"ï¿½ï¿½Æµ", "ï¿½Õ¶ï¿½", "ï¿½Â¶ï¿½", "ï¿½ï¿½ï¿½Â±ï¿½", "ï¿½ï¿½Æ¬",
+                           "É¨ï¿½ï¿½", "Ê±ï¿½ï¿½", "×´Ì¬", "ï¿½ï¿½ï¿½ï¿½"};
   manager = etk_get_wnd_manager();
   jpeg_decoder = etk_image_jpeg_decoder_create();
   bmp_decoder = etk_image_bmp_decoder_create();
@@ -227,7 +227,7 @@ Ret button1_listener(void* user_data, void* obj) {
   EtkWidget* pic;
   EtkImageDecoder* decoder = etk_image_jpeg_decoder_create();
   printf("click button1 dtat:%d obj:%d\n", user_data, obj);
-  b = decoder->decode(decoder, "/dev/sda/duck.jpg");
+  b = decoder->decode(decoder, "/duck.jpg");
   if (b != NULL) {
     t.x = 0;
     t.y = 0;

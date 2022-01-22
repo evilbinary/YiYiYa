@@ -90,7 +90,7 @@ void test_SYS_DEV_READ_write() {
   if (count % 100 == 0) {
     // syscall1(SYS_PRINT, "\n");
   }
-  int fd = syscall2(SYS_OPEN, "/dev/sda/B.TXT", 0);
+  int fd = syscall2(SYS_OPEN, "/B.TXT", 0);
   test_gui();
   syscall1(SYS_PRINT, "\n");
   syscall3(SYS_READ, fd, buf, 512);

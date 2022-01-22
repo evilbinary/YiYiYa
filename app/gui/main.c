@@ -43,9 +43,9 @@ void yiyiya_gui() {
   screen_init();
   screen_info_t* screen = screen_info();
 
-  bitmap_t* bitmap = load_jpeg("/dev/sda/home.jpg");
-  bitmap_t* bitmap2 = load_png("/dev/sda/normal.png");
-  // void* bmp = load_bmp("/dev/sda/duck.bmp");
+  bitmap_t* bitmap = load_jpeg("/home.jpg");
+  bitmap_t* bitmap2 = load_png("/normal.png");
+  // void* bmp = load_bmp("/duck.bmp");
 
   mouse_data_t mouse;
 
@@ -89,10 +89,10 @@ void yiyiya_display() {
 
 void yiyiya_bitmap() {
   screen_init();
-  // bitmap_t* bitmap = load_jpeg("/dev/sda/home.jpg");
-  bitmap_t* bitmap = load_jpeg("/dev/sda/duck.jpg");
-  //  bitmap_t* bitmap = load_png("/dev/sda/normal.png");
-  // void* bmp = load_bmp("/dev/sda/bomb.bmp");
+  // bitmap_t* bitmap = load_jpeg("/home.jpg");
+  bitmap_t* bitmap = load_jpeg("/duck.jpg");
+  //  bitmap_t* bitmap = load_png("/normal.png");
+  // void* bmp = load_bmp("/bomb.bmp");
   for (;;) {
     screen_show_bitmap(0, 0, 227, 149, bitmap);
     // screen_show_bitmap(0, 0, 1024, 768, bitmap);

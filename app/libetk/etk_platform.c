@@ -131,7 +131,7 @@ void etk_platform_display_init() {
   screen = screen_info();
   etkglobal.display->height = screen->height;
   etkglobal.display->width = screen->width;
-  //   curssor= load_png("/dev/sda/normal.png");
+  //   curssor= load_png("/normal.png");
 }
 
 int etk_platform_init(int argc, char **argv) {

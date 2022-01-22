@@ -7,7 +7,7 @@ int main(int argc, char* argv[]) {
     DIR * dir;
     struct dirent * ptr;
     int i;
-    dir = opendir("/dev/sda");
+    dir = opendir("/");
     while((ptr = readdir(dir)) != NULL){
         printf("name : %s type: %d\n", ptr->d_name,ptr->d_type);
     }

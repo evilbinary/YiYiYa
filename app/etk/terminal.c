@@ -130,7 +130,7 @@ void interpret_cmd(char* cmd) {
   }
   int32_t ret = 0;
   char buf[128];
-  sprintf(buf, "/dev/sda/%s", args[0]);
+  sprintf(buf, "/%s", args[0]);
   // ret = execl(buf, args);
   // fprintf(file_out, "exec ret=%d\n", ret);
   // if (ret < 0) {
