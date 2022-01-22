@@ -279,7 +279,7 @@ int main(int argc, const char *argv[]) {
       }
     }
   }
-
+  // setenv("SCHEMEHEAPDIRS", "/", 1);
  /* must call Sbuild_heap after registering boot and heap files.
   * Sbuild_heap() completes the initialization of the Scheme system
   * and loads the boot or heap files.  If no boot or heap files have

@@ -128,8 +128,6 @@ void pre_launch() {
 #else defined(ARM)
   // syscall2(SYS_EXEC,"/dev/sda/hello-rs",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/test-rs",NULL);
-  // syscall2(SYS_EXEC,"/dev/sda/test-musl",NULL);
-  // syscall2(SYS_EXEC,"/dev/sda/test-musl",NULL);
   // syscall2(SYS_EXEC,"/dev/sda/ls",NULL);
   // syscall2(SYS_EXEC, "/dev/sda/test", NULL);
   // syscall2(SYS_EXEC,"/dev/sda/hello",NULL);
@@ -148,7 +146,8 @@ void pre_launch() {
   // };
   // syscall2(SYS_EXEC, "/dev/sda/lua", argv);
 
-  syscall2(SYS_EXEC, "/dev/sda/scheme", argv);
+  syscall2(SYS_EXEC,"/test-musl",NULL);
+  // syscall2(SYS_EXEC, "/dev/sda/scheme", argv);
 
 
 // test_cpu_speed();

@@ -58,6 +58,7 @@ typedef struct vnode{
    vmount_t mount;
    vnode_t *parent; // Used by mountpoints and symlinks.
    vnode_t **child;
+   vnode_t *super;
    size_t child_number;
    size_t child_size;
    void* data;

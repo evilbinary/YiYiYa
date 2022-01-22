@@ -26,7 +26,7 @@ int load_elf(Elf32_Ehdr* elf_header, u32 fd, page_dir_t* page) {
       syscall3(SYS_READ, fd, phdr, sizeof(Elf32_Phdr) * elf_header->e_phnum);
   // kprintf("addr %x elf=%x\n\r", phdr, elf);
   u32 entry = elf_header->e_entry;
-  u32 entry_txt=0;
+  u32 entry_txt = 0;
   for (int i = 0; i < elf_header->e_phnum; i++) {
 #ifdef DEBUG
     kprintf("ptype:%d\n\r", phdr[i].p_type);
@@ -48,7 +48,7 @@ int load_elf(Elf32_Ehdr* elf_header, u32 fd, page_dir_t* page) {
           char* start = phdr[i].p_offset;
           char* vaddr = phdr[i].p_vaddr;
           syscall2(SYS_SEEK, fd, start);
-          entry_txt=vaddr;
+          entry_txt = vaddr;
           u32 ret = syscall3(SYS_READ, fd, vaddr, phdr[i].p_filesz);
         } else {
 #ifdef DEBUG
@@ -115,7 +115,7 @@ int load_elf(Elf32_Ehdr* elf_header, u32 fd, page_dir_t* page) {
   // data
   offset = elf_header->e_shoff;
   if (elf_header->e_shnum > MAX_SHDR) {
-    kprintf("shnum %d > MAX_SHDR %d\n", elf_header->e_shnum,MAX_SHDR);
+    kprintf("shnum %d > MAX_SHDR %d\n", elf_header->e_shnum, MAX_SHDR);
     return -1;
   }
   Elf32_Shdr shdr[MAX_SHDR];
@@ -134,8 +134,8 @@ int load_elf(Elf32_Ehdr* elf_header, u32 fd, page_dir_t* page) {
               shdr[i].sh_size);
 #endif
       // map_alignment(page,vaddr,buf,shdr[i].sh_size);
-    } else if ( SHT_PROGBITS == shdr[i].sh_type &&
-               shdr[i].sh_flags & SHF_ALLOC && shdr[i].sh_addr!=entry_txt) {
+    } else if (SHT_PROGBITS == shdr[i].sh_type &&
+               shdr[i].sh_flags & SHF_ALLOC && shdr[i].sh_addr != entry_txt) {
       char* start = shdr[i].sh_offset;
       char* vaddr = shdr[i].sh_addr;
 #ifdef DEBUG
@@ -154,10 +154,7 @@ void run_elf_thread() {
   Elf32_Ehdr elf;
   thread_t* current = thread_current();
   exec_t* exec = current->exec;
-  kprintf("argv==>%s\n",exec->argv[0]);
   u32 fd = syscall2(SYS_OPEN, exec->filename, 0);
-  kprintf("argv2==>%s\n",exec->argv[0]);
-
   kprintf("load elf %s fd:%d tid:%d\n", exec->filename, fd, current->id);
   if (fd < 0) {
     kprintf("open elf %s error\n", exec->filename);
@@ -165,7 +162,6 @@ void run_elf_thread() {
     return;
   }
   u32 nbytes = syscall3(SYS_READ, fd, &elf, sizeof(Elf32_Ehdr));
-  kprintf("argv3==>%s nbytes=%d\n",exec->argv[0],nbytes);
 
   Elf32_Ehdr* elf_header = (Elf32_Ehdr*)&elf;
   entry_fn entry = NULL;
@@ -181,9 +177,7 @@ void run_elf_thread() {
 #ifdef DEBUG
     kprintf("entry %x\n", entry);
 #endif
-  kprintf("argv4====%x\n",exec->argv);
-  kprintf("argv4==>%s\n",exec->argv[0]);
-    ret = entry(exec->argc, exec->argv,exec->envp);
+    ret = entry(exec->argc, exec->argv, exec->envp);
   }
   syscall1(SYS_EXIT, ret);
 }

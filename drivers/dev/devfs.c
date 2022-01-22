@@ -22,6 +22,7 @@ int devfs_init(void) {
   vnode_t *node_dev = vfs_create("dev", V_DIRECTORY);
   vfs_mount(NULL, "/", node_dev);
   char *name;
+  vnode_t *root_super = NULL;
   for (int i = 0; i < 3; i++) {
     device_t *dev = device_find(DEVICE_SATA + i);
     if (dev == NULL) {
@@ -36,7 +37,14 @@ int devfs_init(void) {
     node_sda->name = name;
     node_sda->flags = V_BLOCKDEVICE;
     vfs_mount(NULL, "/dev", node_sda);
+    if (root_super == NULL) {
+      root_super = node_sda;
+    }
   }
+
+  // auto mount first dev as root
+  vnode_t *root = vfs_find(NULL, "/");
+  root->super = root_super;
 
   // SYS_READ,SYS_WRITE
   vnode_t *stdin = vfs_create("stdin", V_FILE);

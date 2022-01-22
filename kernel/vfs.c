@@ -10,7 +10,7 @@
 
 vnode_t *root_node = NULL;
 
-size_t vioctl(vnode_t *node, u32 cmd, void* args) {
+size_t vioctl(vnode_t *node, u32 cmd, void *args) {
   if (node->ioctl != NULL) {
     u32 ret = 0;
     // va_list args;
@@ -19,7 +19,7 @@ size_t vioctl(vnode_t *node, u32 cmd, void* args) {
     // va_end(args);
     return ret;
   } else {
-    kprintf("node %s ioctl is null\n",node->name);
+    kprintf("node %s ioctl is null\n", node->name);
     return 0;
   }
 }
@@ -28,7 +28,7 @@ u32 vread(vnode_t *node, u32 offset, u32 size, u8 *buffer) {
   if (node->read != NULL) {
     return node->read(node, offset, size, buffer);
   } else {
-    kprintf("node %s read is null\n",node->name);
+    kprintf("node %s read is null\n", node->name);
     return 0;
   }
 }
@@ -36,7 +36,7 @@ u32 vwrite(vnode_t *node, u32 offset, u32 size, u8 *buffer) {
   if (node->write != NULL) {
     return node->write(node, offset, size, buffer);
   } else {
-    kprintf("node %s write is null\n",node->name);
+    kprintf("node %s write is null\n", node->name);
     return 0;
   }
 }
@@ -52,7 +52,7 @@ void vclose(vnode_t *node) {
   if (node->close != NULL) {
     return node->close(node);
   } else {
-    kprintf("node %s close is null\n",node->name);
+    kprintf("node %s close is null\n", node->name);
     return;
   }
 }
@@ -99,12 +99,12 @@ void vfs_exten_child(vnode_t *node) {
   if (node->child_number != 0) {
     size = node->child_number * 2;
   }
-  vnode_t **child = kmalloc(size*sizeof(vnode_t*));
-  for(int i=0;i<size;i++){
-    child[i]=0;
+  vnode_t **child = kmalloc(size * sizeof(vnode_t *));
+  for (int i = 0; i < size; i++) {
+    child[i] = 0;
   }
   vnode_t **temp = node->child;
-  if(node->child!=NULL){
+  if (node->child != NULL) {
     kmemmove(child, node->child, node->child_number * sizeof(vnode_t *));
     kfree(temp);
   }
@@ -130,20 +130,25 @@ vnode_t *vfs_find(vnode_t *root, u8 *path) {
   char buf[256];
   char *start;
   char *s = buf;
+
+  if (root == NULL) {
+    root = root_node;
+  }
   u32 path_len = kstrlen(path);
+  if (path_len == 1 && kstrcmp(root->name, path) == 0) {
+    return root;
+  }
   if (path_len >= 256) {
     s = kmalloc(path_len);
     start = s;
   }
   kstrcpy(s, path);
   token = kstrtok(s, split);
-  if (root == NULL) {
-    root = root_node;
-  }
+
   vnode_t *parent = root;
-  vnode_t * node=NULL;
-  if(token==NULL){
-    node=parent;
+  vnode_t *node = NULL;
+  if (token == NULL) {
+    node = parent;
   }
   while (token != NULL) {
     // if (kstrcmp(token, parent->name) == 0) {
@@ -154,7 +159,7 @@ vnode_t *vfs_find(vnode_t *root, u8 *path) {
       if (n == NULL) continue;
       if (kstrcmp(token, n->name) == 0) {
         node = n;
-        parent=n;
+        parent = n;
         break;
       }
     }
@@ -163,6 +168,30 @@ vnode_t *vfs_find(vnode_t *root, u8 *path) {
   if (path_len >= 256) {
     kfree(start);
   }
+  // not found vfs vnode,is super block then find on block
+  if (node == NULL && parent->super != NULL) {
+    kstrcpy(s, path);
+    token = kstrtok(s, split);
+    if (kstrcmp(split, parent->name) == 0) {
+    } else {
+      while (token != NULL) {
+        if (kstrcmp(token, parent->name) == 0) {
+          break;
+        }
+        token = kstrtok(NULL, split);
+      }
+    }
+
+    vnode_t *find_node = vfind(parent->super, token);
+    if (find_node == NULL) {
+      kprintf("open find %s failed \n", path);
+      return NULL;
+    }
+    node = find_node;
+    // mount to vfs
+    vfs_add_child(parent, node);
+  }
+
   return node;
 }
 
@@ -171,23 +200,23 @@ void vfs_mount(vnode_t *root, u8 *path, vnode_t *node) {
     root = root_node;
   }
   vnode_t *parent = vfs_find(root, path);
-  if(parent!=NULL){
+  if (parent != NULL) {
     vfs_add_child(parent, node);
-  }else{
-    kprintf("mount on %s error\n",path);
+  } else {
+    kprintf("mount on %s error\n", path);
   }
 }
 
 vnode_t *vfs_create(u8 *name, u32 flags) {
   vnode_t *node = kmalloc(sizeof(vnode_t));
-  node->name=kmalloc(kstrlen(name)+1);
-  kstrcpy(node->name,name);
+  node->name = kmalloc(kstrlen(name) + 1);
+  kstrcpy(node->name, name);
   node->flags = flags;
   node->find = vfs_find;
   node->mount = vfs_mount;
-  node->child=NULL;
-  node->child_number=0;
-  node->child_size=0;
+  node->child = NULL;
+  node->child_number = 0;
+  node->child_size = 0;
   return node;
 }
 
