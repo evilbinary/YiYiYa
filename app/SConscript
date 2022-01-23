@@ -65,9 +65,6 @@ if env.get('APP'):
     SConscript(dirs=['launcher'], exports='env')
 
 
-    # SConscript(dirs=['liblua'], exports='env')
-    # SConscript(dirs=['lua'], exports='env')
-
     SConscript(dirs=['liblz4'], exports='env')
 
 
@@ -78,9 +75,6 @@ if env.get('APP'):
             'etk/etk',
             'test/test',
             #'rust/test/test-rs',
-            'lua/lua',
-            'lua/luat',
-            'lua/hello.lua',
             'cmd/ls',
             'lvgl/lvgl',
             'track/track',
@@ -93,12 +87,17 @@ if env.get('APP'):
         SConscript(dirs=['libchez'], exports='env')
         SConscript(dirs=['scheme'], exports='env')
         SConscript(dirs=['test'], exports='env')
+        SConscript(dirs=['liblua'], exports='env')
+        SConscript(dirs=['lua'], exports='env')
 
         apps+=[
             'scheme/scheme',
             'scheme/petite.boot',
             'scheme/scheme.boot',
-            'test/test-musl'
+            'test/test-musl',
+            'lua/lua',
+            'lua/luat',
+            'lua/hello.lua',
             ]
 
     if plt=='Darwin':

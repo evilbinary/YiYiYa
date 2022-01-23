@@ -61,8 +61,8 @@ int main(int argc, char* argv[]) {
   // test_malloc();
   // test_float();
   // test_getenv();
-  test_read_root();
-  // test_read_byte();
+  // test_read_root();
+  test_read_byte();
 
   return 0;
 }

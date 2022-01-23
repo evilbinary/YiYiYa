@@ -123,6 +123,7 @@ size_t sys_write(u32 fd, void* buf, size_t nbytes) {
   }
   // kprintf("sys write %d %s fd:%s\n",current->id,buf,f->name);
   u32 ret = vwrite(node, f->offset, nbytes, buf);
+  f->offset+=nbytes;
   return ret;
 }
 size_t sys_read(u32 fd, void* buf, size_t nbytes) {
@@ -138,6 +139,7 @@ size_t sys_read(u32 fd, void* buf, size_t nbytes) {
     return -1;
   }
   u32 ret = vread(node, f->offset, nbytes, buf);
+  f->offset+=nbytes;
   return ret;
 }
 
