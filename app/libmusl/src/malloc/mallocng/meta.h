@@ -162,6 +162,7 @@ static inline size_t get_nominal_size(const unsigned char *p, const unsigned cha
 	if (reserved >= 5) {
 		assert(reserved == 5);
 		reserved = *(const uint32_t *)(end-4);
+		//todo check
 		assert(reserved >= 5);
 		assert(!end[-5]);
 	}

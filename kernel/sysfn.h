@@ -50,6 +50,8 @@ enum {
   SYS_MPROTECT=125,
   SYS_RT_SIGPROCMASK=175,
   SYS_GETDENTS64=217,
+  SYS_MUNMAP=91,
+  SYS_FCNT64=221,
 };
 
 #else
@@ -160,5 +162,7 @@ int sys_set_thread_area(void* set);
 void sys_dumps();
 
 int sys_getdents64(unsigned int fd, vdirent_t* dir, unsigned int count);
+int sys_munmap(void* addr, size_t size);
+int sys_fcntl64(int fd, int cmd, void* arg);
 
 #endif

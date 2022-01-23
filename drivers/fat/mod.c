@@ -220,7 +220,7 @@ u32 fat_op_open(vnode_t *node) {
   struct fat_dir_entry_struct directory;
   file_info_t *file_info = node->data;
   struct fat_fs_struct *fs = file_info->fs;
-  file_info->offset=0;
+  file_info->offset = 0;
 
   if (file_info->fd == NULL && file_info->dd == NULL) {
     kprintf("create new file %s\n", name);
@@ -304,8 +304,16 @@ u32 fat_op_read_dir(vnode_t *node, struct vdirent *dirent, u32 count) {
   struct fat_dir_entry_struct dir_entry;
   u32 i = 0;
   u32 nbytes = 0;
-
+  u32 total = 0;
   while (fat_read_dir(file_info->dd, &dir_entry)) {
+    total++;
+  }
+  while (fat_read_dir(file_info->dd, &dir_entry)) {
+    if (file_info->offset >= total) {
+      dirent->offset=0;
+      dirent->length=0;
+      return 0;
+    }
     if (i < count) {
       if ((dir_entry.attributes & FAT_ATTRIB_DIR) == FAT_ATTRIB_DIR) {
         dirent->type = DT_DIR;
@@ -322,16 +330,14 @@ u32 fat_op_read_dir(vnode_t *node, struct vdirent *dirent, u32 count) {
     }
     i++;
   }
-  if((file_info->offset)>i){
-    return -1;
-  }
+
   return nbytes;
 }
 
 void fat_op_close(vnode_t *node) {
   file_info_t *file_info = node->data;
-  if(file_info!=NULL){
-    file_info->offset=0;
+  if (file_info != NULL) {
+    file_info->offset = 0;
     fat_close_file(file_info->fd);
   }
 }

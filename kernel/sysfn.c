@@ -313,7 +313,7 @@ int sys_readdir(int fd, int index, void* dirent) {
     kprintf("readdir not found fd %d\n", fd);
     return 0;
   }
-  u32 ret = vreaddir(findfd->data,dirent, index);
+  u32 ret = vreaddir(findfd->data, dirent, index);
   return ret;
 }
 
@@ -424,6 +424,17 @@ int sys_getdents64(unsigned int fd, vdirent_t* dir, unsigned int count) {
     kprintf("getdents64 not found fd %d\n", fd);
     return 0;
   }
-  u32 ret= vreaddir(findfd->data,dir,count);
+  u32 ret = vreaddir(findfd->data, dir, count);
   return ret;
+}
+
+int sys_munmap(void* addr, size_t size) {
+  kprintf("sys munmap not impl addr: %x size: %d\n", addr, size);
+  return 1;
+}
+
+int sys_fcntl64(int fd, int cmd, void* arg) {
+  kprintf("sys fcntl64 not impl fd: %d cmd: %x\n", fd, cmd);
+
+  return 1;
 }
