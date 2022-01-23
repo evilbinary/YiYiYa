@@ -63,3 +63,26 @@ size_t device_ioctl(vnode_t *node, u32 cmd, va_list args) {
   // va_end(args);
   return ret;
 }
+
+
+u32 device_open(vnode_t *node) {
+  u32 ret = 0;
+  device_t *dev = (device_t *)node->device;
+  if (dev == NULL) {
+    return ret;
+  }
+  //todo 
+  //ret = dev->close(dev, buffer, nbytes);
+  return ret;
+}
+
+u32 device_close(vnode_t *node) {
+  u32 ret = 0;
+  device_t *dev = (device_t *)node->device;
+  if (dev == NULL) {
+    return ret;
+  }
+  //todo 
+  //ret = dev->close(dev, buffer, nbytes);
+  return ret;
+}

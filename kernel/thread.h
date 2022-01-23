@@ -48,6 +48,7 @@ typedef struct thread {
     u32 fd_number;
     u32 lock;
     u32 code;
+    u32 fault_count;
 }thread_t;
 
 

@@ -44,7 +44,7 @@ u32 vopen(vnode_t *node) {
   if (node->open != NULL) {
     return node->open(node);
   } else {
-    kprintf("node open is null\n");
+    kprintf("node %s open is null \n",node->name);
     return;
   }
 }

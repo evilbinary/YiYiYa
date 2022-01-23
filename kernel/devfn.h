@@ -19,5 +19,7 @@ size_t dev_write(int fd, void* buf, size_t nbytes);
 u32 device_write(vnode_t *node, u32 offset, size_t nbytes, u8 *buf);
 u32 device_read(vnode_t *node, u32 offset, size_t nbytes, u8 *buf);
 size_t device_ioctl(vnode_t *node, u32 cmd, va_list args);
+u32 device_close(vnode_t *node) ;
+u32 device_open(vnode_t *node);
 
 #endif

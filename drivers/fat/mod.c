@@ -321,7 +321,7 @@ u32 fat_op_read_dir(vnode_t *node, struct vdirent *dirent, u32 count) {
     }
     i++;
   }
-  if(file_info->offset>i){
+  if((file_info->offset)>i){
     return -1;
   }
   return nbytes;
@@ -329,7 +329,10 @@ u32 fat_op_read_dir(vnode_t *node, struct vdirent *dirent, u32 count) {
 
 void fat_op_close(vnode_t *node) {
   file_info_t *file_info = node->data;
-  fat_close_file(file_info->fd);
+  if(file_info!=NULL){
+    file_info->offset=0;
+    fat_close_file(file_info->fd);
+  }
 }
 
 void fat_init_op(vnode_t *node) {

@@ -7,7 +7,7 @@
 
 #include "thread.h"
 
-extern context_t* current_context;
+extern context_t *current_context;
 
 interrupt_handler_t *exception_handlers[EXCEPTION_NUMBER];
 void exception_regist(u32 vec, interrupt_handler_t handler) {
@@ -40,7 +40,7 @@ void exception_info(interrupt_context_t *context) {
   }
   thread_t *current = thread_current();
   if (current != NULL) {
-    kprintf("tid:%d %s\n", current->id,current->name);
+    kprintf("tid:%d %s\n", current->id, current->name);
   }
   kprintf("ifsr: %x dfsr: %x dfar: %x\n", read_ifsr(), read_dfsr(),
           read_dfar());
@@ -295,11 +295,19 @@ void do_page_fault(interrupt_context_t *context) {
     if (mode == USER_MODE) {
       vmemory_area_t *area = vmemory_area_find(current->vmm, fault_addr, 0);
       if (area == NULL) {
-        kprintf("tid: %d %s memory fault at %x\n", current->id, current->name,
-                fault_addr);
-        dump_fault(context, fault_addr);
-        thread_exit(current, -1);
-        // cpu_halt();
+        if (current->fault_count < 3) {
+          thread_exit(current, -1);
+          kprintf("tid: %d %s memory fault at %x\n", current->id, current->name,
+                  fault_addr);
+          dump_fault(context, fault_addr);
+          current->fault_count++;
+        } else if (current->fault_count == 3) {
+          kprintf("tid: %d %s memory fault at %x too many\n",
+                  current->id, current->name, fault_addr);
+          current->fault_count++;
+          thread_exit(current, -1);
+        }
+        
         return;
       }
       // kprintf("exception at %x\n",page_fault);

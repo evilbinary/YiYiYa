@@ -67,8 +67,11 @@ int devfs_init(void) {
   vfs_mount(NULL, "/dev", series);
   series->device = device_find(DEVICE_SERIAL);
 
+  series->open = device_open;
   series->read = device_read;
   series->write = device_write;
+  series->close = device_close;
+  // series->ioctl = device_ioctl;
 
   // frambuffer
   device_t *fb_dev = device_find(DEVICE_VGA);
