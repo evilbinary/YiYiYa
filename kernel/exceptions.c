@@ -232,7 +232,8 @@ INTERRUPT_SERVICE
 void undefined_handler() {
   interrupt_entering_code(1, 0);
   interrupt_process(exception_info);
-  cpu_halt();
+  interrupt_exit();
+  // cpu_halt();
 }
 
 INTERRUPT_SERVICE

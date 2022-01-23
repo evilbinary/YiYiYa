@@ -248,7 +248,7 @@ static inline void a_or_l(volatile void *p, long v)
 static inline void a_crash()
 {
 	printf("i have crash\n");
-	*(volatile char *)0=0;
+	//*(volatile char *)0=0;
 }
 #endif
 
