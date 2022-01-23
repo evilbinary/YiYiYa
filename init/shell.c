@@ -142,7 +142,7 @@ void pre_launch() {
   //  syscall2(SYS_EXEC,"/test",NULL);
   //  syscall2(SYS_EXEC,"/microui",NULL);
 
-  syscall2(SYS_EXEC, "/lua", lua_argv);
+  // syscall2(SYS_EXEC, "/lua", lua_argv);
 
   // syscall2(SYS_EXEC,"/test-musl",NULL);
   // syscall2(SYS_EXEC, "/scheme", scm_argv);
