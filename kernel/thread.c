@@ -55,7 +55,7 @@ thread_t* thread_create_ex_name(char* name, void* entry, u32* stack0,
       thread_create_ex(entry, stack0, stack3, size, data, level, page);
   char* kname = kmalloc(kstrlen(name));
   kstrcpy(kname, name);
-  t->name = name;
+  t->name = kname;
   return t;
 }
 
