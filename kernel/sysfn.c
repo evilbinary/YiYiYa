@@ -72,7 +72,7 @@ u32 sys_open(char* name, int attr) {
     kprintf("sys open name return : %s fd: %d\n", name, f);
     return f;
   }
-  vnode_t* file = vfs_open(NULL, name, attr);
+  vnode_t* file = vfs_open_attr(NULL, name, attr);
   if (file == NULL) {
     kprintf("sys open file %s error\n", name);
     return -1;
@@ -93,7 +93,20 @@ u32 sys_open(char* name, int attr) {
   return f;
 }
 
-void sys_close(u32 fd) {}
+void sys_close(u32 fd) {
+  thread_t* current = thread_current();
+  fd_t* f = thread_find_fd_id(current, fd);
+  if (f == NULL) {
+    kprintf("close not found fd %d tid %d\n", fd, current->id);
+    return 0;
+  }
+  vnode_t* node = f->data;
+  if (node == NULL) {
+    kprintf("sys close node is null tid %d \n", current->id);
+    return -1;
+  }
+  vclose(node);
+}
 
 size_t sys_write(u32 fd, void* buf, size_t nbytes) {
   thread_t* current = thread_current();

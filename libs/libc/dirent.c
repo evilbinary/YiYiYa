@@ -17,6 +17,8 @@ DIR *opendir(const char *dirname) {
 int closedir(DIR *dir) {
   if (dir && (dir->fd != -1)) {
     int ret = close(dir->fd);
+    dir->buffer_pos=0;
+    dir->buffer_end=0;
     free(dir);
     return ret;
   } else {

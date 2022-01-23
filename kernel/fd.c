@@ -40,14 +40,14 @@ fd_t* fd_new(u32* file, u32 type, char* name) {
 
 int fd_std_init() {
   char* stdin = "/dev/stdin";
-  vnode_t* file = vfs_open(NULL, stdin,V_CHARDEVICE);
+  vnode_t* file = vfs_open_attr(NULL, stdin,V_CHARDEVICE);
   fd_t* fdstdin = fd_new(file, DEVICE_TYPE_FILE, stdin);
   if (fdstdin == NULL) {
     kprintf(" new fd stdin error\n");
     return -1;
   }
   char* stdout = "/dev/stdout";
-  file = vfs_open(NULL, stdout,V_CHARDEVICE);
+  file = vfs_open_attr(NULL, stdout,V_CHARDEVICE);
   fd_t* fdstdout = fd_new(file, DEVICE_TYPE_FILE, stdout);
   if (fdstdout == NULL) {
     kprintf(" new fd stdout error\n");

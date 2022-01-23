@@ -44,7 +44,7 @@ u32 vopen(vnode_t *node) {
   if (node->open != NULL) {
     return node->open(node);
   } else {
-    kprintf("node %s open is null \n",node->name);
+    kprintf("node %s open is null \n", node->name);
     return;
   }
 }
@@ -58,7 +58,7 @@ void vclose(vnode_t *node) {
 }
 u32 vreaddir(vnode_t *node, vdirent_t *dirent, u32 count) {
   if (node->readdir != NULL) {
-    if ((node->flags&V_DIRECTORY) == V_DIRECTORY) {
+    if ((node->flags & V_DIRECTORY) == V_DIRECTORY) {
       return node->readdir(node, dirent, count);
     } else {
       kprintf("node readdir is not dir\n");
@@ -70,7 +70,7 @@ u32 vreaddir(vnode_t *node, vdirent_t *dirent, u32 count) {
 }
 vnode_t *vfinddir(vnode_t *node, char *name) {
   if (node->finddir != NULL != NULL) {
-    if ((node->flags&V_DIRECTORY)== V_DIRECTORY) {
+    if ((node->flags & V_DIRECTORY) == V_DIRECTORY) {
       return node->finddir(node, name);
     } else {
       kprintf("node finddir is not dir\n");
@@ -215,12 +215,20 @@ void vfs_mount(vnode_t *root, u8 *path, vnode_t *node) {
   }
 }
 
-u32 vfs_readdir(vnode_t *node, vdirent_t *dirent, u32 count){
+u32 vfs_readdir(vnode_t *node, vdirent_t *dirent, u32 count) {
   // todo search int vfs
-  if(node->super!=NULL){
-    return node->super->readdir(node->super,dirent,count);
+  if (node->super != NULL) {
+    return node->super->readdir(node->super, dirent, count);
   }
   return 0;
+}
+
+u32 vfs_open(vnode_t *node) {
+  int ret = 0;
+  if (node->super != NULL) {
+    vopen(node->super);
+  }
+  return ret;
 }
 
 vnode_t *vfs_create(u8 *name, u32 flags) {
@@ -231,20 +239,22 @@ vnode_t *vfs_create(u8 *name, u32 flags) {
   node->find = vfs_find;
   node->mount = vfs_mount;
   node->readdir = vfs_readdir;
+  node->close = vfs_close;
+  node->open = vfs_open;
   node->child = NULL;
   node->child_number = 0;
   node->child_size = 0;
   return node;
 }
 
-vnode_t *vfs_open(vnode_t *root, u8 *name, u32 attr) {
+vnode_t *vfs_open_attr(vnode_t *root, u8 *name, u32 attr) {
   if (name == NULL) {
     return root;
   }
   if (root == NULL) {
     root = root_node;
   }
-  vnode_t *node = vfind(root, name);
+  vnode_t *node = vfs_find(root, name);
   vnode_t *file = node;
   if (file == NULL) {
     if (attr & O_CREAT == O_CREAT) {
@@ -262,7 +272,7 @@ vnode_t *vfs_open(vnode_t *root, u8 *name, u32 attr) {
       return NULL;
     }
   }
-  u32 ret = vopen(file);
+  u32 ret = vfs_open(file);
   if (ret < 0) {
     kprintf("open third %s failed \n", name);
     return NULL;
@@ -275,7 +285,9 @@ void vfs_close(vnode_t *node) {
     kprintf("close node is nul\n");
     return;
   }
-  vclose(node);
+  if (node->super != NULL) {
+    vclose(node->super);
+  }
 }
 
 int vfs_init() {

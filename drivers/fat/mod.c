@@ -310,8 +310,6 @@ u32 fat_op_read_dir(vnode_t *node, struct vdirent *dirent, u32 count) {
   }
   while (fat_read_dir(file_info->dd, &dir_entry)) {
     if (file_info->offset >= total) {
-      dirent->offset=0;
-      dirent->length=0;
       return 0;
     }
     if (i < count) {
