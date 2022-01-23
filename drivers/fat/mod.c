@@ -220,6 +220,7 @@ u32 fat_op_open(vnode_t *node) {
   struct fat_dir_entry_struct directory;
   file_info_t *file_info = node->data;
   struct fat_fs_struct *fs = file_info->fs;
+  file_info->offset=0;
 
   if (file_info->fd == NULL && file_info->dd == NULL) {
     kprintf("create new file %s\n", name);

@@ -17,6 +17,6 @@ int main(int argc, char* argv[]) {
         }
         printf("\n");
     }
-    // closedir(dir);
+    closedir(dir);
     return 0;
 }
