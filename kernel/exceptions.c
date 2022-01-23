@@ -299,7 +299,7 @@ void do_page_fault(interrupt_context_t *context) {
                 fault_addr);
         dump_fault(context, fault_addr);
         thread_exit(current, -1);
-        cpu_halt();
+        // cpu_halt();
         return;
       }
       // kprintf("exception at %x\n",page_fault);

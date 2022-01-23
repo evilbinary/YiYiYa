@@ -14,9 +14,11 @@ extern "C" {
 #endif
 
 struct dirent {
-	char d_name[256];
-	int ino;
+	u64 d_ino;
+	u64 d_off;
+	unsigned short d_reclen;
 	unsigned char d_type;
+	char d_name[256];
 };
 
 

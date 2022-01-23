@@ -9,8 +9,8 @@ int main(int argc, char* argv[]) {
     int i;
     dir = opendir("/");
     while((ptr = readdir(dir)) != NULL){
-        printf("name : %s type: %d\n", ptr->d_name,ptr->d_type);
+        printf("%-20s %d\n", ptr->d_name,ptr->d_type);
     }
-    closedir(dir);
+    // closedir(dir);
     return 0;
 }

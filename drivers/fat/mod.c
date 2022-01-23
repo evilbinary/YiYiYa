@@ -1,7 +1,7 @@
 #include "fat.h"
-#include "kernel/memory.h"
 #include "fat_config.h"
 #include "kernel/device.h"
+#include "kernel/memory.h"
 
 #ifdef ARM
 #include "drivers/mmc/sdhci.h"
@@ -9,10 +9,31 @@
 #include "drivers/ahci/ahci.h"
 #endif
 
+enum {
+  DT_UNKNOWN = 0,
+#define DT_UNKNOWN DT_UNKNOWN
+  DT_FIFO = 1,
+#define DT_FIFO DT_FIFO
+  DT_CHR = 2,
+#define DT_CHR DT_CHR
+  DT_DIR = 4,
+#define DT_DIR DT_DIR
+  DT_BLK = 6,
+#define DT_BLK DT_BLK
+  DT_REG = 8,
+#define DT_REG DT_REG
+  DT_LNK = 10,
+#define DT_LNK DT_LNK
+  DT_SOCK = 12,
+#define DT_SOCK DT_SOCK
+  DT_WHT = 14
+#define DT_WHT DT_WHT
+};
 typedef struct file_info {
   struct fat_fs_struct *fs;
   struct fat_dir_struct *dd;
   struct fat_file_struct *fd;
+  int offset;
 } file_info_t;
 
 typedef uint8_t (*sd_raw_read_interval_handler_t)(uint8_t *buffer,
@@ -20,7 +41,7 @@ typedef uint8_t (*sd_raw_read_interval_handler_t)(uint8_t *buffer,
 typedef uintptr_t (*sd_raw_write_interval_handler_t)(uint8_t *buffer,
                                                      offset_t offset, void *p);
 
-vnode_t *default_node=NULL;
+vnode_t *default_node = NULL;
 
 static u32 fat_device_read(vnode_t *node, u32 offset, size_t nbytes,
                            u8 *buffer) {
@@ -176,7 +197,7 @@ int open_file_in_dir(struct fat_fs_struct *fs, struct fat_dir_struct *dd,
                      const char *name, file_info_t *new_file_info) {
   struct fat_dir_entry_struct file_entry;
   if (kstrlen(name) == 0) {
-    new_file_info->dd =dd;
+    new_file_info->dd = dd;
     return 1;
   }
   u32 ret = find_file_in_dir(fs, dd, name, &file_entry);
@@ -272,29 +293,38 @@ vnode_t *fat_op_find(vnode_t *node, char *name) {
   return file;
 }
 
-vdirent_t *fat_op_read_dir(vnode_t *node, u32 index) {
-  if (!(node->flags == V_FILE || node->flags == V_DIRECTORY)) {
-    kprintf("read dir failed for not file\n");
-    return NULL;
+u32 fat_op_read_dir(vnode_t *node, struct vdirent *dirent, u32 count) {
+  if (!((node->flags & V_FILE) == V_FILE ||
+        (node->flags & V_DIRECTORY) == V_DIRECTORY)) {
+    kprintf("read dir failed for not file flags is %x\n", node->flags);
+    return 0;
   }
   file_info_t *file_info = node->data;
-  vdirent_t *dirent = kmalloc(sizeof(vdirent_t));
   struct fat_dir_entry_struct dir_entry;
   u32 i = 0;
+  u32 nbytes = 0;
+
   while (fat_read_dir(file_info->dd, &dir_entry)) {
-    if (i <= index) {
+    if (i < count) {
       if ((dir_entry.attributes & FAT_ATTRIB_DIR) == FAT_ATTRIB_DIR) {
-        dirent->type = V_DIRECTORY;
+        dirent->type = DT_DIR;
       } else if ((dir_entry.attributes & FAT_ATTRIB_ARCHIVE) ==
                  FAT_ATTRIB_ARCHIVE) {
-        dirent->type = V_FILE;
+        dirent->type = DT_REG;
       }
-      kstrcpy(dirent->name, dir_entry.long_name);
-      return dirent;
+      kstrncpy(dirent->name, dir_entry.long_name, 256);
+      dirent->offset = i;
+      dirent->length = sizeof(struct vdirent);
+      nbytes += dirent->length;
+      dirent++;
+      file_info->offset++;
     }
     i++;
   }
-  return NULL;
+  if(file_info->offset>i){
+    return -1;
+  }
+  return nbytes;
 }
 
 void fat_op_close(vnode_t *node) {
@@ -341,13 +371,13 @@ void fat_init(void) {
     kprintf("bad dd\n");
     return NULL;
   }
-  
+
   file_info_t *file_info = kmalloc(sizeof(file_info_t));
   file_info->fs = fs;
   file_info->dd = dd;
   node->data = file_info;
   // todo why malloc?
-  kmalloc(1024*4);
+  kmalloc(1024 * 4);
   kprintf("fat init end\n");
 }
 

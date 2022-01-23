@@ -313,13 +313,8 @@ int sys_readdir(int fd, int index, void* dirent) {
     kprintf("readdir not found fd %d\n", fd);
     return 0;
   }
-  vdirent_t* d = vreaddir(findfd->data, index);
-  if (d == NULL) {
-    return 0;
-  }
-  kmemmove(dirent, d, sizeof(vdirent_t));
-  kfree(d);
-  return 1;
+  u32 ret = vreaddir(findfd->data,dirent, index);
+  return ret;
 }
 
 int sys_brk(int addr) {
@@ -420,4 +415,15 @@ int sys_rename(const char* old, const char* new) {
 int sys_set_thread_area(void* set) {
   kprintf("sys set thread area not impl \n");
   return 1;
+}
+
+int sys_getdents64(unsigned int fd, vdirent_t* dir, unsigned int count) {
+  thread_t* current = thread_current();
+  fd_t* findfd = thread_find_fd_id(current, fd);
+  if (fd == NULL) {
+    kprintf("getdents64 not found fd %d\n", fd);
+    return 0;
+  }
+  u32 ret= vreaddir(findfd->data,dir,count);
+  return ret;
 }

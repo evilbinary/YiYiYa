@@ -11,7 +11,7 @@
 
 vnode_t *devfs_create_device(device_t *dev) {
   vnode_t *t = kmalloc(sizeof(vnode_t));
-  t->flags = V_BLOCKDEVICE;
+  t->flags = V_BLOCKDEVICE|V_DIRECTORY;
   t->write = NULL;
   t->read = NULL;
   t->device = dev;
@@ -35,7 +35,6 @@ int devfs_init(void) {
     name[3] = 0;
     vnode_t *node_sda = devfs_create_device(dev);
     node_sda->name = name;
-    node_sda->flags = V_BLOCKDEVICE;
     vfs_mount(NULL, "/dev", node_sda);
     if (root_super == NULL) {
       root_super = node_sda;

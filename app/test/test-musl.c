@@ -30,10 +30,10 @@ void test_getenv() {
 void test_read_root() {
   DIR* dir;
   struct dirent* ptr;
-  int i;
   dir = opendir("/");
   while ((ptr = readdir(dir)) != NULL) {
-    printf("name : %s type: %d\n", ptr->d_name, ptr->d_type);
+    printf("name : %s type: %d   ", ptr->d_name, ptr->d_type);
+
   }
   closedir(dir);
 }
@@ -61,8 +61,8 @@ int main(int argc, char* argv[]) {
   // test_malloc();
   // test_float();
   // test_getenv();
-  // test_read_root();
-  test_read_byte();
+  test_read_root();
+  // test_read_byte();
 
   return 0;
 }

@@ -9,22 +9,25 @@
 #include "arch/arch.h"
 #include "kernel/stdarg.h"
 #include "kernel/memory.h"
+#include "types.h"
 
 #define V_FILE        0x01
 #define V_DIRECTORY   0x02
-#define V_CHARDEVICE  0x03
-#define V_BLOCKDEVICE 0x04
-#define V_PIPE        0x05
-#define V_SYMLINK     0x06
-#define V_MOUNTPOINT  0x08
+#define V_CHARDEVICE  0x04
+#define V_BLOCKDEVICE 0x08
+#define V_PIPE        0x0c
+#define V_SYMLINK     0x14
+#define V_MOUNTPOINT  0x18
 
 struct vnode;
 typedef struct vnode vnode_t;
 
 typedef struct vdirent{
-  char name[256]; // Filename.
-  u32 ino;     // Inode number. Required by POSIX.
+  u64 ino;     // Inode number. Required by POSIX.
+  u64 offset;
+  u16 length;
   u8 type;
+  char name[256]; // Filename.
 }vdirent_t;
 
 typedef u32 (*vread_t)(struct vnode*,u32,u32,u8*);
@@ -33,7 +36,7 @@ typedef u32 (*vopen_t)(struct vnode*);
 typedef void (*vclose_t)(struct vnode*);
 typedef size_t (*vioctl_t)(struct vnode*,u32 cmd, void* args);
 
-typedef struct vdirent * (*vreaddir_t)(struct vnode*,u32);
+typedef u32 (*vreaddir_t)(struct vnode*,struct vdirent *,u32);
 typedef struct vnode * (*vfinddir_t)(struct vnode*,char *name);
 typedef struct vnode * (*vfind_t)(struct vnode*,char *name);
 typedef void (*vmount_t)(struct vnode* root,u8* path,vnode_t* node);
@@ -70,7 +73,7 @@ u32 vread(vnode_t *node, u32 offset, u32 size, u8 *buffer);
 u32 vwrite(vnode_t *node, u32 offset, u32 size, u8 *buffer);
 u32 vopen(vnode_t *node);
 void vclose(vnode_t *node);
-struct vdirent *vreaddir(vnode_t *node, u32 index);
+u32 vreaddir(vnode_t *node,vdirent_t* dirent, u32 index);
 vnode_t *vfinddir(vnode_t *node, char *name);
 vnode_t *vfind(vnode_t *node, char *name);
 vnode_t *vcreate(u8 *name, u32 flags);

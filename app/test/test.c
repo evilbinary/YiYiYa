@@ -264,6 +264,24 @@ void test_scanf(){
   printf("i=%d\n",i);
 }
 
+static char get_u8(int fd) {
+  char buf[1]={0xff};
+  printf("get fd %d\n", fd);
+  if (read(fd, &buf, 1) != 1) return -1;
+  printf("  ret=>%x\n", buf[0]);
+  return buf[0];
+}
+
+void test_read_byte() {
+  char* path = "/scheme.boot";
+  int fd = open(path, 0);
+  if (get_u8(fd) != 0 || get_u8(fd) != 0 || get_u8(fd) != 0 ||
+      get_u8(fd) != 0 || get_u8(fd) != 'c' || get_u8(fd) != 'h' ||
+      get_u8(fd) != 'e' || get_u8(fd) != 'z') {
+    printf("malformed fasl-object header in %s\n", path);
+  }
+}
+
 int main(int argc, char* argv[]) {
   printf(buf);
   // test_syscall();
@@ -278,6 +296,7 @@ int main(int argc, char* argv[]) {
   // test_dup_pty();
   // test_read_write();
   // test_malloc_free();
-  test_scanf();
+  // test_scanf();
+  test_read_byte();
   return 0;
 }

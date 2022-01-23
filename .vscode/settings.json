@@ -54,6 +54,11 @@
     "typeinfo": "c",
     "atomic": "c",
     "*.tcc": "c",
-    "fstream": "c"
+    "fstream": "c",
+    "syscall.h": "c",
+    "__dirent.h": "c",
+    "fat.h": "c",
+    "vfs.h": "c",
+    "fd.h": "c"
   }
 }

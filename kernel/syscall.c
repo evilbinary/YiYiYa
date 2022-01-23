@@ -62,6 +62,9 @@ void syscall_init() {
   syscall_table[SYS_SET_THREAD_AREA]=&sys_set_thread_area;
   syscall_table[SYS_DUMPS] = &sys_dumps;
 
+  syscall_table[SYS_GETDENTS64] = &sys_getdents64;
+  
+
   
 }
 

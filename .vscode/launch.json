@@ -703,11 +703,11 @@
 
 
         {
-            "name": "test arm with GDB",
+            "name": "test musl arm with GDB",
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            "program": "${workspaceRoot}/app/test/test-musl.elf",
+            "program": "${workspaceRoot}/app/test/test-musl",
             "cwd": "${workspaceRoot}",
             "args": [],
             "sourceFileMap": {
@@ -715,7 +715,7 @@
             },
             "targetArchitecture": "arm",
             "MIMode": "gdb",
-            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerPath": "C:\\Program Files (x86)\\GNU Arm Embedded Toolchain\\10 2021.10\\bin\\arm-none-eabi-gdb.exe",
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
                 // {

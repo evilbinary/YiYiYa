@@ -130,7 +130,7 @@ void pre_launch() {
 #else defined(ARM)
   // syscall2(SYS_EXEC,"/hello-rs",NULL);
   // syscall2(SYS_EXEC,"/test-rs",NULL);
-  // syscall2(SYS_EXEC,"/ls",NULL);
+  syscall2(SYS_EXEC,"/ls",NULL);
   // syscall2(SYS_EXEC, "/test", NULL);
   // syscall2(SYS_EXEC,"/hello",NULL);
   // syscall2(SYS_EXEC, "/lvgl", NULL);

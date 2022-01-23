@@ -56,17 +56,25 @@ void vclose(vnode_t *node) {
     return;
   }
 }
-struct vdirent *vreaddir(vnode_t *node, u32 index) {
-  if ((node->flags & 0x7) == V_DIRECTORY && node->readdir != NULL) {
-    return node->readdir(node, index);
+u32 vreaddir(vnode_t *node, vdirent_t *dirent, u32 count) {
+  if (node->readdir != NULL) {
+    if ((node->flags&V_DIRECTORY) == V_DIRECTORY) {
+      return node->readdir(node, dirent, count);
+    } else {
+      kprintf("node readdir is not dir\n");
+    }
   } else {
     kprintf("node readdir is null\n");
     return 0;
   }
 }
 vnode_t *vfinddir(vnode_t *node, char *name) {
-  if ((node->flags & 0x7) == V_DIRECTORY && node->finddir != NULL) {
-    return node->finddir(node, name);
+  if (node->finddir != NULL != NULL) {
+    if ((node->flags&V_DIRECTORY)== V_DIRECTORY) {
+      return node->finddir(node, name);
+    } else {
+      kprintf("node finddir is not dir\n");
+    }
   } else {
     kprintf("node finddir is null\n");
     return 0;
@@ -207,6 +215,14 @@ void vfs_mount(vnode_t *root, u8 *path, vnode_t *node) {
   }
 }
 
+u32 vfs_readdir(vnode_t *node, vdirent_t *dirent, u32 count){
+  // todo search int vfs
+  if(node->super!=NULL){
+    return node->super->readdir(node->super,dirent,count);
+  }
+  return 0;
+}
+
 vnode_t *vfs_create(u8 *name, u32 flags) {
   vnode_t *node = kmalloc(sizeof(vnode_t));
   node->name = kmalloc(kstrlen(name) + 1);
@@ -214,6 +230,7 @@ vnode_t *vfs_create(u8 *name, u32 flags) {
   node->flags = flags;
   node->find = vfs_find;
   node->mount = vfs_mount;
+  node->readdir = vfs_readdir;
   node->child = NULL;
   node->child_number = 0;
   node->child_size = 0;
@@ -262,6 +279,6 @@ void vfs_close(vnode_t *node) {
 }
 
 int vfs_init() {
-  root_node = vfs_create("/", V_MOUNTPOINT);
+  root_node = vfs_create("/", V_DIRECTORY);
   return 1;
 }
