@@ -31,7 +31,7 @@ thread_t* thread_create_name(char* name, void* entry, void* data) {
   thread_t* t = thread_create(entry, data);
   char* kname = kmalloc(kstrlen(name));
   kstrcpy(kname, name);
-  t->name = name;
+  t->name = kname;
   return t;
 }
 
@@ -40,7 +40,7 @@ thread_t* thread_create_name_level(char* name, void* entry, void* data,
   thread_t* t = thread_create_level(entry, data, level);
   char* kname = kmalloc(kstrlen(name));
   kstrcpy(kname, name);
-  t->name = name;
+  t->name = kname;
   return t;
 }
 
