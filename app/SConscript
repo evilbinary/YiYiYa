@@ -81,7 +81,7 @@ if env.get('APP'):
             'track/track',
             'launcher/launcher',
             ]
-    
+    apps+=Glob('resource/*')
     if env.get('DEFAULT_LIBC')=='libmusl':
         SConscript(dirs=['libuuid'], exports='env')
         SConscript(dirs=['libncurses'], exports='env')
@@ -99,7 +99,6 @@ if env.get('APP'):
             'lua/luat',
             'lua/hello.lua',
             ]
-        apps+=Glob('resource/*')
 
     if plt=='Darwin':
         env.Command('copyapp', 
