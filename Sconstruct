@@ -31,7 +31,7 @@ support_platform={
     'v3s':'armv7-a'
 }
 
-default_libc='libc'# libmusl libc
+default_libc='libmusl'# libmusl libc
 
 libc=['../../libs/libc/libc.a','../../libs/libalgorithm/libalgorithm.a']
 libcflags='-Ilibs/include/c/ -DLIBYC'

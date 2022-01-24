@@ -99,6 +99,7 @@ if env.get('APP'):
             'lua/luat',
             'lua/hello.lua',
             ]
+        apps+=Glob('resource/*')
 
     if plt=='Darwin':
         env.Command('copyapp', 
@@ -113,8 +114,7 @@ if env.get('APP'):
         ])
     elif plt=='Windows':
         try:
-
-            env.Command('copyapp', 
+            ret=env.Command('copyapp', 
             apps,
             [
                 'cp ${SOURCES} app/bin/ & mcopy.exe -nmov  -i image/disk.img app/bin/* ::'
