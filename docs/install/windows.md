@@ -17,19 +17,9 @@ windows 安装比较麻烦，需要的步骤比较多，需要有点耐心。有
 
 ### 安装gcc
 
-1、到 https://www.msys2.org/ 页面下载，找到 [msys2-x86_64-20210725.exe](https://github.com/msys2/msys2-installer/releases/download/2021-07-25/msys2-x86_64-20210725.exe) 点击下载，直接默认安装。
+1、下载gcc 到`D:\app\gcc` [https://github.com/lordmilko/i686-elf-tools/releases/download/7.1.0/i686-elf-tools-windows.zip](https://github.com/lordmilko/i686-elf-tools/releases/download/7.1.0/i686-elf-tools-windows.zip)
 
-2、打开msys2.exe，运行命令
-
-```bash
-#查询并找到msys/gcc 可以看到软件大致分为了三大类:mingw32、mingw64、msys
-pacman -Ss gcc
-#安装，选择其中一种
-pacman -S mingw32/mingw-w64-i686-gcc
-pacman -S mingw32/mingw-w64-i686-nasm
-```
-
-3、将安装所在的目例如：`D:\Program Files (x86)\msys2\mingw32\bin`  加入到系统环境变量PATH，则在powershell下或者cmd下就可以用gcc了。
+3、将安装所在的目例如：`D:\app\gcc`  加入到系统环境变量PATH，则在powershell下或者cmd下就可以用gcc了。
 
 ### 安装qemu
 
