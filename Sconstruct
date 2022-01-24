@@ -10,12 +10,22 @@ import platform
 import sys
 plt = platform.system()
 
-# board select platform 选择你要编译的平台
-# platform='pc'
+# board select platform,选择你要编译的平台
+platform='pc'
 # platform='v3s'
-platform='raspi2'
+# platform='raspi2'
 # platform='esp32'
 # platform='stm32f4xx'
+
+
+# gcc path,这里是gcc路径配置
+cc_path=''
+cc_prefix=''
+cc_lib_path='D:\\app\\msys2\\mingw32\\lib\\gcc\\i686-w64-mingw32\\10.3.0\\' #D:\\Program Files\\gcc-arm-none-eabi-9\\lib\\gcc\\arm-none-eabi\\9.2.1\\  /opt/local/lib/gcc/arm-none-eabi/9.2.0/ /lib/gcc/arm-none-eabi/9.2.1/
+
+
+# default libc 默认libc 选择
+default_libc='libc'# libmusl libc
 
 supports_archs={
     'arm': ['armv5','armv6','armv7','armv7-a'],
@@ -31,7 +41,7 @@ support_platform={
     'v3s':'armv7-a'
 }
 
-default_libc='libmusl'# libmusl libc
+
 
 libc=['../../libs/libc/libc.a','../../libs/libalgorithm/libalgorithm.a']
 libcflags='-Ilibs/include/c/ -DLIBYC'
@@ -57,20 +67,16 @@ print('your select platform: %s arch: %s  support archs: %s'%(platform,arch, arc
 DefaultEnvironment(tools=[])
 env = Environment(ENV = {}, tools=['gcc'])
 
-cc_path='/opt/local/bin/'
-cc_prefix='i386-elf-'
-cc_lib_path='' #or /opt/local/lib/gcc/arm-none-eabi/9.2.0/ /lib/gcc/arm-none-eabi/9.2.1/
-
-
 if plt=='Linux':
-    cc_path='/usr/bin/'
-    cc_prefix=''
+    if len(cc_path)==0:
+        cc_path='/usr/bin/'
 elif plt=='Darwin':
+    if len(cc_path)==0:
+        cc_path='/opt/local/bin/'
+    if len(cc_prefix)==0:
+        cc_prefix='i386-elf-'
     pass
 elif plt=='Windows':
-    cc_path=''
-    cc_prefix=''
-    cc_lib_path='D:\\Program Files\\gcc-arm-none-eabi-9\\lib\\gcc\\arm-none-eabi\\9.2.1\\'
     pass
 else:
     print('no support ^_^! '+plt)

@@ -49,7 +49,8 @@ if env.get('APP'):
     SConscript(dirs=['gui'], exports='env')
     SConscript(dirs=['microui'], exports='env')
     #SConscript(dirs=['jpeg'], exports='env')
-
+    
+    SConscript(dirs=['test'], exports='env')
 
     SConscript(dirs=['file'], exports='env')
     
@@ -86,7 +87,6 @@ if env.get('APP'):
         SConscript(dirs=['libncurses'], exports='env')
         SConscript(dirs=['libchez'], exports='env')
         SConscript(dirs=['scheme'], exports='env')
-        SConscript(dirs=['test'], exports='env')
         SConscript(dirs=['liblua'], exports='env')
         SConscript(dirs=['lua'], exports='env')
 

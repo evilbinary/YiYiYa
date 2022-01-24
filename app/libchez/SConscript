@@ -15,7 +15,7 @@ if env['ARCHTYPE']=='arm':
     type='arm32le'
     cflags ='-DINLINES -DGC_MACROS -DARMV6 -DMB_LEN_MAX=8 -D_LARGEFILE64_SOURCE -DHAVE_HIDDEN'
 else:
-    print('not support')
+    print('libchez not support',env['ARCHTYPE'])
 
 source=[]
 source+= ['c/statics.c',
