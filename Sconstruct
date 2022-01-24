@@ -19,9 +19,9 @@ platform='pc'
 
 
 # gcc path,这里是gcc路径配置
-cc_path=''
-cc_prefix=''
-cc_lib_path='D:\\app\\msys2\\mingw32\\lib\\gcc\\i686-w64-mingw32\\10.3.0\\' #D:\\Program Files\\gcc-arm-none-eabi-9\\lib\\gcc\\arm-none-eabi\\9.2.1\\  /opt/local/lib/gcc/arm-none-eabi/9.2.0/ /lib/gcc/arm-none-eabi/9.2.1/
+cc_path='D:\\app\\gcc\\bin\\'
+cc_prefix='i686-elf-'
+cc_lib_path='D:\\app\\gcc\\lib\\gcc\\i686-elf\\7.1.0\\' #D:\\Program Files\\gcc-arm-none-eabi-9\\lib\\gcc\\arm-none-eabi\\9.2.1\\  /opt/local/lib/gcc/arm-none-eabi/9.2.0/ /lib/gcc/arm-none-eabi/9.2.1/
 
 
 # default libc 默认libc 选择
@@ -113,9 +113,8 @@ env = Environment(
         USER='--entry main -Txlinker/user.ld',
         ARCHS=archs,
         ARCHTYPE=arch_type,
-        DEFAULT_LIBC=default_libc
+        DEFAULT_LIBC=default_libc,
         )
-
 if plt=='Linux':
     if arch =='x86':
         env['LINKFLAGS']= env['LINKFLAGS']+' -m32'
@@ -186,6 +185,7 @@ def generate_kernel_size(env,target,source):
     file_out=str(target[0])
     get_kernel_size(env,target,source)
     kernel_header=file_out.upper().rsplit('/',1)[-1].replace('.','_')
+    kernel_header=file_out.upper().rsplit('\\',1)[-1].replace('.','_')
     f = open(file_out, 'w')
     content="""#ifndef %s
 #define %s
