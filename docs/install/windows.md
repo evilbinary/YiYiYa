@@ -17,9 +17,7 @@ windows 安装比较麻烦，需要的步骤比较多，需要有点耐心。有
 
 ### 安装gcc
 
-1、到 https://www.msys2.org/ 页面下载
-
-早找 [msys2-x86_64-20210725.exe](https://github.com/msys2/msys2-installer/releases/download/2021-07-25/msys2-x86_64-20210725.exe) 点击下载，直接默认安装。
+1、到 https://www.msys2.org/ 页面下载，找到 [msys2-x86_64-20210725.exe](https://github.com/msys2/msys2-installer/releases/download/2021-07-25/msys2-x86_64-20210725.exe) 点击下载，直接默认安装。
 
 2、打开msys2.exe，运行命令
 
@@ -35,12 +33,35 @@ pacman -S mingw32/mingw-w64-i686-nasm
 
 ### 安装qemu
 
-1、 进入[https://qemu.weilnetz.de/w32/](https://qemu.weilnetz.de/w32/) 去下载`qemu-w32-setup-20210825.exe` 
+1、 进入[https://qemu.weilnetz.de/w32/](https://qemu.weilnetz.de/w32/) 去下载`qemu-w32-setup-20210825.exe` 。
 
-2、将  `D:\Program Files (x86)\msys2\usr\bin` 、`D:\Program Files (x86)\qemu` 加入到系统环境变量PATH
+2、将  `D:\Program Files (x86)\msys2\usr\bin` 、`D:\Program Files (x86)\qemu` 加入到系统环境变量PATH。
 
+### 安装mtool
+
+
+1、进入[https://www.gnu.org/software/mtools/](https://www.gnu.org/software/mtools/) 去下载`mtools-4.0.37.tar.gz` ，下载后记得解压。
+
+2、打开powershell.exe或者terminal，运行命令
+
+```bash
+PS C:\Users\admin\Downloads\mtools-4.0.37> sh -c configure
+configure: loading site script /usr/local/etc/config.site
+checking for gcc... gcc
+checking whether the C compiler works... yes
+checking for C compiler default output file name... a.exe
+checking for suffix of executables... .exe
+checking whether we are cross compiling...
+```
+
+3、等待结束后，输入make -j8，等待编译后生成mtool.exe
+
+4、将 `C:\Users\admin\Downloads\mtools-4.0.37` 加入到系统环境变量PATH。
 
 ### 编译与运行
+
+
+打开windows terminal，进入YiYiYa目录，输入一下命令。
 
 ```bash
 #清理

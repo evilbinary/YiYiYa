@@ -15,11 +15,11 @@ wsl.exe --set-version Ubuntu-20.04 2
 
 ### 安装qemu
 
-1、 进入[https://qemu.weilnetz.de/w32/](https://qemu.weilnetz.de/w32/) 去下载`qemu-w32-setup-20210825.exe` 
+在打开的wsl的ubuntu20.01 tls版本下输入
 
-2、将  `D:\Program Files (x86)\msys2\usr\bin` 、`D:\Program Files (x86)\qemu` 加入到系统环境变量PATH
-
-3、修改`D:\Program Files (x86)\qemu` 拷贝qemu目录下的qemu-system-i386.exe 为qemu-system-i386 方便wsl使用（貌似wsl没有qemu）。
+```bash
+apt install qemu
+```
 
 
 ### 安装scons
@@ -30,6 +30,27 @@ wsl.exe --set-version Ubuntu-20.04 2
 apt install scons gcc
 
 ```
+
+
+### 安装x11
+
+1、在windows上安装[VcXsrv](https://sourceforge.net/projects/vcxsrv/)
+
+2、在wsl里面配置DISPLAY为VcXsrv得限制地址
+
+```bash
+export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}'):0
+```
+
+3、打开VcXsrv得XLaunch启动程序，配置如下，记得最后一步加-ac 否则会报错。
+
+<img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/image/vcxsrv-win?raw=true" width="400px" />
+
+<img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/image/vcxsrv-one?raw=true" width="400px" />
+
+<img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/image/vcxsrv-ac?raw=true" width="400px" />
+
+
 
 ### 编译与运行
 
