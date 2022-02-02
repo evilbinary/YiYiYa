@@ -10,19 +10,14 @@ static int is_send() { return io_read8(PORT_COM1 + 5) & 0x20; }
 static int is_receive() { return io_read8(PORT_COM1 + 5) & 1; }
 
 void serial_write(char a) {
-  int i=0;
-  while (is_send() == 0||i>1000){
-    i++;
-  }
   io_write8(PORT_COM1, a);
 }
 
 char serial_read() {
   int i=0;
-  while (is_receive() == 0||i>1000){
-    i++;
-  }
+  if(is_receive())
   return io_read8(PORT_COM1);
+  return 0;
 }
 
 void serial_printf(char* fmt, ...) {
@@ -38,9 +33,12 @@ void serial_printf(char* fmt, ...) {
 }
 
 static size_t read(device_t* dev, void* buf, size_t len) {
-  u32 ret = len;
+  u32 ret = 0;
   for (int i = 0; i < len; i++) {
     ((char*)buf)[i] = serial_read();
+    if(((char*)buf)[i]>0){
+      ret++;
+    }
   }
   return ret;
 }

@@ -42,7 +42,7 @@ int do_exec(char* cmd, int count) {
 }
 
 void do_shell_cmd(char* cmd, int count) {
-  print_string("\n");
+  print_string("\n");  
   if (count == 0) return;
   if (kstrncmp(cmd, "help", count) == 0) {
     print_help();
@@ -119,12 +119,12 @@ void pre_launch() {
   // syscall2(SYS_EXEC, "/lua", argv);
   // syscall2(SYS_EXEC,"/launcher",NULL);
   // syscall2(SYS_EXEC,"/track",NULL);
-  syscall2(SYS_EXEC,"/test",NULL);
+  // syscall2(SYS_EXEC,"/test",NULL);
   // syscall2(SYS_EXEC,"/mcroui",NULL);
   // syscall2(SYS_EXEC,"/lvgl",NULL);
   // kprintf("fd=>%d\n",fd);
-  for (;;)
-    ;
+  // for (;;)
+  //   ;
 #elif defined(ARMV7)
   test_lcd();
 #else defined(ARM)
