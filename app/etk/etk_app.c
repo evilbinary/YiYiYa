@@ -21,8 +21,9 @@ int etk_app_main(int argc, char* argv[]) {
   e32 i;
   e32 xsize, ysize, xspan, yspan, startx, starty, x, y;
 
-  e8 button_name[9][10] = {"��Ƶ", "�ն�", "�¶�", "���±�", "��Ƭ",
-                           "ɨ��", "ʱ��", "״̬", "����"};
+  e8 button_name[9][10] = {"Clock", "Vdieo", "Temp",  "Note", "Shut",
+                           "Help",  "Mine",  "Block", "Photo"};
+
   manager = etk_get_wnd_manager();
   jpeg_decoder = etk_image_jpeg_decoder_create();
   bmp_decoder = etk_image_bmp_decoder_create();
