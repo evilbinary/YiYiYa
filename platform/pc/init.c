@@ -31,7 +31,7 @@ static int com_serial_init() {
 
 void com_write(char a) {
   int i = 0;
-  while (com_is_send() == 0 || i < 1000) {
+  while (com_is_send() == 0) {
     i++;
   }
   if(i<=0){
@@ -41,7 +41,7 @@ void com_write(char a) {
 
 char com_read() {
   int i=0;
-  while (com_is_receive() == 0||i < 1000){
+  while (com_is_receive() == 0){
     i++;
   }
   return io_read8(PORT_COM1);
