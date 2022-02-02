@@ -68,6 +68,8 @@ thread_t* thread_create_ex(void* entry, u32* stack0, u32* stack3, u32 size,
   thread->fd_number = 0;
   thread->fds = kmalloc(sizeof(fd_t) * thread->fd_size);
 
+  // vfs
+  thread->vfs=kmalloc(sizeof(vfs_t));
   // file description
   thread_fill_fd(thread);
 

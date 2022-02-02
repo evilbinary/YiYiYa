@@ -110,7 +110,7 @@ void pre_launch() {
   // syscall2(SYS_EXEC,"/file",NULL);
   // syscall2(SYS_EXEC, "/luat", NULL);
 
-  syscall2(SYS_EXEC, "/etk", NULL);
+  // syscall2(SYS_EXEC, "/etk", NULL);
   // syscall2(SYS_EXEC,"/test-rs",NULL);
   // char* argv[] = {
   //     "lua",
@@ -119,7 +119,7 @@ void pre_launch() {
   // syscall2(SYS_EXEC, "/lua", argv);
   // syscall2(SYS_EXEC,"/launcher",NULL);
   // syscall2(SYS_EXEC,"/track",NULL);
-  // syscall2(SYS_EXEC,"/test",NULL);
+  syscall2(SYS_EXEC,"/test",NULL);
   // syscall2(SYS_EXEC,"/mcroui",NULL);
   // syscall2(SYS_EXEC,"/lvgl",NULL);
   // kprintf("fd=>%d\n",fd);

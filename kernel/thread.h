@@ -9,6 +9,7 @@
 #include "arch/arch.h"
 #include "memory.h"
 #include "device.h"
+#include "vfs.h"
 #include "fd.h"
 #include "config.h"
 
@@ -49,6 +50,7 @@ typedef struct thread {
     u32 lock;
     u32 code;
     u32 fault_count;
+    vfs_t *vfs;
 }thread_t;
 
 

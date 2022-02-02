@@ -69,6 +69,12 @@ typedef struct vnode{
 } vnode_t;
 
 
+typedef struct vfs {
+	int users;
+	vnode_t* root;
+  vnode_t* pwd;
+}vfs_t;
+
 u32 vread(vnode_t *node, u32 offset, u32 size, u8 *buffer);
 u32 vwrite(vnode_t *node, u32 offset, u32 size, u8 *buffer);
 u32 vopen(vnode_t *node);
