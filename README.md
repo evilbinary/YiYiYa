@@ -25,15 +25,14 @@ scons -Q init && scons --run=qemu
 ## 开发
 
 具体见文档：[开发文档](https://github.com/evilbinary/YiYiYa/tree/main/docs/develop)
-## FAQ
 
-1、在linux下如果运行黑屏失败，修改根目录Sconstruct `env['CC']='/usr/bin/gcc-9'` gcc 改成9版本。
+## 建议
 
-2、如果在linux下运行出现boot duck停住了，则`env['CFLAGS']= env['CFLAGS']+' -no-pie -fno-pic '`修改修改成这个。
+1、c语言没有基础，建议先不玩，等会了再来。
 
-3、如果运行出现 ../app/kernel not exist，则image下的disk.img被删除了，需要找回来。
+2、os开发并不是一天就可以开发好的，需要持续的耐心和毅力。
 
-
+3、没弄明白的建议不要fork或下载此项目。
 
 
 
