@@ -26,3 +26,27 @@ env.Program('ls', source,
     CFLAGS='$CFLAGS $LIBCFLAGS ',
     LINKFLAGS= '$LINKFLAGS $USER')
 
+
+
+source=[
+    'pwd.c',
+    ]+env['LIBC']
+
+if env.get('MYLIB'):
+    source.append(env.get('MYLIB'))
+
+env.Program('pwd', source,
+    CFLAGS='$CFLAGS $LIBCFLAGS ',
+    LINKFLAGS= '$LINKFLAGS $USER')
+
+
+source=[
+    'cd.c',
+    ]+env['LIBC']
+
+if env.get('MYLIB'):
+    source.append(env.get('MYLIB'))
+
+env.Program('cd', source,
+    CFLAGS='$CFLAGS $LIBCFLAGS ',
+    LINKFLAGS= '$LINKFLAGS $USER')

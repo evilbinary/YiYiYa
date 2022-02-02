@@ -77,6 +77,8 @@ if env.get('APP'):
             'test/test',
             #'rust/test/test-rs',
             'cmd/ls',
+            'cmd/pwd',
+            'cmd/cd',
             'lvgl/lvgl',
             'track/track',
             'launcher/launcher',
