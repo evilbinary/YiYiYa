@@ -82,7 +82,7 @@ u32 sys_open(char* name, int attr) {
     kprintf(" new fd error\n");
     return -1;
   }
-
+  fd->offset=0;
   f = thread_add_fd(current, fd);
   if (f < 0) {
     kprintf("sys open %s error\n", name);

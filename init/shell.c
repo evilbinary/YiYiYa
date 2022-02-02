@@ -37,8 +37,17 @@ void ps_command() { syscall0(SYS_DUMPS); }
 int do_exec(char* cmd, int count) {
   char buf[64];
   cmd[count] = 0;
-  sprintf(buf, "/%s", cmd);
-  return syscall2(SYS_EXEC, buf, NULL);
+  char* argv[10];
+  int i=0;
+  const char *split = " ";
+  char *ptr = kstrtok(cmd, split);
+  argv[i++]=ptr;
+  sprintf(buf, "/%s", argv[0]);
+  while(ptr != NULL){
+		argv[i++]=ptr;
+		ptr = kstrtok(NULL, split);
+	}
+  return syscall2(SYS_EXEC, buf, &argv[1]);
 }
 
 void do_shell_cmd(char* cmd, int count) {
