@@ -496,3 +496,24 @@ int sys_fchdir(int fd){
   current->vfs->pwd=node;
   return ret;
 }
+
+
+int sys_clone(void* fn,void* stack,void* arg){
+  thread_t* current = thread_current();
+  if (current == NULL) {
+    kprintf("current is null\n");
+    return -1;
+  }
+  thread_t* copy_thread = thread_clone(current, STACK_ADDR, THREAD_STACK_SIZE);
+  kprintf("-------dump current thread %d %s-------------\n", current->id);
+  thread_dump(current);
+  kprintf("-------dump clone thread %d-------------\n", copy_thread->id);
+  thread_dump(copy_thread);
+
+  interrupt_context_t* context = copy_thread->context.esp0;
+  context_ret(context) = 0;
+  context_set_entry(&copy_thread->context,fn);
+
+  thread_run(copy_thread);
+  return copy_thread->id;
+}

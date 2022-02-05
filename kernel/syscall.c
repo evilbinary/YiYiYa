@@ -69,6 +69,7 @@ void syscall_init() {
   syscall_table[SYS_GETCWD] =&sys_getcwd;
   syscall_table[SYS_CHDIR]=&sys_chdir;
   syscall_table[SYS_FCHDIR]=&sys_fchdir;
+  syscall_table[SYS_CLONE]=&sys_clone;
   
 }
 

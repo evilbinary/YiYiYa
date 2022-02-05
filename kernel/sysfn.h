@@ -30,6 +30,7 @@ enum {
   SYS_DUP2 = 63,
   SYS_GETPPID = 64,
   SYS_READDIR=89,
+  SYS_CLONE= 120,
   SYS_FCHDIR=133,
   SYS_WRITEV=146,
   SYS_READV=145,
@@ -93,7 +94,8 @@ enum {
   SYS_MPROTECT,
   SYS_DUMPS,
   SYS_RT_SIGPROCMASK,
-  SYS_GETCWD
+  SYS_GETCWD,
+  SYS_CLONE
 };
 #endif
 
@@ -169,5 +171,7 @@ int sys_munmap(void* addr, size_t size);
 int sys_fcntl64(int fd, int cmd, void* arg);
 int sys_getcwd(char *buf, size_t size);
 int sys_fchdir(int fd);
+
+int sys_clone(void* stack,void* fn,void* arg);
 
 #endif

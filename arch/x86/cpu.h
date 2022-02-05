@@ -45,6 +45,8 @@ typedef struct context_t {
 
 #define context_fn(context) context->eax
 #define context_ret(context) context->eax
+#define context_set_entry(context,entry) ((interrupt_context_t*)((context)->esp0))->eip=entry
+
 
 #define context_restore(duck_context) interrupt_exit_context(duck_context)
 void context_clone(context_t* context, context_t* src, u32* stack0, u32* stack3,
