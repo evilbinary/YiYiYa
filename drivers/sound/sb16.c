@@ -40,7 +40,7 @@
 #define SAMPLE_RATE 44100
 
 #define DSP_VOLUME 0x22
-#define DSP_IRQ 0x80
+#define DSP_IRQ 5
 
 #define DMA_CHANNEL_16 5
 #define DMA_FLIP_FLOP 0xD8
@@ -153,6 +153,31 @@ static size_t write(device_t* dev, void* buf, size_t len) {
   return ret;
 }
 
+void do_sb16(interrupt_context_t* context) {
+  kprintf("sb16 handler\n");
+
+   buffer_flip = !buffer_flip;
+    // fill(
+    //     &buffer[buffer_flip ? 0 : (BUFFER_SIZE / 2)],
+    //     (BUFFER_SIZE / 2)
+    // );
+ u16 sample_count = (BUFFER_SIZE / 2) - 1;
+  dsp_write(DSP_PLAY | DSP_PROG_16 | DSP_AUTO_INIT);
+  dsp_write(DSP_SIGNED | DSP_MONO);
+  dsp_write((u8)((sample_count >> 0) & 0xFF));
+  dsp_write((u8)((sample_count >> 8) & 0xFF));
+
+  io_read8(DSP_STATUS);
+  io_read8(DSP_INT_ACK);
+}
+
+INTERRUPT_SERVICE
+void sb16_handler(interrupt_context_t* context) {
+  interrupt_entering_code(MIXER_IRQ, 0);
+  interrupt_process(do_sb16);
+  interrupt_exit();
+}
+
 int sb16_init(void) {
   kprintf("sb16 init\n");
   device_t* dev = kmalloc(sizeof(device_t));
@@ -163,11 +188,26 @@ int sb16_init(void) {
   dev->type = DEVICE_TYPE_BLOCK;
   device_add(dev);
 
+
+  interrutp_regist(MIXER_IRQ, sb16_handler);
+
+// // set irq
+  io_write8(DSP_ADDR_PORT, DSP_IRQ);
+  io_write8(DSP_DATA_PORT, MIXER_IRQ_DATA);
+
+
   // reset
   dsp_reset();
   set_sample_rate(SAMPLE_RATE);
+
+  u16 sample_count = (BUFFER_SIZE / 2) - 1;
+  dsp_write(DSP_PLAY | DSP_PROG_16 | DSP_AUTO_INIT);
+  dsp_write(DSP_SIGNED | DSP_MONO);
+  dsp_write((u8) ((sample_count >> 0) & 0xFF));
+  dsp_write((u8) ((sample_count >> 8) & 0xFF));
+
   dsp_write(DSP_ON);
-  // dsp_write(DSP_ON_16);
+  dsp_write(DSP_ON_16);
 
   return 0;
 }
