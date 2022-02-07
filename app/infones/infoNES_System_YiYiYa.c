@@ -501,7 +501,7 @@ int InfoNES_ReadRom( const char *pszFileName )
   }
 
 	/* Read ROM Header */
-	fread( &NesHeader, sizeof NesHeader, sizeof NesHeader, fp );
+	fread( &NesHeader, sizeof NesHeader, 1, fp );
 	if ( memcmp( NesHeader.byID, "NES\x1a", 4 ) != 0 )
 	{
 		/* not .nes file */

@@ -88,16 +88,16 @@ int fseek(FILE *stream, long int offset, int origin) {
 
 int fclose(FILE *stream) { return close(stream->fd); }
 
-size_t fread(void * /* restrict */ ptr, size_t size, size_t nmemb,
-             FILE * /* restrict */ stream) {
+size_t fread(void * ptr, size_t size, size_t nmemb,
+             FILE * stream) {
   unsigned char *buffer = (unsigned char *)ptr;
   int i, j, c;
 
   // C99 sanity check.
   if (size == 0) return 0;
   if (nmemb == 0) return 0;
-  for (size_t i = 0; i < size; ++i) {
-    size_t r = ya_read(stream->fd, buffer, nmemb);
+  for (size_t i = 0; i < nmemb; ++i) {
+    size_t r = ya_read(stream->fd, buffer, size);
     stream->offset += nmemb;
     fseek(stream, stream->offset, SEEK_SET);
     if (r < 0) {
