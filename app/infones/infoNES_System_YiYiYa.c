@@ -210,14 +210,7 @@ int main( int argc, char **argv )
 	{
 		start_application( argv[1] );
 	}
-	
-	//主循环中处理输入事件 声音播放
-	while(1)
-	{
-		dwKeyPad1 = GetJoypadInput();
-		//主线程休息一下 让子线程用一下 CPU
-		// usleep(300);
-	}
+  printf("exit\n");
 	return(0);
 }
 
@@ -462,13 +455,14 @@ int InfoNES_Menu()
  *     0 : Normally
  *    -1 : Exit InfoNES
  */
+  // printf("bThread %d\n",bThread);
 
 	/* If terminated */
 	if ( bThread == FALSE )
 	{
 		return(-1);
 	}
-
+  
 	/* Nothing to do here */
 	return(0);
 }
@@ -678,10 +672,12 @@ void InfoNES_PadState( DWORD *pdwPad1, DWORD *pdwPad2, DWORD *pdwSystem )
  *
  */
 
+  InfoNES_ReadJoypad();
+
 	/* Transfer joypad state */
 	*pdwPad1	= dwKeyPad1;
 	*pdwPad2	= dwKeyPad2;
-	*pdwSystem	= dwKeySystem;
+	*pdwSystem	= bThread==FALSE ? PAD_SYS_QUIT : 0;
 	
 	//取消重置手柄 在 输入函数中自行处理
 	//dwKeyPad1 = 0;
@@ -752,6 +748,15 @@ void InfoNES_SoundOutput( int samples, BYTE *wave1, BYTE *wave2, BYTE *wave3, BY
 }
 
 
+void InfoNES_ReadJoypad(){
+  int ret=GetJoypadInput();
+  if(ret>=0){
+    dwKeyPad1 =ret;
+    // dwKeyPad2=ret;
+    // dwKeySystem=ret;
+  } 
+}
+
 /*===================================================================*/
 /*                                                                   */
 /*            InfoNES_Wait() : Wait Emulation if required            */
@@ -759,8 +764,8 @@ void InfoNES_SoundOutput( int samples, BYTE *wave1, BYTE *wave2, BYTE *wave3, BY
 /*===================================================================*/
 void InfoNES_Wait()
 {
+    
 }
-
 
 /*===================================================================*/
 /*                                                                   */
