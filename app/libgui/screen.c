@@ -557,13 +557,13 @@ void screen_show_bmp_picture(i32 x, i32 y, void *bmp_addr, i32 mask_color,
 void screen_init() {
   int fd = open("/dev/fb", 0);
   printf("screen init fd:%d\n",fd);
-  gscreen.fd = fd;
   ioctl(fd, IOC_READ_FRAMBUFFER_INFO, &(gscreen.fb),
         sizeof(framebuffer_info_t));
   gscreen.buffer = gscreen.fb.frambuffer;
   gscreen.width = gscreen.fb.width;
   gscreen.height = gscreen.fb.height;
   gscreen.bpp = gscreen.fb.bpp;
+  gscreen.fd = fd;
   printf("screen init %dx%d bpp:%d fb count:%d\n",gscreen.width,gscreen.height,gscreen.fb.bpp,gscreen.fb.framebuffer_count);
   event_init();
 }

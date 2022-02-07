@@ -111,6 +111,12 @@ char* lua_argv[] = {
     NULL
 };
 
+char* nes_argv[] ={
+  "infones",
+  "/mario.nes",
+  NULL
+};
+
 void pre_launch() {
 #ifdef X86
   // int fd = syscall2(SYS_OPEN, "/dev/stdin", 0);
@@ -132,6 +138,9 @@ void pre_launch() {
   // syscall2(SYS_EXEC,"/mcroui",NULL);
   // syscall2(SYS_EXEC,"/lvgl",NULL);
   // kprintf("fd=>%d\n",fd);
+
+  syscall2(SYS_EXEC, "/infones", nes_argv);
+  
   // for (;;)
   //   ;
 #elif defined(ARMV7)

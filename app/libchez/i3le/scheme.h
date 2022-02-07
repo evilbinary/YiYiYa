@@ -196,7 +196,8 @@ EXPORT void Sscheme_deinit PROTO((void));
 
 /* Features. */
 #define FEATURE_ICONV
-#define FEATURE_EXPEDITOR
+//todo
+// #define FEATURE_EXPEDITOR
 
 /* Locking macros. */
 #define INITLOCK(addr)     \
