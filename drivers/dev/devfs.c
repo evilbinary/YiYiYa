@@ -121,6 +121,14 @@ int devfs_init(void) {
 
   fd_std_init();
 
+  //dsp
+  vnode_t *dsp = vfs_create("dsp", V_FILE|V_BLOCKDEVICE);
+  dsp->device = device_find(DEVICE_SB);
+  dsp->read = device_read;
+  dsp->ioctl = device_ioctl;
+  dsp->write =device_write;
+  vfs_mount(NULL, "/dev", dsp);
+
   return 0;
 }
 
