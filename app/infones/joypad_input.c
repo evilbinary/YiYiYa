@@ -42,10 +42,10 @@ int GetJoypadInput(void) {
         case 'm':  //选择
           keyPad |= (1 << 2);
           break;
-        case 'j':  // A
+        case 'k':  // B
           keyPad |= (1 << 1);
           break;
-        case 'k':  // B
+        case 'j':  // A
           keyPad |= (1 << 0);
           break;
         case 'q':
@@ -74,10 +74,10 @@ int GetJoypadInput(void) {
         case 'm':  //选择
           keyPad &= ~(1 << 2);
           break;
-        case 'j':  // A
+        case 'k':  // B
           keyPad &= ~(1 << 1);
           break;
-        case 'k':  // B
+        case 'j':  // A
           keyPad &= ~(1 << 0);
           break;
         default:
