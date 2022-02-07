@@ -1,0 +1,32 @@
+# coding:utf-8
+# *******************************************************************
+# * Copyright 2021-2080 evilbinary
+# * 作者: evilbinary on 01/01/20
+# * 邮箱: rootdebug@163.com
+# ********************************************************************
+import os
+
+Import('env')
+
+
+source =[
+    'K6502.c',
+    'InfoNES.c',
+    'InfoNES_Mapper.c',
+    'InfoNES_pAPU.c',
+    'InfoNES_System_YiYiYa.c',
+    'joypad_input.c',
+    
+    '../libgui/libgui.a',
+    '../libgui/libimage.a',
+    '../libjpeg/libjpeg.a',
+    '../libpng/libpng.a',
+    '../libzlib/libzlib.a',
+    ]+env['LIBC']
+
+if env.get('MYLIB'):
+    source.append(env.get('MYLIB'))
+
+env.Program('infones', source,
+    CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libgui/ -Iapp/libjpeg -Iapp/infones -I.',
+    LINKFLAGS= '$LINKFLAGS $USER')

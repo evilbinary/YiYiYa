@@ -68,6 +68,8 @@ if env.get('APP'):
 
     SConscript(dirs=['liblz4'], exports='env')
 
+    SConscript(dirs=['infones'], exports='env')
+
 
     apps=['hello/hello',
             'gui/gui',
@@ -81,11 +83,12 @@ if env.get('APP'):
             'lvgl/lvgl',
             'track/track',
             'launcher/launcher',
+            'infones/infones'
             ]
     apps+=Glob('resource/*')
     if env.get('DEFAULT_LIBC')=='libmusl':
         SConscript(dirs=['libuuid'], exports='env')
-        SConscript(dirs=['libncurses'], exports='env')
+        # SConscript(dirs=['libncurses'], exports='env')
         SConscript(dirs=['libchez'], exports='env')
         SConscript(dirs=['scheme'], exports='env')
         SConscript(dirs=['liblua'], exports='env')
