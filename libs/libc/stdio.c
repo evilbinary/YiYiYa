@@ -98,7 +98,7 @@ size_t fread(void * ptr, size_t size, size_t nmemb,
   if (nmemb == 0) return 0;
   for (size_t i = 0; i < nmemb; ++i) {
     size_t r = ya_read(stream->fd, buffer, size);
-    stream->offset += nmemb;
+    stream->offset += size;
     fseek(stream, stream->offset, SEEK_SET);
     if (r < 0) {
       return -1;

@@ -54,12 +54,13 @@ extern int GetJoypadInput(void);
 
 static int lcd_fb_display_px(WORD color, int x, int y)
 {
-	unsigned char  *pen8;
-	unsigned short *pen16;
-	pen8 = (unsigned char *)(fb_mem + y*line_width + x*px_width);
-	pen16 = (unsigned short *)pen8;
-	*pen16 = color;
-	
+  //565 -> 888
+  u8 R,G,B;
+  R = (color>>11 & 0xff);
+  G = (color>>5 & 0x3f);
+  B = (color & 0x1f);
+  color=(R<<16)|(G<<8)|B;
+  screen_put_pixel(x,y,color);
 	return 0;
 }
 
@@ -638,7 +639,6 @@ void InfoNES_LoadFrame()
 	int line_width;
 	WORD wColor;
 
-	//修正 即便没有 LCD 也可以出声
 	if(0 < fb_fd)
 	{
 		for (y = 0; y < lcd_height; y++ )
@@ -647,11 +647,8 @@ void InfoNES_LoadFrame()
 			for (x = 0; x < lcd_width; x++ )
 			{
 				wColor = WorkFrame[line_width  + zoom_x_tab[x]];
-
-        //Translate here into 5-6-5 format
-        // u32 color = ((wColor & 0x7c00) << 9) | ((wColor & 0x03e0) << 6) | ((wColor & 0x001f) << 3) | (0xff << 24);
-				// lcd_fb_display_px(wColor, x, y);
-        screen_put_pixel(x,y,wColor);
+        u32 color = ((wColor & 0x7c00) << 9) | ((wColor & 0x03e0) << 6) | ((wColor & 0x001f) << 3) | (0xff << 24);
+        screen_put_pixel(x,y,color);
 			}
 		}
     screen_flush();
