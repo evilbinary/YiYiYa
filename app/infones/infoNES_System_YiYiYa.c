@@ -732,36 +732,36 @@ void InfoNES_SoundClose( void )
 /*===================================================================*/
 void InfoNES_SoundOutput( int samples, BYTE *wave1, BYTE *wave2, BYTE *wave3, BYTE *wave4, BYTE *wave5 )
 {
-	// int i;
-	// int ret;
-	// unsigned char wav;
-	// unsigned char *pcmBuf = (unsigned char *)malloc(samples);
+	int i;
+	int ret;
+	unsigned char wav;
+	unsigned char *pcmBuf = (unsigned char *)malloc(samples);
 
-	// for (i=0; i <samples; i++)
-	// {
-	// 	wav = (wave1[i] + wave2[i] + wave3[i] + wave4[i] + wave5[i]) / 5;
-	// 	//单声道 8位数据
-	// 	pcmBuf[i] = wav;
-	// }
-	// ret = snd_pcm_writei(playback_handle, pcmBuf, samples);
-	// if(-EPIPE == ret)
-  //   {
-  //       snd_pcm_prepare(playback_handle);
-  //   }
-	// free(pcmBuf);
-
-  if (sound_fd != -1)
+	for (i=0; i <samples; i++)
+	{
+		wav = (wave1[i] + wave2[i] + wave3[i] + wave4[i] + wave5[i]) / 5;
+		//单声道 8位数据
+		pcmBuf[i] = wav;
+	}
+	ret = write(sound_fd, pcmBuf, samples);
+	if(ret<0)
   {
-    for (int i = 0; i < samples; i++)
-    {
-      final_wave[i * 2 + 1] = final_wave[i * 2] = (wave1[i] + wave2[i] + wave3[i] + wave4[i] + wave5[i]) * 50;
-    }
-
-    if (write(sound_fd, final_wave, samples * 4) < samples * 4)
-    {
-      printf("wrote less than 1024 bytes\n");
-    }
+        printf("write error\n");
   }
+	free(pcmBuf);
+
+  // if (sound_fd != -1)
+  // {
+  //   for (int i = 0; i < samples; i++)
+  //   {
+  //     final_wave[i * 2 + 1] = final_wave[i * 2] = (wave1[i] + wave2[i] + wave3[i] + wave4[i] + wave5[i]) * 50;
+  //   }
+
+  //   if (write(sound_fd, final_wave, samples * 4) < samples * 4)
+  //   {
+  //     printf("wrote less than 1024 bytes\n");
+  //   }
+  // }
 	return ;
 }
 
