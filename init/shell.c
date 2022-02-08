@@ -125,21 +125,17 @@ void pre_launch() {
   // syscall2(SYS_EXEC,"/file",NULL);
   // syscall2(SYS_EXEC, "/luat", NULL);
 
-  // syscall2(SYS_EXEC, "/etk", NULL);
+  syscall2(SYS_EXEC, "/etk", NULL);
   // syscall2(SYS_EXEC,"/test-rs",NULL);
-  // char* argv[] = {
-  //     "lua",
-  //     "hello.lua",
-  // };
-  // syscall2(SYS_EXEC, "/lua", argv);
+  // syscall2(SYS_EXEC, "/lua", lua_argv);
   // syscall2(SYS_EXEC,"/launcher",NULL);
   // syscall2(SYS_EXEC,"/track",NULL);
   // syscall2(SYS_EXEC,"/test",NULL);
-  // syscall2(SYS_EXEC,"/mcroui",NULL);
+  // syscall2(SYS_EXEC,"/microui",NULL);
   // syscall2(SYS_EXEC,"/lvgl",NULL);
   // kprintf("fd=>%d\n",fd);
 
-  syscall2(SYS_EXEC, "/infones", nes_argv);
+  // syscall2(SYS_EXEC, "/infones", nes_argv);
   
   // for (;;)
   //   ;

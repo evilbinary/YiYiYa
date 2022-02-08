@@ -13,7 +13,7 @@ void read_file_to_buffer(char* buffer,char* filename,int size){
 	}
 	//printf("size:%d",size);
 	fseek(f,0,SEEK_SET);
-	fread(buffer,sizeof(char),size,f);
+	fread(buffer,sizeof(char)*size,1,f);
 	fclose(f);
 	if(strcmp("zmrom.bin",filename)==0){
 		printf("zmrom.bin\n");

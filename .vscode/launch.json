@@ -258,7 +258,7 @@
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
             // "program": "${workspaceRoot}/app/hello/hello.elf",
-            "program": "${workspaceRoot}/app/etk/etk.elf",
+            "program": "${workspaceRoot}/app/etk/etk",
             "cwd": "${workspaceRoot}",
             "args": [],
             "sourceFileMap": {

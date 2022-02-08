@@ -96,19 +96,28 @@ size_t fread(void * ptr, size_t size, size_t nmemb,
   // C99 sanity check.
   if (size == 0) return 0;
   if (nmemb == 0) return 0;
-  for (size_t i = 0; i < nmemb; ++i) {
-    size_t r = ya_read(stream->fd, buffer, size);
-    stream->offset += size;
-    fseek(stream, stream->offset, SEEK_SET);
-    if (r < 0) {
-      return -1;
-    }
-    buffer += r;
-    if (r < (int)size) {
-      return i;
-    }
-  }
-  return nmemb;
+
+  int total=nmemb*size;
+  size_t r = ya_read(stream->fd, buffer, total);
+
+  // if(nmemb>size){
+  //   int n=nmemb;
+  //   nmemb=size;
+  //   size=n;
+  // }
+  // for (size_t i = 0; i < nmemb; ++i) {
+  //   size_t r = ya_read(stream->fd, buffer, size);
+  //   stream->offset += size;
+  //   fseek(stream, stream->offset, SEEK_SET);
+  //   if (r < 0) {
+  //     return -1;
+  //   }
+  //   buffer += r;
+  //   if (r < (int)size) {
+  //     return i;
+  //   }
+  // }
+  return r;
 }
 
 size_t fwrite(const void * /* restrict */ ptr, size_t size, size_t nmemb,

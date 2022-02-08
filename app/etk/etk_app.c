@@ -37,7 +37,7 @@ int etk_app_main(int argc, char* argv[]) {
   // b=etk_image_jpeg_decoder_decode(jpeg_decoder,"duck.jpg");
 
   // b=etk_image_bmp_decoder(bmp_decoder,"bg.bmp");
-  b = etk_image_jpeg_decoder_decode(jpeg_decoder, "home.jpg");
+  b = etk_image_jpeg_decoder_decode(jpeg_decoder, "/home.jpg");
   printf("pp=>%p %p\n", jpeg_decoder, bmp_decoder);
 
   printf("load bmp b:%x\n", b);
