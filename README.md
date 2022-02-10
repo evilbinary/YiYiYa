@@ -75,7 +75,7 @@ https://github.com/evilbinary/YiYiYa
 捐赠人 | 金额¥| 日期
 ---   |---|---
 眼眸流转 |100| 2022-02-10
-巫云    | 20 | 2021-05-08
+巫云    | 25 | 2021-05-08
 
 ## 参考资料
 https://wiki.osdev.org
