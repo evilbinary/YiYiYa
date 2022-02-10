@@ -68,13 +68,14 @@ qq群 26893532 可以加入一起讨论学习，如果找不到该群，使用�
 https://github.com/evilbinary/YiYiYa
 
 
-# 项目捐赠
+## 项目捐赠
 
 ![喜欢就支持一下](https://github.com/evilbinary/myblog/raw/master/data/s.png)
 
 
 捐赠人 | 金额¥| 日期
 ---|---|---
+cm| 30 | 2022-02-10
 [SynestiaOS](https://github.com/SynestiaOS) | 66.66 | 2022-02-10
 [开心的派大星](https://github.com/ysh329) | 19 | 2022-02-10
 眼眸流转 |100| 2022-02-10
