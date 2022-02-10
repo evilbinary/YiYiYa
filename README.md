@@ -75,7 +75,7 @@ https://github.com/evilbinary/YiYiYa
 
 捐赠人 | 金额¥| 日期
 ---|---|---
-cm| 30 | 2022-02-10
+[cm](https://gitee.com/starseacloud)| 30 | 2022-02-10
 [SynestiaOS](https://github.com/SynestiaOS) | 66.66 | 2022-02-10
 [开心的派大星](https://github.com/ysh329) | 19 | 2022-02-10
 眼眸流转 |100| 2022-02-10
