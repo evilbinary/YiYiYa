@@ -209,6 +209,20 @@ int ya_rename(const char *old, const char *new){
   return syscall2(SYS_RENAME,old,new);
 }
 
+int ya_getcwd(char *buf, size_t size){
+  return syscall2(SYS_GETCWD,buf,size);
+}
+
+int ya_chdir(char* path){
+  return syscall1(SYS_CHDIR,path);
+}
+
+int ya_fchdir(int fd){
+  return syscall1(SYS_FCHDIR,fd);
+}
+
+
+
 void __main(){
   //printf("main call\n");
 }

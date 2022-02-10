@@ -37,12 +37,21 @@ void ps_command() { syscall0(SYS_DUMPS); }
 int do_exec(char* cmd, int count) {
   char buf[64];
   cmd[count] = 0;
-  sprintf(buf, "/%s", cmd);
-  return syscall2(SYS_EXEC, buf, NULL);
+  char* argv[10];
+  int i=0;
+  const char *split = " ";
+  char *ptr = kstrtok(cmd, split);
+  argv[i++]=ptr;
+  sprintf(buf, "/%s", argv[0]);
+  while(ptr != NULL){
+		argv[i++]=ptr;
+		ptr = kstrtok(NULL, split);
+	}
+  return syscall2(SYS_EXEC, buf, &argv[1]);
 }
 
 void do_shell_cmd(char* cmd, int count) {
-  print_string("\n");
+  print_string("\n");  
   if (count == 0) return;
   if (kstrncmp(cmd, "help", count) == 0) {
     print_help();
@@ -102,6 +111,12 @@ char* lua_argv[] = {
     NULL
 };
 
+char* nes_argv[] ={
+  "infones",
+  "/mario.nes",
+  NULL
+};
+
 void pre_launch() {
 #ifdef X86
   // int fd = syscall2(SYS_OPEN, "/dev/stdin", 0);
@@ -110,7 +125,7 @@ void pre_launch() {
   // syscall2(SYS_EXEC,"/file",NULL);
   // syscall2(SYS_EXEC, "/luat", NULL);
 
-  syscall2(SYS_EXEC, "/etk", NULL);
+  // syscall2(SYS_EXEC, "/etk", NULL);
   // syscall2(SYS_EXEC,"/test-rs",NULL);
   // char* argv[] = {
   //     "lua",
@@ -123,8 +138,11 @@ void pre_launch() {
   // syscall2(SYS_EXEC,"/mcroui",NULL);
   // syscall2(SYS_EXEC,"/lvgl",NULL);
   // kprintf("fd=>%d\n",fd);
-  for (;;)
-    ;
+
+  syscall2(SYS_EXEC, "/infones", nes_argv);
+  
+  // for (;;)
+  //   ;
 #elif defined(ARMV7)
   test_lcd();
 #else defined(ARM)

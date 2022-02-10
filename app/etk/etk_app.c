@@ -21,8 +21,9 @@ int etk_app_main(int argc, char* argv[]) {
   e32 i;
   e32 xsize, ysize, xspan, yspan, startx, starty, x, y;
 
-  e8 button_name[9][10] = {"��Ƶ", "�ն�", "�¶�", "���±�", "��Ƭ",
-                           "ɨ��", "ʱ��", "״̬", "����"};
+  e8 button_name[9][10] = {"Clock", "Vdieo", "Temp",  "Note", "Shut",
+                           "Help",  "Mine",  "Block", "Photo"};
+
   manager = etk_get_wnd_manager();
   jpeg_decoder = etk_image_jpeg_decoder_create();
   bmp_decoder = etk_image_bmp_decoder_create();
@@ -36,7 +37,7 @@ int etk_app_main(int argc, char* argv[]) {
   // b=etk_image_jpeg_decoder_decode(jpeg_decoder,"duck.jpg");
 
   // b=etk_image_bmp_decoder(bmp_decoder,"bg.bmp");
-  b = etk_image_jpeg_decoder_decode(jpeg_decoder, "dev/sda/home.jpg");
+  b = etk_image_jpeg_decoder_decode(jpeg_decoder, "home.jpg");
   printf("pp=>%p %p\n", jpeg_decoder, bmp_decoder);
 
   printf("load bmp b:%x\n", b);

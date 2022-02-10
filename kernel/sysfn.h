@@ -30,9 +30,12 @@ enum {
   SYS_DUP2 = 63,
   SYS_GETPPID = 64,
   SYS_READDIR=89,
+  SYS_CLONE= 120,
+  SYS_FCHDIR=133,
   SYS_WRITEV=146,
   SYS_READV=145,
   SYS_YIELD = 158,
+  SYS_GETCWD=183,
   SYS_SET_THREAD_AREA=243,
   SYS_PRINT = 500,
   SYS_PRINT_AT = 501,
@@ -90,7 +93,9 @@ enum {
   SYS_MMAP2,
   SYS_MPROTECT,
   SYS_DUMPS,
-  SYS_RT_SIGPROCMASK
+  SYS_RT_SIGPROCMASK,
+  SYS_GETCWD,
+  SYS_CLONE
 };
 #endif
 
@@ -164,5 +169,9 @@ void sys_dumps();
 int sys_getdents64(unsigned int fd, vdirent_t* dir, unsigned int count);
 int sys_munmap(void* addr, size_t size);
 int sys_fcntl64(int fd, int cmd, void* arg);
+int sys_getcwd(char *buf, size_t size);
+int sys_fchdir(int fd);
+
+int sys_clone(void* stack,void* fn,void* arg);
 
 #endif

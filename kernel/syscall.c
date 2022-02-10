@@ -66,8 +66,10 @@ void syscall_init() {
   syscall_table[SYS_MUNMAP] = &sys_munmap;
 
   syscall_table[SYS_FCNT64] = &sys_fcntl64;
-
-
+  syscall_table[SYS_GETCWD] =&sys_getcwd;
+  syscall_table[SYS_CHDIR]=&sys_chdir;
+  syscall_table[SYS_FCHDIR]=&sys_fchdir;
+  syscall_table[SYS_CLONE]=&sys_clone;
   
 }
 

@@ -60,6 +60,7 @@ int fchown(int fd, uid_t uid, gid_t gid) {
 
 int fchdir(int fd) {
   int rc;
+  rc=ya_fchdir(fd);
 
   return rc;
 }
@@ -72,9 +73,13 @@ int ftruncate(int fd, off_t offset) {
 
 char *getcwd(char *buf, size_t size) {
   int rc;
-
+  rc=ya_getcwd(buf,size);
   errno = rc;
-  return NULL;
+
+  if(rc<0){
+    return NULL;
+  }
+  return buf;
 }
 
 pid_t getpid(void) { return ya_getpid(); }

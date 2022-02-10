@@ -25,15 +25,14 @@ scons -Q init && scons --run=qemu
 ## 开发
 
 具体见文档：[开发文档](https://github.com/evilbinary/YiYiYa/tree/main/docs/develop)
-## FAQ
 
-1、在linux下如果运行黑屏失败，修改根目录Sconstruct `env['CC']='/usr/bin/gcc-9'` gcc 改成9版本。
+## 建议
 
-2、如果在linux下运行出现boot duck停住了，则`env['CFLAGS']= env['CFLAGS']+' -no-pie -fno-pic '`修改修改成这个。
+1、c语言没有基础，建议先不玩，等会了再来。
 
-3、如果运行出现 ../app/kernel not exist，则image下的disk.img被删除了，需要找回来。
+2、os开发并不是一天就可以开发好的，需要持续的耐心和毅力。
 
-
+3、没弄明白的建议不要fork或下载去尝试编译此项目。
 
 
 
@@ -62,10 +61,23 @@ https://user-images.githubusercontent.com/5143386/121841338-acf76f80-cd10-11eb-9
 ## 开发
 
 qq群 26893532 可以加入一起讨论学习，如果找不到该群，使用扫码加入。
+
 <img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/demo/group.jpeg?raw=true" width="200px" />
 
 
 https://github.com/evilbinary/YiYiYa
+
+
+# 项目捐赠
+
+![喜欢就支持一下](https://github.com/evilbinary/myblog/raw/master/data/s.png)
+
+
+捐赠人 | 金额¥| 日期
+---|---|---
+[开心的派大星](https://github.com/ysh329) | 19 | 2022-02-10
+眼眸流转 |100| 2022-02-10
+巫云    | 25 | 2021-05-08
 
 
 ## 参考资料

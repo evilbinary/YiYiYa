@@ -282,6 +282,18 @@ void test_read_byte() {
   }
 }
 
+void test_getcwd(){
+  char buf[256]={0};
+  char* test=getcwd(buf,20);
+  printf("pwd=>%s\n",buf);
+  chdir("/haha");
+  
+  test=getcwd(buf,20);
+  printf("pwd=>%s\n",buf);
+
+}
+
+
 int main(int argc, char* argv[]) {
   printf(buf);
   // test_syscall();
@@ -297,6 +309,7 @@ int main(int argc, char* argv[]) {
   // test_read_write();
   // test_malloc_free();
   // test_scanf();
-  test_read_byte();
+  // test_read_byte();
+  test_getcwd();
   return 0;
 }

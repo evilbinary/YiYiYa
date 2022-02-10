@@ -44,8 +44,8 @@ typedef struct screen_info {
   u32 *buffer;
   struct screen_point_t cur;
   u8 *ASC;
-  framebuffer_info_t fb;
   int fd;
+  framebuffer_info_t fb;
 } screen_info_t;
 
 

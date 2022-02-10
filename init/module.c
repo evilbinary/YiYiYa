@@ -88,10 +88,10 @@ void driver_init(void) {
   module_regist(&qemu_module);
   module_regist(&mouse_module);
   module_regist(&ahci_module);
+  module_regist(&sb16_module);
   module_regist(&devfs_module);
   // module_regist(&fat32_module);
   module_regist(&fat_module);
-  module_regist(&sb16_module);
 
 #elif defined(XTENSA)
   module_regist(&hello_module);
