@@ -75,6 +75,8 @@ https://github.com/evilbinary/YiYiYa
 
 捐赠人 | 金额¥| 日期
 ---|---|---
+**焱    | 0.01 | 2022-02-11
+懒懒    | 10 | 2022-02-11
 fix-eua.dax    | 30 | 2022-02-11
 yyz639    | 2.5 | 2022-02-11
 [cm](https://gitee.com/starseacloud)| 30 | 2022-02-10
