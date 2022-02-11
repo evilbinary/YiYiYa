@@ -17,6 +17,8 @@
     #include "armv7/context.h"
   #elif ARMV5
     #include "armv5/context.h"
+#elif defined(ARMV8_A)
+    #include "armv8-a/context.h"
   #else
     #error "no support arm"
   #endif

@@ -17,6 +17,8 @@
     #include "armv7/cpu.h"
   #elif defined(ARMV5)
     #include "armv5/cpu.h"
+  #elif defined(ARMV8_A)
+    #include "armv8-a/cpu.h"
   #else
     #error "no support arm"
   #endif
