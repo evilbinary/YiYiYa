@@ -85,6 +85,7 @@
     "system_error": "c",
     "new": "c",
     "assert.h": "c",
-    "iosfwd": "c"
+    "iosfwd": "c",
+    "common.h": "c"
   }
 }
