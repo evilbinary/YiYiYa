@@ -75,6 +75,7 @@ https://github.com/evilbinary/YiYiYa
 
 捐赠人 | 金额¥| 日期
 ---|---|---
+[hulang1024](https://github.com/hulang1024)    | 12 | 2022-02-11
 **焱    | 0.01 | 2022-02-11
 懒懒    | 10 | 2022-02-11
 fix-eua.dax    | 30 | 2022-02-11
