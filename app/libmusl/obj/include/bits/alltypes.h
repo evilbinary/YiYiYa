@@ -3,26 +3,22 @@
 #define _Int64 long long
 #define _Reg int
 
+#if __ARMEB__
+#define __BYTE_ORDER 4321
+#else
 #define __BYTE_ORDER 1234
+#endif
+
 #define __LONG_MAX 0x7fffffffL
 
 #ifndef __cplusplus
-#ifdef __WCHAR_TYPE__
 #if defined(__NEED_wchar_t) && !defined(__DEFINED_wchar_t)
-typedef __WCHAR_TYPE__ wchar_t;
-#define __DEFINED_wchar_t
-#endif
-
-#else
-#if defined(__NEED_wchar_t) && !defined(__DEFINED_wchar_t)
-typedef long wchar_t;
+typedef unsigned wchar_t;
 #define __DEFINED_wchar_t
 #endif
 
 #endif
-#endif
 
-#if defined(__FLT_EVAL_METHOD__) && __FLT_EVAL_METHOD__ == 0
 #if defined(__NEED_float_t) && !defined(__DEFINED_float_t)
 typedef float float_t;
 #define __DEFINED_float_t
@@ -33,38 +29,12 @@ typedef double double_t;
 #define __DEFINED_double_t
 #endif
 
-#else
-#if defined(__NEED_float_t) && !defined(__DEFINED_float_t)
-typedef long double float_t;
-#define __DEFINED_float_t
-#endif
 
-#if defined(__NEED_double_t) && !defined(__DEFINED_double_t)
-typedef long double double_t;
-#define __DEFINED_double_t
-#endif
-
-#endif
-
-#if !defined(__cplusplus)
 #if defined(__NEED_max_align_t) && !defined(__DEFINED_max_align_t)
-typedef struct { _Alignas(8) long long __ll; long double __ld; } max_align_t;
+typedef struct { long long __ll; long double __ld; } max_align_t;
 #define __DEFINED_max_align_t
 #endif
 
-#elif defined(__GNUC__)
-#if defined(__NEED_max_align_t) && !defined(__DEFINED_max_align_t)
-typedef struct { __attribute__((__aligned__(8))) long long __ll; long double __ld; } max_align_t;
-#define __DEFINED_max_align_t
-#endif
-
-#else
-#if defined(__NEED_max_align_t) && !defined(__DEFINED_max_align_t)
-typedef struct { alignas(8) long long __ll; long double __ld; } max_align_t;
-#define __DEFINED_max_align_t
-#endif
-
-#endif
 #define __LITTLE_ENDIAN 1234
 #define __BIG_ENDIAN 4321
 #define __USE_TIME_BITS64 1

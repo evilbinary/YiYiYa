@@ -90,7 +90,7 @@ int mknodat(int, const char *, mode_t, dev_t);
 #endif
 
 // int futimens(int, const struct timespec [2]);
-// int utimensat(int, const char *, const struct timespec [2], int);
+int utimensat(int, const char *, const struct timespec [2], int);
 int futimes(int, const struct timeval [2]);
 int futimesat(int, const char *, const struct timeval [2]);
 int futimens(int fd, const struct timespec times[2]);
