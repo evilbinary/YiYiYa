@@ -141,9 +141,9 @@
 
 
 // #ifdef __LIB_MUSL__
-#ifndef HAVE_XLOCALE
-#define HAVE_XLOCALE
-#endif
+// #ifndef HAVE_XLOCALE
+// #define HAVE_XLOCALE
+// #endif
 
 
 
