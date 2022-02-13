@@ -25,6 +25,8 @@
 #include "../SDL_sysvideo.h"
 #include "SDL_nullframebuffer_c.h"
 
+#include "screen.h"
+
 
 #define DUMMY_SURFACE   "_SDL_DummySurface"
 
@@ -32,28 +34,34 @@ int SDL_DUMMY_CreateWindowFramebuffer(_THIS, SDL_Window * window, Uint32 * forma
 {
     printf("SDL_DUMMY_CreateWindowFramebuffer\n");
     SDL_Surface *surface;
-    const Uint32 surface_format = SDL_PIXELFORMAT_RGB888;
+    const Uint32 surface_format = SDL_PIXELFORMAT_ARGB8888;
     int w, h;
     int bpp;
     Uint32 Rmask, Gmask, Bmask, Amask;
 
-    /* Free the old framebuffer surface */
-    surface = (SDL_Surface *) SDL_GetWindowData(window, DUMMY_SURFACE);
-    SDL_FreeSurface(surface);
 
-    /* Create a new one */
-    SDL_PixelFormatEnumToMasks(surface_format, &bpp, &Rmask, &Gmask, &Bmask, &Amask);
-    SDL_GetWindowSize(window, &w, &h);
-    surface = SDL_CreateRGBSurface(0, w, h, bpp, Rmask, Gmask, Bmask, Amask);
-    if (!surface) {
-        return -1;
-    }
-
-    /* Save the info and return! */
-    SDL_SetWindowData(window, DUMMY_SURFACE, surface);
+    screen_info_t* screen = screen_info();
     *format = surface_format;
-    *pixels = surface->pixels;
-    *pitch = surface->pitch;
+    *pixels = screen->fb.frambuffer;
+    *pitch = (((window->w * SDL_BYTESPERPIXEL(*format)) + 3) & ~3);
+
+    // /* Free the old framebuffer surface */
+    // surface = (SDL_Surface *) SDL_GetWindowData(window, DUMMY_SURFACE);
+    // SDL_FreeSurface(surface);
+
+    // /* Create a new one */
+    // SDL_PixelFormatEnumToMasks(surface_format, &bpp, &Rmask, &Gmask, &Bmask, &Amask);
+    // SDL_GetWindowSize(window, &w, &h);
+    // surface = SDL_CreateRGBSurface(0, w, h, bpp, Rmask, Gmask, Bmask, Amask);
+    // if (!surface) {
+    //     return -1;
+    // }
+
+    // /* Save the info and return! */
+    // SDL_SetWindowData(window, DUMMY_SURFACE, surface);
+    // *format = surface_format;
+    // *pixels = surface->pixels;
+    // *pitch = surface->pitch;
     return 0;
 }
 
