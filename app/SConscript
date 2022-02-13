@@ -75,6 +75,17 @@ if env.get('APP'):
 
     SConscript(dirs=['mgba'], exports='env')
 
+    SConscript(dirs=[
+        'libffmpeg/libavformat',
+        'libffmpeg/libavcodec',
+        'libffmpeg/libavdevice',
+        'libffmpeg/libavfilter',
+        'libffmpeg/libswscale',
+        'libffmpeg/libavresample',
+        'libffmpeg/libavutil',
+        'libffmpeg/libpostproc',
+        'libffmpeg/libswresample',
+        ], exports='env')
 
 
     apps=['hello/hello',

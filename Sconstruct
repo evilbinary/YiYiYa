@@ -44,8 +44,9 @@ support_platform={
 }
 
 
+project_path=os.path.abspath(os.curdir)
 
-libc=['../../libs/libc/libc.a','../../libs/libalgorithm/libalgorithm.a']
+libc=[project_path+'/libs/libc/libc.a',project_path+'/libs/libalgorithm/libalgorithm.a']
 libcflags='-Ilibs/include/c/ -DLIBYC'
 
 
@@ -62,7 +63,7 @@ archs=supports_archs[arch_type]
 
 
 if default_libc=='libmusl':
-    libc=['../../app/libmusl/lib/libc.a']#'/opt/local/lib/gcc/i386-elf/9.2.0/libgcc.a'
+    libc=[project_path+'/app/libmusl/lib/libc.a']#'/opt/local/lib/gcc/i386-elf/9.2.0/libgcc.a'
     libcflags=' -Iapp/libmusl/include/ -Iapp/libmusl/obj/include/ -Iapp/libmusl/arch/generic/ '
     if arch=='x86':
         libcflags+=' -Iapp/libmusl/arch/i386/ '

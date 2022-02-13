@@ -10,7 +10,7 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            // "program": "${workspaceRoot}/app/hello/hello.elf",
+            // "program": "${workspaceRoot}/app/hello/hello",
             "program": "${workspaceRoot}/app/hello/hello",
             "cwd": "${workspaceRoot}",
             "args": [],
@@ -46,8 +46,8 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            // "program": "${workspaceRoot}/app/hello/hello.elf",
-            "program": "${workspaceRoot}/app/gui/gui.elf",
+            // "program": "${workspaceRoot}/app/hello/hello",
+            "program": "${workspaceRoot}/app/gui/gui",
             "cwd": "${workspaceRoot}",
             "args": [],
             "sourceFileMap": {
@@ -81,7 +81,7 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            // "program": "${workspaceRoot}/app/hello/hello.elf",
+            // "program": "${workspaceRoot}/app/hello/hello",
             "program": "${workspaceRoot}/app/lua/luat",
             "cwd": "${workspaceRoot}",
             "args": [],
@@ -116,7 +116,7 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            // "program": "${workspaceRoot}/app/hello/hello.elf",
+            // "program": "${workspaceRoot}/app/hello/hello",
             "program": "${workspaceRoot}/app/lua/lua",
             "cwd": "${workspaceRoot}",
             "args": [],
@@ -151,7 +151,7 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            // "program": "${workspaceRoot}/app/hello/hello.elf",
+            // "program": "${workspaceRoot}/app/hello/hello",
             "program": "${workspaceRoot}/app/rust/test/test-rs",
             "cwd": "${workspaceRoot}",
             "args": [],
@@ -186,8 +186,8 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            // "program": "${workspaceRoot}/app/hello/hello.elf",
-            "program": "${workspaceRoot}/app/test/test.elf",
+            // "program": "${workspaceRoot}/app/hello/hello",
+            "program": "${workspaceRoot}/app/test/test",
             "cwd": "${workspaceRoot}",
             "args": [],
             "sourceFileMap": {
@@ -222,8 +222,8 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            // "program": "${workspaceRoot}/app/hello/hello.elf",
-            "program": "${workspaceRoot}/app/gui/gui.elf",
+            // "program": "${workspaceRoot}/app/hello/hello",
+            "program": "${workspaceRoot}/app/gui/gui",
             "cwd": "${workspaceRoot}",
             "args": [],
             "sourceFileMap": {
@@ -257,7 +257,7 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            // "program": "${workspaceRoot}/app/hello/hello.elf",
+            // "program": "${workspaceRoot}/app/hello/hello",
             "program": "${workspaceRoot}/app/etk/etk",
             "cwd": "${workspaceRoot}",
             "args": [],
@@ -293,8 +293,8 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            // "program": "${workspaceRoot}/app/hello/hello.elf",
-            "program": "${workspaceRoot}/app/file/file.elf",
+            // "program": "${workspaceRoot}/app/hello/hello",
+            "program": "${workspaceRoot}/app/file/file",
             "cwd": "${workspaceRoot}",
             "args": [],
             "sourceFileMap": {
@@ -329,8 +329,8 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            // "program": "${workspaceRoot}/app/hello/hello.elf",
-            "program": "${workspaceRoot}/app/gui/gui.elf",
+            // "program": "${workspaceRoot}/app/hello/hello",
+            "program": "${workspaceRoot}/app/gui/gui",
             "cwd": "${workspaceRoot}",
             "args": [],
             "sourceFileMap": {
@@ -357,7 +357,7 @@
                     "description": "set architecture i386"
                 },
                 {
-                    "text": "file ${workspaceRoot}/app/hello/hello.elf",
+                    "text": "file ${workspaceRoot}/app/hello/hello",
                     "description": "Load binary."
                 },
                 {
@@ -407,11 +407,11 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            "program": "${workspaceRoot}/init/kernel.elf",
-            // "program": "${workspaceRoot}/app/hello/hello.elf",
-            // "program": "${workspaceRoot}/app/gui/gui.elf",
-            // "program": "${workspaceRoot}/app/file/file.elf",
-            // "program": "${workspaceRoot}/app/microui/microui.elf",
+            "program": "${workspaceRoot}/init/kernel",
+            // "program": "${workspaceRoot}/app/hello/hello",
+            // "program": "${workspaceRoot}/app/gui/gui",
+            // "program": "${workspaceRoot}/app/file/file",
+            // "program": "${workspaceRoot}/app/microui/microui",
 
             // "program": "${workspaceRoot}/boot/x86/init",
             "cwd": "${workspaceRoot}",
@@ -462,7 +462,7 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            "program": "${workspaceRoot}/boot/x86/init.elf",
+            "program": "${workspaceRoot}/boot/x86/init",
             "cwd": "${workspaceRoot}",
             "args": [],
             "sourceFileMap": {
@@ -489,7 +489,7 @@
                     "description": "set architecture i386"
                 },
                 // {
-                //     "text": "file ${workspaceRoot}/boot/x86/init.elf",
+                //     "text": "file ${workspaceRoot}/boot/x86/init",
                 //     "description": "file on setup."
                 // },
             ],
@@ -499,7 +499,7 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            "program": "${workspaceRoot}/boot/arm/init.elf",
+            "program": "${workspaceRoot}/boot/arm/init",
             "cwd": "${workspaceRoot}",
             "args": [],
             "sourceFileMap": {
@@ -526,7 +526,7 @@
                 //     "description": "set architecture i386"
                 // },
                 // {
-                //     "text": "file ${workspaceRoot}/boot/x86/init.elf",
+                //     "text": "file ${workspaceRoot}/boot/x86/init",
                 //     "description": "file on setup."
                 // },
             ],
@@ -538,11 +538,11 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            "program": "${workspaceRoot}/app/track/track.elf",
-            // "program": "${workspaceRoot}/app/hello/hello.elf",
-            // "program": "${workspaceRoot}/app/gui/gui.elf",
-            // "program": "${workspaceRoot}/app/file/file.elf",
-            // "program": "${workspaceRoot}/app/microui/microui.elf",
+            "program": "${workspaceRoot}/app/track/track",
+            // "program": "${workspaceRoot}/app/hello/hello",
+            // "program": "${workspaceRoot}/app/gui/gui",
+            // "program": "${workspaceRoot}/app/file/file",
+            // "program": "${workspaceRoot}/app/microui/microui",
 
             // "program": "${workspaceRoot}/boot/x86/init",
             "cwd": "${workspaceRoot}",
@@ -577,11 +577,11 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            "program": "${workspaceRoot}/app/hello/hello.elf",
-            // "program": "${workspaceRoot}/app/hello/hello.elf",
-            // "program": "${workspaceRoot}/app/gui/gui.elf",
-            // "program": "${workspaceRoot}/app/file/file.elf",
-            // "program": "${workspaceRoot}/app/microui/microui.elf",
+            "program": "${workspaceRoot}/app/hello/hello",
+            // "program": "${workspaceRoot}/app/hello/hello",
+            // "program": "${workspaceRoot}/app/gui/gui",
+            // "program": "${workspaceRoot}/app/file/file",
+            // "program": "${workspaceRoot}/app/microui/microui",
 
             // "program": "${workspaceRoot}/boot/x86/init",
             "cwd": "${workspaceRoot}",
@@ -616,11 +616,11 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            // "program": "${workspaceRoot}/app/hello/hello.elf",
-            // "program": "${workspaceRoot}/app/hello/hello.elf",
+            // "program": "${workspaceRoot}/app/hello/hello",
+            // "program": "${workspaceRoot}/app/hello/hello",
             "program": "${workspaceRoot}/app/lvgl/lvgl",
-            // "program": "${workspaceRoot}/app/file/file.elf",
-            // "program": "${workspaceRoot}/app/microui/microui.elf",
+            // "program": "${workspaceRoot}/app/file/file",
+            // "program": "${workspaceRoot}/app/microui/microui",
 
             // "program": "${workspaceRoot}/boot/x86/init",
             "cwd": "${workspaceRoot}",
@@ -655,11 +655,11 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            // "program": "${workspaceRoot}/app/hello/hello.elf",
-            // "program": "${workspaceRoot}/app/hello/hello.elf",
-            "program": "${workspaceRoot}/app/etk/etk.elf",
-            // "program": "${workspaceRoot}/app/file/file.elf",
-            // "program": "${workspaceRoot}/app/microui/microui.elf",
+            // "program": "${workspaceRoot}/app/hello/hello",
+            // "program": "${workspaceRoot}/app/hello/hello",
+            "program": "${workspaceRoot}/app/etk/etk",
+            // "program": "${workspaceRoot}/app/file/file",
+            // "program": "${workspaceRoot}/app/microui/microui",
 
             // "program": "${workspaceRoot}/boot/x86/init",
             "cwd": "${workspaceRoot}",
@@ -694,11 +694,11 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            // "program": "${workspaceRoot}/app/hello/hello.elf",
-            // "program": "${workspaceRoot}/app/hello/hello.elf",
-            "program": "${workspaceRoot}/app/gui/gui.elf",
-            // "program": "${workspaceRoot}/app/file/file.elf",
-            // "program": "${workspaceRoot}/app/microui/microui.elf",
+            // "program": "${workspaceRoot}/app/hello/hello",
+            // "program": "${workspaceRoot}/app/hello/hello",
+            "program": "${workspaceRoot}/app/gui/gui",
+            // "program": "${workspaceRoot}/app/file/file",
+            // "program": "${workspaceRoot}/app/microui/microui",
 
             // "program": "${workspaceRoot}/boot/x86/init",
             "cwd": "${workspaceRoot}",
@@ -729,9 +729,85 @@
             "preLaunchTask": "Build and run"
         },
         
-        
+        {
+            "name": "sdl2 arm with GDB",
+            "type": "cppdbg",
+            "request": "launch",
+            "miDebuggerServerAddress": "localhost:1234",
+            // "program": "${workspaceRoot}/app/hello/hello",
+            // "program": "${workspaceRoot}/app/hello/hello",
+            "program": "${workspaceRoot}/app/sdl2/sdl2",
+            // "program": "${workspaceRoot}/app/file/file",
+            // "program": "${workspaceRoot}/app/microui/microui",
 
+            // "program": "${workspaceRoot}/boot/x86/init",
+            "cwd": "${workspaceRoot}",
+            "args": [],
+            "sourceFileMap": {
+                "<source-path>": "<target-path>"
+            },
+            // "logging": {
+            //     "engineLogging": true
+            // },
+            "targetArchitecture": "arm",
+            "MIMode": "gdb",
+            "miDebuggerPath": "C:\\Program Files (x86)\\GNU Arm Embedded Toolchain\\10 2021.10\\bin\\arm-none-eabi-gdb.exe",
+            "miDebuggerArgs": "",
+            "customLaunchSetupCommands": [
+                // {
+                //     "text": "target remote localhost:1234",
+                //     "description": "Connect to QEMU remote debugger"
+                // }
+            ],
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+            ],
+            "preLaunchTask": "Build and run"
+        },
 
+        {
+            "name": "mgba arm with GDB",
+            "type": "cppdbg",
+            "request": "launch",
+            "miDebuggerServerAddress": "localhost:1234",
+            // "program": "${workspaceRoot}/app/hello/hello",
+            // "program": "${workspaceRoot}/app/hello/hello",
+            "program": "${workspaceRoot}/app/mgba/mgba",
+            // "program": "${workspaceRoot}/app/file/file",
+            // "program": "${workspaceRoot}/app/microui/microui",
+
+            // "program": "${workspaceRoot}/boot/x86/init",
+            "cwd": "${workspaceRoot}",
+            "args": [],
+            "sourceFileMap": {
+                "<source-path>": "<target-path>"
+            },
+            // "logging": {
+            //     "engineLogging": true
+            // },
+            "targetArchitecture": "arm",
+            "MIMode": "gdb",
+            "miDebuggerPath": "C:\\Program Files (x86)\\GNU Arm Embedded Toolchain\\10 2021.10\\bin\\arm-none-eabi-gdb.exe",
+            "miDebuggerArgs": "",
+            "customLaunchSetupCommands": [
+                // {
+                //     "text": "target remote localhost:1234",
+                //     "description": "Connect to QEMU remote debugger"
+                // }
+            ],
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+            ],
+            "preLaunchTask": "Build and run"
+        },
 
 
 
@@ -884,10 +960,10 @@
             "program": "${workspaceRoot}/init/kernel.elf",
             // "program": "${workspaceRoot}/app/launcher/launcher",
 
-            // "program": "${workspaceRoot}/app/hello/hello.elf",
-            // "program": "${workspaceRoot}/app/gui/gui.elf",
-            // "program": "${workspaceRoot}/app/file/file.elf",
-            // "program": "${workspaceRoot}/app/microui/microui.elf",
+            // "program": "${workspaceRoot}/app/hello/hello",
+            // "program": "${workspaceRoot}/app/gui/gui",
+            // "program": "${workspaceRoot}/app/file/file",
+            // "program": "${workspaceRoot}/app/microui/microui",
 
             // "program": "${workspaceRoot}/boot/x86/init",
             "cwd": "${workspaceRoot}",
@@ -943,11 +1019,11 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:2331",
-            "program": "${workspaceRoot}/init/kernel.elf",
-            // "program": "${workspaceRoot}/app/hello/hello.elf",
-            // "program": "${workspaceRoot}/app/gui/gui.elf",
-            // "program": "${workspaceRoot}/app/file/file.elf",
-            // "program": "${workspaceRoot}/app/microui/microui.elf",
+            "program": "${workspaceRoot}/init/kernel",
+            // "program": "${workspaceRoot}/app/hello/hello",
+            // "program": "${workspaceRoot}/app/gui/gui",
+            // "program": "${workspaceRoot}/app/file/file",
+            // "program": "${workspaceRoot}/app/microui/microui",
 
             // "program": "${workspaceRoot}/boot/x86/init",
             "cwd": "${workspaceRoot}",
@@ -999,11 +1075,11 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            "program": "${workspaceRoot}/init/kernel.elf",
-            // "program": "${workspaceRoot}/app/hello/hello.elf",
-            // "program": "${workspaceRoot}/app/gui/gui.elf",
-            // "program": "${workspaceRoot}/app/file/file.elf",
-            // "program": "${workspaceRoot}/app/microui/microui.elf",
+            "program": "${workspaceRoot}/init/kernel",
+            // "program": "${workspaceRoot}/app/hello/hello",
+            // "program": "${workspaceRoot}/app/gui/gui",
+            // "program": "${workspaceRoot}/app/file/file",
+            // "program": "${workspaceRoot}/app/microui/microui",
 
             // "program": "${workspaceRoot}/boot/x86/init",
             "cwd": "${workspaceRoot}",
@@ -1042,11 +1118,11 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:8832",
-            "program": "${workspaceRoot}/init/kernel.elf",
-            // "program": "${workspaceRoot}/app/hello/hello.elf",
-            // "program": "${workspaceRoot}/app/gui/gui.elf",
-            // "program": "${workspaceRoot}/app/file/file.elf",
-            // "program": "${workspaceRoot}/app/microui/microui.elf",
+            "program": "${workspaceRoot}/init/kernel",
+            // "program": "${workspaceRoot}/app/hello/hello",
+            // "program": "${workspaceRoot}/app/gui/gui",
+            // "program": "${workspaceRoot}/app/file/file",
+            // "program": "${workspaceRoot}/app/microui/microui",
 
             // "program": "${workspaceRoot}/boot/x86/init",
             "cwd": "${workspaceRoot}",
@@ -1099,7 +1175,7 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            "program": "${workspaceRoot}/init/kernel.elf",
+            "program": "${workspaceRoot}/init/kernel",
             "cwd": "${workspaceRoot}",
             "args": [],
             "targetArchitecture": "arm",
@@ -1133,7 +1209,7 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:2331",
-            "program": "${workspaceRoot}/init/kernel.elf",
+            "program": "${workspaceRoot}/init/kernel",
             "cwd": "${workspaceRoot}",
             "args": [],
             "targetArchitecture": "arm",
@@ -1167,7 +1243,7 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            "program": "${workspaceRoot}/init/kernel.elf",
+            "program": "${workspaceRoot}/init/kernel",
             "cwd": "${workspaceRoot}",
             "args": [],
             "targetArchitecture": "arm",
@@ -1203,7 +1279,7 @@
             "request": "launch",
             "servertype": "jlink",
             "cwd": "${workspaceRoot}",
-            "executable": "${workspaceRoot}/init/kernel.elf",
+            "executable": "${workspaceRoot}/init/kernel",
             "device": "STM32F401",
             "interface":"swd",
             // "armToolchainPath": "C:\\Program Files (x86)\\GNU Arm Embedded Toolchain\\10 2021.10\\bin\\arm-none-eabi-gdb.exe",

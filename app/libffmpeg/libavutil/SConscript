@@ -1,0 +1,23 @@
+# coding:utf-8
+# *******************************************************************
+# * Copyright 2021-2080 evilbinary
+# * 作者: evilbinary on 01/01/20
+# * 邮箱: rootdebug@163.c',",om
+# ********************************************************************
+import os
+
+Import('env')
+
+source=[]
+
+source+= Glob('libavutil/*.c')
+
+if env.get('MYLIB'):
+    source.append(env.get('MYLIB'))
+
+
+source+= [
+    ]+env['LIBC']
+
+env.Library('avutil', source,
+    CFLAGS='$CFLAGS  $LIBCFLAGS  ',)

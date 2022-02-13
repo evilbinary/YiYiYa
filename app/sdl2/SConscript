@@ -28,3 +28,24 @@ env.Program('sdl2', source,
     CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libsdl2/ -Iapp/libsdl2/include',
     LINKFLAGS= '$LINKFLAGS $USER')
 
+
+source= [
+    'player.c',
+
+    '../libffmpeg/libavcodec/libavcodec.a',  
+    '../libffmpeg/libavdevice/libavdevice.a',
+    '../libffmpeg/libavfilter/libavfilter.a',
+    '../libffmpeg/libavformat/libavformat.a', 
+    '../libffmpeg/libavutil/libavutil.a',
+    '../libffmpeg/libswscale/libswscale.a', 
+
+    '../libsdl2/libsdl2.a',  
+
+    ]+env['LIBC']
+    
+if env.get('MYLIB'):
+    source.append(env.get('MYLIB'))
+
+env.Program('player', source,
+    CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libsdl2/ -Iapp/libsdl2/include -Iapp/libffmpeg/',
+    LINKFLAGS= '$LINKFLAGS $USER')

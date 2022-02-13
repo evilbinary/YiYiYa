@@ -14,11 +14,11 @@ CXX_GUARD_START
 
 #ifdef HAVE_XLOCALE
 #elif !defined(HAVE_LOCALE)
-#ifdef __LIB_MUSL__
-#else
-#include "xlocale.h"
+// #ifdef __LIB_MUSL__
+// #else
+// #include "xlocale.h"
 typedef const char* locale_t;
-#endif
+// #endif
 #endif
 
 int ftostr_l(char* restrict str, size_t size, float f, locale_t locale);
