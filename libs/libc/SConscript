@@ -36,6 +36,7 @@ source=[
 ]
 
 source+= Glob('math/*.c')
+source+= Glob('environ/*.c')
 
 if env['ARCHTYPE'] =='arm':
     source=source+[

@@ -7,7 +7,7 @@
 #define STDLIB_H
 #include "stdint.h"
 #include "stddef.h"
-
+#include "malloc.h"
 
 #define EXIT_FAILURE 1
 #define EXIT_SUCCESS 0
@@ -33,14 +33,12 @@ int atoi(const char *);
 long int atol(const char *);
 void *bsearch(const void *, const void *, size_t, size_t,
               int (*)(const void *, const void *));
-void *calloc(size_t, size_t);
 div_t div(int, int);
 double drand48(void);
 char *ecvt(double, int, int *, int *);
 double erand48(unsigned short int[3]);
 void exit(int);
 char *fcvt(double, int, int *, int *);
-void free(void *);
 
 char *gcvt(double, int, char *);
 char *getenv(const char *);
@@ -53,7 +51,6 @@ long int labs(long int);
 void lcong48(unsigned short int[7]);
 ldiv_t ldiv(long int, long int);
 long int lrand48(void);
-void *malloc(size_t);
 int mblen(const char *, size_t);
 size_t mbstowcs(wchar_t *, const char *, size_t);
 int mbtowc(wchar_t *, const char *, size_t);
@@ -84,5 +81,9 @@ size_t wcstombs(char *, const wchar_t *, size_t);
 int wctomb(char *, wchar_t);
 
 char *getenv (const char *);
+
+unsigned long long strtoull(const char * nptr, char ** endptr, int base);
+unsigned long strtoul(const char * nptr, char ** endptr, int base);
+long long strtoll(const char * nptr, char ** endptr, int base);
 
 #endif
