@@ -1,0 +1,30 @@
+# coding:utf-8
+# *******************************************************************
+# * Copyright 2021-2080 evilbinary
+# * 作者: evilbinary on 01/01/20
+# * 邮箱: rootdebug@163.com
+# ********************************************************************
+import os
+
+Import('env')
+
+
+
+source= [
+    'main.c',
+    '../libsdl2/libsdl2.a',  
+    '../libgui/libgui.a',
+    '../libgui/libimage.a',
+    '../libjpeg/libjpeg.a',
+    '../libpng/libpng.a',
+    '../libzlib/libzlib.a',
+    ]+env['LIBC']
+    
+if env.get('MYLIB'):
+    source.append(env.get('MYLIB'))
+
+
+env.Program('sdl2', source,
+    CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libsdl2/ -Iapp/libsdl2/include',
+    LINKFLAGS= '$LINKFLAGS $USER')
+
