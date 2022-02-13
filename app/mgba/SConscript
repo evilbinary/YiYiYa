@@ -1,0 +1,81 @@
+# coding:utf-8
+# *******************************************************************
+# * Copyright 2021-2080 evilbinary
+# * 作者: evilbinary on 01/01/20
+# * 邮箱: rootdebug@163.com
+# ********************************************************************
+import os
+
+Import('env')
+
+
+cflags=' -DUSE_FILE32API -Iapp/mgba/src/libgba -Iapp/mgba/include -Iapp/libzlib/ -Iapp/mgba/src -Iapp/mgba/include/mgba-util -Iapp/mgba/src/third-party/zlib/contrib/ -Iapp/mgba/src/third-party/zlib/contrib/minizip/'
+
+
+source=[]
+
+source+=[
+    'src/platform/sdl/main.c',
+    'src/platform/sdl/sw-sdl2.c',
+    'src/platform/sdl/sdl-events.c',
+    'src/platform/sdl/sdl-audio.c',
+
+    'src/version.c',
+
+        ]
+
+source+=Glob('src/arm/*.c')
+source+=Glob('src/arm/*/*.c')
+source+=Glob('src/core/*.c')
+source+=Glob('src/debugger/*.c')
+# source+=Glob('src/feature/*.c')
+
+# source+=Glob('src/feature/gui/*.c')
+source+=Glob('src/feature/video-logger.c')
+source+=Glob('src/feature/commandline.c')
+
+source+=Glob('src/gb/*.c')
+source+=Glob('src/gb/*/*.c')
+source+=Glob('src/gba/*.c')
+source+=Glob('src/gba/*/*.c')
+source+=Glob('src/sm83/*.c')
+source+=Glob('src/sm83/debugger/*.c')
+
+# source+=Glob('src/util/gui/*.c')
+
+source+=Glob('src/util/vfs/*.c')
+source+=Glob('src/util/*.c')
+
+source+=Glob('src/libgba/*.c')
+
+
+source+=[
+    'src/third-party/zlib/contrib/minizip/ioapi.c',
+    # 'src/third-party/zlib/contrib/minizip/miniunz.c',
+    # 'src/third-party/zlib/contrib/minizip/minizip.c',
+    'src/third-party/zlib/contrib/minizip/unzip.c',
+    'src/third-party/zlib/contrib/minizip/zip.c',
+
+        ]
+source+=Glob('src/third-party/inih/*.c')
+
+source+=Glob('src/third-party/blip_buf/*.c')
+
+
+
+
+source+= [
+
+    '../libsdl2/libsdl2.a',
+    '../libgui/libgui.a',
+    '../libgui/libimage.a',
+    '../libpng/libpng.a',
+    '../libzlib/libzlib.a',
+    ]+env['LIBC']
+    
+if env.get('MYLIB'):
+    source.append(env.get('MYLIB'))
+
+env.Program('mgba', source,
+    CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/liblvgl -Iapp/libgui/ -Iapp/libzlib/ -Iapp/libpng -Iapp/libjpeg -Iapp/libsdl2/ -Iapp/libsdl2/include '+cflags,
+    LINKFLAGS= '$LINKFLAGS $USER')

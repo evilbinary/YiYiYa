@@ -70,6 +70,12 @@ if env.get('APP'):
 
     SConscript(dirs=['infones'], exports='env')
 
+    SConscript(dirs=['libsdl2'], exports='env')
+    SConscript(dirs=['sdl2'], exports='env')
+
+    SConscript(dirs=['mgba'], exports='env')
+
+
 
     apps=['hello/hello',
             'gui/gui',
@@ -83,7 +89,9 @@ if env.get('APP'):
             'lvgl/lvgl',
             'track/track',
             'launcher/launcher',
-            'infones/infones'
+            'infones/infones',
+            'sdl2/sdl2',
+            'mgba/mgba'
             ]
     apps+=Glob('resource/*')
     if env.get('DEFAULT_LIBC')=='libmusl':

@@ -235,7 +235,7 @@ typedef	unsigned int		u_uint32_t;
 
 
 
-
+typedef unsigned short sa_family_t;
 
 
 

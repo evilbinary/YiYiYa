@@ -88,8 +88,7 @@ int fseek(FILE *stream, long int offset, int origin) {
 
 int fclose(FILE *stream) { return close(stream->fd); }
 
-size_t fread(void * ptr, size_t size, size_t nmemb,
-             FILE * stream) {
+size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream) {
   unsigned char *buffer = (unsigned char *)ptr;
   int i, j, c;
 
@@ -97,7 +96,7 @@ size_t fread(void * ptr, size_t size, size_t nmemb,
   if (size == 0) return 0;
   if (nmemb == 0) return 0;
 
-  int total=nmemb*size;
+  int total = nmemb * size;
   size_t r = ya_read(stream->fd, buffer, total);
 
   // if(nmemb>size){
@@ -343,3 +342,14 @@ int scanf(const char *str, ...) {
   va_end(vl);
   return ret;
 }
+
+int sscanf(const char *restrict s, const char *restrict fmt, ...) {
+  int ret;
+  va_list ap;
+  va_start(ap, fmt);
+  ret = vsscanf(s, fmt, ap);
+  va_end(ap);
+  return ret;
+}
+
+weak_alias(sscanf, __isoc99_sscanf);

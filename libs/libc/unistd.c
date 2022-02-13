@@ -60,7 +60,7 @@ int fchown(int fd, uid_t uid, gid_t gid) {
 
 int fchdir(int fd) {
   int rc;
-  rc=ya_fchdir(fd);
+  rc = ya_fchdir(fd);
 
   return rc;
 }
@@ -73,10 +73,10 @@ int ftruncate(int fd, off_t offset) {
 
 char *getcwd(char *buf, size_t size) {
   int rc;
-  rc=ya_getcwd(buf,size);
+  rc = ya_getcwd(buf, size);
   errno = rc;
 
-  if(rc<0){
+  if (rc < 0) {
     return NULL;
   }
   return buf;
@@ -214,7 +214,7 @@ int execl(const char *path, const char *argv0, ...) {
 }
 
 int execvp(const char *file, char *const argv[]) {
-  char *const envp=environ;
+  char *const envp = environ;
   const char *p, *z, *path = getenv("PATH");
   size_t l, k;
   int seen_eacces = 0;
@@ -259,28 +259,28 @@ int execvp(const char *file, char *const argv[]) {
   // return execv(filename, argv);
 }
 
-int execlp(const char *file, const char *argv0, ...)
-{
-	int argc;
-	va_list ap;
-	va_start(ap, argv0);
-	for (argc=1; va_arg(ap, const char *); argc++);
-	va_end(ap);
-	{
-		int i;
-		char *argv[argc+1];
-		va_start(ap, argv0);
-		argv[0] = (char *)argv0;
-		for (i=1; i<argc; i++)
-			argv[i] = va_arg(ap, char *);
-		argv[i] = NULL;
-		va_end(ap);
-		return execvp(file, argv);
-	}
+int execlp(const char *file, const char *argv0, ...) {
+  int argc;
+  va_list ap;
+  va_start(ap, argv0);
+  for (argc = 1; va_arg(ap, const char *); argc++)
+    ;
+  va_end(ap);
+  {
+    int i;
+    char *argv[argc + 1];
+    va_start(ap, argv0);
+    argv[0] = (char *)argv0;
+    for (i = 1; i < argc; i++) argv[i] = va_arg(ap, char *);
+    argv[i] = NULL;
+    va_end(ap);
+    return execvp(file, argv);
+  }
 }
 
+int getpagesize(void) { return PAGE_SIZE; }
 
-int getpagesize(void)
-{
-	return PAGE_SIZE;
+int fsync(int fd) {
+  printf("unimpl fsync\n");
+  return 1;
 }

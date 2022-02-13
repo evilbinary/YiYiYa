@@ -145,9 +145,13 @@ char *tmpnam(char *);
 int ungetc(int, FILE *);
 int vfprintf(FILE *, const char *, va_list);
 int vprintf(const char *, va_list);
+
 int vsnprintf(char *, size_t, const char *, va_list);
 int vsprintf(char *, const char *, va_list);
 
+int vfscanf(FILE *restrict f, const char *restrict fmt, va_list ap);
+int vsscanf(const char *restrict s, const char *restrict fmt, va_list ap);
+int sscanf(const char *restrict s, const char *restrict fmt, ...);
 
 #ifdef __cplusplus
 }
