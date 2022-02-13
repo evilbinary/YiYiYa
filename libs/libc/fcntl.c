@@ -24,3 +24,9 @@ int open(const char *filename, int flags, ...) {
 int creat(const char *filename, u32 mode) {
   return open(filename, O_CREAT | O_WRONLY | O_TRUNC);
 }
+
+int fcntl(int fd, int cmd, ...){
+  printf("unimpl fcntl\n");
+
+  return 1;
+}

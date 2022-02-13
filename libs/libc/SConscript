@@ -33,10 +33,14 @@ source=[
     'dirent.c',
     'assert.c',
     'locale.c',
+    'vsscanf.c',
+    'strntoumax.c',
+    'vsnprintf.c',
 ]
 
 source+= Glob('math/*.c')
 source+= Glob('environ/*.c')
+source+= Glob('sys/*.c')
 
 if env['ARCHTYPE'] =='arm':
     source=source+[

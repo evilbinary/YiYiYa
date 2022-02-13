@@ -17,8 +17,8 @@ DIR *opendir(const char *dirname) {
 int closedir(DIR *dir) {
   if (dir && (dir->fd != -1)) {
     int ret = close(dir->fd);
-    dir->buffer_pos=0;
-    dir->buffer_end=0;
+    dir->buffer_pos = 0;
+    dir->buffer_end = 0;
     free(dir);
     return ret;
   } else {
@@ -40,4 +40,12 @@ struct dirent *readdir(DIR *dir) {
   de = (void *)(dir->buffer + dir->buffer_pos);
   dir->buffer_pos += de->d_reclen;
   return de;
+}
+
+void rewinddir(DIR *dir) {
+  // LOCK(dir->lock);
+  lseek(dir->fd, 0, SEEK_SET);
+  dir->buffer_pos = dir->buffer_end = 0;
+  // dir->tell = 0;
+  // UNLOCK(dir->lock);
 }

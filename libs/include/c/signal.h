@@ -4,6 +4,7 @@
 extern "C" {
 #endif
 
+#include "unistd.h"
 
 #define SIGABRT			1
 #define SIGALRM			2
@@ -55,6 +56,7 @@ typedef int sig_atomic_t;
 
 int    raise(int);
 
+int kill(pid_t, int);
 
 #ifdef __cplusplus
 }

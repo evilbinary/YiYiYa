@@ -5,6 +5,7 @@ extern "C" {
 #endif
 
 #include <features.h>
+#include "time.h"
 
 #define __NEED_dev_t
 #define __NEED_ino_t
@@ -88,8 +89,11 @@ int mknod(const char *, mode_t, dev_t);
 int mknodat(int, const char *, mode_t, dev_t);
 #endif
 
-int futimens(int, const struct timespec [2]);
-int utimensat(int, const char *, const struct timespec [2], int);
+// int futimens(int, const struct timespec [2]);
+// int utimensat(int, const char *, const struct timespec [2], int);
+int futimes(int, const struct timeval [2]);
+int futimesat(int, const char *, const struct timeval [2]);
+int futimens(int fd, const struct timespec times[2]);
 
 #if defined(_GNU_SOURCE) || defined(_BSD_SOURCE)
 int lchmod(const char *, mode_t);

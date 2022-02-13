@@ -22,4 +22,4 @@ int clearenv(void);
 }
 #endif
 
-#endif /* __XLIBC_ENVIRON_H__ */
+#endif /* __ENVIRON_H__ */
