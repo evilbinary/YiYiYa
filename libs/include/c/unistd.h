@@ -7,6 +7,8 @@
 #include "stdio.h"
 #include "fcntl.h"
 
+#define PAGE_SIZE 1024*4
+
 #define STDIN_FILENO		0
 #define	STDOUT_FILENO		1
 #define	STDERR_FILENO		2

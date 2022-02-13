@@ -278,3 +278,9 @@ int execlp(const char *file, const char *argv0, ...)
 		return execvp(file, argv);
 	}
 }
+
+
+int getpagesize(void)
+{
+	return PAGE_SIZE;
+}
