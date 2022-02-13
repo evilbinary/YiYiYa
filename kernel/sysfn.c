@@ -517,3 +517,9 @@ int sys_clone(void* fn,void* stack,void* arg){
   thread_run(copy_thread);
   return copy_thread->id;
 }
+
+int sys_llseek(int fd, off_t offset_hi, off_t offset_lo,
+                       off_t *result, int whence){
+    *result=0;                    
+    return sys_seek(fd,offset_hi<<32|offset_lo);                 
+}

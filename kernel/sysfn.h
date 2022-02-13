@@ -7,6 +7,7 @@
 #define SYSFN_H
 
 #include "kernel.h"
+#include "sys/types.h"
 
 #if defined(ARM)|| defined(X86)
 enum {
@@ -32,6 +33,7 @@ enum {
   SYS_READDIR=89,
   SYS_CLONE= 120,
   SYS_FCHDIR=133,
+  SYS_LLSEEK=140,
   SYS_WRITEV=146,
   SYS_READV=145,
   SYS_YIELD = 158,
@@ -173,5 +175,7 @@ int sys_getcwd(char *buf, size_t size);
 int sys_fchdir(int fd);
 
 int sys_clone(void* stack,void* fn,void* arg);
+int sys_llseek(int fd, off_t offset_hi, off_t offset_lo,
+                       off_t *result, int whence);
 
 #endif

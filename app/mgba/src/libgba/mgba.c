@@ -27,9 +27,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <mgba.h>
+#include <stdbool.h>
 
-#define REG_DEBUG_ENABLE (u16*) 0x4FFF780
-#define REG_DEBUG_FLAGS (u16*) 0x4FFF700
+#define REG_DEBUG_ENABLE (uint16_t *) 0x4FFF780
+#define REG_DEBUG_FLAGS (uint16_t*) 0x4FFF700
 #define REG_DEBUG_STRING (char*) 0x4FFF600
 
 ssize_t mgba_stdout_write(struct _reent* r __attribute__((unused)), void* fd __attribute__((unused)), const char* ptr, size_t len) {

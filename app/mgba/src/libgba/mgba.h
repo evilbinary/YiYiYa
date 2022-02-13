@@ -27,6 +27,8 @@
 extern "C" {
 #endif
 
+#include <stdbool.h>
+
 #define MGBA_LOG_FATAL 0
 #define MGBA_LOG_ERROR 1
 #define MGBA_LOG_WARN 2
