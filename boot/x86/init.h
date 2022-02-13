@@ -10,11 +10,16 @@
 #include "config.h"
 
 
-#define KERNEL_MOVE 
+#define KERNEL_MOVE
+// 扇区大小
 #define READ_BLOCK_SIZE 512
+// 内核地址
 #define KERNEL_BASE 0x100000
+// 内核原地址
 #define KERNEL_ORIGIN_BASE 0x10000
+// 页表地址
 #define PDT_BASE 0x9000
+// 版本
 #define BOOT_VERSION 0x01
 
 
