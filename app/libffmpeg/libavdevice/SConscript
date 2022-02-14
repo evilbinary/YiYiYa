@@ -10,7 +10,12 @@ Import('env')
 
 source=[]
 
-source+= Glob('libavdevice/*.c')
+source+= [
+    'alldevices.c',                                                  
+    'avdevice.c',                                                    
+    'utils.c',                                                       
+
+]
 
 if env.get('MYLIB'):
     source.append(env.get('MYLIB'))
@@ -20,4 +25,4 @@ source+= [
     ]+env['LIBC']
 
 env.Library('avdevice', source,
-    CFLAGS='$CFLAGS  $LIBCFLAGS  ',)
+    CFLAGS='$CFLAGS  $LIBCFLAGS -Iapp/libffmpeg/ ',)

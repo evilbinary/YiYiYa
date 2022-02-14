@@ -26,6 +26,7 @@
 #include "imgutils.h"
 #include "mem.h"
 #include "samplefmt.h"
+#include "internal.h"
 
 MAKE_ACCESSORS(AVFrame, frame, int64_t, best_effort_timestamp)
 MAKE_ACCESSORS(AVFrame, frame, int64_t, pkt_duration)

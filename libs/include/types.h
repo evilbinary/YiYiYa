@@ -1,7 +1,7 @@
 #ifndef TYPES_H
 #define TYPES_H
 
-#include "sys/types.h"
+#include "c/sys/types.h"
 
 #define _Addr int
 #define _Int64 long long

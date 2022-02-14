@@ -23,6 +23,7 @@
 
 #include "libavutil/common.h"
 #include "internal.h"
+#include "resample.h"
 
 #if defined(CONFIG_RESAMPLE_DBL)
 #define SET_TYPE(func)  func ## _dbl
@@ -61,13 +62,13 @@ static void SET_TYPE(resample_nearest)(void *dst0, int dst_index, const void *sr
     dst[dst_index] = src[index];
 }
 
-static void SET_TYPE(resample_linear)(ResampleContext *c, void *dst0, int dst_index,
+static void SET_TYPE(resample_linear) (struct ResampleContext *c, void *dst0, int dst_index,
                                       const void *src0, unsigned int index, int frac)
 {
     FELEM *dst = dst0;
     const FELEM *src = src0;
     int i;
-    unsigned int sample_index = index >> c->phase_shift;
+    unsigned int sample_index = index >> (c->phase_shift);
     FELEM2 val = 0;
     FELEM *filter = ((FELEM *)c->filter_bank) +
                     c->filter_length * (index & c->phase_mask);
@@ -82,7 +83,7 @@ static void SET_TYPE(resample_linear)(ResampleContext *c, void *dst0, int dst_in
     OUT(dst[dst_index], val);
 }
 
-static void SET_TYPE(resample_one)(ResampleContext *c,
+static void SET_TYPE(resample_one)(struct ResampleContext *c,
                                    void *dst0, int dst_index, const void *src0,
                                    unsigned int index, int frac)
 {

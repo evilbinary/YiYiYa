@@ -10,14 +10,58 @@ Import('env')
 
 source=[]
 
-source+= Glob('libavcodec/*.c')
+source+=[
+    'allcodecs.c',                                                      
+    'audioconvert.c',    
+    'avdct.c',           
+    'avpacket.c',        
+    'avpicture.c',       
+    'bitstream.c',       
+    'bitstream_filter.c',
+    'codec_desc.c',      
+    'd3d11va.c',         
+    'dirac.c',           
+    'dv_profile.c',      
+    'imgconvert.c',      
+    'mathtables.c',      
+    'options.c',         
+    'parser.c',          
+    'profiles.c',        
+    'qsv_api.c',         
+    'raw.c',             
+    'resample.c',        
+    'resample2.c',       
+    'utils.c',           
+    'vorbis_parser.c',   
+    'xiph.c',
+
+
+    # 'me_cmp.c',
+    # 'snow_dwt.c',
+    # 'snow.c',
+    # 'hpeldsp_init.c',
+
+]
+
+
+if env['ARCHTYPE']=='arm':
+    source+= [
+        'arm/me_cmp_init_arm.c',
+    ]
+else:
+    print('libavcodec not support',env['ARCHTYPE'])
+
+
+
+source+=[
+    '../libavutil/libavutil.a',
+]
 
 if env.get('MYLIB'):
     source.append(env.get('MYLIB'))
-
 
 source+= [
     ]+env['LIBC']
 
 env.Library('avcodec', source,
-    CFLAGS='$CFLAGS  $LIBCFLAGS  ',)
+    CFLAGS='$CFLAGS  $LIBCFLAGS  -Iapp/libffmpeg/',)

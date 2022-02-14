@@ -2,7 +2,7 @@
 #define _SYS_TYPES_H		1
 
 
-#include <inttypes.h>
+#include "c/inttypes.h"
 
 
 #ifndef _HAVE_BLKCNT_T

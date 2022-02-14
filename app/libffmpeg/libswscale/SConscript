@@ -10,7 +10,30 @@ Import('env')
 
 source=[]
 
-source+= Glob('libswscale/*.c')
+source+= [
+
+       'alphablend.c',                
+       'hscale_fast_bilinear.c',      
+       'input.c',                     
+       'options.c',                   
+       'output.c',                    
+       'rgb2rgb.c',                   
+       'swscale.c',                   
+       'swscale_unscaled.c',          
+       'utils.c',                     
+       'yuv2rgb.c',                   
+       'slice.c',                     
+       'hscale.c',                    
+       'vscale.c',                    
+       'gamma.c',                     
+]
+
+if env['ARCHTYPE']=='arm':
+    source+= [
+        'arm/swscale_unscaled.c',
+    ]
+else:
+    print('libswscale not support',env['ARCHTYPE'])
 
 if env.get('MYLIB'):
     source.append(env.get('MYLIB'))
@@ -20,4 +43,4 @@ source+= [
     ]+env['LIBC']
 
 env.Library('swscale', source,
-    CFLAGS='$CFLAGS  $LIBCFLAGS  ',)
+    CFLAGS='$CFLAGS  $LIBCFLAGS -Iapp/libffmpeg/ ',)

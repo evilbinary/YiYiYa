@@ -64,7 +64,7 @@ static double bessel(double x)
 }
 
 /* Build a polyphase filterbank. */
-static int build_filter(ResampleContext *c, double factor)
+static int build_filter(struct ResampleContext *c, double factor)
 {
     int ph, i;
     double x, y, w;
@@ -117,9 +117,9 @@ static int build_filter(ResampleContext *c, double factor)
     return 0;
 }
 
-ResampleContext *ff_audio_resample_init(AVAudioResampleContext *avr)
+struct ResampleContext *ff_audio_resample_init(AVAudioResampleContext *avr)
 {
-    ResampleContext *c;
+    struct ResampleContext *c;
     int out_rate    = avr->out_sample_rate;
     int in_rate     = avr->in_sample_rate;
     double factor   = FFMIN(out_rate * avr->cutoff / in_rate, 1.0);
@@ -221,7 +221,7 @@ error:
     return NULL;
 }
 
-void ff_audio_resample_free(ResampleContext **c)
+void ff_audio_resample_free(struct ResampleContext **c)
 {
     if (!*c)
         return;
@@ -233,7 +233,7 @@ void ff_audio_resample_free(ResampleContext **c)
 int avresample_set_compensation(AVAudioResampleContext *avr, int sample_delta,
                                 int compensation_distance)
 {
-    ResampleContext *c;
+    struct ResampleContext *c;
 
     if (compensation_distance < 0)
         return AVERROR(EINVAL);
@@ -256,7 +256,7 @@ int avresample_set_compensation(AVAudioResampleContext *avr, int sample_delta,
     return 0;
 }
 
-static int resample(ResampleContext *c, void *dst, const void *src,
+static int resample(struct ResampleContext *c, void *dst, const void *src,
                     int *consumed, int src_size, int dst_size, int update_ctx,
                     int nearest_neighbour)
 {
@@ -331,7 +331,7 @@ static int resample(ResampleContext *c, void *dst, const void *src,
     return dst_index;
 }
 
-int ff_audio_resample(ResampleContext *c, AudioData *dst, AudioData *src)
+int ff_audio_resample(struct ResampleContext *c, AudioData *dst, AudioData *src)
 {
     int ch, in_samples, in_leftover, consumed = 0, out_samples = 0;
     int ret = AVERROR(EINVAL);
@@ -437,7 +437,7 @@ int ff_audio_resample(ResampleContext *c, AudioData *dst, AudioData *src)
 
 int avresample_get_delay(AVAudioResampleContext *avr)
 {
-    ResampleContext *c = avr->resample;
+    struct ResampleContext *c = avr->resample;
 
     if (!avr->resample_needed || !avr->resample)
         return 0;

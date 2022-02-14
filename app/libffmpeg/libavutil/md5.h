@@ -25,6 +25,7 @@
 
 #include "attributes.h"
 #include "version.h"
+#include "config.h"
 
 /**
  * @defgroup lavu_md5 MD5

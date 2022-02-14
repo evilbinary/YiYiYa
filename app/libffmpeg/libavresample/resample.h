@@ -25,6 +25,8 @@
 #include "internal.h"
 #include "audio_data.h"
 
+typedef struct ResampleContext  ResampleContext_t;
+
 struct ResampleContext {
     AVAudioResampleContext *avr;
     AudioData *buffer;

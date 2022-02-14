@@ -10,7 +10,36 @@ Import('env')
 
 source=[]
 
-source+= Glob('libavformat/*.c')
+source+=[
+
+       'allformats.c',        
+       'avio.c',              
+       'aviobuf.c',           
+       'cutils.c',            
+       'dump.c',              
+       'format.c',            
+       'id3v1.c',             
+       'id3v2.c',             
+       'metadata.c',          
+       'mux.c',               
+       'options.c',           
+       'os_support.c',        
+       'qtpalette.c',         
+       'riff.c',              
+       'sdp.c',               
+       'url.c',               
+       'utils.c',
+
+       
+       'subfile.c',   
+       'mmst.c',      
+       'concat.c', 
+       'bintext.c',      
+]
+
+source+=[
+    '../libavcodec/libavcodec.a'
+]
 
 if env.get('MYLIB'):
     source.append(env.get('MYLIB'))
@@ -20,4 +49,4 @@ source+= [
     ]+env['LIBC']
 
 env.Library('avformat', source,
-    CFLAGS='$CFLAGS  $LIBCFLAGS  ',)
+    CFLAGS='$CFLAGS  $LIBCFLAGS  -Iapp/libffmpeg/',)

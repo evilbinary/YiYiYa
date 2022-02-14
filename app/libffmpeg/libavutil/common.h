@@ -30,11 +30,11 @@
 #error missing -D__STDC_CONSTANT_MACROS / #define __STDC_CONSTANT_MACROS
 #endif
 
+#include "stdint.h"
 #include <errno.h>
 #include <inttypes.h>
 #include <limits.h>
 #include <math.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -43,6 +43,9 @@
 #include "macros.h"
 #include "version.h"
 #include "libavutil/avconfig.h"
+
+#include "stdint.h"
+#include "config.h"
 
 #if AV_HAVE_BIGENDIAN
 #   define AV_NE(be, le) (be)
@@ -202,7 +205,7 @@ static av_always_inline av_const int16_t av_clip_int16_c(int a)
  */
 static av_always_inline av_const int32_t av_clipl_int32_c(int64_t a)
 {
-    if ((a+0x80000000u) & ~UINT64_C(0xFFFFFFFF)) return (int32_t)((a>>63) ^ 0x7FFFFFFF);
+    if ((a+0x80000000u) & ~ (  0xFFFFFFFFULL ) ) return (int32_t)((a>>63) ^ 0x7FFFFFFF);
     else                                         return (int32_t)a;
 }
 

@@ -21,6 +21,11 @@
 #ifndef AVUTIL_AVUTIL_H
 #define AVUTIL_AVUTIL_H
 
+#include "config.h"
+
+#include "internal.h"
+
+
 /**
  * @file
  * external API header

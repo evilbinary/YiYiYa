@@ -20,9 +20,8 @@
  * @file
  * misc parsing utilities
  */
-
+#include "stdint.h"
 #include <time.h>
-
 #include "avstring.h"
 #include "avutil.h"
 #include "common.h"

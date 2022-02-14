@@ -10,7 +10,16 @@ Import('env')
 
 source=[]
 
-source+= Glob('libswresample/*.c')
+source+=[
+    'audioconvert.c',    
+    'dither.c',          
+    'options.c',         
+    'rematrix.c',        
+    'resample.c',        
+    'resample_dsp.c',    
+    'swresample.c',      
+    'swresample_frame.c',
+]
 
 if env.get('MYLIB'):
     source.append(env.get('MYLIB'))
@@ -20,4 +29,4 @@ source+= [
     ]+env['LIBC']
 
 env.Library('swresample', source,
-    CFLAGS='$CFLAGS  $LIBCFLAGS  ',)
+    CFLAGS='$CFLAGS  $LIBCFLAGS -Iapp/libffmpeg/ ',)

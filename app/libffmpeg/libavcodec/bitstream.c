@@ -125,7 +125,7 @@ static int alloc_table(VLC *vlc, int size, int use_static)
     }
     return index;
 }
-
+extern const uint8_t ff_reverse[256];
 static av_always_inline uint32_t bitswap_32(uint32_t x)
 {
     return (uint32_t)ff_reverse[ x        & 0xFF] << 24 |

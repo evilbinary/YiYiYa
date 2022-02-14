@@ -18,7 +18,7 @@ int ffplayer() {
   AVCodecContext *pCodecCtx;
   AVCodec *pCodec;
   char filepath[]="/test.wmv";
-//   char rtspUrl[] = "rtsp://admin:12345@192.168.10.76:554";
+//   char rtspUrl[] = "rtsp://admin:12345@192.168.10.76:522";
   av_register_all();                      //注册组件
   avformat_network_init();                //支持网络流
   pFormatCtx = avformat_alloc_context();  //初始化AVFormatContext
@@ -54,8 +54,8 @@ int ffplayer() {
     return -1;
   }
   AVFrame *pFrame, *pFrameYUV;
-  pFrame = avcodec_alloc_frame();     //存储解码后AVFrame
-  pFrameYUV = avcodec_alloc_frame();  //存储转换后AVFrame
+  pFrame = av_frame_alloc();     //存储解码后AVFrame
+  pFrameYUV = av_frame_alloc();  //存储转换后AVFrame
   uint8_t *out_buffer;
   out_buffer =
       malloc(avpicture_get_size(AV_PIX_FMT_YUV420P, pCodecCtx->width,

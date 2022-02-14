@@ -522,3 +522,11 @@ static char *_add(const char *str, char *pt, const char *ptlim) {
   while (pt < ptlim && (*pt = *str++) != '\0') ++pt;
   return pt;
 }
+
+
+int nanosleep(const struct timespec *req, struct timespec *rem)
+{
+	
+  printf("not imple nanosleep\n");
+  return 1;
+}

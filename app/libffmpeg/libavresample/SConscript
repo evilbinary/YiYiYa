@@ -10,7 +10,7 @@ Import('env')
 
 source=[]
 
-source+= Glob('libavresample/*.c')
+source+= Glob('*.c')
 
 if env.get('MYLIB'):
     source.append(env.get('MYLIB'))
@@ -20,4 +20,4 @@ source+= [
     ]+env['LIBC']
 
 env.Library('avresample', source,
-    CFLAGS='$CFLAGS  $LIBCFLAGS  ',)
+    CFLAGS='$CFLAGS  $LIBCFLAGS -Iapp/libffmpeg/ ',)

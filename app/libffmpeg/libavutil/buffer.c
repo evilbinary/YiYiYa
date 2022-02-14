@@ -18,7 +18,7 @@
 
 #include <stdint.h>
 #include <string.h>
-
+#include "internal.h"
 #include "atomic.h"
 #include "buffer_internal.h"
 #include "common.h"
