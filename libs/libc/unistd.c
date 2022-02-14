@@ -284,3 +284,8 @@ int fsync(int fd) {
   printf("unimpl fsync\n");
   return 1;
 }
+
+int usleep(unsigned i){
+  printf("unimpl usleep\n");
+  return 1;
+}

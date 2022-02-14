@@ -24,7 +24,7 @@
  * AVOptions
  * @author Michael Niedermayer <michaelni@gmx.at>
  */
-
+#include "stdint.h"
 #include "avutil.h"
 #include "avassert.h"
 #include "avstring.h"
@@ -39,6 +39,7 @@
 #include "mathematics.h"
 #include "samplefmt.h"
 #include "bprint.h"
+
 
 #include <float.h>
 

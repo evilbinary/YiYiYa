@@ -1,12 +1,13 @@
 /*
  * libc/stdio/vsscanf.c
  */
-
+#include "stdint.h"
 #include <ctype.h>
 #include <limits.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+
 
 enum flags {
 	FL_SPLAT			= 0x01,			/* Drop the value, do not assign */

@@ -59,7 +59,7 @@ int ff_neterrno(void);
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <netdb.h>
+// #include <netdb.h>
 
 #define ff_neterrno() AVERROR(errno)
 #endif /* HAVE_WINSOCK2_H */

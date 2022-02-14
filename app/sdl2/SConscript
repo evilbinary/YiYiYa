@@ -32,14 +32,14 @@ env.Program('sdl2', source,
 source= [
     'player.c',
 
-    '../libffmpeg/libavcodec/libavcodec.a',  
+    '../libsdl2/libsdl2.a', 
+    '../libgui/libgui.a', 
     '../libffmpeg/libavdevice/libavdevice.a',
     '../libffmpeg/libavfilter/libavfilter.a',
     '../libffmpeg/libavformat/libavformat.a', 
-    '../libffmpeg/libavutil/libavutil.a',
     '../libffmpeg/libswscale/libswscale.a', 
-
-    '../libsdl2/libsdl2.a',  
+    '../libffmpeg/libavcodec/libavcodec.a',  
+    '../libffmpeg/libavutil/libavutil.a',
 
     ]+env['LIBC']
     

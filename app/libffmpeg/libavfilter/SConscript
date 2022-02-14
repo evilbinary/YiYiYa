@@ -10,7 +10,23 @@ Import('env')
 
 source=[]
 
-source+= Glob('libavfilter/*.c')
+source+= [
+    'allfilters.c',        
+    'audio.c',             
+    'avfilter.c',          
+    'avfiltergraph.c',     
+    'buffersink.c',        
+    'buffersrc.c',         
+    'drawutils.c',         
+    'fifo.c',              
+    'formats.c',           
+    'framepool.c',         
+    'graphdump.c',         
+    'graphparser.c',       
+    'opencl_allkernels.c', 
+    'transform.c',         
+    'video.c',     
+]
 
 if env.get('MYLIB'):
     source.append(env.get('MYLIB'))
@@ -20,4 +36,4 @@ source+= [
     ]+env['LIBC']
 
 env.Library('avfilter', source,
-    CFLAGS='$CFLAGS  $LIBCFLAGS  ',)
+    CFLAGS='$CFLAGS  $LIBCFLAGS -Iapp/libffmpeg/ ',)

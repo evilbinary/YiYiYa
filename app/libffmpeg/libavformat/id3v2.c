@@ -35,6 +35,8 @@
 #include "libavutil/avstring.h"
 #include "libavutil/dict.h"
 #include "libavutil/intreadwrite.h"
+#include "libavutil/internal.h"
+
 #include "avio_internal.h"
 #include "internal.h"
 #include "id3v1.h"

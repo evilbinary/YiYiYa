@@ -26,7 +26,7 @@
  * @file
  * AVOptions
  */
-
+#include "internal.h"
 #include "rational.h"
 #include "avutil.h"
 #include "dict.h"

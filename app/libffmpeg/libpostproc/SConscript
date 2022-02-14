@@ -10,7 +10,9 @@ Import('env')
 
 source=[]
 
-source+= Glob('libpostproc/*.c')
+source+= [
+    'postprocess.c'
+]
 
 if env.get('MYLIB'):
     source.append(env.get('MYLIB'))
@@ -20,4 +22,4 @@ source+= [
     ]+env['LIBC']
 
 env.Library('postproc', source,
-    CFLAGS='$CFLAGS  $LIBCFLAGS  ',)
+    CFLAGS='$CFLAGS  $LIBCFLAGS -Iapp/libffmpeg/ ',)
