@@ -82,7 +82,7 @@ FILE *fopen(const char *filename, const char *mode) {
 
 int fseek(FILE *stream, long int offset, int origin) {
   int rc;
-  rc = ya_seek((u32)stream->fd, offset);
+  rc = ya_seek(stream->fd, offset,origin);
   return rc;
 }
 

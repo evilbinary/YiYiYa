@@ -97,7 +97,7 @@ size_t ya_read(u32 fd, void* buf, size_t nbytes) {
   return syscall3(SYS_READ, fd, buf, nbytes);
 }
 
-size_t ya_seek(u32 fd, ulong offset) { return syscall2(SYS_SEEK, fd, offset); }
+size_t ya_seek(u32 fd, ulong offset,int whence) { return syscall3(SYS_SEEK, fd, offset,whence); }
 
 uint32_t secs_of_years(int years) {
   uint32_t days = 0;

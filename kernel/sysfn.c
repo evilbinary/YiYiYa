@@ -82,7 +82,7 @@ u32 sys_open(char* name, int attr) {
     kprintf(" new fd error\n");
     return -1;
   }
-  fd->offset=0;
+  fd->offset = 0;
   f = thread_add_fd(current, fd);
   if (f < 0) {
     kprintf("sys open %s error\n", name);
@@ -123,7 +123,7 @@ size_t sys_write(u32 fd, void* buf, size_t nbytes) {
   }
   // kprintf("sys write %d %s fd:%s\n",current->id,buf,f->name);
   u32 ret = vwrite(node, f->offset, nbytes, buf);
-  f->offset+=nbytes;
+  f->offset += nbytes;
   return ret;
 }
 size_t sys_read(u32 fd, void* buf, size_t nbytes) {
@@ -139,17 +139,29 @@ size_t sys_read(u32 fd, void* buf, size_t nbytes) {
     return -1;
   }
   u32 ret = vread(node, f->offset, nbytes, buf);
-  f->offset+=nbytes;
+  f->offset += nbytes;
   return ret;
 }
 
-size_t sys_seek(u32 fd, ulong offset) {
+size_t sys_seek(u32 fd, ulong offset, int whence) {
   fd_t* f = thread_find_fd_id(thread_current(), fd);
   if (f == NULL) {
     kprintf("seek not found fd %d\n", fd);
     return 0;
   }
-  f->offset = offset;
+  // set start offset
+  if (whence == 0) {
+    f->offset = offset;
+  } else if (whence == 1) {  // seek set
+    f->offset += offset;
+  } else if (whence == 2) {  // seek end
+    vnode_t* file = f->data;
+    if (file != NULL) {
+      f->offset = file->length + offset;
+    }
+  } else {
+    kprintf("seek whence error %d\n", whence);
+  }
   return 1;
 }
 
@@ -219,16 +231,16 @@ u32 sys_exec(char* filename, char* const argv[], char* const envp[]) {
   t->context.page_dir = current->context.page_dir;
 #endif
 
-  //init pwd
+  // init pwd
   vnode_t* node = f->data;
   if (node == NULL) {
     kprintf("sys read node is null\n");
     return -1;
   }
-  if(node->parent!=NULL){
-    t->vfs->pwd=node->parent;
-  }else{
-    t->vfs->pwd=node;
+  if (node->parent != NULL) {
+    t->vfs->pwd = node->parent;
+  } else {
+    t->vfs->pwd = node;
   }
 
   // init vmm
@@ -400,9 +412,9 @@ int sys_writev(int fd, iovec_t* vector, int count) {
 int sys_chdir(const char* path) {
   int ret = 0;
   thread_t* current = thread_current();
-  int fd=sys_open(path,0);
-  if(fd<0){
-     return -1;
+  int fd = sys_open(path, 0);
+  if (fd < 0) {
+    return -1;
   }
   sys_fchdir(fd);
   sys_close(fd);
@@ -477,15 +489,14 @@ int sys_fcntl64(int fd, int cmd, void* arg) {
   return 1;
 }
 
-int sys_getcwd(char *buf, size_t size){
+int sys_getcwd(char* buf, size_t size) {
   thread_t* current = thread_current();
-  int ret=kstrcpy(buf,current->vfs->pwd->name);
+  int ret = kstrcpy(buf, current->vfs->pwd->name);
   return ret;
 }
 
-
-int sys_fchdir(int fd){
-  u32 ret=0;
+int sys_fchdir(int fd) {
+  u32 ret = 0;
   thread_t* current = thread_current();
   fd_t* f = thread_find_fd_id(current, fd);
   if (f == NULL) {
@@ -493,12 +504,11 @@ int sys_fchdir(int fd){
     return -1;
   }
   vnode_t* node = f->data;
-  current->vfs->pwd=node;
+  current->vfs->pwd = node;
   return ret;
 }
 
-
-int sys_clone(void* fn,void* stack,void* arg){
+int sys_clone(void* fn, void* stack, void* arg) {
   thread_t* current = thread_current();
   if (current == NULL) {
     kprintf("current is null\n");
@@ -512,14 +522,14 @@ int sys_clone(void* fn,void* stack,void* arg){
 
   interrupt_context_t* context = copy_thread->context.esp0;
   context_ret(context) = 0;
-  context_set_entry(&copy_thread->context,fn);
+  context_set_entry(&copy_thread->context, fn);
 
   thread_run(copy_thread);
   return copy_thread->id;
 }
 
-int sys_llseek(int fd, off_t offset_hi, off_t offset_lo,
-                       off_t *result, int whence){
-    *result=0;                    
-    return sys_seek(fd,offset_hi<<32|offset_lo);                 
+int sys_llseek(int fd, off_t offset_hi, off_t offset_lo, off_t* result,
+               int whence) {
+  *result = 0;
+  return sys_seek(fd, offset_hi << 32 | offset_lo, whence);
 }
