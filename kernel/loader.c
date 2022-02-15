@@ -21,7 +21,7 @@ int load_elf(Elf32_Ehdr* elf_header, u32 fd, page_dir_t* page) {
   }
   Elf32_Phdr phdr[MAX_PHDR];
   kmemset(phdr, 0, MAX_PHDR * sizeof(Elf32_Phdr));
-  syscall2(SYS_SEEK, fd, offset);
+  syscall3(SYS_SEEK, fd, offset,0);
   u32 nbytes =
       syscall3(SYS_READ, fd, phdr, sizeof(Elf32_Phdr) * elf_header->e_phnum);
   // kprintf("addr %x elf=%x\n\r", phdr, elf);
@@ -47,7 +47,7 @@ int load_elf(Elf32_Ehdr* elf_header, u32 fd, page_dir_t* page) {
 
           char* start = phdr[i].p_offset;
           char* vaddr = phdr[i].p_vaddr;
-          syscall2(SYS_SEEK, fd, start);
+          syscall3(SYS_SEEK, fd, start,0);
           entry_txt = vaddr;
           u32 ret = syscall3(SYS_READ, fd, vaddr, phdr[i].p_filesz);
         } else {
@@ -120,7 +120,7 @@ int load_elf(Elf32_Ehdr* elf_header, u32 fd, page_dir_t* page) {
   }
   Elf32_Shdr shdr[MAX_SHDR];
   kmemset(shdr, 0, sizeof(Elf32_Shdr) * elf_header->e_shnum);
-  syscall2(SYS_SEEK, fd, offset);
+  syscall3(SYS_SEEK, fd, offset,0);
   nbytes =
       syscall3(SYS_READ, fd, shdr, sizeof(Elf32_Shdr) * elf_header->e_shnum);
 
@@ -142,7 +142,7 @@ int load_elf(Elf32_Ehdr* elf_header, u32 fd, page_dir_t* page) {
       kprintf("data start:%x vaddr:%x sh_size:%x \n\r", start, vaddr,
               shdr[i].sh_size);
 #endif
-      syscall2(SYS_SEEK, fd, start);
+      syscall3(SYS_SEEK, fd, start,0);
       u32 ret = syscall3(SYS_READ, fd, vaddr, shdr[i].sh_size);
       // map_alignment(page,vaddr,buf,shdr[i].sh_size);
     }

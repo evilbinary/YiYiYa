@@ -51,18 +51,16 @@ source+=Glob('src/libgba/*.c')
 
 source+=[
     'src/third-party/zlib/contrib/minizip/ioapi.c',
-    # 'src/third-party/zlib/contrib/minizip/miniunz.c',
-    # 'src/third-party/zlib/contrib/minizip/minizip.c',
     'src/third-party/zlib/contrib/minizip/unzip.c',
     'src/third-party/zlib/contrib/minizip/zip.c',
 
+    # 'src/third-party/zlib/contrib/minizip/miniunz.c',
+    # 'src/third-party/zlib/contrib/minizip/minizip.c',
         ]
+
 source+=Glob('src/third-party/inih/*.c')
 
 source+=Glob('src/third-party/blip_buf/*.c')
-
-
-
 
 source+= [
 
@@ -77,5 +75,29 @@ if env.get('MYLIB'):
     source.append(env.get('MYLIB'))
 
 env.Program('mgba', source,
+    CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/liblvgl -Iapp/libgui/ -Iapp/libzlib/ -Iapp/libpng -Iapp/libjpeg -Iapp/libsdl2/ -Iapp/libsdl2/include '+cflags,
+    LINKFLAGS= '$LINKFLAGS $USER')
+
+# build miniunz
+
+source=[
+    'src/third-party/zlib/contrib/minizip/ioapi.c',
+    'src/third-party/zlib/contrib/minizip/unzip.c',
+    'src/third-party/zlib/contrib/minizip/zip.c',
+    'src/third-party/zlib/contrib/minizip/miniunz.c',
+    # 'src/third-party/zlib/contrib/minizip/minizip.c',
+        ]
+
+source+= [
+    '../libgui/libgui.a',
+    '../libgui/libimage.a',
+    '../libpng/libpng.a',
+    '../libzlib/libzlib.a',
+    ]+env['LIBC']
+
+if env.get('MYLIB'):
+    source.append(env.get('MYLIB'))
+
+env.Program('miniunz', source,
     CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/liblvgl -Iapp/libgui/ -Iapp/libzlib/ -Iapp/libpng -Iapp/libjpeg -Iapp/libsdl2/ -Iapp/libsdl2/include '+cflags,
     LINKFLAGS= '$LINKFLAGS $USER')

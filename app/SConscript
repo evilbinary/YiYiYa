@@ -102,7 +102,9 @@ if env.get('APP'):
             'launcher/launcher',
             'infones/infones',
             'sdl2/sdl2',
-            'mgba/mgba'
+            'sdl2/player',
+            'mgba/mgba',
+            'mgba/miniunz'
             ]
     apps+=Glob('resource/*')
     if env.get('DEFAULT_LIBC')=='libmusl':
