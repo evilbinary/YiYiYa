@@ -72,7 +72,8 @@ void syscall_init() {
   syscall_table[SYS_CLONE]=&sys_clone;
   syscall_table[SYS_LLSEEK]=&sys_llseek;
 
-  
+  syscall_table[SYS_UMASK]=&sys_umask;
+
   
 }
 

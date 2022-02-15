@@ -1,0 +1,34 @@
+# coding:utf-8
+# *******************************************************************
+# * Copyright 2021-2080 evilbinary
+# * 作者: evilbinary on 01/01/20
+# * 邮箱: rootdebug@163.com
+# ********************************************************************
+import os
+
+Import('env')
+
+
+
+source= [
+    'main.c',
+]
+
+source+= Glob('lib/*.c')
+
+source+= [
+    'toys/posix/cat.c',
+    'toys/posix/wc.c',
+]
+
+source+=[ 
+    ]+env['LIBC']
+    
+
+if env.get('MYLIB'):
+    source.append(env.get('MYLIB'))
+
+
+env.Program('toybox', source,
+    CFLAGS='$CFLAGS  $LIBCFLAGS  -Iapp/toybox -D__linux__ -DCFG_TOYBOX',
+    LINKFLAGS= '$LINKFLAGS $USER')

@@ -699,6 +699,6 @@ int timer_create_wrap(clockid_t c, struct sigevent *se, timer_t *t)
 int timer_settime_wrap(timer_t t, int flags, struct itimerspec *val,
   struct itimerspec *old)
 {
-  return syscall(SYS_timer_settime, t, flags, val, old);
+  return syscall(SYS_timer_settime32, t, flags, val, old);
 }
 #endif

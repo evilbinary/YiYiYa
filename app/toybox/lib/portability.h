@@ -8,6 +8,8 @@
 // This must come before we #include any system header file to take effect!
 #define _FILE_OFFSET_BITS 64
 
+#include "sys/statfs.h"
+
 // For musl
 #define _ALL_SOURCE
 #include <regex.h>
