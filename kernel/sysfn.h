@@ -7,7 +7,7 @@
 #define SYSFN_H
 
 #include "kernel.h"
-#include "sys/types.h"
+#include "types.h"
 
 #if defined(ARM)|| defined(X86)
 enum {
@@ -127,7 +127,7 @@ void sys_vumap(void* ptr, size_t size);
 void* sys_alloc_alignment(size_t size, u32 alignment);
 
 void sys_free_alignment(void* ptr);
-size_t sys_seek(u32 fd, ulong offset);
+size_t sys_seek(u32 fd, ulong offset,int whence);
 
 void* sys_valloc(void* addr, size_t size);
 void sys_vfree(void* addr);
