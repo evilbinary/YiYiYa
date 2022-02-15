@@ -12,9 +12,9 @@
 #else
 #define OLDTOY(name, oldname, flags) HELP_##oldname "\0"
 #endif
-static char *help_data =
-#include "generated/newtoys.h"
-;
+// static char *help_data =
+// #include "generated/newtoys.h"
+// ;
 
 void show_help(FILE *out, int full)
 {
@@ -27,19 +27,19 @@ void show_help(FILE *out, int full)
                  USE_TOYBOX(" (see toybox --help)") "\n\n", toybox_version);
 
   if (CFG_TOYBOX_HELP) {
-    for (;;) {
-      s = help_data;
-      while (i--) s += strlen(s) + 1;
-      // If it's an alias, restart search for real name
-      if (*s != 255) break;
-      i = toy_find(++s)-toy_list;
-    }
+    // for (;;) {
+    //   s = help_data;
+    //   while (i--) s += strlen(s) + 1;
+    //   // If it's an alias, restart search for real name
+    //   if (*s != 255) break;
+    //   i = toy_find(++s)-toy_list;
+    // }
 
-    if (full) fprintf(out, "%s\n", s);
-    else {
-      strstart(&s, "usage: ");
-      for (ss = s; *ss && *ss!='\n'; ss++);
-      fprintf(out, "%.*s\n", (int)(ss-s), s);
-    }
+    // if (full) fprintf(out, "%s\n", s);
+    // else {
+    //   strstart(&s, "usage: ");
+    //   for (ss = s; *ss && *ss!='\n'; ss++);
+    //   fprintf(out, "%.*s\n", (int)(ss-s), s);
+    // }
   }
 }

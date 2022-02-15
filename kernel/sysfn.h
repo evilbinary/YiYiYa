@@ -28,6 +28,7 @@ enum {
   SYS_DUP = 41,
   SYS_BRK = 45,
   SYS_IOCTL = 54,
+  SYS_UMASK=60,
   SYS_DUP2 = 63,
   SYS_GETPPID = 64,
   SYS_READDIR=89,
@@ -177,5 +178,7 @@ int sys_fchdir(int fd);
 int sys_clone(void* stack,void* fn,void* arg);
 int sys_llseek(int fd, off_t offset_hi, off_t offset_lo,
                        off_t *result, int whence);
+
+int sys_umask(int mask);
 
 #endif

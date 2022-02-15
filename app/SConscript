@@ -97,6 +97,7 @@ if env.get('APP'):
             #'rust/test/test-rs',
             'cmd/ls',
             'cmd/echo',
+            'cmd/cat',
             'lvgl/lvgl',
             'track/track',
             'launcher/launcher',
@@ -104,7 +105,11 @@ if env.get('APP'):
             'sdl2/sdl2',
             'sdl2/player',
             'mgba/mgba',
-            'mgba/miniunz'
+            'mgba/miniunz',
+            'lua/lua',
+            'lua/luat',
+            'lua/hello.lua',
+            
             ]
     apps+=Glob('resource/*')
     if env.get('DEFAULT_LIBC')=='libmusl':
@@ -114,15 +119,14 @@ if env.get('APP'):
         SConscript(dirs=['scheme'], exports='env')
         SConscript(dirs=['liblua'], exports='env')
         SConscript(dirs=['lua'], exports='env')
+        SConscript(dirs=['toybox'], exports='env')
 
         apps+=[
             'scheme/scheme',
             'scheme/petite.boot',
             'scheme/scheme.boot',
             'test/test-musl',
-            'lua/lua',
-            'lua/luat',
-            'lua/hello.lua',
+            'toybox/toybox',
             ]
 
     if plt=='Darwin':

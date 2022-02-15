@@ -533,3 +533,14 @@ int sys_llseek(int fd, off_t offset_hi, off_t offset_lo, off_t* result,
   *result = 0;
   return sys_seek(fd, offset_hi << 32 | offset_lo, whence);
 }
+
+int sys_umask(int mask){
+  thread_t* current = thread_current();
+  if (current == NULL) {
+    kprintf("current is null\n");
+    return -1;
+  }
+  //todo
+  
+  return mask;
+}
