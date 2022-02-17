@@ -491,7 +491,20 @@ int sys_fcntl64(int fd, int cmd, void* arg) {
 
 int sys_getcwd(char* buf, size_t size) {
   thread_t* current = thread_current();
-  int ret = kstrcpy(buf, current->vfs->pwd->name);
+  if (current == NULL) {
+    kprintf("current is null\n");
+    return -1;
+  }
+  int ret = 0;
+  vfs_t* vfs = current->vfs;
+  if (vfs == NULL) {
+    return -1;
+  }
+  if (vfs->pwd != NULL) {
+    ret == kstrcpy(buf, vfs->pwd->name);
+  } else {
+    buf[0] = 0;
+  }
   return ret;
 }
 
@@ -504,7 +517,12 @@ int sys_fchdir(int fd) {
     return -1;
   }
   vnode_t* node = f->data;
-  current->vfs->pwd = node;
+  if ( (node->flags& V_DIRECTORY) == V_DIRECTORY) {
+    current->vfs->pwd = node;
+  } else {
+    kprintf("not directory\n");
+    return -1;
+  }
   return ret;
 }
 
@@ -534,13 +552,13 @@ int sys_llseek(int fd, off_t offset_hi, off_t offset_lo, off_t* result,
   return sys_seek(fd, offset_hi << 32 | offset_lo, whence);
 }
 
-int sys_umask(int mask){
+int sys_umask(int mask) {
   thread_t* current = thread_current();
   if (current == NULL) {
     kprintf("current is null\n");
     return -1;
   }
-  //todo
-  
+  // todo
+
   return mask;
 }

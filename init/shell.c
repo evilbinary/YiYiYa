@@ -30,7 +30,7 @@ void print_logo() {
 
 void print_promot() { print_string("yiyiya$"); }
 
-void print_help() { print_string("supports help ps command\n"); }
+void print_help() { print_string("supports help ps cd pwd command\n"); }
 
 void ps_command() { syscall0(SYS_DUMPS); }
 
@@ -38,24 +38,48 @@ int do_exec(char* cmd, int count) {
   char buf[64];
   cmd[count] = 0;
   char* argv[10];
-  int i=0;
-  const char *split = " ";
-  char *ptr = kstrtok(cmd, split);
-  argv[i++]=ptr;
+  int i = 0;
+  const char* split = " ";
+  char* ptr = kstrtok(cmd, split);
+  argv[i++] = ptr;
   sprintf(buf, "/%s", argv[0]);
-  while(ptr != NULL){
-		argv[i++]=ptr;
-		ptr = kstrtok(NULL, split);
-	}
+  while (ptr != NULL) {
+    argv[i++] = ptr;
+    ptr = kstrtok(NULL, split);
+  }
   return syscall2(SYS_EXEC, buf, &argv[1]);
 }
 
+void cd_command(char* cmd, int count) {
+  char buf[64];
+  cmd[count] = 0;
+  char* argv[64];
+  int i = 0;
+  const char* split = " ";
+  char* ptr = kstrtok(cmd, split);
+  ptr = kstrtok(NULL, split);
+  print_string(ptr);
+  return syscall1(SYS_CHDIR, ptr);
+}
+
+void pwd_command() {
+  char buf[128];
+  kmemset(buf, 0, 128);
+  syscall2(SYS_GETCWD, buf, 128);
+  print_string(buf);
+  print_string("\n");
+}
+
 void do_shell_cmd(char* cmd, int count) {
-  print_string("\n");  
+  print_string("\n");
   if (count == 0) return;
   if (kstrncmp(cmd, "help", count) == 0) {
     print_help();
-  } else if (kstrncmp(cmd, "ps", count) == 0) {
+  } else if (kstrncmp(cmd, "cd", 2) == 0) {
+    cd_command(cmd, count);
+  } else if (kstrncmp(cmd, "pwd", 3) == 0) {
+    pwd_command();
+  } else if (kstrncmp(cmd, "ps", 2) == 0) {
     ps_command();
   } else {
     int ret = do_exec(cmd, count);
@@ -85,6 +109,7 @@ void do_shell_thread(void) {
   if (syscall2(SYS_DUP2, series, 0) < 0) {
     print_string("err in dup2\n");
   }
+  syscall1(SYS_CHDIR, "/");
   pre_launch();
 
   for (;;) {
@@ -105,29 +130,13 @@ void do_shell_thread(void) {
 
 // must init global for armv7-a
 char* scm_argv[] = {"/scheme", "-b", "/scheme.boot", NULL};
-char* lua_argv[] = {
-    "/lua",
-    "hello.lua",
-    NULL
-};
+char* lua_argv[] = {"/lua", "hello.lua", NULL};
 
-char* nes_argv[] ={
-  "infones",
-  "/mario.nes",
-  NULL
-};
+char* nes_argv[] = {"infones", "/mario.nes", NULL};
 
-char* mgba_argv[] ={
-  "mgba",
-  "/mario.gba",
-  NULL
-};
+char* mgba_argv[] = {"mgba", "/mario.gba", NULL};
 
-char* cat_argv[] = {
-    "/cat",
-    "hello.lua",
-    NULL
-};
+char* cat_argv[] = {"/cat", "hello.lua", NULL};
 
 void pre_launch() {
 #ifdef X86
@@ -148,7 +157,7 @@ void pre_launch() {
   // kprintf("fd=>%d\n",fd);
 
   // syscall2(SYS_EXEC, "/infones", nes_argv);
-  
+
   // for (;;)
   //   ;
 #elif defined(ARMV7)
@@ -175,7 +184,7 @@ void pre_launch() {
   // syscall2(SYS_EXEC, "/sdl2", NULL);
   // syscall2(SYS_EXEC, "/mgba", mgba_argv);
   // syscall2(SYS_EXEC, "/player", mgba_argv);
-  syscall2(SYS_EXEC, "/cat", cat_argv);
+  // syscall2(SYS_EXEC, "/cat", cat_argv);
 
 // test_cpu_speed();
 #endif
