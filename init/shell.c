@@ -123,6 +123,12 @@ char* mgba_argv[] ={
   NULL
 };
 
+char* cat_argv[] = {
+    "/cat",
+    "hello.lua",
+    NULL
+};
+
 void pre_launch() {
 #ifdef X86
   // int fd = syscall2(SYS_OPEN, "/dev/stdin", 0);
@@ -169,6 +175,7 @@ void pre_launch() {
   // syscall2(SYS_EXEC, "/sdl2", NULL);
   // syscall2(SYS_EXEC, "/mgba", mgba_argv);
   // syscall2(SYS_EXEC, "/player", mgba_argv);
+  syscall2(SYS_EXEC, "/cat", cat_argv);
 
 // test_cpu_speed();
 #endif
