@@ -10,11 +10,10 @@ int main(int argc, char *argv[]) {
 
   for (count = 1; count < argc; count++) {
     if ((file = fopen(argv[count], "r")) == NULL) {
-      fprintf(stderr, "%s: %s : %s\n", argv[0], argv[count], strerror(errno));
+      printf("%s: %s : %s\n", argv[0], argv[count], strerror(errno));
       continue;
     }
-    while ((chr = getc(file)) != EOF) fprintf(stdout, "%c", chr);
+    while ((chr = getc(file)) != EOF) printf("%c", chr);
     fclose(file);
   }
-  exit(0);
 }
