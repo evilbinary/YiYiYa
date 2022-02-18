@@ -93,10 +93,10 @@ void do_shell_cmd(char* cmd, int count) {
 void pre_launch();
 
 void do_shell_thread(void) {
-  print_logo();
-  int count = 0;
   char buf[64];
+  int count = 0;
   int ret = 0;
+  print_logo();
   print_promot();
   int series = syscall2(SYS_OPEN, "/dev/series", 0);
   if (series < 0) {
@@ -121,8 +121,8 @@ void do_shell_thread(void) {
         count = 0;
         print_promot();
       } else {
-        syscall3(SYS_WRITE, 1, &ch, 1);
         buf[count++] = ch;
+        syscall3(SYS_WRITE, 1, &ch, 1);
       }
     }
   }
@@ -161,7 +161,7 @@ void pre_launch() {
   // for (;;)
   //   ;
 #elif defined(ARMV7)
-  test_lcd();
+  // test_lcd();
 #else defined(ARM)
   // syscall2(SYS_EXEC,"/hello-rs",NULL);
   // syscall2(SYS_EXEC,"/test-rs",NULL);
@@ -185,6 +185,7 @@ void pre_launch() {
   // syscall2(SYS_EXEC, "/mgba", mgba_argv);
   // syscall2(SYS_EXEC, "/player", mgba_argv);
   // syscall2(SYS_EXEC, "/cat", cat_argv);
+  // syscall2(SYS_EXEC, "/infones", nes_argv);
 
 // test_cpu_speed();
 #endif

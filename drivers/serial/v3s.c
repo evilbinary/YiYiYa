@@ -11,7 +11,7 @@ void serial_write(char a) {
 }
 
 char serial_read() {
-  
+  return uart_receive();
 }
 
 void serial_printf(char* fmt, ...) {
@@ -29,7 +29,11 @@ void serial_printf(char* fmt, ...) {
 static size_t read(device_t* dev, void* buf, size_t len) {
   u32 ret = len;
   for (int i = 0; i < len; i++) {
-    ((char*)buf)[i] = serial_read();
+    int c = serial_read();
+    if (c >= 0) {
+      ret++;
+      ((char*)buf)[i] = c;
+    }
   }
   return ret;
 }

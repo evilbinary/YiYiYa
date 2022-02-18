@@ -13,8 +13,8 @@ static u32 io_read32(uint port) {
 }
 
 void uart_send_ch(unsigned int c) {
-  unsigned int addr = 0x01c28000;
-  while ((io_read32(addr + 0x7c) & (0x1 << 1)) == 0)
+  unsigned int addr = 0x01c28000;  // UART0
+  while ((io_read32(addr + 0x14) & (0x1 << 6)) == 0)
     ;
   io_write32(addr + 0x00, c);
 }
@@ -26,6 +26,16 @@ void uart_send(unsigned int c) {
   }
   uart_send_ch(c);
 }
+
+unsigned int uart_receive() {
+  unsigned int c = 0;
+  unsigned int addr = 0x01c28000;  // UART0
+  while ((io_read32(addr + 0x14) & (0x1 << 0)) == 0) {
+  }
+  c = io_read32(addr + 0x00);
+  return c;
+}
+
 extern int timer_count;
 
 void timer_init(int hz) {
@@ -109,7 +119,7 @@ void cpu_clock_init(void) {
   /* Set APB2 to OSC24M/1 (24MHz). */
   io_write32(V3S_CCU_BASE + CCU_AHB2_CFG, 1 << 24 | 0 << 16 | 0);
 
-    // Enable TWI0 clock gating
+  // Enable TWI0 clock gating
   u32 gate_reg = io_read32(V3S_CCU_BASE + CCU_BUS_CLK_GATE3);
   io_write32(V3S_CCU_BASE + CCU_BUS_CLK_GATE3, gate_reg | 1 << 0);
 }
@@ -135,5 +145,4 @@ void platform_init() {
   // sys_dram_init();
 }
 
-void platform_end(){
- }
+void platform_end() {}
