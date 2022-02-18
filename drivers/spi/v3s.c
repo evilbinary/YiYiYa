@@ -334,10 +334,8 @@ void v3s_test_lcd(spi_t* spi) {
 
   lcd_write_cmd(0x29);
 
-  kprintf("lcd end\n");
-  for (;;) {
-    lcd_fill(0, 0, 240, 240, RED);
-  }
+  kprintf("v3s test lcd end\n");
+  lcd_fill(0, 0, 240, 240, RED);
 }
 
 int spi_init_device(device_t* dev) {
@@ -404,7 +402,9 @@ int spi_init_device(device_t* dev) {
 
   v3s_spi_cs(spi, 1);
 
-  // test_lcd(spi);
+  // v3s_test_lcd(spi);
+
+  kprintf("v3s spi init end \n");
 
   return 0;
 }
