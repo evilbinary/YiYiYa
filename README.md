@@ -7,7 +7,7 @@ https://github.com/evilbinary/YiYiYa
 
 ### 编译
 
-提前安装 scons、qemu [安装文档](https://github.com/evilbinary/YiYiYa/tree/main/docs/install)
+提前安装 scons、qemu [开发环境文档](https://github.com/evilbinary/YiYiYa/blob/main/docs/develop/%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83.md)
 
 编译
 
