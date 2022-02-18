@@ -251,7 +251,7 @@ void lcd_fill(u16 xsta, u16 ysta, u16 xend, u16 yend, u16 color) {
 
 void lcd_set_dc(u32 val) { gpio_output(GPIO_G, 0, val); }
 
-void test_lcd(spi_t* spi) {
+void v3s_test_lcd(spi_t* spi) {
   gspi = spi;
 
   gpio_config(GPIO_G, 0, GPIO_OUTPUT);
