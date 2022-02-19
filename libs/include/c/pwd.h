@@ -15,6 +15,8 @@ extern "C" {
 #endif
 
 
+#include "sys/types.h"
+
 struct passwd {
 	char *pw_name;
 	char *pw_passwd;
