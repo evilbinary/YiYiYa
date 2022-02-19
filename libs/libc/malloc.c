@@ -11,10 +11,10 @@
 void *malloc(unsigned long size) { return ya_alloc(size); }
 
 void free(void *addr) { ya_free(addr); }
+
 void *realloc(void *p, size_t size) {
   void *ptr;
-  int real_size;
-
+  int real_size = size;
   if (size == 0) {
     free(p);
     return NULL;
