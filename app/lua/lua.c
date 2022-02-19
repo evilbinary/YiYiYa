@@ -75,7 +75,7 @@ static void lstop (lua_State *L, lua_Debug *ar) {
 */
 static void laction (int i) {
   int flag = LUA_MASKCALL | LUA_MASKRET | LUA_MASKLINE | LUA_MASKCOUNT;
-  // setsignal(i, SIG_DFL); /* if another SIGINT happens, terminate process */
+  setsignal(i, SIG_DFL); /* if another SIGINT happens, terminate process */
   lua_sethook(globalL, lstop, flag, 1);
 }
 
@@ -155,9 +155,9 @@ static int docall (lua_State *L, int narg, int nres) {
   lua_pushcfunction(L, msghandler);  /* push message handler */
   lua_insert(L, base);  /* put it under function and args */
   globalL = L;  /* to be available to 'laction' */
-  // setsignal(SIGINT, laction);  /* set C-signal handler */
+  setsignal(SIGINT, laction);  /* set C-signal handler */
   status = lua_pcall(L, narg, nres, base);
-  // setsignal(SIGINT, SIG_DFL); /* reset C-signal handler */
+  setsignal(SIGINT, SIG_DFL); /* reset C-signal handler */
   lua_remove(L, base);  /* remove message handler from the stack */
   return status;
 }
@@ -197,7 +197,6 @@ static int dochunk (lua_State *L, int status) {
 
 
 static int dofile (lua_State *L, const char *name) {
-  printf("dofile %s\n",name);
   return dochunk(L, luaL_loadfile(L, name));
 }
 
@@ -269,7 +268,6 @@ static int handle_script (lua_State *L, char **argv) {
 static int collectargs (char **argv, int *first) {
   int args = 0;
   int i;
-
   for (i = 1; argv[i] != NULL; i++) {
     *first = i;
     if (argv[i][0] != '-')  /* not an option? */
@@ -602,17 +600,6 @@ static void doREPL (lua_State *L) {
 static int pmain (lua_State *L) {
   int argc = (int)lua_tointeger(L, 1);
   char **argv = (char **)lua_touserdata(L, 2);
-
-  if(argv==NULL){
-    printf("no args\n");
-    return has_error;
-  }else{
-    printf('argc %d\n',argc);
-    for(int i=0;i<argc;i++){
-      printf("argv[%d]=%s\n",i,argv[i]);
-    }
-  }
-
   int script;
   int args = collectargs(argv, &script);
   luaL_checkversion(L);  /* check that interpreter has correct version */
@@ -660,18 +647,11 @@ int main (int argc, char **argv) {
     l_message(argv[0], "cannot create state: not enough memory");
     return EXIT_FAILURE;
   }
-  for(int i=0;i<argc;i++){
-    printf("argv %s\n",argv[i]);
-  }
   lua_pushcfunction(L, &pmain);  /* to call 'pmain' in protected mode */
   lua_pushinteger(L, argc);  /* 1st argument */
   lua_pushlightuserdata(L, argv); /* 2nd argument */
-  printf("call\n");
   status = lua_pcall(L, 2, 1, 0);  /* do the call */
-  printf("call status %d\n",status);
-
   result = lua_toboolean(L, -1);  /* get result */
-  printf("call ret %d\n",result);
   report(L, status);
   lua_close(L);
   return (result && status == LUA_OK) ? EXIT_SUCCESS : EXIT_FAILURE;
