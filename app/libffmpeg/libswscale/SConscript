@@ -32,6 +32,12 @@ if env['ARCHTYPE']=='arm':
     source+= [
         'arm/swscale_unscaled.c',
     ]
+elif env['ARCHTYPE']=='x86':
+    source+= [
+        'x86/swscale.c',
+        'x86/rgb2rgb.c',
+        'x86/yuv2rgb.c'
+    ]
 else:
     print('libswscale not support',env['ARCHTYPE'])
 
