@@ -114,6 +114,12 @@
     "avformat.h": "c",
     "avutil.h": "c",
     "swscale.h": "c",
-    "avdevice.h": "c"
+    "avdevice.h": "c",
+    "alloca.h": "c",
+    "sdl.h": "c",
+    "sdl_main.h": "c",
+    "sdl_stdinc.h": "c",
+    "sdl_config.h": "c",
+    "fixed_dsp.h": "c"
   }
 }

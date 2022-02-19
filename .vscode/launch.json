@@ -407,7 +407,7 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            "program": "${workspaceRoot}/init/kernel",
+            "program": "${workspaceRoot}/init/kernel.elf",
             // "program": "${workspaceRoot}/app/hello/hello",
             // "program": "${workspaceRoot}/app/gui/gui",
             // "program": "${workspaceRoot}/app/file/file",
@@ -421,13 +421,16 @@
             },
             "targetArchitecture": "x86",
             "MIMode": "gdb",
-            "miDebuggerPath": "/opt/local/bin/ggdb",
+            // "miDebuggerPath": "/opt/local/bin/ggdb",
+            // "miDebuggerPath": "D:\\app\\gcc\\bin\\i686-elf-gdb.exe",
+            "miDebuggerPath": "D:\\app\\msys2\\mingw32\\bin\\gdb-multiarch.exe",
+            
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
-                // {
-                //     "text": "target remote localhost:1234",
-                //     "description": "Connect to QEMU remote debugger"
-                // }
+                {
+                    "text": "target remote localhost:1234",
+                    "description": "Connect to QEMU remote debugger"
+                }
             ],
             "setupCommands": [
                 {
