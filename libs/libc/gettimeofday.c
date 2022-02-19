@@ -37,3 +37,8 @@ void gettimeofday (struct timeval * tp, void * dummy)
 }
 
 #endif
+
+
+void __gettimeofday_time64(struct timeval * tp, void * dummy){
+    gettimeofday(tp,dummy);
+}

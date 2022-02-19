@@ -7,6 +7,7 @@ extern "C" {
 #define __NEED_pid_t
 #define __NEED_id_t
 
+#include "unistd.h"
 
 typedef enum {
 	P_ALL = 0,

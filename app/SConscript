@@ -87,6 +87,11 @@ if env.get('APP'):
         'libffmpeg/libswresample',
         ], exports='env')
 
+    SConscript(dirs=['liblua'], exports='env')
+    SConscript(dirs=['lua'], exports='env')
+
+    SConscript(dirs=['libchez'], exports='env')
+    SConscript(dirs=['scheme'], exports='env')
 
     apps=['hello/hello',
             'gui/gui',
@@ -109,22 +114,18 @@ if env.get('APP'):
             'lua/lua',
             'lua/luat',
             'lua/hello.lua',
-            
+            'scheme/scheme',
+            'scheme/petite.boot',
+            'scheme/scheme.boot',
             ]
     apps+=Glob('resource/*')
     if env.get('DEFAULT_LIBC')=='libmusl':
         SConscript(dirs=['libuuid'], exports='env')
         # SConscript(dirs=['libncurses'], exports='env')
-        SConscript(dirs=['libchez'], exports='env')
-        SConscript(dirs=['scheme'], exports='env')
-        SConscript(dirs=['liblua'], exports='env')
-        SConscript(dirs=['lua'], exports='env')
+
         SConscript(dirs=['toybox'], exports='env')
 
         apps+=[
-            'scheme/scheme',
-            'scheme/petite.boot',
-            'scheme/scheme.boot',
             'test/test-musl',
             'toybox/toybox',
             ]

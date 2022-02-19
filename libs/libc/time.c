@@ -523,15 +523,22 @@ static char *_add(const char *str, char *pt, const char *ptlim) {
   return pt;
 }
 
-
-int nanosleep(const struct timespec *req, struct timespec *rem)
-{
-	
+int nanosleep(const struct timespec *req, struct timespec *rem) {
   printf("not imple nanosleep\n");
   return 1;
 }
 
-int clock_gettime(clockid_t clockid, struct timespec * ts){
-   printf("not imple clock_gettime\n");
+int clock_gettime(clockid_t clockid, struct timespec *ts) {
+  printf("not imple clock_gettime\n");
+  return 1;
+}
+
+char *ctime_r(const time_t *t, char *buf) {
+  printf("not imple ctime_r\n");
+  return 1;
+}
+
+char *asctime_r(const struct tm *restrict tm, char *restrict buf) {
+  printf("not imple asctime_r\n");
   return 1;
 }

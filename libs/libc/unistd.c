@@ -285,7 +285,12 @@ int fsync(int fd) {
   return 1;
 }
 
-int usleep(unsigned i){
+int usleep(unsigned i) {
   printf("unimpl usleep\n");
+  return 1;
+}
+
+int lockf(int fd, int op, off_t size) {
+  printf("unimpl lockf\n");
   return 1;
 }
