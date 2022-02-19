@@ -54,7 +54,7 @@ int fd_std_init() {
     return -1;
   }
 
-  char* stderro = "/dev/stdout";
+  char* stderro = "/dev/stderr";
   fd_t* fdstderro = fd_new(file, DEVICE_TYPE_FILE, stderro);
   if (fdstderro == NULL) {
     kprintf(" new fd stderro error\n");

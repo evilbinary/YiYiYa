@@ -109,6 +109,10 @@ void do_shell_thread(void) {
   if (syscall2(SYS_DUP2, series, 0) < 0) {
     print_string("err in dup2\n");
   }
+  if (syscall2(SYS_DUP2, series, 2) < 0) {
+    print_string("err in dup2\n");
+  }
+
   syscall1(SYS_CHDIR, "/");
   pre_launch();
 

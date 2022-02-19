@@ -69,4 +69,11 @@
 #endif
 
 
+//是否打印加载ELF信息
+// #define LOAD_ELF_DEBUG
+
+//打印加载elf名字
+#define LOAD_ELF_NAME_DEBUG 1
+
+
 #endif
