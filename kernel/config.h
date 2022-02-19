@@ -73,7 +73,12 @@
 // #define LOAD_ELF_DEBUG
 
 //打印加载elf名字
-#define LOAD_ELF_NAME_DEBUG 1
+// #define LOAD_ELF_NAME_DEBUG 1
 
+//打印 sysfn信息
+// #define LOG_DEBUG 0
+
+
+#include "logger.h"
 
 #endif

@@ -52,9 +52,7 @@ size_t sys_ioctl(u32 fd, u32 cmd, void* args) {
   vnode_t* node = f->data;
   ret = vioctl(node, cmd, args);
 
-#ifdef SYS_DEBUG
-  kprintf("sys ioctl fd %d %s cmd %x ret %x\n", fd, f->name, cmd, ret);
-#endif
+  log_debug("sys ioctl fd %d %s cmd %x ret %x\n", fd, f->name, cmd, ret);
   return ret;
 }
 
@@ -69,7 +67,7 @@ u32 sys_open(char* name, int attr) {
   }
   int f = thread_find_fd_name(current, name);
   if (f >= 0) {
-    kprintf("sys open name return : %s fd: %d\n", name, f);
+    log_debug("sys open name return : %s fd: %d\n", name, f);
     return f;
   }
   vnode_t* file = vfs_open_attr(NULL, name, attr);
@@ -88,7 +86,7 @@ u32 sys_open(char* name, int attr) {
     kprintf("sys open %s error\n", name);
     return -1;
   }
-  kprintf("sys open new name: %s fd:%d fd->id:%d ptr:%x tid:%d\n", name, f,
+  log_debug("sys open new name: %s fd:%d fd->id:%d ptr:%x tid:%d\n", name, f,
           fd->id, fd, current->id);
   return f;
 }
@@ -171,7 +169,7 @@ void sys_exit(int status) {
   thread_t* current = thread_current();
   thread_exit(current, status);
   // thread_dumps();
-  kprintf("sys exit tid %d %s status %d\n", current->id, current->name, status);
+  log_debug("sys exit tid %d %s status %d\n", current->id, current->name, status);
 }
 
 void* sys_vmap(void* addr, size_t size) {
@@ -308,9 +306,7 @@ int sys_pipe(int fds[2]) {
 
 int sys_getpid() {
   thread_t* current = thread_current();
-#ifdef SYS_DEBUG
-  kprintf("sys get pid %d\n", current->id);
-#endif
+  log_debug("sys get pid %d\n", current->id);
   return current->id;
 }
 
