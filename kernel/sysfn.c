@@ -280,10 +280,12 @@ int sys_fork() {
   }
   thread_t* copy_thread = thread_clone(current, STACK_ADDR, THREAD_STACK_SIZE);
 
-  kprintf("-------dump current thread %d %s-------------\n", current->id);
+#ifdef LOG_DEBUG
+  log_debug("-------dump current thread %d %s-------------\n", current->id);
   thread_dump(current);
-  kprintf("-------dump clone thread %d-------------\n", copy_thread->id);
+  log_debug("-------dump clone thread %d-------------\n", copy_thread->id);
   thread_dump(copy_thread);
+#endif
 
   interrupt_context_t* context = copy_thread->context.esp0;
   context_ret(context) = 0;
@@ -359,7 +361,7 @@ int sys_readdir(int fd, int index, void* dirent) {
 
 int sys_brk(int addr) {
   thread_t* current = thread_current();
-  kprintf("sys sbrk tid:%x addr:%x\n", current->id, addr);
+  log_debug("sys sbrk tid:%x addr:%x\n", current->id, addr);
 
   vmemory_area_t* vm = vmemory_area_find_flag(current->vmm, MEMORY_HEAP);
   if (vm == NULL) {
@@ -375,7 +377,7 @@ int sys_brk(int addr) {
     return addr;
   }
   vm->vend = addr;
-  kprintf("sys sbrk return addr:%x\n", vm->vend);
+  log_debug("sys sbrk return addr:%x\n", vm->vend);
   return vm->vend;
 }
 
@@ -529,10 +531,12 @@ int sys_clone(void* fn, void* stack, void* arg) {
     return -1;
   }
   thread_t* copy_thread = thread_clone(current, STACK_ADDR, THREAD_STACK_SIZE);
+#ifdef LOG_DEBUG
   kprintf("-------dump current thread %d %s-------------\n", current->id);
   thread_dump(current);
   kprintf("-------dump clone thread %d-------------\n", copy_thread->id);
   thread_dump(copy_thread);
+#endif
 
   interrupt_context_t* context = copy_thread->context.esp0;
   context_ret(context) = 0;

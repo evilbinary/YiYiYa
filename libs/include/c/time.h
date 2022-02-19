@@ -1,8 +1,9 @@
-#include <inttypes.h>
-#include <signal.h>
-
 #ifndef _TIME_H
 #define _TIME_H
+
+#include <inttypes.h>
+#include <signal.h>
+#include "sys/types.h"
 
 struct tm {
   int tm_sec;
@@ -14,6 +15,8 @@ struct tm {
   int tm_wday;
   int tm_yday;
   int tm_isdst;
+  long tm_gmtoff;
+	const char *tm_zone;
 };
 
 #ifndef NULL
@@ -65,8 +68,18 @@ struct timezone {
   int tz_dsttime;
 };
 
-#define CLOCK_REALTIME
-#define TIMER_ABSTIME
+#define CLOCK_REALTIME           0
+#define CLOCK_MONOTONIC          1
+#define CLOCK_PROCESS_CPUTIME_ID 2
+#define CLOCK_THREAD_CPUTIME_ID  3
+#define CLOCK_MONOTONIC_RAW      4
+#define CLOCK_REALTIME_COARSE    5
+#define CLOCK_MONOTONIC_COARSE   6
+#define CLOCK_BOOTTIME           7
+#define CLOCK_REALTIME_ALARM     8
+#define CLOCK_BOOTTIME_ALARM     9
+#define CLOCK_SGI_CYCLE         10
+#define CLOCK_TAI               11
 
 #ifdef __cplusplus
 extern "C" {

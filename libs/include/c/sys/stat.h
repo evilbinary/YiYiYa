@@ -21,9 +21,15 @@ struct stat {
 	blksize_t st_blksize;
 	int __pad2;
 	blkcnt_t st_blocks;
+#if defined(__rtems__)
+  struct timespec st_atim;
+  struct timespec st_mtim;
+  struct timespec st_ctim;
+#else
 	time_t st_atim;
 	time_t st_mtim;
 	time_t st_ctim;
+#endif
 	unsigned __unused[2];
 };
 
@@ -40,9 +46,15 @@ struct stat {
 #define __NEED_blkcnt_t
 #define __NEED_struct_timespec
 
+#if defined(__rtems__)
 #define st_atime st_atim.tv_sec
-#define st_mtime st_mtim.tv_sec
 #define st_ctime st_ctim.tv_sec
+#define st_mtime st_mtim.tv_sec
+#endif
+
+// #define st_atime st_atim.tv_sec
+// #define st_mtime st_mtim.tv_sec
+// #define st_ctime st_ctim.tv_sec
 
 #define S_IFMT  0170000
 
@@ -133,6 +145,12 @@ __REDIR(fstatat, __fstatat_time64);
 __REDIR(futimens, __futimens_time64);
 __REDIR(utimensat, __utimensat_time64);
 #endif
+
+
+// int utimensat(int, const char *, const struct timespec [2], int);
+// int futimes(int, const struct timeval [2]);
+// int futimesat(int, const char *, const struct timeval [2]);
+// int futimens(int fd, const struct timespec times[2]);
 
 #ifdef __cplusplus
 }
