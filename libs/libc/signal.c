@@ -14,3 +14,9 @@ int kill(pid_t pid, int attr) {
   printf("unimpl kill\n");
   return 1;
 }
+
+void (*signal(int sig, void (*func)(int)))(int) {
+
+  printf("unimpl signal\n");
+  return 0;
+}
