@@ -382,10 +382,18 @@ void do_page_fault(interrupt_context_t *context) {
     if (current != NULL) {
       vmemory_area_t *area = vmemory_area_find(current->vmm, fault_addr, 0);
       if (area == NULL) {
-        kprintf("\ntid: %d %s memory fault at %x\n", current->id, current->name,
-                fault_addr);
-        dump_fault(context, fault_addr);
-        thread_exit(current, -1);
+        if (current->fault_count < 3) {
+          thread_exit(current, -1);
+          kprintf("tid: %d %s memory fault at %x\n", current->id, current->name,
+                  fault_addr);
+          dump_fault(context, fault_addr);
+          current->fault_count++;
+        } else if (current->fault_count == 3) {
+          kprintf("tid: %d %s memory fault at %x too many\n",
+                  current->id, current->name, fault_addr);
+          current->fault_count++;
+          thread_exit(current, -1);
+        }
         return;
       }
       void *phy = virtual_to_physic(current->context.page_dir, fault_addr);
