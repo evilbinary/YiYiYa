@@ -11,7 +11,6 @@
 #include <limits.h>
 #include <stddef.h>
 
-#define LUAI_ASSERT 
 
 /*
 ** ===================================================================
@@ -48,7 +47,6 @@
 /*
 ** By default, Lua on Windows use (some) specific Windows features
 */
-#undef _WIN32
 #if !defined(LUA_USE_C89) && defined(_WIN32) && !defined(_WIN32_WCE)
 #define LUA_USE_WINDOWS  /* enable goodies for regular Windows */
 #endif
@@ -776,10 +774,17 @@
 
 
 
+
 /* =================================================================== */
 
 /*
 ** Local configuration. You can use this space to add your redefinitions
 ** without modifying the main part of the file.
 */
+
+
+
+
+
 #endif
+
