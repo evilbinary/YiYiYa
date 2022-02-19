@@ -6,6 +6,29 @@ extern "C" {
 
 #include "unistd.h"
 
+#define SIG_BLOCK     0
+#define SIG_UNBLOCK   1
+#define SIG_SETMASK   2
+
+#define SI_ASYNCNL (-60)
+#define SI_TKILL (-6)
+#define SI_SIGIO (-5)
+#define SI_ASYNCIO (-4)
+#define SI_MESGQ (-3)
+#define SI_TIMER (-2)
+#define SI_QUEUE (-1)
+#define SI_USER 0
+#define SI_KERNEL 128
+
+#define SA_NOCLDSTOP  1
+#define SA_NOCLDWAIT  2
+#define SA_SIGINFO    4
+#define SA_ONSTACK    0x08000000
+#define SA_RESTART    0x10000000
+#define SA_NODEFER    0x40000000
+#define SA_RESETHAND  0x80000000
+#define SA_RESTORER   0x04000000
+
 #define SIGABRT			1
 #define SIGALRM			2
 #define SIGFPE			3
@@ -44,6 +67,26 @@ typedef struct
 } sigset_t;
 #endif
 
+
+typedef struct {
+#ifdef __SI_SWAP_ERRNO_CODE
+	int si_signo, si_code, si_errno;
+#else
+	int si_signo, si_errno, si_code;
+#endif
+} siginfo_t;
+
+struct sigaction {
+	union {
+		void (*sa_handler)(int);
+		void (*sa_sigaction)(int, siginfo_t *, void *);
+	} __sa_handler;
+	sigset_t sa_mask;
+	int sa_flags;
+	void (*sa_restorer)(void);
+};
+#define sa_handler   __sa_handler.sa_handler
+#define sa_sigaction __sa_handler.sa_sigaction
 
 typedef int sig_atomic_t;
 

@@ -530,3 +530,8 @@ int nanosleep(const struct timespec *req, struct timespec *rem)
   printf("not imple nanosleep\n");
   return 1;
 }
+
+int clock_gettime(clockid_t clockid, struct timespec * ts){
+   printf("not imple clock_gettime\n");
+  return 1;
+}
