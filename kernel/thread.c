@@ -69,7 +69,7 @@ thread_t* thread_create_ex(void* entry, u32* stack0, u32* stack3, u32 size,
   thread->fds = kmalloc(sizeof(fd_t) * thread->fd_size);
 
   // vfs
-  thread->vfs=kmalloc(sizeof(vfs_t));
+  thread->vfs = kmalloc(sizeof(vfs_t));
   // file description
   thread_fill_fd(thread);
 
@@ -310,7 +310,8 @@ int thread_find_fd_name(thread_t* thread, u8* name) {
     thread_fill_fd(thread);
   }
   if (thread->fd_number > thread->fd_size) {
-    kprintf("thread find fd name limit %d > %d\n",thread->fd_number,thread->fd_size);
+    kprintf("thread find fd name limit %d > %d\n", thread->fd_number,
+            thread->fd_size);
     return -1;
   }
   for (int i = 0; i < thread->fd_number; i++) {
@@ -337,7 +338,7 @@ fd_t* thread_find_fd_id(thread_t* thread, u32 fd) {
     return NULL;
   }
   if (fd > thread->fd_number) {
-    kprintf("thread find fd limit %d > %d\n", fd,thread->fd_number);
+    kprintf("thread find fd limit %d > %d\n", fd, thread->fd_number);
     return NULL;
   }
   return thread->fds[fd];
@@ -387,13 +388,15 @@ void thread_dumps() {
                        "waitting"
                        "sleep"};
   char* str = "unkown";
-  kprintf("\n--------------dump all thread--------------\n");
-  kprintf("tid    name                 state    counter\n");
+  kprintf("\n--------------threads--------------\n");
+  kprintf("id    pid    name                 state    counter\n");
   for (thread_t* p = head_thread; p != NULL; p = p->next) {
     if (p->state <= THREAD_SLEEP) {
       str = state_str[p->state];
     }
     kprintf("%-6d ", p->id);
+    kprintf("%-6d ", p->pid);
+
     if (p->name != NULL) {
       kprintf("%-20s ", p->name);
     } else {
