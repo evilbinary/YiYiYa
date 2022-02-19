@@ -161,6 +161,7 @@ void pre_launch() {
   // kprintf("fd=>%d\n",fd);
 
   // syscall2(SYS_EXEC, "/infones", nes_argv);
+  // syscall2(SYS_EXEC, "/mgba", mgba_argv);
 
   // for (;;)
   //   ;
