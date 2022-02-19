@@ -11,7 +11,7 @@
 
 vnode_t *devfs_create_device(device_t *dev) {
   vnode_t *t = kmalloc(sizeof(vnode_t));
-  t->flags = V_BLOCKDEVICE|V_DIRECTORY;
+  t->flags = V_BLOCKDEVICE | V_DIRECTORY;
   t->write = NULL;
   t->read = NULL;
   t->device = dev;
@@ -48,10 +48,15 @@ int devfs_init(void) {
   // SYS_READ,SYS_WRITE
   vnode_t *stdin = vfs_create("stdin", V_FILE);
   vnode_t *stdout = vfs_create("stdout", V_FILE);
+  vnode_t *stderr = vfs_create("stderr", V_FILE);
   vfs_mount(NULL, "/dev", stdin);
   vfs_mount(NULL, "/dev", stdout);
+  vfs_mount(NULL, "/dev", stderr);
+
   stdin->read = device_read;
   stdout->write = device_write;
+  stderr->write = device_write;
+
   stdin->device = device_find(DEVICE_KEYBOARD);
   stdout->device = device_find(DEVICE_VGA);
 
@@ -61,6 +66,7 @@ int devfs_init(void) {
   if (stdout->device == NULL) {
     stdout->device = device_find(DEVICE_SERIAL);
   }
+  stderr->device = stdout->device;
 
   // series
   vnode_t *series = vfs_create("series", V_FILE);
@@ -121,12 +127,12 @@ int devfs_init(void) {
 
   fd_std_init();
 
-  //dsp
-  vnode_t *dsp = vfs_create("dsp", V_FILE|V_BLOCKDEVICE);
+  // dsp
+  vnode_t *dsp = vfs_create("dsp", V_FILE | V_BLOCKDEVICE);
   dsp->device = device_find(DEVICE_SB);
   dsp->read = device_read;
   dsp->ioctl = device_ioctl;
-  dsp->write =device_write;
+  dsp->write = device_write;
   vfs_mount(NULL, "/dev", dsp);
 
   return 0;

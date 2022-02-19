@@ -5,14 +5,13 @@
 #include "stdint.h"
 #include "syscall.h"
 
-FILE STDIN;
-FILE STDOUT;
-FILE STDERROR;
+FILE STDIN={.fd=0};
+FILE STDOUT={.fd=1};
+FILE STDERROR={.fd=2};
 
-FILE *stdin = NULL;
-FILE *stdout = NULL;
-FILE *stderr = NULL;
-
+FILE *stdin = &STDIN;
+FILE *stdout = &STDOUT;
+FILE *stderr = &STDERROR;
 
 int putchar(int ch) {
   if (stdout == NULL) {
@@ -83,7 +82,7 @@ FILE *fopen(const char *filename, const char *mode) {
 
 int fseek(FILE *stream, long int offset, int origin) {
   int rc;
-  rc = ya_seek(stream->fd, offset,origin);
+  rc = ya_seek(stream->fd, offset, origin);
   return rc;
 }
 
@@ -171,6 +170,9 @@ int fgetc(FILE *stream) {
 int fputc(int c, FILE *stream) {
   int rc;
   unsigned char ch = (unsigned char)c;
+  if (stream == NULL) {
+    return -1;
+  }
   rc = ya_write(stream->fd, &ch, 1);
   stream->offset++;
   fseek(stream, stream->offset, SEEK_SET);
