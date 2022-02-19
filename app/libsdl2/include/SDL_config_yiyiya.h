@@ -98,7 +98,7 @@ typedef unsigned long uintptr_t;
 #define HAVE_GCC_ATOMICS    1
 
 #define STDC_HEADERS    1
-#define HAVE_ALLOCA_H       1
+// #define HAVE_ALLOCA_H       1
 // #define HAVE_CTYPE_H    1
 #define HAVE_INTTYPES_H 1
 #define HAVE_LIMITS_H   1
