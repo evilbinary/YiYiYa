@@ -125,7 +125,7 @@
             },
             "targetArchitecture": "x86",
             "MIMode": "gdb",
-            "miDebuggerPath": "gdb",
+            "miDebuggerPath": "/opt/local/bin/ggdb",
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
                 // {
@@ -289,6 +289,42 @@
             "preLaunchTask": "Build and run"
         },
         {
+            "name": "player with GDB",
+            "type": "cppdbg",
+            "request": "launch",
+            "miDebuggerServerAddress": "localhost:1234",
+            // "program": "${workspaceRoot}/app/hello/hello",
+            "program": "${workspaceRoot}/app/sdl2/player",
+            "cwd": "${workspaceRoot}",
+            "args": [],
+            "sourceFileMap": {
+                "<source-path>": "<target-path>"
+            },
+            "targetArchitecture": "x86",
+            "MIMode": "gdb",
+            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerArgs": "",
+            "customLaunchSetupCommands": [
+                // {
+                //     "text": "target remote localhost:1234",
+                //     "description": "Connect to QEMU remote debugger"
+                // }
+            ],
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "text": "set architecture i386:intel ",
+                    "description": "set architecture i386"
+                },
+               
+            ],
+            "preLaunchTask": "Build and run"
+        },
+        {
             "name": "file with GDB",
             "type": "cppdbg",
             "request": "launch",
@@ -407,13 +443,8 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            "program": "${workspaceRoot}/init/kernel.elf",
             // "program": "${workspaceRoot}/app/hello/hello",
-            // "program": "${workspaceRoot}/app/gui/gui",
-            // "program": "${workspaceRoot}/app/file/file",
-            // "program": "${workspaceRoot}/app/microui/microui",
-
-            // "program": "${workspaceRoot}/boot/x86/init",
+            "program": "${workspaceRoot}/init/kernel.elf",
             "cwd": "${workspaceRoot}",
             "args": [],
             "sourceFileMap": {
@@ -421,16 +452,13 @@
             },
             "targetArchitecture": "x86",
             "MIMode": "gdb",
-            // "miDebuggerPath": "/opt/local/bin/ggdb",
-            // "miDebuggerPath": "D:\\app\\gcc\\bin\\i686-elf-gdb.exe",
-            "miDebuggerPath": "D:\\app\\msys2\\mingw32\\bin\\gdb-multiarch.exe",
-            
+            "miDebuggerPath": "/opt/local/bin/ggdb",
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
-                {
-                    "text": "target remote localhost:1234",
-                    "description": "Connect to QEMU remote debugger"
-                }
+                // {
+                //     "text": "target remote localhost:1234",
+                //     "description": "Connect to QEMU remote debugger"
+                // }
             ],
             "setupCommands": [
                 {
@@ -442,22 +470,6 @@
                     "text": "set architecture i386:intel ",
                     "description": "set architecture i386"
                 },
-                // {
-                //     "text": "target remote :1234",
-                //     "description": "connect the port"
-                // },
-                // {
-                //     "text": "file ./boot/x86/setup.bin",
-                //     "description": "file on setup."
-                // },
-                // {
-                //     "text": "break _start",
-                //     "description": "Break on exception handler."
-                // },
-                // {
-                //     "text": "break start",
-                //     "description": "Break on exception handler."
-                // },
             ],
             "preLaunchTask": "Build and run"
         },{

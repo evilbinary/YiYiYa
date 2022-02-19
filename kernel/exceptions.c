@@ -382,6 +382,9 @@ void do_page_fault(interrupt_context_t *context) {
     if (current != NULL) {
       vmemory_area_t *area = vmemory_area_find(current->vmm, fault_addr, 0);
       if (area == NULL) {
+        if(current->state==THREAD_STOPPED){
+          return;
+        }
         if (current->fault_count < 3) {
           thread_exit(current, -1);
           kprintf("tid: %d %s memory fault at %x\n", current->id, current->name,

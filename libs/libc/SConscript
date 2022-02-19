@@ -48,12 +48,9 @@ if env['ARCHTYPE'] =='arm':
         'arm/setjmp.S'
     ]
 elif env['ARCHTYPE']=='x86':
-    # source=source+[
-    #     'i386/longjmp.s',
-    #     'i386/setjmp.s'
-    # ]
-    source=source+[    
-        'setjmp.c',
+    source=source+[
+        'i386/longjmp.s',
+        'i386/setjmp.s'
     ]
 
 if env.get('MYLIB'):

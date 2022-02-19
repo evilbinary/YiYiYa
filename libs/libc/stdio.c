@@ -12,7 +12,7 @@ FILE STDERROR;
 FILE *stdin = NULL;
 FILE *stdout = NULL;
 FILE *stderr = NULL;
-char printf_buffer[512];
+
 
 int putchar(int ch) {
   if (stdout == NULL) {
@@ -28,6 +28,7 @@ int putchar(int ch) {
 }
 
 int printf(const char *format, ...) {
+  char printf_buffer[512];
   memset(printf_buffer, 0, 512);
   int i;
   va_list args;
