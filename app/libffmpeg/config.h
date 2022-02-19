@@ -15,16 +15,36 @@
 #define EXTERN_ASM 
 #define BUILDSUF ""
 #define SLIBSUF ".so"
-#define HAVE_MMX2 HAVE_MMXEXT
+
+#define HAVE_MMX2 0
 #define SWS_MAX_FILTER_SIZE 256
 
 #include "stdint.h"
 
 
+#ifdef X86 
+
+#define ARCH_X86 1
+#define ARCH_X86_32 1
+#define ARCH_X86_64 0
+#define ARCH_ARM 0
+
+#elif defined(ARM)
+
+#define ARCH_X86 0
+#define ARCH_X86_32 0
+#define ARCH_X86_64 0
+#define ARCH_ARM 1
+
+#else
+
+
+
+#endif
 
 #define ARCH_AARCH64 0
 #define ARCH_ALPHA 0
-#define ARCH_ARM 1
+
 #define ARCH_AVR32 0
 #define ARCH_AVR32_AP 0
 #define ARCH_AVR32_UC 0
@@ -43,9 +63,7 @@
 #define ARCH_TILEGX 0
 #define ARCH_TILEPRO 0
 #define ARCH_TOMI 0
-#define ARCH_X86 0
-#define ARCH_X86_32 0
-#define ARCH_X86_64 0
+
 #define HAVE_ARMV5TE 0
 #define HAVE_ARMV6 0
 #define HAVE_ARMV6T2 0
@@ -61,23 +79,25 @@
 #define HAVE_PPC4XX 0
 #define HAVE_VSX 0
 #define HAVE_AESNI 1
-#define HAVE_AMD3DNOW 1
-#define HAVE_AMD3DNOWEXT 1
-#define HAVE_AVX 1
-#define HAVE_AVX2 1
+#define HAVE_AMD3DNOW 0
+#define HAVE_AMD3DNOWEXT 0
+#define HAVE_AVX 0
+#define HAVE_AVX2 0
 #define HAVE_FMA3 1
 #define HAVE_FMA4 1
-#define HAVE_MMX 1
-#define HAVE_MMXEXT 1
-#define HAVE_SSE 1
-#define HAVE_SSE2 1
-#define HAVE_SSE3 1
-#define HAVE_SSE4 1
-#define HAVE_SSE42 1
-#define HAVE_SSSE3 1
+
+#define HAVE_MMX 0
+#define HAVE_MMXEXT 0
+
+#define HAVE_SSE 0
+#define HAVE_SSE2 0
+#define HAVE_SSE3 0
+#define HAVE_SSE4 0
+#define HAVE_SSE42 0
+#define HAVE_SSSE3 0
 #define HAVE_XOP 1
 #define HAVE_CPUNOP 0
-#define HAVE_I686 1
+#define HAVE_I686 0
 #define HAVE_MIPSFPU 0
 #define HAVE_MIPS32R2 0
 #define HAVE_MIPS64R2 0
@@ -86,8 +106,8 @@
 #define HAVE_MIPSDSP 0
 #define HAVE_MIPSDSPR2 0
 #define HAVE_MSA 0
-#define HAVE_LOONGSON2 1
-#define HAVE_LOONGSON3 1
+#define HAVE_LOONGSON2 0
+#define HAVE_LOONGSON3 0
 #define HAVE_MMI 0
 #define HAVE_ARMV5TE_EXTERNAL 0
 #define HAVE_ARMV6_EXTERNAL 0
@@ -106,18 +126,19 @@
 #define HAVE_AESNI_EXTERNAL 1
 #define HAVE_AMD3DNOW_EXTERNAL 1
 #define HAVE_AMD3DNOWEXT_EXTERNAL 1
-#define HAVE_AVX_EXTERNAL 1
-#define HAVE_AVX2_EXTERNAL 1
-#define HAVE_FMA3_EXTERNAL 1
-#define HAVE_FMA4_EXTERNAL 1
-#define HAVE_MMX_EXTERNAL 1
-#define HAVE_MMXEXT_EXTERNAL 1
-#define HAVE_SSE_EXTERNAL 1
-#define HAVE_SSE2_EXTERNAL 1
-#define HAVE_SSE3_EXTERNAL 1
-#define HAVE_SSE4_EXTERNAL 1
-#define HAVE_SSE42_EXTERNAL 1
-#define HAVE_SSSE3_EXTERNAL 1
+#define HAVE_AVX_EXTERNAL 0
+#define HAVE_AVX2_EXTERNAL 0
+#define HAVE_FMA3_EXTERNAL 0
+#define HAVE_FMA4_EXTERNAL 0
+#define HAVE_MMX_EXTERNAL 0
+
+#define HAVE_MMXEXT_EXTERNAL 0
+#define HAVE_SSE_EXTERNAL 0
+#define HAVE_SSE2_EXTERNAL 0
+#define HAVE_SSE3_EXTERNAL 0
+#define HAVE_SSE4_EXTERNAL 0
+#define HAVE_SSE42_EXTERNAL 0
+#define HAVE_SSSE3_EXTERNAL 0
 #define HAVE_XOP_EXTERNAL 1
 #define HAVE_CPUNOP_EXTERNAL 0
 #define HAVE_I686_EXTERNAL 0
@@ -149,20 +170,20 @@
 #define HAVE_AESNI_INLINE 1
 #define HAVE_AMD3DNOW_INLINE 1
 #define HAVE_AMD3DNOWEXT_INLINE 1
-#define HAVE_AVX_INLINE 1
-#define HAVE_AVX2_INLINE 1
+#define HAVE_AVX_INLINE 0
+#define HAVE_AVX2_INLINE 0
 #define HAVE_FMA3_INLINE 1
 #define HAVE_FMA4_INLINE 1
 #define HAVE_MMX_INLINE 0
 
 #define HAVE_MMXEXT_INLINE 0
 
-#define HAVE_SSE_INLINE 1
-#define HAVE_SSE2_INLINE 1
-#define HAVE_SSE3_INLINE 1
-#define HAVE_SSE4_INLINE 1
-#define HAVE_SSE42_INLINE 1
-#define HAVE_SSSE3_INLINE 1
+#define HAVE_SSE_INLINE 0
+#define HAVE_SSE2_INLINE 0
+#define HAVE_SSE3_INLINE 0
+#define HAVE_SSE4_INLINE 0
+#define HAVE_SSE42_INLINE 0
+#define HAVE_SSSE3_INLINE 0
 #define HAVE_XOP_INLINE 1
 #define HAVE_CPUNOP_INLINE 0
 #define HAVE_I686_INLINE 0
@@ -198,9 +219,10 @@
 #define HAVE_SYNC_VAL_COMPARE_AND_SWAP 1
 #define HAVE_CABS 1
 #define HAVE_CEXP 1
-#define HAVE_INLINE_ASM 1
+#define HAVE_INLINE_ASM 0
 #define HAVE_SYMVER 1
-#define HAVE_YASM 1
+#define HAVE_YASM 0
+
 #define HAVE_BIGENDIAN 0
 #define HAVE_FAST_UNALIGNED 1
 #define HAVE_INCOMPATIBLE_LIBAV_ABI 0

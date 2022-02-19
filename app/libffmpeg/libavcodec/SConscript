@@ -48,6 +48,10 @@ if env['ARCHTYPE']=='arm':
     source+= [
         'arm/me_cmp_init_arm.c',
     ]
+elif env['ARCHTYPE']=='x86':
+    source+= [
+        # 'x86/me_cmp_init_arm.c',
+    ]
 else:
     print('libavcodec not support',env['ARCHTYPE'])
 

@@ -81,6 +81,13 @@ if env['ARCHTYPE']=='arm':
     source+= [
         'arm/cpu.c'
     ]
+elif env['ARCHTYPE']=='x86':
+    source+= [
+        'x86/cpu.c',
+        'x86/fixed_dsp_init.c',
+        'x86/float_dsp_init.c',                                          \
+        'x86/lls_init.c'
+    ]
 else:
     print('libavutil not support',env['ARCHTYPE'])
 
