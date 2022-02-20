@@ -150,7 +150,7 @@ void pre_launch() {
   // syscall2(SYS_EXEC,"/file",NULL);
   // syscall2(SYS_EXEC, "/luat", NULL);
 
-  syscall2(SYS_EXEC, "/etk", NULL);
+  // syscall2(SYS_EXEC, "/etk", NULL);
   // syscall2(SYS_EXEC,"/test-rs",NULL);
   // syscall2(SYS_EXEC, "/lua", lua_argv);
   // syscall2(SYS_EXEC,"/launcher",NULL);

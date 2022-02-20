@@ -93,6 +93,9 @@ if env.get('APP'):
     SConscript(dirs=['libchez'], exports='env')
     SConscript(dirs=['scheme'], exports='env')
 
+    SConscript(dirs=['libuuid'], exports='env')
+
+
     apps=['hello/hello',
             'gui/gui',
             'microui/microui',
@@ -120,7 +123,6 @@ if env.get('APP'):
             ]
     apps+=Glob('resource/*')
     if env.get('DEFAULT_LIBC')=='libmusl':
-        SConscript(dirs=['libuuid'], exports='env')
         # SConscript(dirs=['libncurses'], exports='env')
 
         SConscript(dirs=['toybox'], exports='env')
