@@ -34,7 +34,26 @@ source+=[
        'subfile.c',   
        'mmst.c',      
        'concat.c', 
-       'bintext.c',      
+       'bintext.c',  
+
+    #CONFIG_XMV_DEMUXER
+    'xmv.c',
+
+       'movenc.c',
+       'isom.c',
+       'avc.c',
+        'hevc.c',
+        'movenchint.c',
+        'mov_chan.c',
+        'rtp.c',
+        'movenccenc.c',
+
+    'rtpenc_chain.c',
+    
+    #CONFIG_RIFFENC
+    'riffenc.c',
+
+    # 'sapdec.c',
 ]
 
 source+=[

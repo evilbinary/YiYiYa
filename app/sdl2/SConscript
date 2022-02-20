@@ -47,5 +47,5 @@ if env.get('MYLIB'):
     source.append(env.get('MYLIB'))
 
 env.Program('player', source,
-    CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libsdl2/ -Iapp/libsdl2/include -Iapp/libffmpeg/',
+    CFLAGS='$CFLAGS $LIBCFLAGS  -Iapp/libsdl2/ -Iapp/libsdl2/include -Iapp/libffmpeg/',
     LINKFLAGS= '$LINKFLAGS $USER')

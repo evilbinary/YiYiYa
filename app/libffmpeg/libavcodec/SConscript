@@ -35,6 +35,23 @@ source+=[
     'vorbis_parser.c',   
     'xiph.c',
 
+    #CONFIG_MSMPEG4V3_ENCODER
+    'msmpeg4enc.c',
+
+    #CONFIG_MSMPEG4V3_DECODER
+    'msmpeg4dec.c',
+    'msmpeg4.c',
+    'msmpeg4data.c',
+
+    #CONFIG_AC3_PARSER
+    'ac3_parser.c',
+    'ac3tab.c',
+    'aac_ac3_parser.c',
+
+    'mpeg4audio.c',
+    'mpegaudiodata.c',
+
+
 
     # 'me_cmp.c',
     # 'snow_dwt.c',

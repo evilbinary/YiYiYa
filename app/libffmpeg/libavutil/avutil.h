@@ -21,10 +21,11 @@
 #ifndef AVUTIL_AVUTIL_H
 #define AVUTIL_AVUTIL_H
 
-#include "config.h"
+
 
 #include "internal.h"
-
+#include "config.h"
+#include "avconfig.h"
 
 /**
  * @file

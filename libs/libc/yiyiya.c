@@ -34,9 +34,9 @@ typedef struct free_block {
 static int page_size = -1;
 void* last_heap_addr = NULL;
 
-u32 time_fd=-1;
+u32 time_fd = -1;
 
-static free_block_t free_block_list_head = {0, 0};
+static free_block_t free_block_list_head = {.size = 0, .next = 0};
 static const size_t align_to = 16;
 
 void* ya_sbrk(size_t size) {
@@ -53,10 +53,10 @@ void* ya_alloc(size_t size) {
   size = (size + sizeof(free_block_t) + (align_to - 1)) & ~(align_to - 1);
   free_block_t* block = free_block_list_head.next;
   free_block_t** head = &(free_block_list_head.next);
-  while (block != 0) {
+  while (free_block_list_head.size != 0 && block != 0) {
     if (block->size >= size) {
       *head = block->next;
-      void* addr=((char*)block) + sizeof(free_block_t);
+      void* addr = ((char*)block) + sizeof(free_block_t);
       // memset(addr,0,s);
       return addr;
     }
@@ -75,7 +75,7 @@ void* ya_alloc(size_t size) {
 void ya_free(void* ptr) {
   free_block_t* block = (free_block_t*)(((char*)ptr) - sizeof(free_block_t));
   block->next = free_block_list_head.next;
-  free_block_list_head.next = block;  
+  free_block_list_head.next = block;
 }
 
 void* ya_valloc(void* addr, size_t size) {
@@ -97,7 +97,9 @@ size_t ya_read(u32 fd, void* buf, size_t nbytes) {
   return syscall3(SYS_READ, fd, buf, nbytes);
 }
 
-size_t ya_seek(u32 fd, ulong offset,int whence) { return syscall3(SYS_SEEK, fd, offset,whence); }
+size_t ya_seek(u32 fd, ulong offset, int whence) {
+  return syscall3(SYS_SEEK, fd, offset, whence);
+}
 
 uint32_t secs_of_years(int years) {
   uint32_t days = 0;
@@ -155,19 +157,19 @@ uint32_t secs_of_month(int months, int year) {
 }
 
 u32 ya_time(time_t* current) {
-  if(time_fd==-1){
-    time_fd= ya_open("/dev/time", 0);
+  if (time_fd == -1) {
+    time_fd = ya_open("/dev/time", 0);
   }
-  if(time_fd<0) return 0;
+  if (time_fd < 0) return 0;
   rtc_time_t time;
-  time.day=1;
-  time.hour=0;
-  time.minute=0;
-  time.month=1;
-  time.second=0;
-  time.year=1900;
+  time.day = 1;
+  time.hour = 0;
+  time.minute = 0;
+  time.month = 1;
+  time.second = 0;
+  time.year = 1900;
   int ret = ya_read(time_fd, &time, sizeof(rtc_time_t));
-  if(ret<0){
+  if (ret < 0) {
     return 0;
   }
   uint32_t seconds = secs_of_years(time.year - 1) +
@@ -197,32 +199,24 @@ int ya_exec(const char* pathname, char* const argv[], char* const envp[]) {
   return syscall3(SYS_EXEC, pathname, argv, envp);
 }
 
-void ya_exit(u32 ret){
-  syscall1(SYS_EXIT, ret);
+void ya_exit(u32 ret) { syscall1(SYS_EXIT, ret); }
+
+int ya_readdir(int fd, int index, struct dirent* dirent) {
+  return syscall3(SYS_READDIR, fd, dirent, index);
 }
 
-int ya_readdir(int fd,int index,struct dirent* dirent){
-  return syscall3(SYS_READDIR, fd,dirent,index);
+int ya_rename(const char* old, const char* new) {
+  return syscall2(SYS_RENAME, old, new);
 }
 
-int ya_rename(const char *old, const char *new){
-  return syscall2(SYS_RENAME,old,new);
+int ya_getcwd(char* buf, size_t size) {
+  return syscall2(SYS_GETCWD, buf, size);
 }
 
-int ya_getcwd(char *buf, size_t size){
-  return syscall2(SYS_GETCWD,buf,size);
-}
+int ya_chdir(char* path) { return syscall1(SYS_CHDIR, path); }
 
-int ya_chdir(char* path){
-  return syscall1(SYS_CHDIR,path);
-}
+int ya_fchdir(int fd) { return syscall1(SYS_FCHDIR, fd); }
 
-int ya_fchdir(int fd){
-  return syscall1(SYS_FCHDIR,fd);
-}
-
-
-
-void __main(){
-  //printf("main call\n");
+void __main() {
+  // printf("main call\n");
 }

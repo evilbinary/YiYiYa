@@ -4,6 +4,15 @@
 #define true 1
 #define false 0
 
+#ifdef X86
+#define WIDTH 1024
+#define HEIGHT 768
+#else
+
+#define WIDTH 480
+#define HEIGHT 272
+#endif
+
 int main( int argc, char* args[] )
 {
     SDL_Window* window;
@@ -15,7 +24,7 @@ int main( int argc, char* args[] )
     // Create the window where we will draw.
     window = SDL_CreateWindow("SDL_RenderClear",
                     SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                    512, 512,
+                    WIDTH, HEIGHT,
                     0);
     SDL_assert(window);
     // We must call SDL_CreateRenderer in order for draw calls to affect this window.

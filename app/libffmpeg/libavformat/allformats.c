@@ -193,7 +193,7 @@ void av_register_all(void)
 //     REGISTER_MUXDEMUX(MOV,              mov);
 //     REGISTER_MUXER   (MP2,              mp2);
 //     REGISTER_MUXDEMUX(MP3,              mp3);
-//     REGISTER_MUXER   (MP4,              mp4);
+    REGISTER_MUXER   (MP4,              mp4);
 //     REGISTER_DEMUXER (MPC,              mpc);
 //     REGISTER_DEMUXER (MPC8,             mpc8);
 //     REGISTER_MUXER   (MPEG1SYSTEM,      mpeg1system);
