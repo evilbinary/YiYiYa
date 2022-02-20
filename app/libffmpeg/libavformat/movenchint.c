@@ -25,6 +25,7 @@
 #include "rtpenc_chain.h"
 #include "avio_internal.h"
 #include "rtp.h"
+#include "stdint.h"
 
 int ff_mov_init_hinting(AVFormatContext *s, int index, int src_index)
 {
