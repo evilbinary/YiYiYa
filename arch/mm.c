@@ -90,14 +90,15 @@ void mm_dump_phy() {
   }
   kprintf("total memory %dm %dk\n", boot_info->total_memory / 1024 / 1024,boot_info->total_memory/1024);
 }
+#define debug 
 
 void* mm_alloc(size_t size) {
   mem_block_t* p = block_available;
-  // debug("malloc count %d size %d\n",count,size);
+  debug("malloc count %d size %d\n",count,size);
   u32 pre_alloc_size = size + sizeof(mem_block_t);
   pre_alloc_size = (pre_alloc_size + 8) & ~0x3;
   for (; p != NULL; p = p->next) {
-    // debug("p=>:%x type:%d size:%x\n", p, p->type, p->size);
+    debug("p=>:%x type:%d size:%x\n", p, p->type, p->size);
     if ((p->type != MEM_FREE)) {
       continue;
     }
@@ -210,6 +211,7 @@ void mm_dump() {
 }
 
 void mm_free(void* addr) {
+  debug("free %x\n",addr);
   if (addr == NULL) return;
   mem_block_t* block = (mem_block_t*)((u32)addr);
   if (block->addr == 0) {
