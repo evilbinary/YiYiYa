@@ -101,8 +101,9 @@ typedef int tputsputcchar;
 #endif
 #define NOBLOCK O_NONBLOCK
 #define LOAD_SHARED_OBJECT
-#define USE_MMAP
-#define MMAP_HEAP
+// #define USE_MMAP
+// #define MMAP_HEAP
+#define USE_MALLOC
 #define IEEE_DOUBLE
 #define LITTLE_ENDIAN_IEEE_DOUBLE
 #define LDEXP

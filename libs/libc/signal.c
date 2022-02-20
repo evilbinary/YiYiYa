@@ -23,7 +23,7 @@ void (*signal(int sig, void (*func)(int)))(int) {
 int sigemptyset(sigset_t *set) {
   printf("unimpl sigemptyset\n");
 
-  return 0;
+  return 1;
 }
 
 int sigaction(int sig, const struct sigaction *restrict sa,
