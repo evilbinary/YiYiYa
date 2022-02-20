@@ -135,6 +135,14 @@ int devfs_init(void) {
   dsp->write = device_write;
   vfs_mount(NULL, "/dev", dsp);
 
+  //net
+  vnode_t *net = vfs_create("net", V_FILE | V_BLOCKDEVICE);
+  net->device = device_find(DEVICE_NET);
+  net->read = device_read;
+  net->ioctl = device_ioctl;
+  net->write = device_write;
+  vfs_mount(NULL, "/dev", net);
+
   return 0;
 }
 
