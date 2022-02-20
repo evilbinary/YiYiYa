@@ -121,12 +121,22 @@ typedef int tputsputcchar;
 #define OFF_T off64_t
 #define _LARGEFILE64_SOURCE
 #define STATBUF stat
+
+#ifdef __LIB_MUSL__
+#define SECATIME(sb) (sb).st_atim.tv_sec
+#define SECCTIME(sb) (sb).st_ctim.tv_sec
+#define SECMTIME(sb) (sb).st_mtim.tv_sec
+#define NSECATIME(sb) (sb).st_atim.tv_nsec
+#define NSECCTIME(sb) (sb).st_ctim.tv_nsec
+#define NSECMTIME(sb) (sb).st_mtim.tv_nsec
+#else
 #define SECATIME(sb) (sb).st_atim
 #define SECCTIME(sb) (sb).st_ctim
 #define SECMTIME(sb) (sb).st_mtim
 #define NSECATIME(sb) 0
 #define NSECCTIME(sb) 0
 #define NSECMTIME(sb) 0
+#endif
 #define ICONV_INBUF_TYPE char **
 #define UNUSED __attribute__((__unused__))
 #endif

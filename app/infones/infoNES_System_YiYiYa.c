@@ -735,20 +735,20 @@ void InfoNES_SoundOutput( int samples, BYTE *wave1, BYTE *wave2, BYTE *wave3, BY
 	int i;
 	int ret;
 	unsigned char wav;
-	unsigned char *pcmBuf = (unsigned char *)malloc(samples);
+// 	unsigned char *pcmBuf = (unsigned char *)malloc(samples);
 
-	for (i=0; i <samples; i++)
-	{
-		wav = (wave1[i] + wave2[i] + wave3[i] + wave4[i] + wave5[i]) / 5;
-		//单声道 8位数据
-		pcmBuf[i] = wav;
-	}
-	ret = write(sound_fd, pcmBuf, samples);
-	if(ret<0)
-  {
-        printf("write error\n");
-  }
-	free(pcmBuf);
+// 	for (i=0; i <samples; i++)
+// 	{
+// 		wav = (wave1[i] + wave2[i] + wave3[i] + wave4[i] + wave5[i]) / 5;
+// 		//单声道 8位数据
+// 		pcmBuf[i] = wav;
+// 	}
+// 	ret = write(sound_fd, pcmBuf, samples);
+// 	if(ret<0)
+//   {
+//         printf("write error\n");
+//   }
+// 	free(pcmBuf);
 
   // if (sound_fd != -1)
   // {
