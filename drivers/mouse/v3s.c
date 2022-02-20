@@ -71,7 +71,7 @@ int ns2009_get_touch() {
     return 1;
   } else {
     event.sate = 0;
-    kprintf("up %d\n", z);
+    // kprintf("up %d\n", z);
   }
   return 0;
 }

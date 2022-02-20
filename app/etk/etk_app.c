@@ -44,17 +44,20 @@ int etk_app_main(int argc, char* argv[]) {
 
   t.x = 0;
   t.y = 0;
-  t.width = b->w;
-  t.height = b->h;
+  t.width = b->w>etkglobal.display->width?etkglobal.display->width:b->w;
+  t.height = b->h>etkglobal.display->height?etkglobal.display->height:b->h;
   etk_canvas_set_bitmap(desktop->canvas, b);
 
-  status = (EtkWidget*)etk_create_window(0, 0, 1024, 30, ETK_WIDGET_CHILD);
+  printf("create bar status\n");
+  status = (EtkWidget*)etk_create_window(0, 0, etkglobal.display->width, 30, ETK_WIDGET_CHILD);
   etk_widget_append_child(desktop, status);
 
+  printf("create menu\n");
   menu[0] = (EtkWidget*)etk_create_menu(status, 0, 00, 80, 30);
   etk_widget_set_text(menu[0], "Menu");
   etk_button_set_clicked_listener(menu[0], menu0_listener, menu[0]);
 
+  printf("create menu item\n");
   menu_item[0] = (EtkWidget*)etk_create_menu_item(
       menu[0], menu[0]->rect.x, menu[0]->rect.height, menu[0]->rect.width, 20);
   etk_widget_set_text(menu_item[0], "Open");
@@ -99,12 +102,14 @@ int etk_app_main(int argc, char* argv[]) {
   etk_menu_item_set_clicked_listener(menu_item[5], menu0_item2_listener,
                                      menu_item[5]);
 
+  printf("create buttons\n");
+
   xsize = 52;
   ysize = 40;
   xspan = 5;
   yspan = 5;
   startx = 10;
-  starty = DISAPLAY_HEIGHT - ysize - yspan * 2;
+  starty = etkglobal.display->height - ysize - yspan * 2;
   x = startx;
   y = starty;
   for (i = 0; i < 9; i++) {
@@ -151,23 +156,31 @@ int etk_app_main(int argc, char* argv[]) {
   // wins[2] = etk_light_create(100, 600, 250, 180);
   // etk_widget_append_child(desktop, wins[2]);
 
-  wins[3] = etk_temhum_create(10, 50, 200, 290);
+  printf("create temhum\n");
+  wins[3] = etk_temhum_create(10, 250, 200, 290);
   etk_widget_append_child(desktop, wins[3]);
 
-  wins[4] = etk_status_create(200, 400, 200, 150);
+  printf("create status\n");
+  wins[4] = etk_status_create(200, 300, 200, 150);
   etk_widget_append_child(desktop, wins[4]);
 
+  printf("create clock\n");
   // clock
   wins[6] = etk_app_clock(840, 40, 180, 180);
 
-  // //mine
-  wins[7] = etk_game_mine(10, 30, 8, 8, 10);
+  //mine
+  printf("create mine\n");
+  wins[7] = etk_game_mine(210, 230, 8, 8, 10);
   // wins[7]=etk_game_mine(160, 230, 10, 10, 14);
   // etk_game_mine(340, 30, 16, 16, 20);
+
+#ifdef X86
+  printf("create terminal\n");
   EtkWidget* terminal = etk_terminal(340, 140, 420, 340);
   wins[8] = terminal;
 
   etk_wnd_manager_set_active_widget(etk_get_wnd_manager(), terminal);
+#endif
 
   etk_widget_show_all(desktop);
 

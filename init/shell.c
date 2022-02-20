@@ -176,6 +176,7 @@ void pre_launch() {
   // syscall2(SYS_EXEC, "/lvgl", NULL);
   // syscall2(SYS_EXEC, "/launcher", NULL);
 
+ 
   // syscall2(SYS_EXEC,"/track",NULL);
   // syscall2(SYS_EXEC,"/gui",NULL);
   // syscall2(SYS_EXEC,"/etk",NULL);
@@ -193,5 +194,6 @@ void pre_launch() {
   // syscall2(SYS_EXEC, "/infones", nes_argv);
 
 // test_cpu_speed();
+//  for(;;);
 #endif
 }
