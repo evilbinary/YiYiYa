@@ -133,7 +133,7 @@ void do_shell_thread(void) {
 }
 
 // must init global for armv7-a
-char* scm_argv[] = {"/scheme", "-b", "/scheme.boot", NULL};
+char* scm_argv[] = {"/scheme", "-b", "/scheme.boot","--verbose", NULL};
 char* lua_argv[] = {"/lua", "hello.lua", NULL};
 
 char* nes_argv[] = {"infones", "/mario.nes", NULL};
@@ -162,6 +162,7 @@ void pre_launch() {
 
   // syscall2(SYS_EXEC, "/infones", nes_argv);
   // syscall2(SYS_EXEC, "/mgba", mgba_argv);
+  syscall2(SYS_EXEC, "/scheme", scm_argv);
 
   // for (;;)
   //   ;

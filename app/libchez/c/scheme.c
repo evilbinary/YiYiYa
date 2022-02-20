@@ -458,7 +458,9 @@ static char *get_defaultheapdirs() {
 #define SEARCHPATHSEP ':'
 #define PATHSEP '/'
 #ifndef DEFAULT_HEAP_PATH
-#define DEFAULT_HEAP_PATH "/usr/lib/csv%v/%m:/usr/local/lib/csv%v/%m"
+#define DEFAULT_HEAP_PATH "/"
+// #define DEFAULT_HEAP_PATH "/usr/lib/csv%v/%m:/usr/local/lib/csv%v/%m"
+
 #endif
 
 static char *get_defaultheapdirs() {
