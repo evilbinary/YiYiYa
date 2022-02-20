@@ -279,8 +279,8 @@ static bool mouse_is_pressed(void) {
 static void mouse_get_xy(lv_coord_t* x, lv_coord_t* y) {
   /*Your code comes here*/
   (*x) = mouse.x;
-  // (*y) = screen->height - mouse.y;
-  (*y) = mouse.y;
+  (*y) = screen->height - mouse.y;
+  // (*y) = mouse.y;
 }
 
 /*------------------
