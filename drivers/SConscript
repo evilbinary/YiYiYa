@@ -92,7 +92,10 @@ elif arch_type=='x86':
     'fat/partition.c',
     'fat/mod.c',
 
-    'sound/sb16.c',]
+    'sound/sb16.c',
+    'net/net.c',
+    'net/e1000.c'
+    ]
 
 elif arch_type=='xtensa':
      driver=[

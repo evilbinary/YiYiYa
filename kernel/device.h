@@ -29,7 +29,8 @@ enum {
   DEVICE_I2C,
   DEVICE_GPIO,
   DEVICE_SPI,
-  DEVICE_SB
+  DEVICE_SB,
+  DEVICE_NET
 };
 
 enum {
