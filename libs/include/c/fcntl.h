@@ -113,6 +113,16 @@ int lockf(int, int, off_t);
 #define AT_SYMLINK_FOLLOW 0x400
 #define AT_EACCESS 0x200
 
+
+struct flock {
+	short l_type;
+	short l_whence;
+	off_t l_start;
+	off_t l_len;
+	pid_t l_pid;
+};
+
+
 int creat(const char *, u32);
 int fcntl(int, int, ...);
 int open(const char *, int, ...);

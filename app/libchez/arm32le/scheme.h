@@ -195,7 +195,8 @@ EXPORT int Sscheme_program PROTO((const char *, int, const char *[]));
 EXPORT void Sscheme_deinit PROTO((void));
 
 /* Features. */
-#define FEATURE_ICONV
+//todo
+// #define FEATURE_ICONV
 // #define FEATURE_EXPEDITOR
 
 /* Locking macros. */
