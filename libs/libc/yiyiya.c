@@ -32,12 +32,12 @@ typedef struct free_block {
 
 // static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 static int page_size = -1;
-void* last_heap_addr = NULL;
+static char* last_heap_addr = NULL;
+const size_t align_to = 16;
 
 u32 time_fd = -1;
 
-static free_block_t free_block_list_head = {.size = 0, .next = 0};
-static const size_t align_to = 16;
+free_block_t free_block_list_head = {.size = 0, .next = 0};
 
 void* ya_sbrk(size_t size) {
   if (last_heap_addr == NULL) {
@@ -65,7 +65,8 @@ void* ya_alloc(size_t size) {
   }
 
   block = (free_block_t*)ya_sbrk(size);
-  block->size = size;
+  block->size = s;
+  block->next=NULL;
 
   void* addr = ((char*)block) + sizeof(free_block_t);
   // memset(addr,0,s);
@@ -76,6 +77,8 @@ void ya_free(void* ptr) {
   free_block_t* block = (free_block_t*)(((char*)ptr) - sizeof(free_block_t));
   block->next = free_block_list_head.next;
   free_block_list_head.next = block;
+  void* addr = ((char*)block) + sizeof(free_block_t);
+  memset(addr,0,block->size);
 }
 
 void* ya_valloc(void* addr, size_t size) {

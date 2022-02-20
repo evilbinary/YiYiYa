@@ -242,7 +242,7 @@ u32 sys_exec(char* filename, char* const argv[], char* const envp[]) {
   }
 
   // init vmm
-  t->vmm = vmemory_area_create(HEAP_ADDR, MEMORY_CREATE_SIZE, MEMORY_HEAP);
+  t->vmm = vmemory_area_create(HEAP_ADDR, MEMORY_HEAP_SIZE, MEMORY_HEAP);
   vmemory_area_t* vmexec =
       vmemory_area_create(EXEC_ADDR, MEMORY_EXEC_SIZE, MEMORY_EXEC);
   vmemory_area_add(t->vmm, vmexec);
