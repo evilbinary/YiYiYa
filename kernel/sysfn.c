@@ -160,7 +160,7 @@ size_t sys_seek(u32 fd, ulong offset, int whence) {
   } else {
     kprintf("seek whence error %d\n", whence);
   }
-  return 1;
+  return 0;
 }
 
 size_t sys_yeild() { thread_yield(); }

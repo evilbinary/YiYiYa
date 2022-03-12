@@ -49,3 +49,27 @@ if env.get('MYLIB'):
 env.Program('player', source,
     CFLAGS='$CFLAGS $LIBCFLAGS  -Iapp/libsdl2/ -Iapp/libsdl2/include -Iapp/libffmpeg/',
     LINKFLAGS= '$LINKFLAGS $USER')
+
+
+
+#showimage
+
+source= [
+    'showimage.c',
+
+    '../libsdl2/libsdl2.a',   
+    '../libsdl2-image/libsdl2-image.a',
+    '../libgui/libgui.a',
+    '../libjpeg/libjpeg.a',
+    '../libpng/libpng.a',
+    '../libzlib/libzlib.a',
+    '../libwebp/libwebp.a',
+    
+    ]+env['LIBC']
+    
+if env.get('MYLIB'):
+    source.append(env.get('MYLIB'))
+
+env.Program('showimage', source,
+    CFLAGS='$CFLAGS $LIBCFLAGS  -Iapp/libsdl2/ -Iapp/libjpeg/ -Iapp/libpng/ -Iapp/libsdl2/include -Iapp/libsdl2-image/',
+    LINKFLAGS= '$LINKFLAGS $USER')

@@ -8,35 +8,8 @@ import os
 
 Import('env')
 
+source=[]
 
-env.Library('jpeg', [
-    "jdinput.c",
-    "jdhuff.c",
-    "jddctmgr.c",
-    "jdcolor.c",
-    "jdcoefct.c",
-    "jdapistd.c",
-    "jcomapi.c",
-    "jutils.c",
-    "jquant2.c",
-    "jquant1.c",
-    "jmemmgr.c",
-    "jidctred.c",
-    "jidctint.c",
-    "jidctfst.c",
-    "jidctflt.c",
-    "jfdctint.c",
-    "jfdctfst.c",
-    "jfdctflt.c",
-    "jerror.c",
-    "jdtrans.c",
-    "jdsample.c",
-    "jdpostct.c",
-    "jdphuff.c",
-    "jdmerge.c",
-    "jdmaster.c",
-    "jdmarker.c",
-    "jdmainct.c",
-    "jdapimin.c",
-    "jmemsysextern.c",
-]+env['LIBC'],CFLAGS='$CFLAGS $LIBCFLAGS')
+source+=Glob('*.c')
+
+env.Library('jpeg', source+env['LIBC'],CFLAGS='$CFLAGS $LIBCFLAGS')

@@ -13,10 +13,10 @@ cflags=''
 
 if env['ARCHTYPE']=='arm':
     type='arm32le'
-    cflags ='-DINLINES -DGC_MACROS -DARMV6 -DMB_LEN_MAX=8 -D_LARGEFILE64_SOURCE -DHAVE_HIDDEN'
+    cflags ='-DARMV6 -DINLINES -DGC_MACROS -DARMV6 -DMB_LEN_MAX=8 -D_LARGEFILE64_SOURCE -DHAVE_HIDDEN'
 elif env['ARCHTYPE']=='x86':
     type='i3le'
-    cflags ='-DINLINES -DGC_MACROS  -DMB_LEN_MAX=8 -D_LARGEFILE64_SOURCE -DHAVE_HIDDEN'
+    cflags ='-DI386 -DINLINES -DGC_MACROS  -DMB_LEN_MAX=8 -D_LARGEFILE64_SOURCE -DHAVE_HIDDEN'
 else:
     print('libchez not support',env['ARCHTYPE'])
 

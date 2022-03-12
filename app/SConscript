@@ -70,8 +70,14 @@ if env.get('APP'):
 
     SConscript(dirs=['infones'], exports='env')
 
+    SConscript(dirs=['libwebp'], exports='env')
     SConscript(dirs=['libsdl2'], exports='env')
+    SConscript(dirs=['libsdl2-image'], exports='env')
     SConscript(dirs=['sdl2'], exports='env')
+
+
+    SConscript(dirs=['libuuid'], exports='env')
+
 
     SConscript(dirs=['mgba'], exports='env')
 
@@ -93,7 +99,7 @@ if env.get('APP'):
     SConscript(dirs=['libchez'], exports='env')
     SConscript(dirs=['scheme'], exports='env')
 
-    SConscript(dirs=['libuuid'], exports='env')
+
 
 
     apps=['hello/hello',
@@ -112,6 +118,7 @@ if env.get('APP'):
             'infones/infones',
             'sdl2/sdl2',
             'sdl2/player',
+            'sdl2/showimage',
             'mgba/mgba',
             'mgba/miniunz',
             'lua/lua',
@@ -125,11 +132,11 @@ if env.get('APP'):
     if env.get('DEFAULT_LIBC')=='libmusl':
         # SConscript(dirs=['libncurses'], exports='env')
 
-        SConscript(dirs=['toybox'], exports='env')
+        # SConscript(dirs=['toybox'], exports='env')
 
         apps+=[
             'test/test-musl',
-            'toybox/toybox',
+            # 'toybox/toybox',
             ]
 
     if plt=='Darwin':

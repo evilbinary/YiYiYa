@@ -1,5 +1,5 @@
 #ifndef BOOT/ARM/CONFIG_H
 #define BOOT/ARM/CONFIG_H
 #define KERNEL_BLOCK_SIZE 165
-#define KERNEL_SIZE 168608
+#define KERNEL_SIZE 168612
 #endif

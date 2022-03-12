@@ -13,7 +13,7 @@ struct environ_t {
 extern struct environ_t __xenviron;
 
 char * getenv(const char * name);
-int putenv(const char * str);
+int putenv(char * str);
 int setenv(const char * name, const char * val, int overwrite);
 int unsetenv(const char * name);
 int clearenv(void);

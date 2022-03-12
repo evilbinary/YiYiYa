@@ -60,7 +60,7 @@ void exception_info(interrupt_context_t *context) {
       "PAGE FAULT",        "REVERSED",
       "COPROCESSOR_ERROR",
   };
-  cls();
+  //cls();
   if (context->no != 14) {
     thread_t *current = thread_current();
     if (context->no < sizeof exception_msg) {
