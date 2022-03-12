@@ -9,8 +9,13 @@
 #include "syscall.h"
 
 thread_t* current_thread = NULL;
-thread_t* head_thread = NULL;
-thread_t* tail_thread = NULL;
+thread_t* schedulable_head_thread = NULL;
+thread_t* schedulable_tail_thread = NULL;
+
+thread_t* recycle_head_thread = NULL;
+thread_t* recycle_tail_thread = NULL;
+u32 recycle_head_thread_count = 0;
+
 u32 thread_ids = 0;
 extern context_t* current_context;
 
@@ -138,39 +143,44 @@ void thread_init(thread_t* thread, void* entry, u32* stack0, u32* stack3,
 
 void thread_add(thread_t* thread) {
   cpu_cli();
-  if (head_thread == NULL) {
-    head_thread = thread;
-    tail_thread = thread;
+  if (schedulable_head_thread == NULL) {
+    schedulable_head_thread = thread;
+    schedulable_tail_thread = thread;
   } else {
-    tail_thread->next = thread;
-    tail_thread = thread;
+    schedulable_tail_thread->next = thread;
+    schedulable_tail_thread = thread;
   }
   thread->state = THREAD_RUNABLE;
   if (current_thread == NULL) {
-    if (head_thread == NULL) {
+    if (schedulable_head_thread == NULL) {
       kprintf("no thread please create a thread\n");
       cpu_halt();
     }
-    current_thread = head_thread;
+    current_thread = schedulable_head_thread;
     current_context = &current_thread->context;
   }
 }
 
 void thread_remove(thread_t* thread) {
-  thread_t* v = head_thread;
+  thread_t* prev = schedulable_head_thread;
+  thread_t* v = prev->next;
   thread->state = THREAD_STOPPED;
   thread->counter += 1000;
 
-  thread_t* prev = v;
-  if (head_thread == v) {
-    head_thread = v->next;
-    thread_destroy(thread);
+  if (schedulable_head_thread == thread) {
+    schedulable_head_thread = NULL;
+    schedulable_tail_thread = NULL;
+    thread->next = NULL;
     return;
   }
+
   for (; v; v = v->next) {
     if (v == thread) {
       prev->next = v->next;
-      thread_destroy(thread);
+      v->next = NULL;
+      if (thread == schedulable_tail_thread) {
+        schedulable_tail_thread = prev;
+      }
       break;
     }
     prev = v;
@@ -191,19 +201,31 @@ void thread_destroy(thread_t* thread) {
 void thread_stop(thread_t* thread) {
   if (thread == NULL) return;
   thread->state = THREAD_STOPPED;
-}
-
-void thread_exit(thread_t* thread, int code) {
-  if (thread == NULL) return;
-  thread_stop(thread);
-  thread->code = code;
-  // todo relase more
+  thread_remove(thread);
+  // add into cycle thread
+  if (recycle_head_thread == NULL) {
+    recycle_head_thread = thread;
+    recycle_tail_thread = thread;
+  } else {
+    recycle_tail_thread->next = thread;
+    recycle_tail_thread = thread;
+  }
+  recycle_head_thread_count++;
+  // kprintf("recycle count %d\n", recycle_head_thread_count);
   // schedule_next();
   // cpu_sti();
 }
 
-thread_t* thread_find(thread_t* thread) {
-  thread_t* v = head_thread;
+thread_t* thread_head() { return schedulable_head_thread; }
+
+void thread_exit(thread_t* thread, int code) {
+  if (thread == NULL) return;
+  thread->code = code;
+  thread_stop(thread);
+}
+
+thread_t* thread_find_next(thread_t* thread) {
+  thread_t* v = schedulable_head_thread;
   for (; v; v = v->next) {
     if (v->next == thread) {
       return v;
@@ -390,7 +412,7 @@ void thread_dumps() {
   char* str = "unkown";
   kprintf("\n--------------threads--------------\n");
   kprintf("id    pid    name                 state    counter\n");
-  for (thread_t* p = head_thread; p != NULL; p = p->next) {
+  for (thread_t* p = schedulable_head_thread; p != NULL; p = p->next) {
     if (p->state <= THREAD_SLEEP) {
       str = state_str[p->state];
     }
@@ -407,7 +429,7 @@ void thread_dumps() {
 }
 
 void thread_run_all() {
-  thread_t* v = head_thread;
+  thread_t* v = schedulable_head_thread;
   for (; v; v = v->next) {
     thread_run(v);
   }

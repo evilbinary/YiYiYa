@@ -85,6 +85,9 @@ fd_t* thread_find_fd_id(thread_t* thread,u32 fd);
 int thread_find_fd_name(thread_t* thread, u8* name);
 fd_t* thread_set_fd(thread_t* thread, u32 fd,fd_t* nfd);
 
+thread_t* thread_find_next(thread_t* thread);
+
+thread_t* thread_head();
 
 void thread_run_all();
 
