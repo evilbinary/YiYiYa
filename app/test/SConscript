@@ -39,3 +39,15 @@ if env.get('DEFAULT_LIBC')=='libmusl':
 
 
 
+
+source= [
+    'test-file.c',
+    ]+env['LIBC']
+    
+if env.get('MYLIB'):
+    source.append(env.get('MYLIB'))
+
+
+env.Program('test-file', source,
+    CFLAGS='$CFLAGS $LIBCFLAGS ',
+    LINKFLAGS= '$LINKFLAGS $USER')
