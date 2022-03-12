@@ -50,3 +50,15 @@ if env.get('MYLIB'):
 env.Program('cat', source,
     CFLAGS='$CFLAGS $LIBCFLAGS ',
     LINKFLAGS= '$LINKFLAGS $USER')
+
+
+source=[
+    'hexdump.c',
+    ]+env['LIBC']
+
+if env.get('MYLIB'):
+    source.append(env.get('MYLIB'))
+
+env.Program('hexdump', source,
+    CFLAGS='$CFLAGS $LIBCFLAGS ',
+    LINKFLAGS= '$LINKFLAGS $USER')

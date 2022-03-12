@@ -149,7 +149,7 @@ void pre_launch() {
   // int fd = syscall2(SYS_OPEN, "/dev/stdin", 0);
   // syscall2(SYS_EXEC,"/hello",NULL);
   // syscall2(SYS_EXEC,"/gui",NULL);
-  // syscall2(SYS_EXEC,"/test-file",NULL);
+  syscall2(SYS_EXEC,"/test-file",NULL);
   // syscall2(SYS_EXEC, "/luat", NULL);
 
   // syscall2(SYS_EXEC, "/etk", NULL);
