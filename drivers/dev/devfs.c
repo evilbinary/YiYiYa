@@ -9,17 +9,33 @@
 #include "kernel/vfs.h"
 #include "pty/pty.h"
 
+voperator_t no_rw_operator = {.close = NULL,
+                              .read = NULL,
+                              .write = NULL,
+                              .open = vfs_open,
+                              .find = vfs_find,
+                              .mount = vfs_mount,
+                              .readdir = vfs_readdir};
+
+voperator_t device_operator = {.ioctl = device_ioctl,
+                               .close = device_close,
+                               .open = device_open,
+                               .read = device_read,
+                               .write = device_write,
+                               .find = vfs_find,
+                               .mount = vfs_mount,
+                               .readdir = vfs_readdir};
+
 vnode_t *devfs_create_device(device_t *dev) {
-  vnode_t *t = kmalloc(sizeof(vnode_t));
+  vnode_t *t = vfs_create_node("dev", V_DIRECTORY);
   t->flags = V_BLOCKDEVICE | V_DIRECTORY;
-  t->write = NULL;
-  t->read = NULL;
+  t->op = &no_rw_operator;
   t->device = dev;
   return t;
 }
 
 int devfs_init(void) {
-  vnode_t *node_dev = vfs_create("dev", V_DIRECTORY);
+  vnode_t *node_dev = vfs_create_node("dev", V_DIRECTORY);
   vfs_mount(NULL, "/", node_dev);
   char *name;
   vnode_t *root_super = NULL;
@@ -46,16 +62,16 @@ int devfs_init(void) {
   root->super = root_super;
 
   // SYS_READ,SYS_WRITE
-  vnode_t *stdin = vfs_create("stdin", V_FILE);
-  vnode_t *stdout = vfs_create("stdout", V_FILE);
-  vnode_t *stderr = vfs_create("stderr", V_FILE);
+  vnode_t *stdin = vfs_create_node("stdin", V_FILE);
+  vnode_t *stdout = vfs_create_node("stdout", V_FILE);
+  vnode_t *stderr = vfs_create_node("stderr", V_FILE);
   vfs_mount(NULL, "/dev", stdin);
   vfs_mount(NULL, "/dev", stdout);
   vfs_mount(NULL, "/dev", stderr);
 
-  stdin->read = device_read;
-  stdout->write = device_write;
-  stderr->write = device_write;
+  stdin->op = &device_operator;
+  stdout->op = &device_operator;
+  stderr->op = &device_operator;
 
   stdin->device = device_find(DEVICE_KEYBOARD);
   stdout->device = device_find(DEVICE_VGA);
@@ -69,15 +85,11 @@ int devfs_init(void) {
   stderr->device = stdout->device;
 
   // series
-  vnode_t *series = vfs_create("series", V_FILE);
+  vnode_t *series = vfs_create_node("series", V_FILE);
   vfs_mount(NULL, "/dev", series);
   series->device = device_find(DEVICE_SERIAL);
 
-  series->open = device_open;
-  series->read = device_read;
-  series->write = device_write;
-  series->close = device_close;
-  // series->ioctl = device_ioctl;
+  series->op = &device_operator;
 
   // frambuffer
   device_t *fb_dev = device_find(DEVICE_VGA);
@@ -85,11 +97,10 @@ int devfs_init(void) {
     fb_dev = device_find(DEVICE_VGA_QEMU);
   }
   if (fb_dev != NULL) {
-    vnode_t *frambuffer = vfs_create("fb", V_FILE);
+    vnode_t *frambuffer = vfs_create_node("fb", V_FILE);
     vfs_mount(NULL, "/dev", frambuffer);
     frambuffer->device = fb_dev;
-    frambuffer->write = device_write;
-    frambuffer->ioctl = device_ioctl;
+    frambuffer->op = &device_operator;
   } else {
     kprintf("dev fb not found\n");
   }
@@ -97,11 +108,10 @@ int devfs_init(void) {
   // mouse
   device_t *mouse_dev = device_find(DEVICE_MOUSE);
   if (mouse_dev != NULL) {
-    vnode_t *mouse = vfs_create("mouse", V_FILE);
+    vnode_t *mouse = vfs_create_node("mouse", V_FILE);
     vfs_mount(NULL, "/dev", mouse);
     mouse->device = mouse_dev;
-    mouse->read = device_read;
-    mouse->ioctl = device_ioctl;
+    mouse->op = &device_operator;
   } else {
     kprintf("dev mouse not found\n");
   }
@@ -109,11 +119,10 @@ int devfs_init(void) {
   // time
   device_t *rtc_dev = device_find(DEVICE_RTC);
   if (rtc_dev != NULL) {
-    vnode_t *time = vfs_create("time", V_FILE);
+    vnode_t *time = vfs_create_node("time", V_FILE);
     vfs_mount(NULL, "/dev", time);
     time->device = rtc_dev;
-    time->read = device_read;
-    time->ioctl = device_ioctl;
+    time->op = &device_operator;
   } else {
     kprintf("dev time not found\n");
   }
@@ -128,19 +137,16 @@ int devfs_init(void) {
   fd_std_init();
 
   // dsp
-  vnode_t *dsp = vfs_create("dsp", V_FILE | V_BLOCKDEVICE);
+  vnode_t *dsp = vfs_create_node("dsp", V_FILE | V_BLOCKDEVICE);
   dsp->device = device_find(DEVICE_SB);
-  dsp->read = device_read;
-  dsp->ioctl = device_ioctl;
-  dsp->write = device_write;
+  dsp->op = &device_operator;
+
   vfs_mount(NULL, "/dev", dsp);
 
-  //net
-  vnode_t *net = vfs_create("net", V_FILE | V_BLOCKDEVICE);
+  // net
+  vnode_t *net = vfs_create_node("net", V_FILE | V_BLOCKDEVICE);
   net->device = device_find(DEVICE_NET);
-  net->read = device_read;
-  net->ioctl = device_ioctl;
-  net->write = device_write;
+  net->op = &device_operator;
   vfs_mount(NULL, "/dev", net);
 
   return 0;

@@ -65,9 +65,11 @@ u32 pip_write(vnode_t* node, u32 offset, u32 size, u8* buffer) {
 }
 
 vnode_t* pipe_make(u32 size) {
-  vnode_t* node = vfs_create("pipe", 0);
+  vnode_t* node = vfs_create_node("pipe", 0);
   node->device = pipe_create(size);
-  node->read = pip_read;
-  node->write = pip_write;
+  voperator_t* op=kmalloc(sizeof(voperator_t));
+  node->op=op;
+  op->read = pip_read;
+  op->write = pip_write;
   return node;
 }

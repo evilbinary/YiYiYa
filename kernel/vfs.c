@@ -9,13 +9,18 @@
 #include "fd.h"
 
 vnode_t *root_node = NULL;
+voperator_t default_operator = {.close = vfs_close,
+                                .open = vfs_open,
+                                .find = vfs_find,
+                                .mount = vfs_mount,
+                                .readdir = vfs_readdir};
 
 size_t vioctl(vnode_t *node, u32 cmd, void *args) {
-  if (node->ioctl != NULL) {
+  if (node->op->ioctl != NULL) {
     u32 ret = 0;
     // va_list args;
     // va_start(args, cmd);
-    ret = node->ioctl(node, cmd, args);
+    ret = node->op->ioctl(node, cmd, args);
     // va_end(args);
     return ret;
   } else {
@@ -25,41 +30,41 @@ size_t vioctl(vnode_t *node, u32 cmd, void *args) {
 }
 
 u32 vread(vnode_t *node, u32 offset, u32 size, u8 *buffer) {
-  if (node->read != NULL) {
-    return node->read(node, offset, size, buffer);
+  if (node->op->read != NULL) {
+    return node->op->read(node, offset, size, buffer);
   } else {
     kprintf("node %s read is null\n", node->name);
     return 0;
   }
 }
 u32 vwrite(vnode_t *node, u32 offset, u32 size, u8 *buffer) {
-  if (node->write != NULL) {
-    return node->write(node, offset, size, buffer);
+  if (node->op->write != NULL) {
+    return node->op->write(node, offset, size, buffer);
   } else {
     kprintf("node %s write is null\n", node->name);
     return 0;
   }
 }
 u32 vopen(vnode_t *node) {
-  if (node->open != NULL) {
-    return node->open(node);
+  if (node->op->open != NULL) {
+    return node->op->open(node);
   } else {
     kprintf("node %s open is null \n", node->name);
     return;
   }
 }
 void vclose(vnode_t *node) {
-  if (node->close != NULL) {
-    return node->close(node);
+  if (node->op->close != NULL) {
+    return node->op->close(node);
   } else {
     kprintf("node %s close is null\n", node->name);
     return;
   }
 }
 u32 vreaddir(vnode_t *node, vdirent_t *dirent, u32 count) {
-  if (node->readdir != NULL) {
+  if (node->op->readdir != NULL) {
     if ((node->flags & V_DIRECTORY) == V_DIRECTORY) {
-      return node->readdir(node, dirent, count);
+      return node->op->readdir(node, dirent, count);
     } else {
       kprintf("node readdir is not dir\n");
     }
@@ -69,9 +74,9 @@ u32 vreaddir(vnode_t *node, vdirent_t *dirent, u32 count) {
   }
 }
 vnode_t *vfinddir(vnode_t *node, char *name) {
-  if (node->finddir != NULL != NULL) {
+  if (node->op->finddir != NULL != NULL) {
     if ((node->flags & V_DIRECTORY) == V_DIRECTORY) {
-      return node->finddir(node, name);
+      return node->op->finddir(node, name);
     } else {
       kprintf("node finddir is not dir\n");
     }
@@ -85,8 +90,8 @@ vnode_t *vfind(vnode_t *node, char *name) {
   if (node == NULL) {
     node = root_node;
   }
-  if (node->find != NULL) {
-    return node->find(node, name);
+  if (node->op->find != NULL) {
+    return node->op->find(node, name);
   } else {
     kprintf("node find is null\n");
     return 0;
@@ -94,8 +99,8 @@ vnode_t *vfind(vnode_t *node, char *name) {
 }
 
 void vmount(vnode_t *root, u8 *path, vnode_t *node) {
-  if (root->mount != NULL) {
-    return node->mount(root, path, node);
+  if (root->op->mount != NULL) {
+    return node->op->mount(root, path, node);
   } else {
     kprintf("node mount is null\n");
     return;
@@ -218,7 +223,7 @@ void vfs_mount(vnode_t *root, u8 *path, vnode_t *node) {
 u32 vfs_readdir(vnode_t *node, vdirent_t *dirent, u32 count) {
   // todo search int vfs
   if (node->super != NULL) {
-    return node->super->readdir(node->super, dirent, count);
+    return node->super->op->readdir(node->super, dirent, count);
   }
   return 0;
 }
@@ -231,16 +236,13 @@ u32 vfs_open(vnode_t *node) {
   return ret;
 }
 
-vnode_t *vfs_create(u8 *name, u32 flags) {
+vnode_t *vfs_create_node(u8 *name, u32 flags) {
   vnode_t *node = kmalloc(sizeof(vnode_t));
   node->name = kmalloc(kstrlen(name) + 1);
   kstrcpy(node->name, name);
   node->flags = flags;
-  node->find = vfs_find;
-  node->mount = vfs_mount;
-  node->readdir = vfs_readdir;
-  node->close = vfs_close;
-  node->open = vfs_open;
+  node->op = &default_operator;
+
   node->child = NULL;
   node->child_number = 0;
   node->child_size = 0;
@@ -254,23 +256,29 @@ vnode_t *vfs_open_attr(vnode_t *root, u8 *name, u32 attr) {
   if (root == NULL) {
     root = root_node;
   }
-  vnode_t *node = vfs_find(root, name);
-  vnode_t *file = node;
-  if (file == NULL) {
-    if (attr & O_CREAT == O_CREAT) {
-      char *last = kstrrstr(name, root->name);
-      if (last != NULL) {
-        last += kstrlen(node->name);
-        if (last[0] == '/') last++;
-      }
-      file = vfs_create(last, V_FILE);
-      file->device = node->device;
-      file->data = node->data;
-      file->open = node->open;
-    } else {
-      kprintf("open second %s failed \n", name);
+  vnode_t *file = NULL;
+  if (attr & O_CREAT == O_CREAT) {
+    vnode_t *node = vfs_find(root, name);
+    if (node == NULL) {
+      kprintf("open file %s failed \n", name);
       return NULL;
     }
+    char *last = kstrrstr(name, root->name);
+    if (last != NULL) {
+      last += kstrlen(node->name);
+      if (last[0] == '/') last++;
+    }
+    file = vfs_create_node(last, V_FILE);
+    file->device = node->device;
+    file->data = node->data;
+    file->op->open = node->op->open;
+  } else {
+    vnode_t *node = vfs_find(root, name);
+    if (node == NULL) {
+      kprintf("open file %s failed \n", name);
+      return NULL;
+    }
+    file = node;
   }
   u32 ret = vfs_open(file);
   if (ret < 0) {
@@ -291,6 +299,6 @@ void vfs_close(vnode_t *node) {
 }
 
 int vfs_init() {
-  root_node = vfs_create("/", V_DIRECTORY);
+  root_node = vfs_create_node("/", V_DIRECTORY);
   return 1;
 }
