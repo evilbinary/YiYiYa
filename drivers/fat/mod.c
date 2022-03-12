@@ -171,6 +171,10 @@ u32 fat_op_read(vnode_t *node, u32 offset, size_t nbytes, u8 *buffer) {
 
 u32 fat_op_write(vnode_t *node, u32 offset, size_t nbytes, u8 *buffer) {
   file_info_t *file_info = node->data;
+  if (file_info == NULL) {
+    kprintf("write file info faild not opend\n");
+    return -1;
+  }
   if (file_info->fd == NULL) {
     kprintf("write error fd null\n");
     return -1;
@@ -215,14 +219,18 @@ int open_file_in_dir(struct fat_fs_struct *fs, struct fat_dir_struct *dd,
   return 1;
 }
 
-u32 fat_op_open(vnode_t *node) {
+u32 fat_op_open(vnode_t *node, u32 mode) {
   char *name = node->name;
   struct fat_dir_entry_struct directory;
   file_info_t *file_info = node->data;
+  if (file_info == NULL) {
+    file_info = node->super->data;
+    node->data = file_info;
+  }
   struct fat_fs_struct *fs = file_info->fs;
   file_info->offset = 0;
-
-  if (file_info->fd == NULL && file_info->dd == NULL) {
+  if ((mode & O_CREAT == O_CREAT) ||
+      (file_info->fd == NULL && file_info->dd == NULL)) {
     kprintf("create new file %s\n", name);
     file_info_t *parent_file_info = node->parent->data;
     file_info_t *new_file_info = kmalloc(sizeof(struct file_info));

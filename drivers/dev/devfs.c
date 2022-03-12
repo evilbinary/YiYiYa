@@ -9,9 +9,9 @@
 #include "kernel/vfs.h"
 #include "pty/pty.h"
 
-voperator_t no_rw_operator = {.close = NULL,
-                              .read = NULL,
-                              .write = NULL,
+voperator_t no_rw_operator = {.close = device_close,
+                              .read = device_read,
+                              .write = device_write,
                               .open = vfs_open,
                               .find = vfs_find,
                               .mount = vfs_mount,
