@@ -87,7 +87,7 @@ u32 sys_open(char* name, int attr) {
     return -1;
   }
   log_debug("sys open new name: %s fd:%d fd->id:%d ptr:%x tid:%d\n", name, f,
-          fd->id, fd, current->id);
+            fd->id, fd, current->id);
   return f;
 }
 
@@ -169,7 +169,8 @@ void sys_exit(int status) {
   thread_t* current = thread_current();
   thread_exit(current, status);
   // thread_dumps();
-  log_debug("sys exit tid %d %s status %d\n", current->id, current->name, status);
+  log_debug("sys exit tid %d %s status %d\n", current->id, current->name,
+            status);
 }
 
 void* sys_vmap(void* addr, size_t size) {
@@ -215,13 +216,11 @@ u32 sys_exec(char* filename, char* const argv[], char* const envp[]) {
     return 0;
   }
   sys_close(fd);
-  u8* stack0 = kmalloc(KERNEL_THREAD_STACK_SIZE);
-  u8* stack3 = kmalloc_alignment(THREAD_STACK_SIZE, PAGE_SIZE);
   u8* vstack3 = STACK_ADDR;
-  thread_t* t =
-      thread_create_ex_name(filename, (u32*)&run_elf_thread, stack0, vstack3,
-                            THREAD_STACK_SIZE, NULL, USER_MODE, 0);
+  thread_t* t = thread_create_ex_name(filename, (u32*)&run_elf_thread,
+                                 THREAD_STACK_SIZE, NULL, USER_MODE, 0);
 
+  thread_reset_stack3(t,vstack3);
   t->context.kernel_page_dir = current->context.kernel_page_dir;
 #ifdef PAGE_CLONE
   t->context.page_dir = page_alloc_clone(current->context.page_dir);
@@ -515,7 +514,7 @@ int sys_fchdir(int fd) {
     return -1;
   }
   vnode_t* node = f->data;
-  if ( (node->flags& V_DIRECTORY) == V_DIRECTORY) {
+  if ((node->flags & V_DIRECTORY) == V_DIRECTORY) {
     current->vfs->pwd = node;
   } else {
     kprintf("not directory\n");
