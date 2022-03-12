@@ -59,7 +59,10 @@ size_t sys_ioctl(u32 fd, u32 cmd, void* args) {
 u32 sys_open(char* name, int attr) {
   // mm_dump();
   // kprintf("open %s attr %x\n",name,attr&O_CREAT==O_CREAT);
-
+  if (name == NULL) {
+    kprintf("open name is null\n");
+    return -1;
+  }
   thread_t* current = thread_current();
   if (current == NULL) {
     kprintf(" cannot find current thread\n");
@@ -218,9 +221,9 @@ u32 sys_exec(char* filename, char* const argv[], char* const envp[]) {
   sys_close(fd);
   u8* vstack3 = STACK_ADDR;
   thread_t* t = thread_create_ex_name(filename, (u32*)&run_elf_thread,
-                                 THREAD_STACK_SIZE, NULL, USER_MODE, 0);
+                                      THREAD_STACK_SIZE, NULL, USER_MODE, 0);
 
-  thread_reset_stack3(t,vstack3);
+  thread_reset_stack3(t, vstack3);
   t->context.kernel_page_dir = current->context.kernel_page_dir;
 #ifdef PAGE_CLONE
   t->context.page_dir = page_alloc_clone(current->context.page_dir);
