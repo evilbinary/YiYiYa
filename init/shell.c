@@ -71,7 +71,6 @@ void pwd_command() {
 }
 
 void do_shell_cmd(char* cmd, int count) {
-  print_string("\n");
   if (count == 0) return;
   if (kstrncmp(cmd, "help", count) == 0) {
     print_help();
@@ -121,6 +120,7 @@ void do_shell_thread(void) {
     ret = syscall3(SYS_READ, 0, &ch, 1);
     if (ret > 0) {
       if (ch == '\r' || ch == '\n') {
+        print_string("\n");
         do_shell_cmd(buf, count);
         count = 0;
         print_promot();
@@ -133,7 +133,7 @@ void do_shell_thread(void) {
 }
 
 // must init global for armv7-a
-char* scm_argv[] = {"/scheme", "-b", "/scheme.boot","--verbose", NULL};
+char* scm_argv[] = {"/scheme", "-b", "/scheme.boot", "--verbose", NULL};
 char* lua_argv[] = {"/lua", "hello.lua", NULL};
 
 char* nes_argv[] = {"infones", "/mario.nes", NULL};
@@ -143,8 +143,6 @@ char* mgba_argv[] = {"mgba", "/mario.gba", NULL};
 char* cat_argv[] = {"/cat", "hello.lua", NULL};
 
 char* showimg_argv[] = {"/showimage", "/duck.png", NULL};
-
-
 
 void pre_launch() {
 #ifdef X86
@@ -183,7 +181,6 @@ void pre_launch() {
   // syscall2(SYS_EXEC, "/lvgl", NULL);
   // syscall2(SYS_EXEC, "/launcher", NULL);
 
- 
   // syscall2(SYS_EXEC,"/track",NULL);
   // syscall2(SYS_EXEC,"/gui",NULL);
   // syscall2(SYS_EXEC,"/etk",NULL);
