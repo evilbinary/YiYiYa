@@ -54,6 +54,7 @@ if env.get('APP'):
     SConscript(dirs=['libsdl2-ttf'], exports='env')
     SConscript(dirs=['liblua'], exports='env')
     SConscript(dirs=['libchez'], exports='env')
+    SConscript(dirs=['libcmocka'], exports='env')
 
 
     SConscript(dirs=[
@@ -96,6 +97,7 @@ if env.get('APP'):
             'cmd/ls',
             'cmd/echo',
             'cmd/cat',
+            'cmd/hexdump',
             'lvgl/lvgl',
             'track/track',
             'launcher/launcher',

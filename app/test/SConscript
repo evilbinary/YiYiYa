@@ -10,44 +10,46 @@ Import('env')
 
 
 env = env.Clone(
-  w=GetOption('w'),
-  ENV = os.environ,
-  PATH= [os.environ['PATH'],'/opt/local/bin' ],
-  )
+    w=GetOption('w'),
+    ENV=os.environ,
+    PATH=[os.environ['PATH'], '/opt/local/bin'],
+)
 
-source= [
-    'test.c'
-    ]+env['LIBC']
+source = [
+    'test.c',
+    '../libcmocka/libcmocka.a'
+]+env['LIBC']
 
 if env.get('MYLIB'):
     source.append(env.get('MYLIB'))
 
 env.Program('test', source,
-    CFLAGS='$CFLAGS $LIBCFLAGS',
-    LINKFLAGS= '$LINKFLAGS $USER')
+            CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libcmocka/include',
+            LINKFLAGS='$LINKFLAGS $USER')
 
-if env.get('DEFAULT_LIBC')=='libmusl':
-    source= [
+if env.get('DEFAULT_LIBC') == 'libmusl':
+    source = [
         'test-musl.c',
-        ]+env['LIBC']
+        '../libcmocka/libcmocka.a',
+    ]+env['LIBC']
     if env.get('MYLIB'):
         source.append(env.get('MYLIB'))
 
     env.Program('test-musl', source,
-        CFLAGS='$CFLAGS $LIBCFLAGS',
-        LINKFLAGS= '$LINKFLAGS $USER')
+                CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libcmocka/include',
+                LINKFLAGS='$LINKFLAGS $USER')
 
 
-
-
-source= [
+source = [
     'test-file.c',
-    ]+env['LIBC']
-    
+
+    '../libcmocka/libcmocka.a',
+]+env['LIBC']
+
 if env.get('MYLIB'):
     source.append(env.get('MYLIB'))
 
 
 env.Program('test-file', source,
-    CFLAGS='$CFLAGS $LIBCFLAGS ',
-    LINKFLAGS= '$LINKFLAGS $USER')
+            CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libcmocka/include',
+            LINKFLAGS='$LINKFLAGS $USER')

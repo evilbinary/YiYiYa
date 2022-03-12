@@ -137,7 +137,7 @@ size_t fwrite(const void * /* restrict */ ptr, size_t size, size_t nmemb,
   }
 
   // Apparently successful.
-  return nmemb;
+  return nmemb*size;
 }
 
 long int ftell(FILE *stream) {

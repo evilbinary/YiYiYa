@@ -106,7 +106,8 @@ void sys_close(u32 fd) {
     kprintf("sys close node is null tid %d \n", current->id);
     return -1;
   }
-  vclose(node);
+  u32 ret=vclose(node);
+  return 0;
 }
 
 size_t sys_write(u32 fd, void* buf, size_t nbytes) {

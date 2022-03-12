@@ -54,15 +54,15 @@ u32 vopen(vnode_t *node,u32 mode) {
     return node->op->open(node,mode);
   } else {
     kprintf("node %s open is null \n", node->name);
-    return;
+    return -1;
   }
 }
-void vclose(vnode_t *node) {
+u32 vclose(vnode_t *node) {
   if (node->op->close != NULL) {
     return node->op->close(node);
   } else {
     kprintf("node %s close is null\n", node->name);
-    return;
+    return -1;
   }
 }
 u32 vreaddir(vnode_t *node, vdirent_t *dirent, u32 count) {
@@ -313,14 +313,15 @@ vnode_t *vfs_open_attr(vnode_t *root, u8 *name, u32 attr) {
   return file;
 }
 
-void vfs_close(vnode_t *node) {
+int vfs_close(vnode_t *node) {
   if (node == NULL) {
     kprintf("close node is nul\n");
-    return;
+    return -1;
   }
   if (node->super != NULL) {
-    vclose(node->super);
+    return vclose(node->super);
   }
+  return 0;
 }
 
 int vfs_init() {

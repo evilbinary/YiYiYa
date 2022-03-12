@@ -34,7 +34,7 @@ typedef struct vdirent {
 typedef u32 (*vread_t)(struct vnode *, u32, u32, u8 *);
 typedef u32 (*vwrite_t)(struct vnode *, u32, u32, u8 *);
 typedef u32 (*vopen_t)(struct vnode *,u32 mode);
-typedef void (*vclose_t)(struct vnode *);
+typedef u32 (*vclose_t)(struct vnode *);
 typedef size_t (*vioctl_t)(struct vnode *, u32 cmd, void *args);
 
 typedef u32 (*vreaddir_t)(struct vnode *, struct vdirent *, u32);
@@ -83,7 +83,7 @@ typedef struct vfs {
 u32 vread(vnode_t *node, u32 offset, u32 size, u8 *buffer);
 u32 vwrite(vnode_t *node, u32 offset, u32 size, u8 *buffer);
 u32 vopen(vnode_t *node,u32 mode);
-void vclose(vnode_t *node);
+u32 vclose(vnode_t *node);
 u32 vreaddir(vnode_t *node, vdirent_t *dirent, u32 index);
 vnode_t *vfinddir(vnode_t *node, char *name);
 vnode_t *vfind(vnode_t *node, char *name);
@@ -96,7 +96,7 @@ void vfs_mount(vnode_t *root, u8 *path, vnode_t *node);
 void vfs_add_child(vnode_t *parent, vnode_t *child);
 void vfs_exten_child(vnode_t *node);
 int vfs_init();
-void vfs_close(vnode_t *node);
+int vfs_close(vnode_t *node);
 u32 vfs_open(vnode_t *node,u32 mode);
 vnode_t *vfs_open_attr(vnode_t *root, u8 *name, u32 attr);
 u32 vfs_readdir(vnode_t *node, vdirent_t *dirent, u32 count);

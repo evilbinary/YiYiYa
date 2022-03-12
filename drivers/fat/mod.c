@@ -340,12 +340,13 @@ u32 fat_op_read_dir(vnode_t *node, struct vdirent *dirent, u32 count) {
   return nbytes;
 }
 
-void fat_op_close(vnode_t *node) {
+int fat_op_close(vnode_t *node) {
   file_info_t *file_info = node->data;
   if (file_info != NULL) {
     file_info->offset = 0;
     fat_close_file(file_info->fd);
   }
+  return 0;
 }
 
 voperator_t fat_op = {
