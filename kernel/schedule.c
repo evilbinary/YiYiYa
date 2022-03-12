@@ -9,14 +9,13 @@
 
 volatile u32 timer_ticks = 0;
 extern thread_t* current_thread;
-extern thread_t* head_thread;
 u32 schedule_lock = 0;
 
 context_t* current_context;
 
 thread_t* schedule_get_next() {
   thread_t* next = NULL;
-  thread_t* v = head_thread;
+  thread_t* v = thread_head();
   // find next priority
   // if(current_thread->counter<0){
   //   current_thread->counter=0;
@@ -32,7 +31,7 @@ thread_t* schedule_get_next() {
     }
   }
   if(next ==NULL ){
-    next= head_thread;
+    next= thread_head();
   }
   next->counter++;
   return next;
