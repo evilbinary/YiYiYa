@@ -44,42 +44,17 @@ if env.get('APP'):
     SConscript(dirs=['libzlib'], exports='env')
     SConscript(dirs=['libpng'], exports='env')
     SConscript(dirs=['liblvgl'], exports='env')
-
-    SConscript(dirs=['hello'], exports='env')
-    SConscript(dirs=['gui'], exports='env')
-    SConscript(dirs=['microui'], exports='env')
-    #SConscript(dirs=['jpeg'], exports='env')
-    
-    SConscript(dirs=['test'], exports='env')
-
-    SConscript(dirs=['file'], exports='env')
-    
-    SConscript(dirs=['etk'], exports='env')
-
-    SConscript(dirs=['cmd'], exports='env')
-    SConscript(dirs=['lvgl'], exports='env')
-
-    SConscript(dirs=['track'], exports='env')
-
+    SConscript(dirs=['libuuid'], exports='env')
     SConscript(dirs=['liblvqrcode'], exports='env')
-
-    SConscript(dirs=['launcher'], exports='env')
-
-
     SConscript(dirs=['liblz4'], exports='env')
-
-    SConscript(dirs=['infones'], exports='env')
-
+    SConscript(dirs=['libfreetype'], exports='env')
     SConscript(dirs=['libwebp'], exports='env')
     SConscript(dirs=['libsdl2'], exports='env')
     SConscript(dirs=['libsdl2-image'], exports='env')
-    SConscript(dirs=['sdl2'], exports='env')
+    SConscript(dirs=['libsdl2-ttf'], exports='env')
+    SConscript(dirs=['liblua'], exports='env')
+    SConscript(dirs=['libchez'], exports='env')
 
-
-    SConscript(dirs=['libuuid'], exports='env')
-
-
-    SConscript(dirs=['mgba'], exports='env')
 
     SConscript(dirs=[
         'libffmpeg/libavformat',
@@ -93,10 +68,19 @@ if env.get('APP'):
         'libffmpeg/libswresample',
         ], exports='env')
 
-    SConscript(dirs=['liblua'], exports='env')
+    SConscript(dirs=['hello'], exports='env')
+    SConscript(dirs=['gui'], exports='env')
+    SConscript(dirs=['microui'], exports='env')
+    SConscript(dirs=['test'], exports='env')
+    SConscript(dirs=['etk'], exports='env')
+    SConscript(dirs=['cmd'], exports='env')
+    SConscript(dirs=['lvgl'], exports='env')
+    SConscript(dirs=['track'], exports='env')
+    SConscript(dirs=['sdl2'], exports='env')
+    SConscript(dirs=['infones'], exports='env')
+    SConscript(dirs=['launcher'], exports='env')
+    SConscript(dirs=['mgba'], exports='env')
     SConscript(dirs=['lua'], exports='env')
-
-    SConscript(dirs=['libchez'], exports='env')
     SConscript(dirs=['scheme'], exports='env')
 
 
@@ -105,9 +89,9 @@ if env.get('APP'):
     apps=['hello/hello',
             'gui/gui',
             'microui/microui',
-            'file/file',
             'etk/etk',
             'test/test',
+            'test/test-file',
             #'rust/test/test-rs',
             'cmd/ls',
             'cmd/echo',
@@ -119,6 +103,7 @@ if env.get('APP'):
             'sdl2/sdl2',
             'sdl2/player',
             'sdl2/showimage',
+            'sdl2/showfont',
             'mgba/mgba',
             'mgba/miniunz',
             'lua/lua',
