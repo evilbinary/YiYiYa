@@ -1,6 +1,16 @@
 #include "pty.h"
-
 #include "kernel/rw_queue.h"
+
+voperator_t pty_master_operator = {.close = NULL,
+                                   .read = pty_master_read,
+                                   .write = pty_master_write,
+                                   .open = pty_open,
+                                   .ioctl = pty_ioctl};
+
+voperator_t pty_slave_operator = {.close = NULL,
+                                  .read = pty_slave_read,
+                                  .write = pty_slave_write,
+                                  .open = pty_slave_open};
 
 size_t pty_ioctl(vnode_t *node, u32 cmd, va_list args) {
   if (cmd == IOC_SLAVE) {
@@ -61,7 +71,7 @@ u32 pty_slave_read(vnode_t *node, u32 offset, u32 size, u8 *buffer) {
 #ifdef DEBUG_PTY
   kprintf("pty slave read\n");
 #endif
-  if(pty->out==NULL){
+  if (pty->out == NULL) {
     kprintf("pty slave read erro for out null\n");
     return -1;
   }
@@ -122,10 +132,9 @@ int pty_slave_add(vnode_t *pts) {
   char buf[128];
   int i = pts->child_size;
   sprintf(buf, "%d", i);
-  vnode_t *child = vfs_create(buf, V_FILE);
+  vnode_t *child = vfs_create_node(buf, V_FILE);
   child->device = pts->device;
-  child->read = pty_slave_read;
-  child->write = pty_slave_write;
+  child->op=&pty_slave_operator;
   vfs_add_child(pts, child);
   return i;
 }
@@ -139,21 +148,17 @@ int pty_create(vnode_t **ptm, vnode_t **pts) {
       buffer_create(PTY_BUFFER, pty_buffer_write_wait, pty_buffer_read_wait,
                     pty_buffer_write_notify, pty_buffer_read_notify);
 
-  pty->master = vfs_create("ptm", V_DIRECTORY);
-  pty->slave = vfs_create("pts", V_DIRECTORY);
+  pty->master = vfs_create_node("ptm", V_DIRECTORY);
+  pty->slave = vfs_create_node("pts", V_DIRECTORY);
 
   *ptm = pty->master;
   *pts = pty->slave;
 
-  pty->master->open = pty_open;
-  pty->master->read = pty_master_read;
-  pty->master->write = pty_master_write;
-  pty->master->ioctl = pty_ioctl;
-  pty->master_read_block = 1;
+  pty->master->op = &pty_master_operator;
 
-  pty->slave->open = pty_slave_open;
-  pty->slave->read = pty_slave_read;
-  pty->slave->write = pty_slave_write;
+  pty->master_read_block = 1;
+  pty->slave->op = &pty_slave_operator;
+
   pty->slave->device = pty;
 
   pty->master->device = pty;

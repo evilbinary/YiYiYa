@@ -287,7 +287,7 @@ vnode_t *fat_op_find(vnode_t *node, char *name) {
   if (dd->dir_entry.attributes == FAT_ATTRIB_DIR) {
     type = V_DIRECTORY;
   }
-  vnode_t *file = vfs_create(name, type);
+  vnode_t *file = vfs_create_node(name, type);
   file->data = new_file_info;
   file->device = node->device;
   fat_init_op(file);
@@ -340,14 +340,16 @@ void fat_op_close(vnode_t *node) {
   }
 }
 
-void fat_init_op(vnode_t *node) {
-  node->read = fat_op_read;
-  node->write = fat_op_write;
-  node->open = fat_op_open;
-  node->close = fat_op_close;
-  node->find = fat_op_find;
-  node->readdir = fat_op_read_dir;
-}
+voperator_t fat_op = {
+    .read = fat_op_read,
+    .write = fat_op_write,
+    .open = fat_op_open,
+    .close = fat_op_close,
+    .find = fat_op_find,
+    .readdir = fat_op_read_dir,
+};
+
+void fat_init_op(vnode_t *node) { node->op = &fat_op; }
 
 void fat_init(void) {
   kprintf("fat init\n");

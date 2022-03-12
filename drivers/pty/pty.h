@@ -27,5 +27,18 @@ typedef struct pty{
     u32 master_read_block;
 }pty_t;
 
+u32 pty_master_write(vnode_t *node, u32 offset, u32 size, u8 *buffer);
+u32 pty_master_read(vnode_t *node, u32 offset, u32 size, u8 *buffer);
+
+u32 pty_slave_read(vnode_t *node, u32 offset, u32 size, u8 *buffer);
+u32 pty_slave_open(vnode_t *node);
+u32 pty_slave_write(vnode_t *node, u32 offset, u32 size, u8 *buffer);
+
+
+u32 pty_open(vnode_t *node);
+u32 pty_close(vnode_t *node);
+size_t pty_ioctl(vnode_t *node, u32 cmd, va_list args);
+
+
 
 #endif
