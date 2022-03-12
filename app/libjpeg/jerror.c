@@ -2,6 +2,7 @@
  * jerror.c
  *
  * Copyright (C) 1991-1998, Thomas G. Lane.
+ * Modified 2012-2015 by Guido Vollbeding.
  * This file is part of the Independent JPEG Group's software.
  * For conditions of distribution and use, see the accompanying README file.
  *
@@ -18,15 +19,15 @@
  * These routines are used by both the compression and decompression code.
  */
 
+#ifdef USE_WINDOWS_MESSAGEBOX
+#include <windows.h>
+#endif
+
 /* this is not a core library module, so it doesn't define JPEG_INTERNALS */
 #include "jinclude.h"
 #include "jpeglib.h"
 #include "jversion.h"
 #include "jerror.h"
-
-#ifdef USE_WINDOWS_MESSAGEBOX
-#include <windows.h>
-#endif
 
 #ifndef EXIT_FAILURE		/* define exit() codes if not provided */
 #define EXIT_FAILURE  1
@@ -41,6 +42,9 @@
  * want to refer to it directly.
  */
 
+#ifdef NEED_SHORT_EXTERNAL_NAMES
+#define jpeg_std_message_table	jMsgTable
+#endif
 
 #define JMESSAGE(code,string)	string ,
 
@@ -63,7 +67,7 @@ const char * const jpeg_std_message_table[] = {
  * or jpeg_destroy) at some point.
  */
 
-METHODDEF(void)
+METHODDEF(noreturn_t)
 error_exit (j_common_ptr cinfo)
 {
   /* Always display the message */
@@ -105,7 +109,7 @@ output_message (j_common_ptr cinfo)
 	     MB_OK | MB_ICONERROR);
 #else
   /* Send it to stderr, adding a newline */
-  /* RS fprintf(stderr, "%s\n", buffer); */
+  fprintf(stderr, "%s\n", buffer);
 #endif
 }
 
@@ -121,8 +125,11 @@ output_message (j_common_ptr cinfo)
  * or change the policy about which messages to display.
  */
 
-METHODDEF(void) emit_message (j_common_ptr cinfo, int msg_level) {
+METHODDEF(void)
+emit_message (j_common_ptr cinfo, int msg_level)
+{
   struct jpeg_error_mgr * err = cinfo->err;
+
   if (msg_level < 0) {
     /* It's a warning message.  Since corrupt files may generate many warnings,
      * the policy implemented here is to show only the first warning,
@@ -147,7 +154,9 @@ METHODDEF(void) emit_message (j_common_ptr cinfo, int msg_level) {
  * Few applications should need to override this method.
  */
 
-METHODDEF(void) format_message (j_common_ptr cinfo, char * buffer) {
+METHODDEF(void)
+format_message (j_common_ptr cinfo, char * buffer)
+{
   struct jpeg_error_mgr * err = cinfo->err;
   int msg_code = err->msg_code;
   const char * msgtext = NULL;
@@ -200,7 +209,9 @@ METHODDEF(void) format_message (j_common_ptr cinfo, char * buffer) {
  * this method if it has additional error processing state.
  */
 
-METHODDEF(void) reset_error_mgr (j_common_ptr cinfo) {
+METHODDEF(void)
+reset_error_mgr (j_common_ptr cinfo)
+{
   cinfo->err->num_warnings = 0;
   /* trace_level is not reset since it is an application-supplied parameter */
   cinfo->err->msg_code = 0;	/* may be useful as a flag for "no error" */
@@ -217,7 +228,9 @@ METHODDEF(void) reset_error_mgr (j_common_ptr cinfo) {
  * after which the application may override some of the methods.
  */
 
-GLOBAL(struct jpeg_error_mgr *) jpeg_std_error (struct jpeg_error_mgr * err) {
+GLOBAL(struct jpeg_error_mgr *)
+jpeg_std_error (struct jpeg_error_mgr * err)
+{
   err->error_exit = error_exit;
   err->emit_message = emit_message;
   err->output_message = output_message;

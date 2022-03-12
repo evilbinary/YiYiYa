@@ -2,6 +2,7 @@
  * jquant1.c
  *
  * Copyright (C) 1991-1996, Thomas G. Lane.
+ * Modified 2011 by Guido Vollbeding.
  * This file is part of the Independent JPEG Group's software.
  * For conditions of distribution and use, see the accompanying README file.
  *
@@ -251,8 +252,6 @@ output_value (j_decompress_ptr cinfo, int ci, int j, int maxj)
    * (Forcing the upper and lower values to the limits ensures that
    * dithering can't produce a color outside the selected gamut.)
    */
-  GUI_USE_PARA(cinfo);
-  GUI_USE_PARA(ci);
   return (int) (((INT32) j * MAXJSAMPLE + maxj/2) / maxj);
 }
 
@@ -262,8 +261,6 @@ largest_input_value (j_decompress_ptr cinfo, int ci, int j, int maxj)
 /* Return largest input value that should map to j'th output value */
 /* Must have largest(j=0) >= 0, and largest(j=maxj) >= MAXJSAMPLE */
 {
-  GUI_USE_PARA(cinfo);
-  GUI_USE_PARA(ci);
   /* Breakpoints are halfway between values returned by output_value */
   return (int) (((INT32) (2*j + 1) * MAXJSAMPLE + maxj) / (2*maxj));
 }
@@ -534,8 +531,8 @@ quantize_ord_dither (j_decompress_ptr cinfo, JSAMPARRAY input_buf,
 
   for (row = 0; row < num_rows; row++) {
     /* Initialize output values to 0 so can process components separately */
-    jzero_far((void FAR *) output_buf[row],
-	      (size_t) (width * SIZEOF(JSAMPLE)));
+    FMEMZERO((void FAR *) output_buf[row],
+	     (size_t) (width * SIZEOF(JSAMPLE)));
     row_index = cquantize->row_index;
     for (ci = 0; ci < nc; ci++) {
       input_ptr = input_buf[row] + ci;
@@ -639,8 +636,8 @@ quantize_fs_dither (j_decompress_ptr cinfo, JSAMPARRAY input_buf,
 
   for (row = 0; row < num_rows; row++) {
     /* Initialize output values to 0 so can process components separately */
-    jzero_far((void FAR *) output_buf[row],
-	      (size_t) (width * SIZEOF(JSAMPLE)));
+    FMEMZERO((void FAR *) output_buf[row],
+	     (size_t) (width * SIZEOF(JSAMPLE)));
     for (ci = 0; ci < nc; ci++) {
       input_ptr = input_buf[row] + ci;
       output_ptr = output_buf[row];
@@ -748,7 +745,6 @@ start_pass_1_quant (j_decompress_ptr cinfo, boolean is_pre_scan)
   size_t arraysize;
   int i;
 
-  GUI_USE_PARA(is_pre_scan);
   /* Install my colormap. */
   cinfo->colormap = cquantize->sv_colormap;
   cinfo->actual_number_of_colors = cquantize->sv_actual;
@@ -786,7 +782,7 @@ start_pass_1_quant (j_decompress_ptr cinfo, boolean is_pre_scan)
     /* Initialize the propagated errors to zero. */
     arraysize = (size_t) ((cinfo->output_width + 2) * SIZEOF(FSERROR));
     for (i = 0; i < cinfo->out_color_components; i++)
-      jzero_far((void FAR *) cquantize->fserrors[i], arraysize);
+      FMEMZERO((void FAR *) cquantize->fserrors[i], arraysize);
     break;
   default:
     ERREXIT(cinfo, JERR_NOT_COMPILED);
@@ -802,7 +798,6 @@ start_pass_1_quant (j_decompress_ptr cinfo, boolean is_pre_scan)
 METHODDEF(void)
 finish_pass_1_quant (j_decompress_ptr cinfo)
 {
-  GUI_USE_PARA(cinfo);
   /* no work in 1-pass case */
 }
 

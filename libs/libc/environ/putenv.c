@@ -45,7 +45,7 @@ int __put_env(char * str, size_t len, int overwrite)
 	return 0;
 }
 
-int putenv(const char * str)
+int putenv(char * str)
 {
 	char * s;
 	const char * e, * z;

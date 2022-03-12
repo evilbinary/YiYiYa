@@ -1,3 +1,5 @@
+#ifndef __JCONFIG_H__
+#define __JCONFIG_H__
 
 
 /*
@@ -95,5 +97,4 @@
 #endif
 
 
-
-
+#endif /* __JCONFIG_H__ */

@@ -142,6 +142,10 @@ char* mgba_argv[] = {"mgba", "/mario.gba", NULL};
 
 char* cat_argv[] = {"/cat", "hello.lua", NULL};
 
+char* showimg_argv[] = {"/showimage", "/duck.png", NULL};
+
+
+
 void pre_launch() {
 #ifdef X86
   // int fd = syscall2(SYS_OPEN, "/dev/stdin", 0);
@@ -162,7 +166,9 @@ void pre_launch() {
 
   // syscall2(SYS_EXEC, "/infones", nes_argv);
   // syscall2(SYS_EXEC, "/mgba", mgba_argv);
-  syscall2(SYS_EXEC, "/scheme", scm_argv);
+  // syscall2(SYS_EXEC, "/scheme", scm_argv);
+  // syscall2(SYS_EXEC, "/sdl2", NULL);
+  // syscall2(SYS_EXEC, "/showimage", showimg_argv);
 
   // for (;;)
   //   ;

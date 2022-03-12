@@ -55,10 +55,6 @@ source+=Glob('src/video/yuv2rgb/*.c')
 
 source +=[
     '../libgui/libgui.a',
-    '../libgui/libimage.a',
-    '../libjpeg/libjpeg.a',
-    '../libpng/libpng.a',
-    '../libzlib/libzlib.a',
     ]+env['LIBC']
 
 if env.get('MYLIB'):
