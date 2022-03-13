@@ -70,6 +70,8 @@ u32 sys_open(char* name, int attr) {
   }
   int f = thread_find_fd_name(current, name);
   if (f >= 0) {
+    fd_t* fd=thread_find_fd_id(current,f);
+    fd->offset = 0;
     log_debug("sys open name return : %s fd: %d\n", name, f);
     return f;
   }
@@ -106,6 +108,8 @@ void sys_close(u32 fd) {
     kprintf("sys close node is null tid %d \n", current->id);
     return -1;
   }
+  //reset offset
+  sys_seek(fd,0,0);
   u32 ret=vclose(node);
   return 0;
 }
@@ -141,7 +145,7 @@ size_t sys_read(u32 fd, void* buf, size_t nbytes) {
     return -1;
   }
   u32 ret = vread(node, f->offset, nbytes, buf);
-  f->offset += nbytes;
+  f->offset += ret;
   return ret;
 }
 
@@ -152,9 +156,9 @@ size_t sys_seek(u32 fd, ulong offset, int whence) {
     return 0;
   }
   // set start offset
-  if (whence == 0) {
+  if (whence == 0) {// seek set
     f->offset = offset;
-  } else if (whence == 1) {  // seek set
+  } else if (whence == 1) { //seek current
     f->offset += offset;
   } else if (whence == 2) {  // seek end
     vnode_t* file = f->data;
@@ -163,8 +167,9 @@ size_t sys_seek(u32 fd, ulong offset, int whence) {
     }
   } else {
     kprintf("seek whence error %d\n", whence);
+    return -1;
   }
-  return 0;
+  return f->offset;
 }
 
 size_t sys_yeild() { thread_yield(); }
