@@ -5,9 +5,9 @@
 #include "stdint.h"
 #include "syscall.h"
 
-FILE STDIN={.fd=0};
-FILE STDOUT={.fd=1};
-FILE STDERROR={.fd=2};
+FILE STDIN = {.fd = 0};
+FILE STDOUT = {.fd = 1};
+FILE STDERROR = {.fd = 2};
 
 FILE *stdin = &STDIN;
 FILE *stdout = &STDOUT;
@@ -74,7 +74,6 @@ FILE *fopen(const char *filename, const char *mode) {
   file->fd = fd;
   file->eof = 0;
   file->error = 0;
-  file->offset = 0;
   file->mode = flags;
 
   return file;
@@ -98,6 +97,7 @@ size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream) {
 
   int total = nmemb * size;
   size_t r = ya_read(stream->fd, buffer, total);
+  return r;
 
   // if(nmemb>size){
   //   int n=nmemb;
@@ -116,7 +116,6 @@ size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream) {
   //     return i;
   //   }
   // }
-  return r;
 }
 
 size_t fwrite(const void * /* restrict */ ptr, size_t size, size_t nmemb,
@@ -137,12 +136,12 @@ size_t fwrite(const void * /* restrict */ ptr, size_t size, size_t nmemb,
   }
 
   // Apparently successful.
-  return nmemb*size;
+  return nmemb * size;
 }
 
 long int ftell(FILE *stream) {
   long int rc;
-
+  printf("ftell not implements\n");
   return rc;
 }
 
@@ -152,8 +151,6 @@ int fgetc(FILE *stream) {
   if (feof(stream) != 0) return EOF;
 
   rc = ya_read(stream->fd, &c, 1);
-  stream->offset++;
-  fseek(stream, stream->offset, SEEK_SET);
 
   if (rc == EOF || rc == 0) {
     stream->eof = 1;
@@ -174,8 +171,6 @@ int fputc(int c, FILE *stream) {
     return -1;
   }
   rc = ya_write(stream->fd, &ch, 1);
-  stream->offset++;
-  fseek(stream, stream->offset, SEEK_SET);
   if (rc == EOF) {
     stream->eof = 1;
     return EOF;
@@ -208,7 +203,10 @@ int fflush(FILE *f) {
   return (f);
 }
 
-int remove(const char *file) { return -1; }
+int remove(const char *file) {
+  printf("remove not implement\n");
+  return -1;
+}
 
 int fileno(FILE *stream) { return stream->fd; }
 
@@ -227,7 +225,6 @@ FILE *fdopen(int fd, const char *mode) {
   file->fd = fd;
   file->eof = 0;
   file->error = 0;
-  file->offset = 0;
   file->mode = flags;
   return file;
 }
@@ -270,7 +267,6 @@ FILE *tmpfile(void) {
 
 int ungetc(int c, FILE *f) {
   if (c == EOF) return c;
-  f->offset--;
   fputc(c, f);
   return (unsigned char)c;
 }
@@ -357,13 +353,13 @@ int sscanf(const char *restrict s, const char *restrict fmt, ...) {
 
 weak_alias(sscanf, __isoc99_sscanf);
 
-int fscanf(FILE *restrict f, const char *restrict fmt, ...){
-	int ret;
-	va_list ap;
-	va_start(ap, fmt);
-	ret = vfscanf(f, fmt, ap);
-	va_end(ap);
-	return ret;
+int fscanf(FILE *restrict f, const char *restrict fmt, ...) {
+  int ret;
+  va_list ap;
+  va_start(ap, fmt);
+  ret = vfscanf(f, fmt, ap);
+  va_end(ap);
+  return ret;
 }
 
 weak_alias(fscanf, __isoc99_fscanf);

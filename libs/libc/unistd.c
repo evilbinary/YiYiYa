@@ -112,10 +112,8 @@ off_t lseek(int fd, off_t position, int whence) {
   if (file == NULL) {
     return (position - 1);
   }
-
-  if (fseek(file, position, whence) == 0) return file->offset;
-
-  return (position - 1);
+  int ret=fseek(file, position, whence);
+  return ret;
 }
 
 ssize_t read(int fd, void *buffer, size_t num) {

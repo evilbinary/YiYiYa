@@ -22,8 +22,9 @@ void test_read(void** state) {
   printf("fd=%d\n", *fp);
   int offset = 0;
   for (;;) {
-    fseek(fp, offset, SEEK_SET);
-    int ret = fread(buffer, READ_BUFFER, 1, fp);
+    int ret = fseek(fp, offset, SEEK_SET);
+    assert_int_equal(ret, offset);
+    ret = fread(buffer, READ_BUFFER, 1, fp);
     if (ret <= 0) {
       break;
     }
@@ -91,16 +92,58 @@ void test_read_dir(void** state) {
   while ((ptr = readdir(dir)) != NULL) {
     printf("name : %s type: %d\n", ptr->d_name, ptr->d_type);
   }
-  ret = closedir(dir);
+  int ret = closedir(dir);
+  assert_true(ret == 0);
+}
+
+static char get_u8(int fd) {
+  char buf[1] = {0xff};
+  int ret = 0;
+  if (ret = read(fd, &buf, 1) != 1) {
+    printf("read faild ret=%d\n", ret);
+    return -1;
+  }
+  printf("  ret=>%d  data=>%x\n", ret, buf[0]);
+  return buf[0];
+}
+
+void test_read_byte(void** state) {
+  char* path = "/scheme.boot";
+  int fd = open(path, 0);
+  assert_true(fd > 0);
+  if (get_u8(fd) != 0 || get_u8(fd) != 0 || get_u8(fd) != 0 ||
+      get_u8(fd) != 0 || get_u8(fd) != 'c' || get_u8(fd) != 'h' ||
+      get_u8(fd) != 'e' || get_u8(fd) != 'z') {
+    printf("malformed fasl-object header in %s\n", path);
+    assert_true(0);
+  }
+}
+
+void test_seek(void** state) {
+  FILE* fp = fopen("/scheme.boot", "r+");
+  assert_non_null(fp);
+
+  int seek = fseek(fp, 1, SEEK_SET);
+  assert_int_equal(seek, 1);
+
+  seek = fseek(fp, 2, SEEK_SET);
+  assert_int_equal(seek, 2);
+
+  seek = fseek(fp, 2, SEEK_CUR);
+  assert_int_equal(seek, 4);
+
+  seek = fseek(fp, 2, SEEK_END);
+
+  int ret = fclose(fp);
   assert_true(ret == 0);
 }
 
 int main(int argc, char* argv[]) {
   const struct CMUnitTest tests[] = {
-      cmocka_unit_test(test_read),
-      cmocka_unit_test(test_write),
-      cmocka_unit_test(test_write_read),
-      cmocka_unit_test(test_read_dir),
+      cmocka_unit_test(test_read),       cmocka_unit_test(test_write),
+      cmocka_unit_test(test_write_read), cmocka_unit_test(test_read_dir),
+      cmocka_unit_test(test_seek),       cmocka_unit_test(test_read_byte),
+
   };
 
   return cmocka_run_group_tests(tests, NULL, NULL);

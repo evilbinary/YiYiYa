@@ -1,3 +1,9 @@
+#include <dirent.h>
+#include <setjmp.h>
+#include <stdarg.h>
+#include <stddef.h>
+
+#include "cmocka.h"
 #include "stdio.h"
 #include "stdlib.h"
 #include "sys/ioctl.h"
@@ -46,7 +52,7 @@ void test_fork() {
     printf("parent %d %d %d\n", getppid(), getpid(), fpid);
   }
   for (int i = 0; i < 10; i++) {
-    printf("ppid:%d pid:%d count:%d\n",getppid(),getpid(), i++);
+    printf("ppid:%d pid:%d count:%d\n", getppid(), getpid(), i++);
     // getpid();
     // syscall0(505);
   }
@@ -245,7 +251,7 @@ void test_pc() {
   // syscall0(12);
   u32 i = 0;
   pid_t fpid = fork();
-  printf("t:%d\n",fpid);
+  printf("t:%d\n", fpid);
   for (;;) {
     printf("t:%d i=>%d\n", fpid, i++);
   }
@@ -258,58 +264,40 @@ void test_syscall() {
 #endif
 }
 
-void test_scanf(){
-  int i=0;
-  scanf("%d",&i);
-  printf("i=%d\n",i);
+void test_scanf() {
+  int i = 0;
+  scanf("%d", &i);
+  printf("i=%d\n", i);
 }
 
-static char get_u8(int fd) {
-  char buf[1]={0xff};
-  printf("get fd %d\n", fd);
-  if (read(fd, &buf, 1) != 1) return -1;
-  printf("  ret=>%x\n", buf[0]);
-  return buf[0];
-}
-
-void test_read_byte() {
-  char* path = "/scheme.boot";
-  int fd = open(path, 0);
-  if (get_u8(fd) != 0 || get_u8(fd) != 0 || get_u8(fd) != 0 ||
-      get_u8(fd) != 0 || get_u8(fd) != 'c' || get_u8(fd) != 'h' ||
-      get_u8(fd) != 'e' || get_u8(fd) != 'z') {
-    printf("malformed fasl-object header in %s\n", path);
-  }
-}
-
-void test_getcwd(){
-  char buf[256]={0};
-  char* test=getcwd(buf,20);
-  printf("pwd=>%s\n",buf);
+void test_getcwd() {
+  char buf[256] = {0};
+  char* test = getcwd(buf, 20);
+  printf("pwd=>%s\n", buf);
   chdir("/haha");
-  
-  test=getcwd(buf,20);
-  printf("pwd=>%s\n",buf);
 
+  test = getcwd(buf, 20);
+  printf("pwd=>%s\n", buf);
 }
-
 
 int main(int argc, char* argv[]) {
   printf(buf);
-  // test_syscall();
   // test_pc();
   // syscall0(12);
-  test_fork();
+  // test_fork();
   // test_pty();
   // test_dup();
   // test_dup2();
   // test_pipe();
   // test_exec();
-  // test_dup_pty();
-  // test_read_write();
-  // test_malloc_free();
-  // test_scanf();
-  // test_read_byte();
-  // test_getcwd();
-  return 0;
+
+  const struct CMUnitTest tests[] = {
+      cmocka_unit_test(test_getcwd),
+      cmocka_unit_test(test_scanf),      cmocka_unit_test(test_malloc_free),
+      cmocka_unit_test(test_read_write), cmocka_unit_test(test_dup_pty),
+      cmocka_unit_test(test_dup_pty),
+      cmocka_unit_test(test_syscall),
+  };
+
+  return cmocka_run_group_tests(tests, NULL, NULL);
 }
