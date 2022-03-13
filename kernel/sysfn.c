@@ -109,7 +109,7 @@ void sys_close(u32 fd) {
     return -1;
   }
   //reset offset
-  sys_seek(fd,0,0);
+  f->offset=0;
   u32 ret=vclose(node);
   return 0;
 }
