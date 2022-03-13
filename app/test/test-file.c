@@ -11,7 +11,7 @@ char* buf = "hello,file\n";
 #define PRINT_WIDTH 24
 #define READ_BUFFER 24 * 20
 
-void test_read(void** state) {
+void test_read_large(void** state) {
   char* name = "/duck.png";
   int succes = 1;
   char* buffer = malloc(READ_BUFFER);
@@ -26,6 +26,7 @@ void test_read(void** state) {
     assert_int_equal(ret, offset);
     ret = fread(buffer, READ_BUFFER, 1, fp);
     if (ret <= 0) {
+      printf("read <=0\n");
       break;
     }
     for (int i = 0; i < ret; i++) {
@@ -33,10 +34,28 @@ void test_read(void** state) {
         printf("\n %07x   ", offset);
       }
       printf("%02x ", 0xff & buffer[i]);
-      offset++;
-      if (!(offset == 0x0011808)) {
-        assert_int_equal(buffer[i], 0xbc);
+
+      if (offset == 0) {
+        if (i == 0) {
+          assert_int_equal(0xff & buffer[i], 0x89);
+        } else if (i == 1) {
+          assert_int_equal(0xff & buffer[i], 0x50);
+        }
+      } else if (offset == 0x00002a0) {
+        if (i == (offset % (READ_BUFFER))) {
+          printf("\n========================>%d =>%x\n", i, buffer[i]);
+          assert_int_equal(0xff & buffer[i], 0x19);
+        }
+      } else if (offset == 0x0011808) {
+        if (i == (offset % (READ_BUFFER))) {
+          assert_int_equal(0xff & buffer[i], 0xbc);
+        }
+      } else if (offset == 0x0011928) {
+        if (i == (offset % (READ_BUFFER))) {
+          assert_int_equal(0xff & buffer[i], 0x53);
+        }
       }
+      offset++;
     }
     printf("ret=%d\n", ret);
   }
@@ -138,11 +157,46 @@ void test_seek(void** state) {
   assert_true(ret == 0);
 }
 
+void test_seek_read(void** state) {
+  char* name = "/duck.png";
+  int succes = 1;
+  char* buffer = malloc(READ_BUFFER);
+  memset(buffer, 0, READ_BUFFER);
+  FILE* fp;
+  fp = fopen(name, "r+");
+  assert_non_null(fp);
+  printf("fd=%d\n", *fp);
+  int offset = 0x2a0;
+  int ret = fseek(fp, offset, SEEK_SET);
+  assert_int_equal(ret, offset);
+  ret = fread(buffer, READ_BUFFER, 1, fp);
+  if (ret <= 0) {
+    printf("read <=0\n");
+    assert_true(0);
+  }
+  printf("offset %d buffer pos %d value %x==0x19 \n", offset, 0, buffer[0]);
+  assert_int_equal(0xff & buffer[0], 0x19);
+  assert_int_equal(0xff & buffer[1], 0x29);
+  assert_int_equal(0xff & buffer[2], 0x4c);
+
+  //at buffer pos 0x180 384
+  printf("offset %d buffer pos %d value %x==0x19 \n", offset, 384, buffer[384]);
+  assert_int_equal(0xff & buffer[384], 0xff);
+  assert_int_equal(0xff & buffer[385], 0x5f);
+
+  ret = fclose(fp);
+  assert_true(ret == 0);
+}
+
 int main(int argc, char* argv[]) {
   const struct CMUnitTest tests[] = {
-      cmocka_unit_test(test_read),       cmocka_unit_test(test_write),
-      cmocka_unit_test(test_write_read), cmocka_unit_test(test_read_dir),
-      cmocka_unit_test(test_seek),       cmocka_unit_test(test_read_byte),
+      // cmocka_unit_test(test_read_large),
+      cmocka_unit_test(test_seek_read),
+      // cmocka_unit_test(test_write),
+      // cmocka_unit_test(test_write_read),
+      // cmocka_unit_test(test_read_dir),
+      // cmocka_unit_test(test_seek),
+      // cmocka_unit_test(test_read_byte),
 
   };
 
