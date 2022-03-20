@@ -47,6 +47,7 @@ typedef struct
 	void *data;			///< Data allocated by the OS.
 	int eof;			///< EOF indicator for the stream.
 	int error;			///< Error indicator for the stream.
+	int offset;
 	unsigned int mode;	///< The fcntl.h mode that the file was opened in.
 } FILE;
 
