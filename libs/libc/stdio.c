@@ -74,6 +74,7 @@ FILE *fopen(const char *filename, const char *mode) {
   file->fd = fd;
   file->eof = 0;
   file->error = 0;
+  file->offset = 0;
   file->mode = flags;
 
   return file;
@@ -97,6 +98,7 @@ size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream) {
 
   int total = nmemb * size;
   size_t r = ya_read(stream->fd, buffer, total);
+  stream->offset += r;
   return r;
 
   // if(nmemb>size){
@@ -134,14 +136,14 @@ size_t fwrite(const void * /* restrict */ ptr, size_t size, size_t nmemb,
       buffer++;
     }
   }
-
+  stream->offset+=nmemb * size;
   // Apparently successful.
   return nmemb * size;
 }
 
 long int ftell(FILE *stream) {
   long int rc;
-  printf("ftell not implements\n");
+  rc=stream->offset;
   return rc;
 }
 
@@ -151,7 +153,6 @@ int fgetc(FILE *stream) {
   if (feof(stream) != 0) return EOF;
 
   rc = ya_read(stream->fd, &c, 1);
-
   if (rc == EOF || rc == 0) {
     stream->eof = 1;
     return EOF;
@@ -160,6 +161,7 @@ int fgetc(FILE *stream) {
     stream->error = 1;
     return -1;
   }
+  stream->offset+=rc;
 
   return (int)c;
 }
@@ -180,6 +182,7 @@ int fputc(int c, FILE *stream) {
     stream->error = 1;
     return EOF;
   }
+  stream->offset+=rc;
   return c;
 }
 
@@ -225,6 +228,7 @@ FILE *fdopen(int fd, const char *mode) {
   file->fd = fd;
   file->eof = 0;
   file->error = 0;
+  file->offset = 0;
   file->mode = flags;
   return file;
 }
@@ -267,6 +271,7 @@ FILE *tmpfile(void) {
 
 int ungetc(int c, FILE *f) {
   if (c == EOF) return c;
+  f->offset--;
   fputc(c, f);
   return (unsigned char)c;
 }
