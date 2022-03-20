@@ -134,22 +134,30 @@ table, ignoring any additional padding.**/
 
 int ahci_dev_port_read(ahci_device_t* ahci_dev, int no, sector_t sector,
                        u32 count, u32 buf) {
+  //转成hba结构体描述，别问hba是啥，其实我也不知道（host bus adapter）是一个ahci的规范结构，用来内存和ata设备通信。
   hba_memory_t* hab_memory = ahci_dev->abar;
+  //根据设备port号，获取对应的port，支持多port
   hba_port_t* port = &hab_memory->ports[no];
-  port->is = (u32)-1;  // Clear pending interrupt bits
+  port->is = (u32)-1;  // 清理中断 Clear pending interrupt bits
   int spin = 0;        // Spin lock timeout counter
-  int slot = find_cmdslot(ahci_dev, no);
-  if (slot == -1) return 0;
-
+  int slot = find_cmdslot(ahci_dev, no); //查找可以用的slot
+  if (slot == -1){
+    kprintf("not slot found\n");
+    return 0;
+  }
   uint64_t addr = 0;
   //   print("\n clb %x clbu %x", port->clb, port->clbu);
+  //获取命令列表基地址（高位和低位）
   addr = (((port->clbu) << 32) | port->clb);
+
+  //转命令指针
   hba_cmd_header_t* cmdheader = (hba_cmd_header_t*)addr;
-  cmdheader += slot;
+  cmdheader += slot;//定位到空闲的命令头
   cmdheader->cfl = sizeof(fis_reg_h2d_t) / sizeof(u32);  // Command FIS size
   cmdheader->w = 0;                                      // Read from device
   cmdheader->prdtl = (uint16_t)((count - 1) >> 4) + 1;   // PRDT entries count
 
+  //获取命令行
   addr = (((cmdheader->ctbau) << 32) | cmdheader->ctba);
   hba_cmd_tbl_t* cmdtbl = (hba_cmd_tbl_t*)(addr);
   kmemset(cmdtbl, 0,
@@ -158,12 +166,11 @@ int ahci_dev_port_read(ahci_device_t* ahci_dev, int no, sector_t sector,
 
   // 8K bytes (16 sectors) per PRDT
   int i;
-  for (i = 0; i < cmdheader->prdtl - 1; i++) {
+  for (i = 0; i < cmdheader->prdtl  - 1; i++) {
     cmdtbl->prdt_entry[i].dba = (u32)(buf & 0xFFFFFFFF);
     // cmdtbl->prdt_entry[i].dbau = (u32)(((buf) >> 32) & 0xFFFFFFFF);
     cmdtbl->prdt_entry[i].dbau = 0;
-    cmdtbl->prdt_entry[i].dbc =
-        8 * 1024 - 1;  // 8K bytes (this value should always be set to 1 less
+    cmdtbl->prdt_entry[i].dbc = 8 * 1024 - 1;  // 8K bytes (this value should always be set to 1 less
                        // than the actual value)
     cmdtbl->prdt_entry[i].i = 1;
     buf += 4 * 1024;  // 4K words
@@ -173,7 +180,7 @@ int ahci_dev_port_read(ahci_device_t* ahci_dev, int no, sector_t sector,
   cmdtbl->prdt_entry[i].dba = (u32)(buf & 0xFFFFFFFF);
   cmdtbl->prdt_entry[i].dbau = 0;
   // cmdtbl->prdt_entry[i].dbau = (u32)(((buf) >> 32) & 0xFFFFFFFF);
-  cmdtbl->prdt_entry[i].dbc = (count << 9) - 1;  // 512 bytes per sector
+  cmdtbl->prdt_entry[i].dbc = count << 9;  // 512 bytes per sector
   cmdtbl->prdt_entry[i].i = 1;
 
   // Setup command
@@ -183,14 +190,14 @@ int ahci_dev_port_read(ahci_device_t* ahci_dev, int no, sector_t sector,
   cmdfis->c = 1;  // Command
   cmdfis->command = ATA_CMD_READ_DMA_EX;
 
-  cmdfis->lba0 = (uint8_t)sector.startl;
-  cmdfis->lba1 = (uint8_t)(sector.startl >> 8);
-  cmdfis->lba2 = (uint8_t)(sector.startl >> 16);
+  cmdfis->lba0 = (uint8_t)(sector.startl & 0xFF);
+  cmdfis->lba1 = (uint8_t)((sector.startl >> 8) & 0xFF);
+  cmdfis->lba2 = (uint8_t)((sector.startl >> 16) & 0xFF);
   cmdfis->device = 1 << 6;  // LBA mode
 
-  cmdfis->lba3 = (uint8_t)(sector.startl >> 24);
-  cmdfis->lba4 = (uint8_t)sector.starth;
-  cmdfis->lba5 = (uint8_t)(sector.starth >> 8);
+  cmdfis->lba3 = (uint8_t)((sector.startl >> 24) & 0xFF);
+  cmdfis->lba4 = (uint8_t)(sector.starth & 0xFF);
+  cmdfis->lba5 = (uint8_t)((sector.starth >> 8) & 0xFF);
 
   cmdfis->countl = count & 0xFF;
   cmdfis->counth = (count >> 8) & 0xFF;
@@ -256,30 +263,27 @@ void stop_cmd(hba_port_t* port) {
 }
 
 void ahci_dev_port_init(ahci_device_t* ahci_dev, int no) {
+  //又来一遍hba memory，来多了其实不好。
   hba_memory_t* hab_memory = ahci_dev->abar;
   hba_port_t* port = &hab_memory->ports[no];
 
-  stop_cmd(port);  // Stop command engine
+  stop_cmd(port);  //停止运行 Stop command engine
 
   // Command list offset: 1K*portno
   // Command list entry size = 32
   // Command list entry maxim count = 32
   // Command list maxim size = 32*32 = 1K per port
   // void* ahci_base = kmalloc(40 * 1024 + 8 * 1024 * 32);
-  void* ahci_base = kmalloc_alignment(40 * 1024 + 8 * 1024 * 32, 1024);
-  // u32 addr=ahci_base;
-  // for (int i = 0; i < (40 * 1024 + 8 * 1024 * 32) / 0x1000; i++) {
-  //   map_page(addr, addr, PAGE_P | PAGE_USU | PAGE_RWW);
-  //   addr += 0x1000;
-  // }
-  ahci_dev->base_cmd = ahci_base;
-  port->clb = ahci_base + (no << 10);
+  //申请命令缓冲
+  void* base_cmd = kmalloc_alignment(40 * 1024 + 8 * 1024 * 32, 1024);
+  ahci_dev->base_cmd = base_cmd;
+  port->clb = base_cmd + (no << 10);
   port->clbu = 0;
   kmemset((void*)(port->clb), 0, 1024);
 
   // FIS offset: 32K+256*portno
   // FIS entry size = 256 bytes per port
-  port->fb = ahci_base + (32 << 10) + (no << 8);
+  port->fb = base_cmd + (32 << 10) + (no << 8);
   port->fbu = 0;
   kmemset((void*)(port->fb), 0, 256);
 
@@ -290,7 +294,7 @@ void ahci_dev_port_init(ahci_device_t* ahci_dev, int no) {
     cmdheader[i].prdtl = 8;  // 8 prdt entries per command table
                              // 256 bytes per command table, 64+16+48+16*8
     // Command table offset: 40K + 8K*portno + cmdheader_index*256
-    cmdheader[i].ctba = ahci_base + (40 << 10) + (no << 13) + (i << 8);
+    cmdheader[i].ctba = base_cmd + (40 << 10) + (no << 13) + (i << 8);
     cmdheader[i].ctbau = 0;
     kmemset((void*)cmdheader[i].ctba, 0, 256);
   }
@@ -320,16 +324,21 @@ i32 ahci_get_port_type(hba_port_t* port) {
 }
 
 void ahci_dev_prob(ahci_device_t* ahci_dev) {
+  //你好，我是hba memory，就是前面的bar5 变过来的。
   hba_memory_t* hab_memory = ahci_dev->abar;
   u32 addr = hab_memory;
+  //映射到内核中，地址一一映射，当然你可以自己映射到固定位置，这里怎么简单怎么来（偷懒）^_^!!
   map_page(addr, addr, PAGE_P | PAGE_USU | PAGE_RWW);
-  u32 pi = hab_memory->pi;
+  u32 pi = hab_memory->pi;//看看port有几个一个bit代表一个，32bit长，需要循环32次看看。
   for (int i = 0; i < 32; i++, pi >>= 1) {
-    if (!(pi & 1)) {
+    if (!(pi & 1)) {//当前位置没有被设置成1，说明没有设备，继续。
       continue;
     }
+    //让我康康，是什么设备，
     i32 type = ahci_get_port_type(&hab_memory->ports[i]);
+    //原来是SATA设备
     if (type == AHCI_DEV_SATA) {
+      //真的发现了ata设备，先初始化了再说
       ahci_dev_port_init(ahci_dev, i);
     } else if (type == AHCI_DEV_NULL) {
     } else {
@@ -404,16 +413,22 @@ static size_t ahci_ioctl(device_t* dev, u32 cmd, ...) {
   return ret;
 }
 
-void ahci_dev_init(ahci_device_t* ahci_dev) { ahci_dev_prob(ahci_dev); }
+void ahci_dev_init(ahci_device_t* ahci_dev) { 
+  //探测并，初始化ahci设备，可能有多个，有多个就初始化多个
+  ahci_dev_prob(ahci_dev); 
+}
 
 int ahci_init(void) {
+  //根据 pci 的ahci class 为0x0106，分类为01是大容量设备，0x6 是串行ata控制 Serial ATA Controller，所以为0x0106
   pci_device_t* pdev = pci_find_class(0x0106);
   if (pdev == NULL) {
     kprintf("can not find ahci device\n");
     return;
   }
+  //获取bar5的地址，别问为什么，规范说bar5是pci为0x24的AHCI Base Address <BAR5>，获取后可以通过内存操作ata设备
   u32 bar5 = pci_dev_read32(pdev, PCI_BASE_ADDR5) & 0xFFFFFFF0;
 
+  //分配一个设备玩一玩，骗你的呢，怎么会有人乱来，分配好后就添加到设备列表去。
   device_t* dev = kmalloc(sizeof(device_t));
   dev->name = "sata";
   dev->read = ahci_read;
@@ -421,11 +436,13 @@ int ahci_init(void) {
   dev->ioctl = ahci_ioctl;
   dev->id = DEVICE_SATA;
   dev->type = DEVICE_TYPE_BLOCK;
-  device_add(dev);
+  device_add(dev); //添加到设备列表去
 
+  //初始化一下ahci私有设备结构体，图啥呢，玩呢，别问为什么，往下面看就知道了。
   ahci_device_t* ahci_dev = kmalloc(sizeof(ahci_device_t));
-  ahci_dev->abar = bar5;
-  dev->data = ahci_dev;
+  ahci_dev->abar = bar5;//把ahci 传进去，用于后面转hba memory操作ata设备。
+  dev->data = ahci_dev;//设置私有设备地址
+  //初始化一下ahci设备
   ahci_dev_init(ahci_dev);
 
   return 0;
