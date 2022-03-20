@@ -196,6 +196,7 @@ void pre_launch() {
   // syscall2(SYS_EXEC, "/player", mgba_argv);
   // syscall2(SYS_EXEC, "/cat", cat_argv);
   // syscall2(SYS_EXEC, "/infones", nes_argv);
+  // syscall2(SYS_EXEC,"/test-file",NULL);
 
 // test_cpu_speed();
 //  for(;;);

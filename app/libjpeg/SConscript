@@ -12,4 +12,4 @@ source=[]
 
 source+=Glob('*.c')
 
-env.Library('jpeg', source+env['LIBC'],CFLAGS='$CFLAGS $LIBCFLAGS')
+env.Library('jpeg', source+env['LIBC'],CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libjpeg/')

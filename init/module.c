@@ -39,6 +39,7 @@ extern module_t fat32_module;
 extern module_t rtc_module;
 extern module_t fat_module;
 extern module_t sb16_module;
+extern module_t test_module;
 
 #elif defined(XTENSA)
 extern module_t hello_module;
@@ -92,6 +93,8 @@ void driver_init(void) {
   module_regist(&devfs_module);
   // module_regist(&fat32_module);
   module_regist(&fat_module);
+
+  module_regist(&test_module);
 
 #elif defined(XTENSA)
   module_regist(&hello_module);

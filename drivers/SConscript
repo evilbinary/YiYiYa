@@ -94,7 +94,11 @@ elif arch_type=='x86':
 
     'sound/sb16.c',
     'net/net.c',
-    'net/e1000.c'
+    'net/e1000.c',
+
+    'test/test.c',
+    'test/test-ahci.c',
+    'test/test-fat.c',
     ]
 
 elif arch_type=='xtensa':
