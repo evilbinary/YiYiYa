@@ -44,11 +44,11 @@ export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}'):0
 
 3、打开VcXsrv得XLaunch启动程序，配置如下，记得最后一步加-ac 否则会报错。
 
-<img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/image/vcxsrv-win?raw=true" width="400px" />
+<img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/image/vcxsrv-win.png?raw=true" width="400px" />
 
-<img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/image/vcxsrv-one?raw=true" width="400px" />
+<img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/image/vcxsrv-one.png?raw=true" width="400px" />
 
-<img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/image/vcxsrv-ac?raw=true" width="400px" />
+<img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/image/vcxsrv-ac.png?raw=true" width="400px" />
 
 
 
