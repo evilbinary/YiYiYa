@@ -292,8 +292,12 @@ vnode_t *vfs_open_attr(vnode_t *root, u8 *name, u32 attr) {
     file = vfs_create_node(last, V_FILE);
     file->device = node->device;
     file->data = node->data;
-    if (node->super->op != NULL) {
-      file->op = node->super->op;
+    if(node->super!=NULL){
+      if (node->super->op != NULL) {
+        file->op = node->super->op;
+      }
+    }else{
+      file->op = node->parent->op;
     }
     file->super = node->super;
     vfs_add_child(node, file);

@@ -284,7 +284,7 @@ void etk_terminal_do_cmd() {
   u32 len = 256;
   memset(buf, 0, 256);
   sprintf(buf, "/dev/pts/%d", pts);
-  fd_pts = open(buf, "r");
+  fd_pts = open(buf, O_RDONLY);
   if (fd_pts < 0) {
     printf("error get pts %d\n", pts);
   }
@@ -370,7 +370,7 @@ EtkWidget* etk_terminal(e32 x, e32 y, e32 width, e32 height) {
   max_col = twidth / char_width - 1;
   max_line = theight / char_height - 1;
 
-  fd_ptm = open("/dev/ptm", "r");
+  fd_ptm = open("/dev/ptm", O_RDONLY);
   if (fd_ptm < 0) {
     printf("error get ptm \n");
   }

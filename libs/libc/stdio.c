@@ -83,6 +83,9 @@ FILE *fopen(const char *filename, const char *mode) {
 int fseek(FILE *stream, long int offset, int origin) {
   int rc;
   rc = ya_seek(stream->fd, offset, origin);
+  if(rc>=0){
+    stream->offset=rc;
+  }
   return rc;
 }
 
@@ -136,7 +139,7 @@ size_t fwrite(const void * /* restrict */ ptr, size_t size, size_t nmemb,
       buffer++;
     }
   }
-  stream->offset+=nmemb * size;
+  // stream->offset+=nmemb * size;
   // Apparently successful.
   return nmemb * size;
 }
@@ -161,7 +164,7 @@ int fgetc(FILE *stream) {
     stream->error = 1;
     return -1;
   }
-  stream->offset+=rc;
+  stream->offset++;
 
   return (int)c;
 }
@@ -182,7 +185,7 @@ int fputc(int c, FILE *stream) {
     stream->error = 1;
     return EOF;
   }
-  stream->offset+=rc;
+  stream->offset++;
   return c;
 }
 

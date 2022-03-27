@@ -10,7 +10,8 @@ voperator_t pty_master_operator = {.close = NULL,
 voperator_t pty_slave_operator = {.close = NULL,
                                   .read = pty_slave_read,
                                   .write = pty_slave_write,
-                                  .open = pty_slave_open};
+                                  .open = pty_slave_open,
+                                  .ioctl = pty_ioctl};
 
 size_t pty_ioctl(vnode_t *node, u32 cmd, va_list args) {
   if (cmd == IOC_SLAVE) {
