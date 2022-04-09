@@ -166,7 +166,7 @@ void pre_launch() {
   // syscall2(SYS_EXEC, "/mgba", mgba_argv);
   // syscall2(SYS_EXEC, "/scheme", scm_argv);
   // syscall2(SYS_EXEC, "/sdl2", NULL);
-  // syscall2(SYS_EXEC, "/showimage", showimg_argv);
+  syscall2(SYS_EXEC, "/showimage", showimg_argv);
 
   // for (;;)
   //   ;

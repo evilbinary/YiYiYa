@@ -8,9 +8,6 @@
 #ifndef ZCONF_H
 #define ZCONF_H
 
-#include <unistd.h>
-#include <fcntl.h>
-
 /*
  * If you *really* need a unique prefix for all types and library functions,
  * compile with -DZ_PREFIX. The "standard" zlib should be compiled without it.
@@ -444,7 +441,7 @@ typedef uLong FAR uLongf;
 
 #ifdef STDC
 #  ifndef Z_SOLO
-//#    include <sys/types.h>      /* for off_t */
+#    include <sys/types.h>      /* for off_t */
 #  endif
 #endif
 
@@ -454,7 +451,6 @@ typedef uLong FAR uLongf;
 #  endif
 #endif
 
-#undef _WIN32
 #ifdef _WIN32
 #  ifndef Z_SOLO
 #    include <stddef.h>         /* for wchar_t */

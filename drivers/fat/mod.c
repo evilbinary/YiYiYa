@@ -72,19 +72,21 @@ size_t fat_read_bytes(vnode_t *node, u32 offset, size_t nbytes, u8 *buf) {
   u32 count = nbytes / BYTE_PER_SECTOR;
   u32 rest = nbytes % BYTE_PER_SECTOR;
   char small_buf[BYTE_PER_SECTOR*2];
-  kmemset(small_buf, 0, BYTE_PER_SECTOR);
   for (int i = 0; i < count; i++) {
+    kmemset(small_buf, 0, BYTE_PER_SECTOR*2);
     ret = fat_device_read(node, offset, BYTE_PER_SECTOR, small_buf);
     kmemmove(buf, small_buf + offset % BYTE_PER_SECTOR, BYTE_PER_SECTOR);
     buf += BYTE_PER_SECTOR;
     offset += BYTE_PER_SECTOR;
   }
   if (rest > 0) {
+    kmemset(small_buf, 0, BYTE_PER_SECTOR*2);
     ret = fat_device_read(node, offset, BYTE_PER_SECTOR*2, small_buf);
     buf += count * BYTE_PER_SECTOR;
     kmemmove(buf, small_buf + offset % BYTE_PER_SECTOR, rest);
   }
   if (ret < 0) {
+    kprintf("fat read bytes error\n");
     return -1;
   }
   return nbytes;
@@ -94,9 +96,9 @@ size_t fat_write_bytes(vnode_t *node, u32 offset, size_t nbytes, u8 *buf) {
   u32 count = nbytes / BYTE_PER_SECTOR;
   u32 rest = nbytes % BYTE_PER_SECTOR;
   char small_buf[BYTE_PER_SECTOR * 2];
-  kmemset(small_buf, 0, BYTE_PER_SECTOR);
   u32 ret = 0;
   for (int i = 0; i < count; i++) {
+    kmemset(small_buf, 0, BYTE_PER_SECTOR);
     fat_device_read(node, offset, BYTE_PER_SECTOR, small_buf);
     kmemmove(small_buf + offset % BYTE_PER_SECTOR, buf, BYTE_PER_SECTOR);
     ret = fat_device_write(node, offset, BYTE_PER_SECTOR, small_buf);
@@ -104,6 +106,7 @@ size_t fat_write_bytes(vnode_t *node, u32 offset, size_t nbytes, u8 *buf) {
     offset += BYTE_PER_SECTOR;
   }
   if (rest > 0) {
+    kmemset(small_buf, 0, BYTE_PER_SECTOR);
     fat_device_read(node, offset, BYTE_PER_SECTOR, small_buf);
     kmemmove(small_buf + offset % BYTE_PER_SECTOR, buf, rest);
     ret = fat_device_write(node, offset, BYTE_PER_SECTOR, small_buf);
