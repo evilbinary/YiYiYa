@@ -2,7 +2,6 @@
  * jquant2.c
  *
  * Copyright (C) 1991-1996, Thomas G. Lane.
- * Modified 2011 by Guido Vollbeding.
  * This file is part of the Independent JPEG Group's software.
  * For conditions of distribution and use, see the accompanying README file.
  *
@@ -233,6 +232,7 @@ prescan_quantize (j_decompress_ptr cinfo, JSAMPARRAY input_buf,
   JDIMENSION col;
   JDIMENSION width = cinfo->output_width;
 
+  GUI_USE_PARA(output_buf);
   for (row = 0; row < num_rows; row++) {
     ptr = input_buf[row];
     for (col = width; col > 0; col--) {
@@ -1156,6 +1156,7 @@ finish_pass1 (j_decompress_ptr cinfo)
 METHODDEF(void)
 finish_pass2 (j_decompress_ptr cinfo)
 {
+  GUI_USE_PARA(cinfo);
   /* no work */
 }
 
@@ -1204,7 +1205,7 @@ start_pass_2_quant (j_decompress_ptr cinfo, boolean is_pre_scan)
 	cquantize->fserrors = (FSERRPTR) (*cinfo->mem->alloc_large)
 	  ((j_common_ptr) cinfo, JPOOL_IMAGE, arraysize);
       /* Initialize the propagated errors to zero. */
-      FMEMZERO((void FAR *) cquantize->fserrors, arraysize);
+      jzero_far((void FAR *) cquantize->fserrors, arraysize);
       /* Make the error-limit table if we didn't already. */
       if (cquantize->error_limiter == NULL)
 	init_error_limit(cinfo);
@@ -1215,8 +1216,8 @@ start_pass_2_quant (j_decompress_ptr cinfo, boolean is_pre_scan)
   /* Zero the histogram or inverse color map, if necessary */
   if (cquantize->needs_zeroed) {
     for (i = 0; i < HIST_C0_ELEMS; i++) {
-      FMEMZERO((void FAR *) histogram[i],
-	       HIST_C1_ELEMS*HIST_C2_ELEMS * SIZEOF(histcell));
+      jzero_far((void FAR *) histogram[i],
+		HIST_C1_ELEMS*HIST_C2_ELEMS * SIZEOF(histcell));
     }
     cquantize->needs_zeroed = FALSE;
   }

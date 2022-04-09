@@ -19,19 +19,6 @@
  */
 
 
-/* Short forms of external names for systems with brain-damaged linkers. */
-
-#ifdef NEED_SHORT_EXTERNAL_NAMES
-#define jpeg_get_small		jGetSmall
-#define jpeg_free_small		jFreeSmall
-#define jpeg_get_large		jGetLarge
-#define jpeg_free_large		jFreeLarge
-#define jpeg_mem_available	jMemAvail
-#define jpeg_open_backing_store	jOpenBackStore
-#define jpeg_mem_init		jMemInit
-#define jpeg_mem_term		jMemTerm
-#endif /* NEED_SHORT_EXTERNAL_NAMES */
-
 
 /*
  * These two functions are used to allocate and release small chunks of
@@ -138,16 +125,9 @@ typedef struct backing_store_struct * backing_store_ptr;
 
 typedef struct backing_store_struct {
   /* Methods for reading/writing/closing this backing-store object */
-  JMETHOD(void, read_backing_store, (j_common_ptr cinfo,
-				     backing_store_ptr info,
-				     void FAR * buffer_address,
-				     long file_offset, long byte_count));
-  JMETHOD(void, write_backing_store, (j_common_ptr cinfo,
-				      backing_store_ptr info,
-				      void FAR * buffer_address,
-				      long file_offset, long byte_count));
-  JMETHOD(void, close_backing_store, (j_common_ptr cinfo,
-				      backing_store_ptr info));
+  JMETHOD(void, read_backing_store,  (j_common_ptr cinfo, backing_store_ptr info, void FAR * buffer_address, long file_offset, long byte_count));
+  JMETHOD(void, write_backing_store, (j_common_ptr cinfo, backing_store_ptr info, void FAR * buffer_address, long file_offset, long byte_count));
+  JMETHOD(void, close_backing_store, (j_common_ptr cinfo, backing_store_ptr info));
 
   /* Private fields for system-dependent backing-store management */
 #ifdef USE_MSDOS_MEMMGR
@@ -162,7 +142,7 @@ typedef struct backing_store_struct {
   char temp_name[TEMP_NAME_LENGTH]; /* name if it's a file */
 #else
   /* For a typical implementation with temp files, we need: */
-  FILE * temp_file;		/* stdio reference to temp file */
+ /*  FILE * temp_file;	*/	/* stdio reference to temp file */
   char temp_name[TEMP_NAME_LENGTH]; /* name of temp file */
 #endif
 #endif
