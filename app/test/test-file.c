@@ -31,9 +31,9 @@ void test_read_large(void** state) {
     }
     for (int i = 0; i < ret; i++) {
       if (i % PRINT_WIDTH == 0) {
-        printf("\n %07x   ", offset);
+        // printf("\n %07x   ", offset);
       }
-      printf("%02x ", 0xff & buffer[i]);
+      // printf("%02x ", 0xff & buffer[i]);
 
       if (offset == 0) {
         if (i == 0) {
@@ -57,7 +57,7 @@ void test_read_large(void** state) {
       }
       offset++;
     }
-    printf("ret=%d\n", ret);
+    // printf("ret=%d\n", ret);
   }
   if (fp != NULL) {
     fclose(fp);
@@ -179,7 +179,7 @@ void test_seek_read(void** state) {
   assert_int_equal(0xff & buffer[1], 0x29);
   assert_int_equal(0xff & buffer[2], 0x4c);
 
-  //at buffer pos 0x180 384
+  // at buffer pos 0x180 384
   printf("offset %d buffer pos %d value %x==0x19 \n", offset, 384, buffer[384]);
   assert_int_equal(0xff & buffer[384], 0xff);
   assert_int_equal(0xff & buffer[385], 0x5f);
@@ -188,15 +188,50 @@ void test_seek_read(void** state) {
   assert_true(ret == 0);
 }
 
+void test_fgetc(void** state) {
+  FILE* fp = fopen("/fgetc.txt", "w+");
+  assert_non_null(fp);
+  int ret = fseek(fp, 0, SEEK_SET);
+  assert_true(ret == 0);
+  for (int i = 0; i < 100; i++) {
+    ret = fwrite("ABC", 3, 1, fp);
+    assert_int_equal(ret, 3);
+  }
+  fclose(fp);
+
+  int c;
+  int n = 0;
+  fp = fopen("fgetc.txt", "r");
+  if (fp == NULL) {
+    perror("Error in opening file");
+    return (-1);
+  }
+  int i=0;
+  do {
+    c = fgetc(fp);
+    if (feof(fp)) {
+      break;
+    }
+    //printf("i=%d c= %c\n",i,c);
+    if (i %3==0) {
+      assert_int_equal(c, 'A');
+    } else if (i %3== 1) {
+      assert_int_equal(c, 'B');
+    } else if (i%3 == 2) {
+      assert_int_equal(c, 'C');
+    }
+    i++;
+  } while (1);
+
+  fclose(fp);
+}
+
 int main(int argc, char* argv[]) {
   const struct CMUnitTest tests[] = {
-      cmocka_unit_test(test_read_large),
-      cmocka_unit_test(test_seek_read),
-      cmocka_unit_test(test_write),
-      cmocka_unit_test(test_write_read),
-      cmocka_unit_test(test_read_dir),
-      cmocka_unit_test(test_seek),
-      cmocka_unit_test(test_read_byte),
+      cmocka_unit_test(test_read_large), cmocka_unit_test(test_seek_read),
+      cmocka_unit_test(test_write),      cmocka_unit_test(test_write_read),
+      cmocka_unit_test(test_read_dir),   cmocka_unit_test(test_seek),
+      cmocka_unit_test(test_read_byte),  cmocka_unit_test(test_fgetc),
 
   };
 
