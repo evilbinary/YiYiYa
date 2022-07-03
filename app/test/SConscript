@@ -53,3 +53,18 @@ if env.get('MYLIB'):
 env.Program('test-file', source,
             CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libcmocka/include',
             LINKFLAGS='$LINKFLAGS $USER')
+
+
+source = [
+    'test-mem.c',
+
+    '../libcmocka/libcmocka.a',
+]+env['LIBC']
+
+if env.get('MYLIB'):
+    source.append(env.get('MYLIB'))
+
+
+env.Program('test-mem', source,
+            CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libcmocka/include',
+            LINKFLAGS='$LINKFLAGS $USER')
