@@ -5,6 +5,9 @@
 #include <unistd.h>
 #include "syscall.h"
 
+#define UNIMPL() printf("unimpl %s:%d %s\n",__FILE__,__LINE__,__FUNCTION__)
+
+
 int open(const char *filename, int flags, ...) {
   FILE *file;
   int fd;

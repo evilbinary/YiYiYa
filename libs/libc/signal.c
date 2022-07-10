@@ -1,5 +1,8 @@
 #include <signal.h>
 
+#define UNIMPL() printf("unimpl %s:%d %s\n",__FILE__,__LINE__,__FUNCTION__)
+
+
 int raise(int sig) {
   int rc;
   UNIMPL();
