@@ -1,7 +1,7 @@
 #ifndef _SYS_SELECT_H
 #define _SYS_SELECT_H
 
-#include <sys/time.h>
+#include "sys/time.h"
 #undef  FD_SETSIZE
 #define FD_SETSIZE    64
 

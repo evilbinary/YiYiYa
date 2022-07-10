@@ -26,7 +26,7 @@ int creat(const char *filename, u32 mode) {
 }
 
 int fcntl(int fd, int cmd, ...){
-  printf("unimpl fcntl\n");
+  UNIMPL();
 
   return 1;
 }

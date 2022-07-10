@@ -2,14 +2,12 @@
 #include "stdio.h"
 
 int dlclose(void *p) {
-  printf("unimpl dlclose\n");
+  UNIMPL();
   return 1;
 }
-char * dlerror(void) {
-  printf("unimpl dlerror\n");
+char *dlerror(void) {
+  UNIMPL();
   return NULL;
 }
-void *dlopen(const char *p, int m) { printf("unimpl dlopen\n"); }
-void *dlsym(void *__restrict p, const char *__restrict s) {
-  printf("unimpl dlsym\n");
-}
+void *dlopen(const char *p, int m) { UNIMPL(); }
+void *dlsym(void *__restrict p, const char *__restrict s) { UNIMPL(); }

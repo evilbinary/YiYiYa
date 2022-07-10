@@ -1,12 +1,13 @@
 // #include "sys/stat.h"
+#include "stdio.h"
 
 int fstat(int fd, struct stat *st) {
-  printf("unimpl fstat\n");
+  UNIMPL();
   return 0;
 }
 
 int fstatat(int fd, const char *restrict path, struct stat *restrict st,
             int flag) {
-  printf("unimpl fstatat\n");
+  UNIMPL();
   return 0;
 }
