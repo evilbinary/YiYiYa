@@ -4,12 +4,12 @@
 
 
 struct passwd *getpwuid (uid_t t){
-  printf("unimpl getpwuid\n");
+  UNIMPL();
 
   return NULL;
 }
 struct passwd *getpwnam (const char * name){
-  printf("unimpl getpwnam\n");
+  UNIMPL();
 
   return NULL;
 }

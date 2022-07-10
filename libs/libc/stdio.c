@@ -101,7 +101,9 @@ size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream) {
 
   int total = nmemb * size;
   size_t r = ya_read(stream->fd, buffer, total);
-  stream->offset += r;
+  if(r>0){
+    stream->offset += r;
+  }
   return r;
 
   // if(nmemb>size){

@@ -151,7 +151,7 @@ ssize_t write(int fd, const void *buffer, size_t num) {
 
 int unlink(const char *pathname) {
   int rc;
-
+  UNIMPL();
   return rc;
 }
 
@@ -279,16 +279,16 @@ int execlp(const char *file, const char *argv0, ...) {
 int getpagesize(void) { return PAGE_SIZE; }
 
 int fsync(int fd) {
-  printf("unimpl fsync\n");
+  UNIMPL();
   return 1;
 }
 
 int usleep(unsigned i) {
-  printf("unimpl usleep\n");
+  UNIMPL();
   return 1;
 }
 
 int lockf(int fd, int op, off_t size) {
-  printf("unimpl lockf\n");
+  UNIMPL();
   return 1;
 }
