@@ -1,6 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
+#include "stdio.h"
+#include "stdlib.h"
+#include "time.h"
 
 #define ASCBUFSIZE (26 + 2)
 
@@ -535,6 +535,7 @@ int clock_gettime(clockid_t clockid, struct timespec *ts) {
     int rc = ya_time(&seconds);
     ts->tv_sec=seconds;
     ts->tv_nsec=0;
+    return 0;
   }
   return 0;
 }

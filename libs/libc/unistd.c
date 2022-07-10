@@ -8,6 +8,9 @@
 #include "stdarg.h"
 #include "syscall.h"
 
+#define UNIMPL() printf("unimpl %s:%d %s\n",__FILE__,__LINE__,__FUNCTION__)
+
+
 char **environ = NULL;  ///< Global environment information
 
 int access(const char *filename, int mode) { return 0; }
