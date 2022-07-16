@@ -151,7 +151,7 @@ void pre_launch() {
   // syscall2(SYS_EXEC,"/gui",NULL);
   // syscall2(SYS_EXEC,"/test-file",NULL);
     // syscall2(SYS_EXEC,"/test-mem",NULL);
-  syscall2(SYS_EXEC,"/test-uncompress",NULL);
+  // syscall2(SYS_EXEC,"/test-uncompress",NULL);
 
   // syscall2(SYS_EXEC, "/luat", NULL);
 
@@ -166,7 +166,7 @@ void pre_launch() {
   // kprintf("fd=>%d\n",fd);
 
   // syscall2(SYS_EXEC, "/infones", nes_argv);
-  // syscall2(SYS_EXEC, "/mgba", mgba_argv);
+  syscall2(SYS_EXEC, "/mgba", mgba_argv);
   // syscall2(SYS_EXEC, "/scheme", scm_argv);
   // syscall2(SYS_EXEC, "/sdl2", NULL);
   // syscall2(SYS_EXEC, "/showimage", showimg_argv);
