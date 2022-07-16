@@ -83,8 +83,8 @@ FILE *fopen(const char *filename, const char *mode) {
 int fseek(FILE *stream, long int offset, int origin) {
   int rc;
   rc = ya_seek(stream->fd, offset, origin);
-  if(rc>=0){
-    stream->offset=rc;
+  if (rc >= 0) {
+    stream->offset = rc;
   }
   return rc;
 }
@@ -101,7 +101,7 @@ size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream) {
 
   int total = nmemb * size;
   size_t r = ya_read(stream->fd, buffer, total);
-  if(r>0){
+  if (r > 0) {
     stream->offset += r;
   }
   return r;
@@ -148,7 +148,7 @@ size_t fwrite(const void * /* restrict */ ptr, size_t size, size_t nmemb,
 
 long int ftell(FILE *stream) {
   long int rc;
-  rc=stream->offset;
+  rc = stream->offset;
   return rc;
 }
 
@@ -239,6 +239,7 @@ FILE *fdopen(int fd, const char *mode) {
 }
 
 void rewind(FILE *f) { fseek(f, 0, SEEK_SET); }
+
 char *fgets(char *s, int n, FILE *f) {
   char *p = s;
   char *ret = NULL;
@@ -247,14 +248,15 @@ char *fgets(char *s, int n, FILE *f) {
   while (n-- > 1) {
     res = fgetc(f);
 
+    if (feof(f)) {
+      break;
+    }
     if (res == 0)
       break;
-
     else if (res < 0)
       return NULL;
-
+    *p++ = res;
     ret = s;
-    if (*p++ == '\n') break;
   }
 
   *p = 0;
@@ -373,3 +375,16 @@ int fscanf(FILE *restrict f, const char *restrict fmt, ...) {
 }
 
 weak_alias(fscanf, __isoc99_fscanf);
+
+int fgetpos(FILE *file, fpos_t *pos) {
+  off_t off = ftell(file);
+  if (off < 0) return -1;
+  *(long long *)pos = off;
+  return 0;
+}
+
+int fsetpos(FILE *file, const fpos_t *pos) {
+  off_t off = fseek(file, *(long *)pos, SEEK_SET);
+  if (off < 0) return -1;
+  return 0;
+}
