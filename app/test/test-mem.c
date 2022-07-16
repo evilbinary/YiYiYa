@@ -30,7 +30,7 @@ void test_my_realloc(void** state) {
   free(str);
 }
 
-void test_my_caloc(void** state){
+void test_my_calloc(void** state){
     int *p=calloc(10,sizeof(int));
     for( i=0 ; i < n ; i++ ) {
       a[i]=i;
@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
   const struct CMUnitTest tests[] = {cmocka_unit_test(test_malloc_free),
                                      cmocka_unit_test(test_malloc_large),
                                      cmocka_unit_test(test_my_realloc),
-                                     cmocka_unit_test(test_my_caloc)
+                                     cmocka_unit_test(test_my_calloc)
 
   };
 
