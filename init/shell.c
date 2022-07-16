@@ -142,7 +142,7 @@ char* mgba_argv[] = {"mgba", "/mario.gba", NULL};
 
 char* cat_argv[] = {"/cat", "hello.lua", NULL};
 
-char* showimg_argv[] = {"/showimage", "/duck.png", NULL};
+char* showimg_argv[] = {"/showimage", "/duck.jpg", NULL};
 
 void pre_launch() {
 #ifdef X86

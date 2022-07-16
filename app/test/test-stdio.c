@@ -90,7 +90,21 @@ void test_stdio(void **state) {
   c = fgetc(fp);
   assert_true(feof(fp));
 
+  fpos_t position;
+  fp = fopen("/file-pos.txt", "w+");
+  fgetpos(fp, &position);
+  fputs("Hello, World!", fp);
 
+  fsetpos(fp, &position);
+  fputs("hahaha evil gaga", fp);
+  fclose(fp);
+
+  char str[64];
+  fp = fopen("/file-pos.txt", "r");
+  fgets(str,64,fp);
+  assert_string_equal(str,"hahaha evil gaga");
+
+  fclose(fp);
 }
 
 int main(int argc, char *argv[]) {
