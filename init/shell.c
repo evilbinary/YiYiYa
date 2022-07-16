@@ -134,7 +134,7 @@ void do_shell_thread(void) {
 
 // must init global for armv7-a
 char* scm_argv[] = {"/scheme", "-b", "/scheme.boot", "--verbose", NULL};
-char* lua_argv[] = {"/lua", "hello.lua", NULL};
+char* lua_argv[] = {"/lua", "/hello.lua", NULL};
 
 char* nes_argv[] = {"infones", "/mario.nes", NULL};
 
@@ -142,7 +142,7 @@ char* mgba_argv[] = {"mgba", "/mario.gba", NULL};
 
 char* cat_argv[] = {"/cat", "hello.lua", NULL};
 
-char* showimg_argv[] = {"/showimage", "/duck.jpg", NULL};
+char* showimg_argv[] = {"/showimage", "/pngtest.png", NULL};
 
 void pre_launch() {
 #ifdef X86
@@ -154,7 +154,7 @@ void pre_launch() {
   // syscall2(SYS_EXEC,"/test-uncompress",NULL);
   // syscall2(SYS_EXEC,"/test-string",NULL);
   // syscall2(SYS_EXEC,"/test-stdlib",NULL);
-  syscall2(SYS_EXEC,"/test-stdio",NULL);
+  // syscall2(SYS_EXEC,"/test-stdio",NULL);
 
   // syscall2(SYS_EXEC, "/luat", NULL);
 
