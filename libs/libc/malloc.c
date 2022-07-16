@@ -24,7 +24,7 @@ void *realloc(void *p, size_t size) {
   ptr = malloc(size);
   memcpy(ptr, p, real_size);
   free(p);
-  return p;
+  return ptr;
 }
 
 void *calloc(size_t nobj, size_t size) {
