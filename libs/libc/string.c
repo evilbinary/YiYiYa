@@ -109,12 +109,8 @@ int memcmp(const void* s1, const void* s2, size_t n) {
 }
 
 int strcmp(const char* s1, const char* s2) {
-  char c;
-  while (*s1!=NULL&&s2!=NULL) {
-    if ((c = *s1 - *s2++) != 0 || !*s1++) break;
-  }
-
-  return c;
+	for (; *s1==*s2 && *s1; s1++, s2++);
+	return *(unsigned char *)s1 - *(unsigned char *)s2;
 }
 
 int strncmp(const char* s1, const char* s2, size_t n) {
@@ -190,24 +186,23 @@ char* strrchr(const char* s, int c) {
   return NULL;
 }
 
-size_t strspn(const char* s1, const char* s2) {
-  int len1;
-  int len2;
-  int i;
-  int j;
-  char c;
+#define BITOP(a,b,op) \
+ ((a)[(size_t)(b)/(8*sizeof *(a))] op (size_t)1<<((size_t)(b)%(8*sizeof *(a))))
 
-  len1 = strlen(s1);
-  len2 = strlen(s2);
 
-  for (i = 0; i < len1; i++) {
-    c = s1[i];
+size_t strspn(const char* s, const char* c) {
+  const char *a = s;
+	size_t byteset[32/sizeof(size_t)] = { 0 };
 
-    for (j = 0; j < len2; j++)
-      if (s2[j] != c) return i;
-  }
+	if (!c[0]) return 0;
+	if (!c[1]) {
+		for (; *s == *c; s++);
+		return s-a;
+	}
 
-  return len1;
+	for (; *c && BITOP(byteset, *(unsigned char *)c, |=); c++);
+	for (; *s && BITOP(byteset, *(unsigned char *)s, &); s++);
+	return s-a;
 }
 
 char* strstr(const char* haystack, const char* needle) {
@@ -237,6 +232,8 @@ char* strerror(int errnum) {
       return "domain error";
     case ERANGE:
       return "range error";
+    case ENOENT:
+      return "No such file or directory";
     default:
       return "unknown error number.";
   }

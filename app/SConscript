@@ -95,6 +95,7 @@ if env.get('APP'):
             'test/test-file',
             'test/test-mem',
             'test/test-uncompress',
+            'test/test-string',
             #'rust/test/test-rs',
             'cmd/ls',
             'cmd/echo',
