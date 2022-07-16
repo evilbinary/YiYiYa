@@ -11,7 +11,7 @@ void test_malloc_free(void** state) {
 }
 
 void test_malloc_large(void** state) {
-  void* p = malloc(1024 * 1024 * 1024);
+  void* p = malloc(1024 * 1024);
   assert_non_null(p);
   free(p);
 }
@@ -44,9 +44,10 @@ void test_my_calloc(void** state){
 
 int main(int argc, char* argv[]) {
   const struct CMUnitTest tests[] = {cmocka_unit_test(test_malloc_free),
-                                     cmocka_unit_test(test_malloc_large),
                                      cmocka_unit_test(test_my_realloc),
-                                     cmocka_unit_test(test_my_calloc)
+                                     cmocka_unit_test(test_my_calloc),
+                                     cmocka_unit_test(test_malloc_large)
+
 
   };
 
