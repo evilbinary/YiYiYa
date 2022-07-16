@@ -549,3 +549,9 @@ char *asctime_r(const struct tm *restrict tm, char *restrict buf) {
   printf("not imple asctime_r\n");
   return 1;
 }
+
+int utimes(const char *path, const struct timeval* t)
+{
+  printf("not imple utimes\n");
+  return 0;
+}

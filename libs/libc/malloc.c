@@ -35,3 +35,7 @@ void *calloc(size_t nobj, size_t size) {
   memset(p, 0, real_size);
   return p;
 }
+
+size_t malloc_usable_size(void *p){
+  return ya_real_size(p);
+}

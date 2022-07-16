@@ -295,3 +295,24 @@ int lockf(int fd, int op, off_t size) {
   UNIMPL();
   return 1;
 }
+
+int symlink(const char *existing, const char *new){
+   UNIMPL();
+}
+
+ssize_t readlink(const char *restrict path, char *restrict buf, size_t bufsize){
+   UNIMPL();
+}
+
+long sysconf(int name){
+  UNIMPL();
+}
+
+int setuid(uid_t uid){
+  UNIMPL();
+}
+
+int setgid(gid_t gid){
+  UNIMPL();
+
+}

@@ -38,7 +38,9 @@ source=[
     'vsnprintf.c',
     'vfscanf.c',
     'dlfcn.c',
-    'password.c'
+    'password.c',
+    'fenv.c',
+    'alloc.c'
 ]
 
 source+= Glob('math/*.c')

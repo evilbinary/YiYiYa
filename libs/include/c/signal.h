@@ -100,7 +100,7 @@ typedef int sig_atomic_t;
 typedef void (*sig_t)(int);
 #endif
 
-#ifdef _GNU_SOURCE
+// #ifdef _GNU_SOURCE
 typedef void (*sighandler_t)(int);
 void (*bsd_signal(int, void (*)(int)))(int);
 int sigisemptyset(const sigset_t *);
@@ -109,7 +109,7 @@ int sigandset(sigset_t *, const sigset_t *, const sigset_t *);
 
 #define SA_NOMASK SA_NODEFER
 #define SA_ONESHOT SA_RESETHAND
-#endif		
+// #endif		
 
 int    raise(int);
 

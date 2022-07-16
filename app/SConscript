@@ -84,6 +84,7 @@ if env.get('APP'):
     SConscript(dirs=['lua'], exports='env')
     SConscript(dirs=['scheme'], exports='env')
 
+    SConscript(dirs=['quickjs'], exports='env')
 
 
 
@@ -120,6 +121,14 @@ if env.get('APP'):
             'scheme/scheme',
             'scheme/petite.boot',
             'scheme/scheme.boot',
+
+            'quickjs/qjs',
+            'quickjs/qjsc',
+            'quickjs/repl.js',
+            'quickjs/qjscalc.js',
+            # 'quickjs/tests/test_builtin.js',
+            'quickjs/examples/hello.js',
+            
             ]
     apps+=Glob('resource/*')
     if env.get('DEFAULT_LIBC')=='libmusl':
