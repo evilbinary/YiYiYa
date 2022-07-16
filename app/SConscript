@@ -96,6 +96,9 @@ if env.get('APP'):
             'test/test-mem',
             'test/test-uncompress',
             'test/test-string',
+            'test/test-stdlib',
+            'test/test-stdio',
+
             #'rust/test/test-rs',
             'cmd/ls',
             'cmd/echo',
@@ -106,7 +109,7 @@ if env.get('APP'):
             'launcher/launcher',
             'infones/infones',
             'sdl2/sdl2',
-            # 'sdl2/player',
+            'sdl2/player',
             'sdl2/showimage',
             'sdl2/showfont',
             'mgba/mgba',

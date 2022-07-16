@@ -98,9 +98,32 @@ source = [
 if env.get('MYLIB'):
     source.append(env.get('MYLIB'))
 
-
-cflags=''
-
 env.Program('test-string', source,
+            CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libcmocka/include ',
+            LINKFLAGS='$LINKFLAGS $USER')
+
+
+source = [
+    'test-stdlib.c',
+    '../libcmocka/libcmocka.a',
+]+env['LIBC']
+
+if env.get('MYLIB'):
+    source.append(env.get('MYLIB'))
+
+env.Program('test-stdlib', source,
+            CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libcmocka/include ',
+            LINKFLAGS='$LINKFLAGS $USER')
+
+
+source = [
+    'test-stdio.c',
+    '../libcmocka/libcmocka.a',
+]+env['LIBC']
+
+if env.get('MYLIB'):
+    source.append(env.get('MYLIB'))
+
+env.Program('test-stdio', source,
             CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libcmocka/include ',
             LINKFLAGS='$LINKFLAGS $USER')

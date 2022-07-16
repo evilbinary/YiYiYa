@@ -152,7 +152,9 @@ void pre_launch() {
   // syscall2(SYS_EXEC,"/test-file",NULL);
     // syscall2(SYS_EXEC,"/test-mem",NULL);
   // syscall2(SYS_EXEC,"/test-uncompress",NULL);
-  syscall2(SYS_EXEC,"/test-string",NULL);
+  // syscall2(SYS_EXEC,"/test-string",NULL);
+  // syscall2(SYS_EXEC,"/test-stdlib",NULL);
+  syscall2(SYS_EXEC,"/test-stdio",NULL);
 
   // syscall2(SYS_EXEC, "/luat", NULL);
 
