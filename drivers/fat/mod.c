@@ -183,7 +183,11 @@ u32 fat_op_write(vnode_t *node, u32 offset, size_t nbytes, u8 *buffer) {
     return -1;
   }
   fat_seek_file(file_info->fd, &offset, FAT_SEEK_SET);
-  return fat_write_file(file_info->fd, buffer, nbytes);
+  u32 ret=fat_write_file(file_info->fd, buffer, nbytes);
+  if(file_info->fd!=NULL){
+    node->length=file_info->fd->dir_entry.file_size;
+  }
+  return ret;
 }
 
 u32 find_file_in_dir(struct fat_fs_struct *fs, struct fat_dir_struct *dd,
@@ -252,21 +256,11 @@ u32 fat_op_open(vnode_t *node, u32 mode) {
       return -1;
     }
     new_file_info->fd = fd;
+  }else{
+    if(file_info->fd!=NULL){
+      node->length =file_info->fd->dir_entry.file_size;
+    }
   }
-  // uint8_t res;
-  // res = fat_get_dir_entry_of_path(fs, name, &directory);
-  // if (!res) {
-  //   kprintf("bad direc");
-  //   return -1;
-  // }
-
-  // struct fat_dir_struct *dd = fat_open_dir(fs, &directory);
-  // if (!dd) {
-  //   kprintf("bad dd");
-  //   return -1;
-  // }
-  // file_info->dd = dd;
-
   return 1;
 }
 
@@ -300,6 +294,9 @@ vnode_t *fat_op_find(vnode_t *node, char *name) {
   }
   vnode_t *file = vfs_create_node(name, type);
   file->data = new_file_info;
+  if(new_file_info->fd!=NULL){
+      file->length =new_file_info->fd->dir_entry.file_size;
+  }
   file->device = node->device;
   fat_init_op(file);
   return file;

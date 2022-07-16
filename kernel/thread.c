@@ -27,9 +27,9 @@ thread_t* thread_create_level(void* entry, void* data, u32 level) {
 
 thread_t* thread_create_name(char* name, void* entry, void* data) {
   thread_t* t = thread_create(entry, data);
-  char* kname = kmalloc(kstrlen(name));
-  kstrcpy(kname, name);
-  t->name = kname;
+  // char* kname = kmalloc(kstrlen(name));
+  // kstrcpy(kname, name);
+  t->name = name;
   return t;
 }
 

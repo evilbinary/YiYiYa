@@ -200,7 +200,7 @@ int main(int argc, char *argv[]) {
       cmocka_unit_test(test_strcoll),  cmocka_unit_test(test_strcspan),
       cmocka_unit_test(test_strerror), cmocka_unit_test(test_strncat),
       cmocka_unit_test(test_strspn),   cmocka_unit_test(test_strstr),
-      // cmocka_unit_test(tst_strtok),
+      cmocka_unit_test(tst_strtok),
 
   };
 

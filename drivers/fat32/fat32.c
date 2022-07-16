@@ -507,6 +507,11 @@ u32 fat32_open(vnode_t *node) {
   if (file_info->entry == NULL) {
     kprintf("create new file %s\n", name);
     fat32_create_file(node);
+  }else{
+    //read length
+    file_info_t *file_info = node->data;
+    node->length=file_info->entry->file_size;
+    kprintf("open and get file size %d\n", node->length);
   }
   return 1;
 }
