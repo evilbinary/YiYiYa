@@ -31,14 +31,15 @@ void test_my_realloc(void** state) {
 }
 
 void test_my_calloc(void** state){
-    int *p=calloc(10,sizeof(int));
-    for( i=0 ; i < n ; i++ ) {
+    int n=10;
+    int *a=calloc(n,sizeof(int));
+    for(int i=0 ; i < n ; i++ ) {
       a[i]=i;
     }
-    for( i=0 ; i < n ; i++ ) {
+    for(int i=0 ; i < n ; i++ ) {
       assert_true(a[i]==i);
     }
-    free(p);
+    free(a);
 }
 
 int main(int argc, char* argv[]) {
