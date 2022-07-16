@@ -382,6 +382,9 @@ double scalb(double, double);
 
 double scalbn(double, int);
 
+double trunc(double x);
+double log2(double x);
+
 extern int signgam;
 
 #ifdef __cplusplus

@@ -8,6 +8,9 @@
 #include "syscall.h"
 #include "limits.h"
 
+#define UNIMPL() printf("unimpl %s:%d %s\n",__FILE__,__LINE__,__FUNCTION__)
+
+
 extern char **environ;
 
 void exit(int status) { ya_exit(status); }
@@ -787,4 +790,14 @@ long long strtoll(const char * nptr, char ** endptr, int base)
 float strtof(const char * nptr, char ** endptr)
 {
 	return (float)strtod(nptr, endptr);
+}
+
+char *realpath(const char * a, char * b){
+    UNIMPL();
+    return NULL;
+}
+
+
+int atexit(void (*f)(void) ){
+  UNIMPL();
 }

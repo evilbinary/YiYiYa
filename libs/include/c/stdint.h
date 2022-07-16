@@ -106,5 +106,6 @@ typedef unsigned long long uintmax_t;
 #define UINTMAX_C(c) c ## ULL
 #endif
 
+#define SIZE_MAX        UINT32_MAX
 
 #endif /* STDINT_H */

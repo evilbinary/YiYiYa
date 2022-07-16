@@ -5,6 +5,9 @@
 #include "stdint.h"
 #include "syscall.h"
 
+#define UNIMPL() printf("unimpl %s:%d %s\n",__FILE__,__LINE__,__FUNCTION__)
+
+
 FILE STDIN = {.fd = 0};
 FILE STDOUT = {.fd = 1};
 FILE STDERROR = {.fd = 2};
@@ -24,6 +27,10 @@ int putchar(int ch) {
   }
   int ret = ya_write((u32)STDOUT_FILENO, &ch, 1);
   return ret;
+}
+
+int putc(int ch , FILE *f){
+  return fputc(ch,f);
 }
 
 int printf(const char *format, ...) {
@@ -387,4 +394,15 @@ int fsetpos(FILE *file, const fpos_t *pos) {
   off_t off = fseek(file, *(long *)pos, SEEK_SET);
   if (off < 0) return -1;
   return 0;
+}
+
+int pclose(FILE *file){
+  fclose(file);
+  UNIMPL();
+  return 0;
+}
+
+FILE *popen(const char *cmd, const char *mode){
+  UNIMPL();
+  return NULL;
 }
