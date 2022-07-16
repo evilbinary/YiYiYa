@@ -12,7 +12,7 @@
 #include "inftrees.h"
 #include "inflate.h"
 
-#define assert assert_true
+#define assert(x) assert_true(x)
 
 #define local static
 #define reallocf realloc
@@ -343,7 +343,7 @@ local void inf(char *hex, char *what, unsigned step, int win, unsigned len,
     strm.avail_out = len;
     strm.next_out = out;
     ret = inflate(&strm, Z_NO_FLUSH);
-    assert(err == 9 || ret == err);
+    assert((err == 9 || ret == err));
     if (ret != Z_OK && ret != Z_BUF_ERROR && ret != Z_NEED_DICT) break;
     if (ret == Z_NEED_DICT) {
       ret = inflateSetDictionary(&strm, in, 1);
