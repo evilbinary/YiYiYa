@@ -25,7 +25,7 @@ void test_stdio(void **state) {
   fseek(fp, 0, SEEK_END);
   int len = ftell(fp);
   fclose(fp);
-  assert_int_equal(len, 13);
+  assert_int_equal(len, 16);
 
   fp = fopen("who.txt", "r");
   assert_non_null(fp);
@@ -43,6 +43,10 @@ void test_stdio(void **state) {
   assert_false(feof(fp));
 
   c = fgetc(fp);
+  assert_true(c == ' ');
+  assert_false(feof(fp));
+
+  c = fgetc(fp);
   assert_true(c == 'a');
   assert_false(feof(fp));
 
@@ -54,6 +58,37 @@ void test_stdio(void **state) {
   assert_true(c == 'e');
   assert_false(feof(fp));
 
+  fclose(fp);
+
+  fp = fopen("/fputs.txt", "w+");
+  assert_non_null(fp);
+  fputc('E', fp);
+  fputc('V', fp);
+  fputc('I', fp);
+  fputc('L', fp);
+  fclose(fp);
+
+  fp = fopen("/fputs.txt", "r");
+  assert_non_null(fp);
+
+  c = fgetc(fp);
+  assert_true(c == 'E');
+  assert_false(feof(fp));
+
+  c = fgetc(fp);
+  assert_true(c == 'V');
+  assert_false(feof(fp));
+
+  c = fgetc(fp);
+  assert_true(c == 'I');
+  assert_false(feof(fp));
+
+  c = fgetc(fp);
+  assert_true(c == 'L');
+  assert_false(feof(fp));
+
+  c = fgetc(fp);
+  assert_true(feof(fp));
 
 
 }
