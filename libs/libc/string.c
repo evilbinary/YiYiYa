@@ -110,8 +110,7 @@ int memcmp(const void* s1, const void* s2, size_t n) {
 
 int strcmp(const char* s1, const char* s2) {
   char c;
-
-  while (1) {
+  while (*s1!=NULL&&s2!=NULL) {
     if ((c = *s1 - *s2++) != 0 || !*s1++) break;
   }
 
