@@ -36,7 +36,7 @@ int load_elf(Elf32_Ehdr* elf_header, u32 fd, page_dir_t* page) {
                 phdr[i].p_memsz);
         break;
       case PT_LOAD: {
-        if ((phdr[i].p_flags & SHF_EXECINSTR) == SHF_EXECINSTR) {
+        if ((phdr[i].p_flags & PF_X) == PF_X) {
 #ifdef LOAD_ELF_DEBUG
           kprintf(" %s %x %x %x %s %x %x \r\n", "LOAD", phdr[i].p_offset,
                   phdr[i].p_vaddr, phdr[i].p_paddr, "", phdr[i].p_filesz,
