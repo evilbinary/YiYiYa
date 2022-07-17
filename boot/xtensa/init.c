@@ -4,7 +4,6 @@
  * 邮箱: rootdebug@163.com
  ********************************************************************/
 #include "init.h"
-
 #include "gpio.h"
 
 boot_info_t* boot_info = NULL;
@@ -14,12 +13,18 @@ typedef int (*entry)(int, char**, char**);
 typedef void (*rom_write_char_uart_fn)(char c);
 typedef u32 (*rom_spiflash_read_fn)(u32 src, u32* des, u32 len);
 typedef int (*rom_printf_fn)(const char* fmt, ...);
+typedef unsigned int (*rom_cache_flash_mmu_set_fn)(int cpu_no, int pid, unsigned int vaddr, unsigned int paddr,  int psize, int num);
+
+typedef void (*rom_cache_read_enable_fn)(int cpu_no);
 
 volatile unsigned char* const UART0_PTR = (unsigned char*)0x0101f1000;
 
 rom_printf_fn printf = 0x40007d54;
 rom_spiflash_read_fn disk_read_lba = 0x40062ed8;
 rom_write_char_uart_fn send = 0x40007cf8;
+rom_cache_flash_mmu_set_fn cache_flash_mmu_set= 0x400095e0;
+rom_cache_read_enable_fn cache_read_enable= 0x40009a84;
+
 
 extern int _bss_start;
 extern int _bss_end;
@@ -199,16 +204,44 @@ void load_elf(Elf32_Ehdr* elf_header) {
                phdr[i].p_memsz);
         break;
       case PT_LOAD: {
-        printf(" %s %x %x %x %s %x %x \r\n", "LOAD", phdr[i].p_offset,
-               phdr[i].p_vaddr, phdr[i].p_paddr, "", phdr[i].p_filesz,
-               phdr[i].p_memsz);
-        char* start = elf + phdr[i].p_offset;
-        char* vaddr = phdr[i].p_vaddr;
-        entry = vaddr;
-        printf("init load start:%x vaddr:%x size:%x \n\r", start, vaddr,
-               phdr[i].p_filesz);
-        u32 ret = disk_read_lba(start, vaddr, phdr[i].p_memsz);
-        printf("move end %d\n\r", ret);
+        if((phdr[i].p_flags & PF_X) == PF_X){//is code
+          printf(" %s %x %x %x %s %x %x flag:%x\r\n", "LOAD", phdr[i].p_offset,
+                phdr[i].p_vaddr, phdr[i].p_paddr, "", phdr[i].p_filesz,
+                phdr[i].p_memsz,phdr[i].p_flags);
+          char* start = elf + phdr[i].p_offset;
+          char* vaddr = phdr[i].p_vaddr;
+          entry = vaddr;
+          printf("  init load code start:%x vaddr:%x size:%x \n\r", start, vaddr,
+                phdr[i].p_filesz);
+          //u32 ret = disk_read_lba(start, vaddr, phdr[i].p_memsz);
+
+          u32 irom_load_addr_aligned = (u32)vaddr & MMU_FLASH_MASK;
+          u32 irom_page_count=(phdr[i].p_memsz + ((u32)vaddr - (((u32)vaddr) & MMU_FLASH_MASK)) + MMU_BLOCK_SIZE - 1) / MMU_BLOCK_SIZE;
+          int rc = cache_flash_mmu_set(0, 0,irom_load_addr_aligned , ((u32)start) & MMU_FLASH_MASK, 64, irom_page_count);
+
+          rc |= cache_flash_mmu_set(1, 0, irom_load_addr_aligned, ((u32)start) & MMU_FLASH_MASK, 64, irom_page_count);
+
+          printf("  move end code  load addr %x  from %x ret=%d\n\r",irom_load_addr_aligned,start,rc);
+        }else if((phdr[i].p_flags & PF_W) == PF_W ){ //is data for write
+           printf(" %s %x %x %x %s %x %x flag:%x\r\n", "LOAD", phdr[i].p_offset,
+                phdr[i].p_vaddr, phdr[i].p_paddr, "", phdr[i].p_filesz,
+                phdr[i].p_memsz,phdr[i].p_flags);
+          char* start = elf + phdr[i].p_offset;
+          char* vaddr = phdr[i].p_vaddr;
+          entry = vaddr;
+          printf("  init load data start:%x vaddr:%x size:%x \n\r", start, vaddr,
+                phdr[i].p_filesz);
+          //u32 ret = disk_read_lba(start, vaddr, phdr[i].p_memsz);
+
+          u32 drom_load_addr_aligned = (u32)vaddr & MMU_FLASH_MASK;
+          u32 drom_page_count=(phdr[i].p_memsz + ((u32)vaddr - (((u32)vaddr) & MMU_FLASH_MASK)) + MMU_BLOCK_SIZE - 1) / MMU_BLOCK_SIZE;
+          int rc = cache_flash_mmu_set(0, 0,drom_load_addr_aligned , ((u32)start) & MMU_FLASH_MASK, 64, drom_page_count);
+
+          rc |= cache_flash_mmu_set(1, 0, drom_load_addr_aligned, ((u32)start) & MMU_FLASH_MASK, 64, drom_page_count);
+
+          printf("  move end data load addr %x  from %x ret=%d\n\r",drom_load_addr_aligned,start,rc);
+        }
+        
       } break;
       default:
         break;
@@ -271,8 +304,8 @@ void* load_kernel() {
     load_elf(elf_header);
     return elf_header->e_entry;
   } else {
-    printf("error load kernel\n");
-    return NULL;
+    printf("bin kernel\n");
+    return KERNEL_BASE;
   }
 #endif
 }
@@ -282,6 +315,24 @@ void start_kernel() {
   boot_info->kernel_entry = load_kernel();
   entry start = boot_info->kernel_entry;
   printf("kernel entry %x\n", boot_info->kernel_entry);
+
+  DPORT_REG_CLR_BIT(DPORT_PRO_CACHE_CTRL1_REG,
+			(DPORT_PRO_CACHE_MASK_IRAM0) |
+			(DPORT_PRO_CACHE_MASK_IRAM1 & 0) |
+			(DPORT_PRO_CACHE_MASK_IROM0 & 0) |
+			DPORT_PRO_CACHE_MASK_DROM0 |
+			DPORT_PRO_CACHE_MASK_DRAM1);
+
+	DPORT_REG_CLR_BIT(DPORT_APP_CACHE_CTRL1_REG,
+			(DPORT_APP_CACHE_MASK_IRAM0) |
+			(DPORT_APP_CACHE_MASK_IRAM1 & 0) |
+			(DPORT_APP_CACHE_MASK_IROM0 & 0) |
+			DPORT_APP_CACHE_MASK_DROM0 |
+			DPORT_APP_CACHE_MASK_DRAM1);
+
+	cache_read_enable(0);
+  cache_read_enable(1);
+
   int argc = 0;
   char** argv = 0;
   char* envp[4];
