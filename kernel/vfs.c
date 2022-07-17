@@ -269,7 +269,7 @@ vnode_t *vfs_open_attr(vnode_t *root, u8 *name, u32 attr) {
     root = root_node;
   }
   vnode_t *file = NULL;
-  if (attr & O_CREAT == O_CREAT) {
+  if ((attr & O_CREAT) == O_CREAT) {
     char parent_path[MAX_PATH_BUFFER];
     int len = kstrlen(name);
     while (len > 0) {

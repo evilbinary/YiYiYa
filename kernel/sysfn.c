@@ -77,7 +77,7 @@ u32 sys_open(char* name, int attr) {
   }
   vnode_t* file = vfs_open_attr(NULL, name, attr);
   if (file == NULL) {
-    kprintf("sys open file %s error\n", name);
+    kprintf("sys open file %s error, attr %x \n", name,attr);
     return -1;
   }
   fd_t* fd = fd_new(file, DEVICE_TYPE_FILE, name);
