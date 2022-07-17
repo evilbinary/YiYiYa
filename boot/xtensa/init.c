@@ -14,8 +14,13 @@ typedef void (*rom_write_char_uart_fn)(char c);
 typedef u32 (*rom_spiflash_read_fn)(u32 src, u32* des, u32 len);
 typedef int (*rom_printf_fn)(const char* fmt, ...);
 typedef unsigned int (*rom_cache_flash_mmu_set_fn)(int cpu_no, int pid, unsigned int vaddr, unsigned int paddr,  int psize, int num);
-
 typedef void (*rom_cache_read_enable_fn)(int cpu_no);
+
+typedef  void (*rom_cache_flush_fn)(int cpu_no);
+typedef  void (*rom_cache_read_disable_fn)(int cpu_no);
+
+
+
 
 volatile unsigned char* const UART0_PTR = (unsigned char*)0x0101f1000;
 
@@ -24,6 +29,8 @@ rom_spiflash_read_fn disk_read_lba = 0x40062ed8;
 rom_write_char_uart_fn send = 0x40007cf8;
 rom_cache_flash_mmu_set_fn cache_flash_mmu_set= 0x400095e0;
 rom_cache_read_enable_fn cache_read_enable= 0x40009a84;
+rom_cache_flush_fn cache_flush=0x40009a14;
+rom_cache_read_disable_fn cache_read_disable=0x40009ab8;
 
 
 extern int _bss_start;
@@ -211,8 +218,8 @@ void load_elf(Elf32_Ehdr* elf_header) {
           char* start = elf + phdr[i].p_offset;
           char* vaddr = phdr[i].p_vaddr;
           entry = vaddr;
-          printf("  init load code start:%x vaddr:%x size:%x \n\r", start, vaddr,
-                phdr[i].p_filesz);
+          printf("  init code start:%x vaddr:%x size:%x \n\r", start, vaddr,
+                phdr[i].p_memsz);
           //u32 ret = disk_read_lba(start, vaddr, phdr[i].p_memsz);
 
           u32 irom_load_addr_aligned = (u32)vaddr & MMU_FLASH_MASK;
@@ -221,7 +228,7 @@ void load_elf(Elf32_Ehdr* elf_header) {
 
           rc |= cache_flash_mmu_set(1, 0, irom_load_addr_aligned, ((u32)start) & MMU_FLASH_MASK, 64, irom_page_count);
 
-          printf("  move end code  load addr %x  from %x ret=%d\n\r",irom_load_addr_aligned,start,rc);
+          printf("  end code  vaddr %x  from %x count %d ret=%d\n\r",irom_load_addr_aligned,start,irom_page_count,rc);
         }else if((phdr[i].p_flags & PF_W) == PF_W ){ //is data for write
            printf(" %s %x %x %x %s %x %x flag:%x\r\n", "LOAD", phdr[i].p_offset,
                 phdr[i].p_vaddr, phdr[i].p_paddr, "", phdr[i].p_filesz,
@@ -229,8 +236,8 @@ void load_elf(Elf32_Ehdr* elf_header) {
           char* start = elf + phdr[i].p_offset;
           char* vaddr = phdr[i].p_vaddr;
           entry = vaddr;
-          printf("  init load data start:%x vaddr:%x size:%x \n\r", start, vaddr,
-                phdr[i].p_filesz);
+          printf("  init data start:%x vaddr:%x size:%x \n\r", start, vaddr,
+                phdr[i].p_memsz);
           //u32 ret = disk_read_lba(start, vaddr, phdr[i].p_memsz);
 
           u32 drom_load_addr_aligned = (u32)vaddr & MMU_FLASH_MASK;
@@ -239,9 +246,9 @@ void load_elf(Elf32_Ehdr* elf_header) {
 
           rc |= cache_flash_mmu_set(1, 0, drom_load_addr_aligned, ((u32)start) & MMU_FLASH_MASK, 64, drom_page_count);
 
-          printf("  move end data load addr %x  from %x ret=%d\n\r",drom_load_addr_aligned,start,rc);
+          printf("  end data vaddr %x  from %x count %d ret=%d\n\r",drom_load_addr_aligned,start,drom_page_count,rc);
         }
-        
+
       } break;
       default:
         break;
@@ -254,7 +261,7 @@ void load_elf(Elf32_Ehdr* elf_header) {
   shdr = &shdr_data;
 
   u32 e_shnum = read16(&elf_header->e_shnum);
-  printf("e_shnum:%d\n", e_shnum);
+  printf("\ne_shnum:%d\n", e_shnum);
   for (int i = 0; i < e_shnum; i++) {
     if (SHT_NOBITS == shdr[i].sh_type) {
       char* vaddr = shdr[i].sh_addr;
@@ -267,9 +274,18 @@ void load_elf(Elf32_Ehdr* elf_header) {
       printf("init load shdr start:%x vaddr:%x size:%x \n\r", start, vaddr,
              shdr[i].sh_size);
       u32* phstart = (u32)elf + shdr[i].sh_offset;
-      u32 ret = disk_read_lba(phstart, vaddr, shdr[i].sh_size);
+      // u32 ret = disk_read_lba(phstart, vaddr, shdr[i].sh_size);
       // memset(vaddr, 0, shdr->sh_size);
       // memmove32(phstart, vaddr, shdr[i].sh_size);
+
+      u32 drom_load_addr_aligned = (u32)vaddr & MMU_FLASH_MASK;
+      u32 drom_page_count=(shdr[i].sh_size + ((u32)vaddr - (((u32)vaddr) & MMU_FLASH_MASK)) + MMU_BLOCK_SIZE - 1) / MMU_BLOCK_SIZE;
+      int rc = cache_flash_mmu_set(0, 0,drom_load_addr_aligned , ((u32)phstart) & MMU_FLASH_MASK, 64, drom_page_count);
+
+      rc |= cache_flash_mmu_set(1, 0, drom_load_addr_aligned, ((u32)phstart) & MMU_FLASH_MASK, 64, drom_page_count);
+
+      printf("  move end data load addr %x  from %x count %d ret=%d\n\r",drom_load_addr_aligned,phstart,drom_page_count,rc);
+
     }
   }
 }
@@ -312,6 +328,16 @@ void* load_kernel() {
 
 // start kernel
 void start_kernel() {  
+
+    cache_read_disable(0);
+    cache_flush(0);
+
+  for (int i = 0; i < DPORT_FLASH_MMU_TABLE_SIZE; i++) {
+		DPORT_PRO_FLASH_MMU_TABLE[i] =
+			DPORT_FLASH_MMU_TABLE_INVALID_VAL;
+	}
+
+
   boot_info->kernel_entry = load_kernel();
   entry start = boot_info->kernel_entry;
   printf("kernel entry %x\n", boot_info->kernel_entry);
@@ -331,7 +357,6 @@ void start_kernel() {
 			DPORT_APP_CACHE_MASK_DRAM1);
 
 	cache_read_enable(0);
-  cache_read_enable(1);
 
   int argc = 0;
   char** argv = 0;
