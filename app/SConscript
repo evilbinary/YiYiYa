@@ -105,6 +105,8 @@ if env.get('APP'):
             'cmd/echo',
             'cmd/cat',
             'cmd/hexdump',
+            'cmd/touch',
+
             'lvgl/lvgl',
             'track/track',
             'launcher/launcher',
