@@ -2,8 +2,8 @@ MEMORY {
   /*iram : org = 0x40082000, len = 0xFC00*/
   /* dram : org = 0x3ffc0000, len = 0x20000 */
   drom   (r)    : ORIGIN = 0x3F400000, LENGTH = 0x20000 /* 0x3F400000-0x3F800000 */
-  dram   (rw)   : ORIGIN = 0x3FFC0000, LENGTH = 0x2000  /* 0x3FFAE000-0x40000000 */
-  iram   (rwx)  : ORIGIN = 0x40082000, LENGTH = 0x20000  /* 0x40080000-0x400A0000  */
+  dram   (rw)   : ORIGIN = 0x3FFC0000, LENGTH = 0x20000  /* 0x3FFAE000-0x40000000 */
+  iram   (rwx)  : ORIGIN = 0x40084000, LENGTH = 0x20000  /* 0x40080000-0x400A0000  */
   irom   (rx)   : ORIGIN = 0x400D0000, LENGTH = 0x330000 /* 0x400D0000-0x40400000  */
 }
 

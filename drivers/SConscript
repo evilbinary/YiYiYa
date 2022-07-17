@@ -112,9 +112,8 @@ source=driver+[
     '../libs/libalgorithm/libalgorithm.a',
     '../libs/libkernel/libkernel.a'
     ]
-
 if env.get('MYLIB'):
     source.append(env.get('MYLIB'))
 
 env.Library('driver', source,
-    CFLAGS='$CFLAGS -Idrivers')
+    CFLAGS='$CFLAGS -Idrivers/')
