@@ -137,10 +137,14 @@ void read_kernel() {
   //   }
 }
 
-void* memset(void* s, int c, size_t n) {
+void* memset(void* dest, int c, size_t n) {
+  //must 32 align will Fatal exception (3): LoadStoreError
   int i;
-  for (i = 0; i < n; i++) ((char*)s)[i] = c;
-  return s;
+  u32* d=dest;
+  for (i = 0; i < n/4; i++){
+    d[i] = c;
+  }
+  return dest;
 }
 
 void* memmove32(void* s1, const void* s2, u32 n) {
@@ -215,8 +219,8 @@ void load_elf(Elf32_Ehdr* elf_header) {
           printf(" %s %x %x %x %s %x %x flag:%x\r\n", "LOAD", phdr[i].p_offset,
                 phdr[i].p_vaddr, phdr[i].p_paddr, "", phdr[i].p_filesz,
                 phdr[i].p_memsz,phdr[i].p_flags);
-          char* start = elf + phdr[i].p_offset;
-          char* vaddr = phdr[i].p_vaddr;
+          u32* start = elf + phdr[i].p_offset;
+          u32* vaddr = phdr[i].p_vaddr;
           entry = vaddr;
           printf("  init code start:%x vaddr:%x size:%x \n\r", start, vaddr,
                 phdr[i].p_memsz);
@@ -233,13 +237,12 @@ void load_elf(Elf32_Ehdr* elf_header) {
            printf(" %s %x %x %x %s %x %x flag:%x\r\n", "LOAD", phdr[i].p_offset,
                 phdr[i].p_vaddr, phdr[i].p_paddr, "", phdr[i].p_filesz,
                 phdr[i].p_memsz,phdr[i].p_flags);
-          char* start = elf + phdr[i].p_offset;
-          char* vaddr = phdr[i].p_vaddr;
+          u32* start = elf + phdr[i].p_offset;
+          u32* vaddr = phdr[i].p_vaddr;
           entry = vaddr;
           printf("  init data start:%x vaddr:%x size:%x \n\r", start, vaddr,
                 phdr[i].p_memsz);
           //u32 ret = disk_read_lba(start, vaddr, phdr[i].p_memsz);
-
           u32 drom_load_addr_aligned = (u32)vaddr & MMU_FLASH_MASK;
           u32 drom_page_count=(phdr[i].p_memsz + ((u32)vaddr - (((u32)vaddr) & MMU_FLASH_MASK)) + MMU_BLOCK_SIZE - 1) / MMU_BLOCK_SIZE;
           int rc = cache_flash_mmu_set(0, 0,drom_load_addr_aligned , ((u32)start) & MMU_FLASH_MASK, 64, drom_page_count);
@@ -255,6 +258,8 @@ void load_elf(Elf32_Ehdr* elf_header) {
     }
   }
 
+  
+
   Elf32_Shdr shdr_data[SHDR_NUM];
   Elf32_Shdr* shdr = (elf + elf_header->e_shoff);
   disk_read_lba(shdr, &shdr_data, sizeof(Elf32_Shdr) * SHDR_NUM);
@@ -264,13 +269,23 @@ void load_elf(Elf32_Ehdr* elf_header) {
   printf("\ne_shnum:%d\n", e_shnum);
   for (int i = 0; i < e_shnum; i++) {
     if (SHT_NOBITS == shdr[i].sh_type) {
-      char* vaddr = shdr[i].sh_addr;
-      memset(vaddr, 0, shdr[i].sh_size);
+      u32* vaddr = shdr[i].sh_addr;
+      u32* phstart = (u32)elf + shdr[i].sh_offset;
+
+      // u32 drom_load_addr_aligned = (u32)vaddr & MMU_FLASH_MASK;
+      // u32 drom_page_count=(shdr[i].sh_size + ((u32)vaddr - (((u32)vaddr) & MMU_FLASH_MASK)) + MMU_BLOCK_SIZE - 1) / MMU_BLOCK_SIZE;
+      // int rc = cache_flash_mmu_set(0, 0,drom_load_addr_aligned , ((u32)phstart) & MMU_FLASH_MASK, 64, drom_page_count);
+
+      // rc |= cache_flash_mmu_set(1, 0, drom_load_addr_aligned, ((u32)phstart) & MMU_FLASH_MASK, 64, drom_page_count);
+
+      // printf("  move end data load addr %x  from %x count %d ret=%d\n\r",drom_load_addr_aligned,phstart,drom_page_count,rc);
+
+      // memset(vaddr, 0, shdr[i].sh_size);
       // map_alignment(page,vaddr,buf,shdr[i].sh_size);
     } else if (entry != shdr[i].sh_addr && SHT_PROGBITS == shdr[i].sh_type &&
                shdr[i].sh_flags & SHF_ALLOC && shdr[i].sh_flags) {
-      char* start = shdr[i].sh_offset;
-      char* vaddr = shdr[i].sh_addr;
+      u32* start = shdr[i].sh_offset;
+      u32* vaddr = shdr[i].sh_addr;
       printf("init load shdr start:%x vaddr:%x size:%x \n\r", start, vaddr,
              shdr[i].sh_size);
       u32* phstart = (u32)elf + shdr[i].sh_offset;
@@ -329,8 +344,8 @@ void* load_kernel() {
 // start kernel
 void start_kernel() {  
 
-    cache_read_disable(0);
-    cache_flush(0);
+  cache_read_disable(0);
+  cache_flush(0);
 
   for (int i = 0; i < DPORT_FLASH_MMU_TABLE_SIZE; i++) {
 		DPORT_PRO_FLASH_MMU_TABLE[i] =
@@ -358,9 +373,10 @@ void start_kernel() {
 
 	cache_read_enable(0);
 
+
   int argc = 0;
-  char** argv = 0;
-  char* envp[4];
+  u32** argv = 0;
+  u32* envp[4];
   envp[0] = boot_info;
   start(argc, argv, envp);
 }
