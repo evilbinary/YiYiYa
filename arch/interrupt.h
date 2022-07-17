@@ -24,8 +24,8 @@
   #endif
 #elif defined(X86)
   #include "x86/context.h"
-#elif defined(XTENSA)
-  #include "xtensa/context.h"
+#elif defined(LX6)
+  #include "lx6/context.h"
 #else
     #error "no support"
 #endif

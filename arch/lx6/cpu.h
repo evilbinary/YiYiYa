@@ -55,6 +55,7 @@ typedef u32 (*sys_call_fn)(u32 arg1, u32 arg2, u32 arg3, u32 arg4, u32 arg5,
 
 #define context_fn(context) context->a7
 #define context_ret(context) context->a0
+#define context_set_entry(context,entry) ((interrupt_context_t*)((context)));
 
 #define context_restore(duck_context) interrupt_exit_context(duck_context);
 
