@@ -1,5 +1,21 @@
 #include "kernel/kernel.h"
 
+#ifdef XTENSA
+
+void test_gui() {
+  // char wheel[] = {'\\', '|', '/', '-'};
+  // screen_init();
+  // int i = 0, j = 0;
+  // for (;;) {
+  //   screen_printf(0, 0, "Hello YiYiYa Os\n");
+  //   screen_fill_rect(0, 40, 30, 30, 0x00ff00);
+  //   screen_draw_line(0, 0, 140, 140, 0xff0000);
+  //   screen_flush();
+  // }
+
+}
+#else
+
 int test_ioctl(int fd, int cmd, ...) {
   void* arg;
   va_list ap;
@@ -60,19 +76,7 @@ void test_cpu_speed() {
   }
 }
 
-void test_gui() {
-#ifdef XTENSA
-  char wheel[] = {'\\', '|', '/', '-'};
-  screen_init();
-  int i = 0, j = 0;
-  for (;;) {
-    screen_printf(0, 0, "Hello YiYiYa Os\n");
-    screen_fill_rect(0, 40, 30, 30, 0x00ff00);
-    screen_draw_line(0, 0, 140, 140, 0xff0000);
-    screen_flush();
-  }
-#endif
-}
+
 
 #define IOC_AHCI_MAGIC 'a'
 #define IOC_READ_OFFSET _IOW(IOC_AHCI_MAGIC, 3, int)
@@ -102,6 +106,8 @@ void test_SYS_DEV_READ_write() {
   memset(buf, 0, 512);
   syscall3(SYS_DEV_READ, DEVICE_SATA, buf, 512);
 }
+
+#endif
 
 void test_syscall() {
   u8 scan_code;

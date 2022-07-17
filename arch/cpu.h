@@ -24,8 +24,8 @@
   #endif
 #elif defined(X86)
   #include "x86/cpu.h"
-#elif defined(XTENSA)
-  #include "xtensa/cpu.h"
+#elif defined(LX6)
+  #include "lx6/cpu.h"
 #else
     #error "no support"
 #endif

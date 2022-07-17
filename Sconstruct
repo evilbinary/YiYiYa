@@ -14,14 +14,14 @@ plt = platform.system()
 platform='pc'
 # platform='v3s'
 # platform='raspi2'
-# platform='esp32'
+platform='esp32'
 # platform='stm32f4xx'
 # platform='raspi3'
 
 # gcc path,这里是gcc路径配置
-cc_path=''
-cc_prefix='i386-elf-'
-cc_lib_path='/opt/local/lib/gcc/i386-elf/9.2.0/' 
+# cc_path=''
+# cc_prefix='i386-elf-'
+# cc_lib_path='/opt/local/lib/gcc/i386-elf/9.2.0/' 
 
 # cc_path=''
 # cc_prefix='arm-none-eabi-'
@@ -32,6 +32,10 @@ cc_lib_path='/opt/local/lib/gcc/i386-elf/9.2.0/'
 # D:\\Program Files\\gcc-arm-none-eabi-9\\lib\\gcc\\arm-none-eabi\\9.2.1\\  
 # /opt/local/lib/gcc/arm-none-eabi/9.2.0/
 # lib/gcc/arm-none-eabi/9.2.1/
+
+cc_path='~/.espressif/tools/xtensa-esp32-elf/esp-2021r1-8.4.0/xtensa-esp32-elf/bin/'
+cc_prefix='xtensa-esp32-elf-gcc'
+cc_lib_path='/Users/evil/.espressif/tools/xtensa-esp32-elf/esp-2021r1-8.4.0/xtensa-esp32-elf/lib/gcc/xtensa-esp32-elf/8.4.0/' 
 
 
 # default libc 默认libc 选择
@@ -48,7 +52,7 @@ support_platform={
     'stm32f4xx':'armv7',
     'pc':'x86',
     'raspi2':'armv7-a',
-    'esp32':'xl6',
+    'esp32':'lx6',
     'v3s':'armv7-a',
     'raspi3':'armv8-a'
 }
@@ -65,7 +69,7 @@ def get_arch(arch):
     for k,v in supports_archs.items():
         for i in v:
             archs[i]=k
-    return archs[arch]   
+    return archs.get(arch)   
 
 arch=support_platform[platform]
 arch_type=get_arch(arch)
@@ -175,7 +179,7 @@ if arch_type == 'arm':
 
 elif arch_type=='xtensa':
     env['APP']=False
-    env['CFLAGS']='-DXTENSA -I. -I./include  -Ilibs/include -g -nostdlib -nostdinc -fno-builtin -c -std=c99 -std=gnu99 -w  -D'+platform.upper()
+    env['CFLAGS']=' -D'+arch.upper().replace('-','_') +' -DXTENSA -I. -I./include  -Ilibs/include -g -nostdlib -nostdinc -fno-builtin -c -std=c99 -std=gnu99 -w  -D'+platform.upper()
     env['LINKLD']='xlinker/link-esp32.ld'
     pass
 
@@ -242,6 +246,8 @@ kernel=SConscript(dirs=['init'], exports='env')
 
 if arch_type in 'arm':
     boot=SConscript(dirs=['boot/arm'], exports='env')
+elif arch_type in 'xtensa':
+    boot=SConscript(dirs=['boot/xtensa'], exports='env')
 else:
     boot=SConscript(dirs=['boot/'+arch], exports='env')
 

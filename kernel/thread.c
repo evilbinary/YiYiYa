@@ -445,7 +445,7 @@ void thread_dump(thread_t* thread) {
 }
 
 void thread_dumps() {
-  char* state_str[] = {"create", "running", "runnable", "stopped",
+  char* state_str[10] = {"create", "running", "runnable", "stopped",
                        "waitting"
                        "sleep"};
   char* str = "unkown";

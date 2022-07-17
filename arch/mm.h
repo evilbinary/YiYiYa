@@ -23,8 +23,8 @@
   #endif
 #elif defined(X86)
   #include "x86/mm.h"
-#elif defined(XTENSA)
-  #include "xtensa/mm.h"
+#elif defined(LX6)
+  #include "lx6/mm.h"
 #else
 #error "no support"
 #endif
