@@ -236,7 +236,7 @@ u32 fat_op_open(vnode_t *node, u32 mode) {
   }
   struct fat_fs_struct *fs = file_info->fs;
   file_info->offset = 0;
-  if ((mode & O_CREAT == O_CREAT) ||
+  if (((mode & O_CREAT) == O_CREAT) ||
       (file_info->fd == NULL && file_info->dd == NULL)) {
     kprintf("create new file %s\n", name);
     file_info_t *parent_file_info = node->parent->data;
