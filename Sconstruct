@@ -14,14 +14,14 @@ plt = platform.system()
 platform='pc'
 # platform='v3s'
 # platform='raspi2'
-platform='esp32'
+# platform='esp32'
 # platform='stm32f4xx'
 # platform='raspi3'
 
 # gcc path,这里是gcc路径配置
-# cc_path=''
-# cc_prefix='i386-elf-'
-# cc_lib_path='/opt/local/lib/gcc/i386-elf/9.2.0/' 
+cc_path=''
+cc_prefix='i386-elf-'
+cc_lib_path='/opt/local/lib/gcc/i386-elf/9.2.0/' 
 
 # cc_path=''
 # cc_prefix='arm-none-eabi-'
@@ -33,9 +33,9 @@ platform='esp32'
 # /opt/local/lib/gcc/arm-none-eabi/9.2.0/
 # lib/gcc/arm-none-eabi/9.2.1/
 
-cc_path='~/.espressif/tools/xtensa-esp32-elf/esp-2021r1-8.4.0/xtensa-esp32-elf/bin/'
-cc_prefix='xtensa-esp32-elf-gcc'
-cc_lib_path='/Users/evil/.espressif/tools/xtensa-esp32-elf/esp-2021r1-8.4.0/xtensa-esp32-elf/lib/gcc/xtensa-esp32-elf/8.4.0/' 
+# cc_path='~/.espressif/tools/xtensa-esp32-elf/esp-2021r1-8.4.0/xtensa-esp32-elf/bin/'
+# cc_prefix='xtensa-esp32-elf-gcc'
+# cc_lib_path='/Users/evil/.espressif/tools/xtensa-esp32-elf/esp-2021r1-8.4.0/xtensa-esp32-elf/lib/gcc/xtensa-esp32-elf/8.4.0/' 
 
 
 # default libc 默认libc 选择
