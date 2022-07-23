@@ -132,8 +132,8 @@ int load_elf(Elf32_Ehdr* elf_header, u32 fd, page_dir_t* page) {
               shdr[i].sh_size);
 #endif
       // map_alignment(page,vaddr,buf,shdr[i].sh_size);
-    } else if (SHT_PROGBITS == shdr[i].sh_type &&
-               shdr[i].sh_flags & SHF_ALLOC && shdr[i].sh_addr != entry_txt) {
+    } else if ((shdr[i].sh_type&SHT_PROGBITS == SHT_PROGBITS) &&
+              (shdr[i].sh_flags & SHF_ALLOC==SHF_ALLOC) && (shdr[i].sh_flags & SHF_WRITE==SHF_WRITE) ) {
       char* start = shdr[i].sh_offset;
       char* vaddr = shdr[i].sh_addr;
 #ifdef LOAD_ELF_DEBUG

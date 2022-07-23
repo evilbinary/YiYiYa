@@ -190,8 +190,8 @@ elif env.get('run')=='esp32':
     ],
     ['esptool.py --chip esp32 elf2image --flash_mode="dio" --flash_freq "40m" --flash_size "4MB" -o boot/xtensa/init.bin  ${SOURCES[0]}',
     # 'esptool.py --chip esp32 elf2image --flash_mode="dio" --flash_freq "40m" --flash_size "4MB" -o init/kernel.bin  ${SOURCES[1]}',
-    'esptool.py --chip esp32 --port /dev/tty.wchusbserial14110 --baud 460800 --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 40m --flash_size detect 0x1000 boot/xtensa/init.bin 0x10000 init/kernel',
-    'idf_monitor.py -p /dev/tty.wchusbserial14110 -b 115200 --toolchain-prefix xtensa-esp32-elf- --target esp32 --revision 0  init/kernel.elf'   #boot/xtensa/init.elf
+    'esptool.py --chip esp32 --port /dev/tty.wchusbserial14120 --baud 460800 --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 40m --flash_size detect 0x1000 boot/xtensa/init.bin 0x10000 init/kernel',
+    'idf_monitor.py -p /dev/tty.wchusbserial14120 -b 115200 --toolchain-prefix xtensa-esp32-elf- --target esp32 --revision 0  init/kernel.elf'   #boot/xtensa/init.elf
   ])
   
   
