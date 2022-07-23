@@ -7,6 +7,7 @@
 #include "syscall.h"
 #include "time.h"
 #include "yiyiya.h"
+#include "sys/stat.h"
 
 #define PAGE_SIZE 4096
 
@@ -228,6 +229,11 @@ int ya_getcwd(char* buf, size_t size) {
 int ya_chdir(char* path) { return syscall1(SYS_CHDIR, path); }
 
 int ya_fchdir(int fd) { return syscall1(SYS_FCHDIR, fd); }
+
+int ya_fstat(int fd, struct stat *buf) { return syscall2(SYS_STAT, fd,buf); }
+
+int ya_stat(const char *path, struct stat *buf) { return syscall2(SYS_STAT, path,buf); }
+
 
 void __main() {
   // printf("main call\n");

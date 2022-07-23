@@ -74,6 +74,10 @@ void syscall_init() {
 
   syscall_table[SYS_UMASK]=&sys_umask;
 
+  syscall_table[SYS_STAT]=&sys_stat;
+  syscall_table[SYS_FSTAT]=&sys_fstat;
+
+
   
 }
 

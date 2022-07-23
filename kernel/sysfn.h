@@ -32,6 +32,8 @@ enum {
   SYS_DUP2 = 63,
   SYS_GETPPID = 64,
   SYS_READDIR=89,
+  SYS_STAT=106,
+  SYS_FSTAT=108,
   SYS_CLONE= 120,
   SYS_FCHDIR=133,
   SYS_LLSEEK=140,
@@ -190,5 +192,8 @@ int sys_llseek(int fd, off_t offset_hi, off_t offset_lo,
                        off_t *result, int whence);
 
 int sys_umask(int mask);
+
+int sys_stat(const char *path, struct stat *buf);
+int sys_fstat(int fd, struct stat *buf);
 
 #endif

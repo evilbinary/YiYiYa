@@ -70,14 +70,14 @@ u32 sys_open(char* name, int attr) {
   }
   int f = thread_find_fd_name(current, name);
   if (f >= 0) {
-    fd_t* fd=thread_find_fd_id(current,f);
+    fd_t* fd = thread_find_fd_id(current, f);
     fd->offset = 0;
     log_debug("sys open name return : %s fd: %d\n", name, f);
     return f;
   }
   vnode_t* file = vfs_open_attr(NULL, name, attr);
   if (file == NULL) {
-    kprintf("sys open file %s error, attr %x \n", name,attr);
+    kprintf("sys open file %s error, attr %x \n", name, attr);
     return -1;
   }
   fd_t* fd = fd_new(file, DEVICE_TYPE_FILE, name);
@@ -108,9 +108,9 @@ void sys_close(u32 fd) {
     kprintf("sys close node is null tid %d \n", current->id);
     return -1;
   }
-  //reset offset
-  f->offset=0;
-  u32 ret=vclose(node);
+  // reset offset
+  f->offset = 0;
+  u32 ret = vclose(node);
   return 0;
 }
 
@@ -156,9 +156,9 @@ size_t sys_seek(u32 fd, ulong offset, int whence) {
     return 0;
   }
   // set start offset
-  if (whence == 0) {// seek set
+  if (whence == 0) {  // seek set
     f->offset = offset;
-  } else if (whence == 1) { //seek current
+  } else if (whence == 1) {  // seek current
     f->offset += offset;
   } else if (whence == 2) {  // seek end
     vnode_t* file = f->data;
@@ -569,4 +569,28 @@ int sys_umask(int mask) {
   // todo
 
   return mask;
+}
+
+int sys_stat(const char* path, struct stat* stat) {
+  if (stat == NULL) {
+    return -1;
+  }
+  int fd = sys_open(path, 0);
+  return sys_fstat(fd,stat);
+}
+
+int sys_fstat(int fd, struct stat* stat) {
+  if (stat == NULL) {
+    return -1;
+  }
+  thread_t* current = thread_current();
+  fd_t* f = thread_find_fd_id(current, fd);
+  if (f == NULL) {
+    kprintf("stat not found fd %d tid %d\n", fd, current->id);
+    return 0;
+  }
+  vnode_t* node = f->data;
+  u32 cmd=IOC_STAT;
+  u32 ret = vioctl(node, cmd, stat);
+  return ret;
 }
