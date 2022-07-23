@@ -3,6 +3,12 @@
 #ifdef XTENSA
 
 void test_gui() {
+
+
+}
+#else
+
+void test_gui() {
   // char wheel[] = {'\\', '|', '/', '-'};
   // screen_init();
   // int i = 0, j = 0;
@@ -12,9 +18,7 @@ void test_gui() {
   //   screen_draw_line(0, 0, 140, 140, 0xff0000);
   //   screen_flush();
   // }
-
 }
-#else
 
 int test_ioctl(int fd, int cmd, ...) {
   void* arg;
