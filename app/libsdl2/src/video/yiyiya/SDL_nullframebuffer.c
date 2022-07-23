@@ -67,7 +67,7 @@ int SDL_DUMMY_CreateWindowFramebuffer(_THIS, SDL_Window * window, Uint32 * forma
 
 int SDL_DUMMY_UpdateWindowFramebuffer(_THIS, SDL_Window * window, const SDL_Rect * rects, int numrects)
 {
-    printf("SDL_DUMMY_UpdateWindowFramebuffer\n");
+    //printf("SDL_DUMMY_UpdateWindowFramebuffer\n");
 
     static int frame_number;
     SDL_Surface *surface;
