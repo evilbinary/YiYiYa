@@ -2,6 +2,8 @@
 #include "fat_config.h"
 #include "kernel/device.h"
 #include "kernel/memory.h"
+#include "kernel/stat.h"
+#include "drivers/rtc/rtc.h"
 
 #ifdef ARM
 #include "drivers/mmc/sdhci.h"
@@ -349,6 +351,67 @@ int fat_op_close(vnode_t *node) {
   return 0;
 }
 
+size_t fat_op_ioctl(struct vnode *node, u32 cmd, void *args){
+  u32 ret = 0;
+
+  if(cmd==IOC_STAT){
+    file_info_t *file_info = node->data;
+    if (file_info == NULL) {
+      file_info = node->super->data;
+      node->data = file_info;
+    }
+    struct stat *stat=args;
+    if(file_info->dd!=NULL){
+      stat->st_size= file_info->dd->dir_entry.file_size;
+      stat->st_mtim= file_info->dd->dir_entry.modification_time;
+      stat->st_mode= file_info->dd->dir_entry.attributes;
+    }else if(file_info->fd!=NULL){
+      stat->st_size= file_info->fd->dir_entry.file_size;
+      stat->st_mtim= file_info->fd->dir_entry.modification_time;
+      stat->st_mode= file_info->fd->dir_entry.attributes;
+    }
+
+    return 0;
+  }
+
+  device_t *dev = node->device;
+  if (dev == NULL) {
+    return ret;
+  }
+  // va_list args;
+  // va_start(args, cmd);
+  ret = dev->ioctl(dev, cmd, args);
+  // va_end(args);
+  return ret;
+}
+
+
+void get_datetime(uint16_t* year, uint8_t* month, uint8_t* day, uint8_t* hour, uint8_t* min, uint8_t* sec){
+  int time_fd=-1;
+  time_fd = sys_open("/dev/time", 0);
+  if (time_fd < 0) return 0;
+
+   rtc_time_t time;
+  time.day = 1;
+  time.hour = 0;
+  time.minute = 0;
+  time.month = 1;
+  time.second = 0;
+  time.year = 1900;
+  int ret = sys_read(time_fd, &time, sizeof(rtc_time_t));
+  if (ret < 0) {
+    kprintf("erro read time\n");
+    return ;
+  }
+  *year=time.year;
+  *month=time.month;
+  *day=time.day;
+  *hour=time.hour;
+  *min=time.minute;
+  *sec=time.second;
+}
+
+
 voperator_t fat_op = {
     .read = fat_op_read,
     .write = fat_op_write,
@@ -356,6 +419,7 @@ voperator_t fat_op = {
     .close = fat_op_close,
     .find = fat_op_find,
     .readdir = fat_op_read_dir,
+    .ioctl = fat_op_ioctl,
 };
 
 void fat_init_op(vnode_t *node) { node->op = &fat_op; }

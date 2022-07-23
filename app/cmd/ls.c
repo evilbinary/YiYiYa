@@ -39,7 +39,7 @@ void ls(char* path) {
       }
       sprintf(buf, "%s/%s", path, ptr->d_name);
       stat(buf, &mystat);
-      printf("%d", mystat.st_size);
+      printf(" %d", mystat.st_size);
 
       printf("\n");
     } else {

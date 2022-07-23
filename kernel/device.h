@@ -46,16 +46,16 @@ enum {
 #define MAX_DEVICE 256
 #endif
 
-typedef struct stat {
+typedef struct dstat {
   size_t size;
   int is_dir;
-} stat_t;
+} dstat_t;
 
 typedef struct device device_t;
 
 typedef size_t (*dev_read_fn)(device_t* dev, void* buf, size_t len);
 typedef size_t (*dev_write_fn)(device_t* dev, const void* buf, size_t len);
-typedef size_t (*dev_stat_fn)(device_t* dev, stat_t* stat);
+typedef size_t (*dev_stat_fn)(device_t* dev, dstat_t* stat);
 typedef size_t (*dev_ioctl_fn)(device_t* dev, u32 cmd, ...);
 
 typedef struct device {

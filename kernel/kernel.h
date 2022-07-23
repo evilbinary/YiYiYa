@@ -16,6 +16,7 @@
 #include "kernel/stdarg.h"
 #include "kernel/ioctl.h"
 #include "kernel/vfs.h"
+#include "kernel/stat.h"
 
 #define kdbg kprintf("%s:%d\n",__FILE__,__LINE__)
 #ifdef MALLOC_TRACE
