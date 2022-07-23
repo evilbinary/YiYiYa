@@ -43,7 +43,9 @@ int SDL_DUMMY_CreateWindowFramebuffer(_THIS, SDL_Window * window, Uint32 * forma
     screen_info_t* screen = screen_info();
     *format = surface_format;
     *pixels = screen->fb.frambuffer;
-    *pitch = (((window->w * SDL_BYTESPERPIXEL(*format)) + 3) & ~3);
+    // window->w=screen->width;
+    // window->h=screen->height;
+    *pitch = (((screen->width * SDL_BYTESPERPIXEL(*format)) + 3) & ~3);
 
     // /* Free the old framebuffer surface */
     // surface = (SDL_Surface *) SDL_GetWindowData(window, DUMMY_SURFACE);
