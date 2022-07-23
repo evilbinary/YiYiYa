@@ -74,3 +74,15 @@ if env.get('MYLIB'):
 env.Program('touch', source,
     CFLAGS='$CFLAGS $LIBCFLAGS ',
     LINKFLAGS= '$LINKFLAGS $USER')
+
+
+source=[
+    'date.c',
+    ]+env['LIBC']
+
+if env.get('MYLIB'):
+    source.append(env.get('MYLIB'))
+
+env.Program('date', source,
+    CFLAGS='$CFLAGS $LIBCFLAGS ',
+    LINKFLAGS= '$LINKFLAGS $USER')
