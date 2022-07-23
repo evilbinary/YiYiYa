@@ -35,7 +35,7 @@ void DUMMY_PumpEvents(_THIS) {
   event_t e;
   int ret = event_poll(&e);
   if (ret <= 0) return;
-  printf("poll event\n");
+  // printf("poll event\n");
 
   //   e.mouse.y = screen->height - e.mouse.y;
   switch (e.type) {
