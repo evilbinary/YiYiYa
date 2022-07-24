@@ -86,6 +86,7 @@ if env.get('APP'):
 
     SConscript(dirs=['quickjs'], exports='env')
 
+    SConscript(dirs=['gnuboy'], exports='env')
 
 
     apps=['hello/hello',
@@ -118,6 +119,8 @@ if env.get('APP'):
             'sdl2/showfont',
             'mgba/mgba',
             'mgba/miniunz',
+            'gnuboy/gnuboy',
+
             'lua/lua',
             'lua/luat',
             'lua/hello.lua',
