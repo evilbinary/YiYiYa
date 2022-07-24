@@ -60,6 +60,7 @@ typedef unsigned long uintptr_t;
 
 /* Enable the stub joystick driver (src/joystick/dummy/\*.c) */
 #define SDL_JOYSTICK_DISABLED   1
+// #define SDL_JOYSTICK_DUMMY 1
 
 /* Enable the stub haptic driver (src/haptic/dummy/\*.c) */
 #define SDL_HAPTIC_DISABLED 1
