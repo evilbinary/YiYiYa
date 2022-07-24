@@ -159,7 +159,7 @@ WORD DoubleFrame[ 2 ][ NES_DISP_WIDTH * NES_DISP_HEIGHT ];
 WORD *WorkFrame;
 WORD WorkFrameIdx;
 #else
-WORD WorkFrame[ NES_DISP_WIDTH * NES_DISP_HEIGHT ];
+WORD WorkFrame[ NES_DISP_WIDTH * NES_DISP_HEIGHT];
 #endif
 
 /* Character Buffer */
