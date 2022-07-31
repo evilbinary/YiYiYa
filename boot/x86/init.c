@@ -123,7 +123,7 @@ void init_boot_info() {
   boot_info->kernel_size = KERNEL_BLOCK_SIZE * READ_BLOCK_SIZE * 2;
   boot_info->gdt_number = GDT_NUMBER;
   boot_info->pdt_base = PDT_BASE;
-  boot_info->tss_number = MAX_CPU;
+  boot_info->tss_number = CPU_NUMBER;
 }
 
 void init_disk() {
@@ -371,6 +371,30 @@ void init_boot() {
     ;
 }
 
+
+void init_apu_boot(){
+  cls();
+  printf("boot apu info addr %x\n\r", boot_info);
+  init_gdt();
+  init_cpu();
+
+  asm volatile(
+      "movl %0, %%esp\n"
+      "mov %%esp,%%ebp\n"
+      :
+      : "m"(kernel_stack_top));\
+
+#if defined(__WIN32__)      
+  asm("jmpl %0, $_start_apu_kernel" ::"i"(GDT_ENTRY_32BIT_CS * GDT_SIZE));
+#else
+  asm("jmpl %0, $start_apu_kernel" ::"i"(GDT_ENTRY_32BIT_CS * GDT_SIZE));
+#endif
+
+  for (;;)
+    ;
+}
+
+
 asm(".code32\n");
 
 void* load_kernel() {
@@ -521,3 +545,28 @@ void start_kernel() {
   envp[0] = boot_info;
   start(argc, argv, envp);
 }
+
+//start kernel
+void start_apu_kernel() {
+  asm volatile("cli\n");
+  asm volatile("movl %0, %%ss" : : "r"(GDT_ENTRY_32BIT_DS * GDT_SIZE));
+  asm volatile("movl %0, %%ds" : : "r"(GDT_ENTRY_32BIT_DS * GDT_SIZE));
+  asm volatile("movl %0, %%es" : : "r"(GDT_ENTRY_32BIT_DS * GDT_SIZE));
+  asm volatile("movl %0, %%gs" : : "r"(GDT_ENTRY_32BIT_DS * GDT_SIZE));
+  asm volatile("movl %0, %%fs" : : "r"(GDT_ENTRY_32BIT_FS * GDT_SIZE));
+  // print_string("load kernel\n\r");
+  entry start = boot_info->kernel_entry;
+  int argc = 0;
+  char** argv = 0;
+  char* envp[10];
+  envp[0] = boot_info;
+  start(argc, argv, envp);
+}
+
+asm(".code16gcc\n");
+asm(".org 0x2000\n");
+#if defined(__WIN32__)
+asm("jmpl $0x0000, $_init_apu_boot\n");
+#else
+asm("jmpl $0x0000, $init_apu_boot\n");
+#endif
