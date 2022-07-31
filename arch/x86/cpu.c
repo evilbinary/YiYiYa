@@ -128,6 +128,8 @@ void cpu_init() {
   asm volatile("lgdtl %0\n" : : "m"(gdt));
 
   kprintf("idt base %x\n", boot_info->pdt_base);
+
+  lapic_init();
 }
 
 void cpu_halt() { asm("hlt\n"); }
@@ -304,4 +306,27 @@ int TAS(volatile int* addr, int newval) {
                : "1"(newval)
                : "cc");
   return result;
+}
+
+
+
+int cpu_get_number(){
+  return boot_info->tss_number;
+}
+
+u32 cpu_get_id(){
+  return acpi_get_id();
+}
+
+u32 cpu_get_index(int idx){
+
+  return 0;
+}
+
+int cpu_init_id(u32 id){
+  return lapic_send_init(id);
+}
+
+int cpu_start_id(u32 id){
+  return lapic_send_start(id);
 }

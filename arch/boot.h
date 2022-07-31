@@ -9,7 +9,7 @@
 #include "libs/include/types.h"
 
 #define MAX_MEMORY_BLOCK 10
-#define MAX_CPU 2
+#define MAX_CPU 4
 #define GDT_NUMBER 12
 
 #ifdef ARM
