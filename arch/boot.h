@@ -10,6 +10,7 @@
 
 #define MAX_MEMORY_BLOCK 10
 #define MAX_CPU 4
+#define CPU_NUMBER 2
 #define GDT_NUMBER 12
 
 #ifdef ARM

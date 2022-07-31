@@ -327,5 +327,11 @@ int cpu_init_id(u32 id){
 }
 
 int cpu_start_id(u32 id){
-  return lapic_send_start(id);
+  //start at 0x2000 at entry-point on boot init.c
+  return lapic_send_start(id,2);
+}
+
+void cpu_delay(int n){
+  for (int i = 0; i < 10000 * n; i++)
+    ;
 }

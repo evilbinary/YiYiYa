@@ -6,11 +6,9 @@
 
 #include "kernel.h"
 
-extern void putch(u8 a);
 extern context_t* current_context;
 
 void kernel_init() {
-  io_add_write_channel(putch);
   kprintf("kernel init\n");
   kprintf("exception init\n");
   exception_init();

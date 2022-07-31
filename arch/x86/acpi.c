@@ -24,16 +24,17 @@ int lapic_init(){
     //clear interrupt
     mem_write32(APIC_BASE+LAPIC_TPR,0);
 
+    // logical destination mode
+    mem_write32(APIC_BASE+LAPIC_DFR, 0xffffffff);   // Flat mode
+    mem_write32(APIC_BASE+LAPIC_LDR, 0x01000000);   // All cpus use logical id 1
+
     //特权指令
     int msrh,msrl;
     ia32_msr_read(APIC_BASE,&msrl,&msrh);
     msrl |= (1 << IA32_APIC_BASE_ENABLE_BIT);
     ia32_msr_write(APIC_BASE,&msrl,&msrh);
 
-    // logical destination mode
-    mem_write32(APIC_BASE+LAPIC_DFR, 0xffffffff);   // Flat mode
-    mem_write32(APIC_BASE+LAPIC_LDR, 0x01000000);   // All cpus use logical id 1
-
+    //8 Local-APIC is Enabled  (1=yes, 0=no)
     u32 val=mem_read32(APIC_BASE+LAPIC_SVR);
     val|=0x100;//Spurious Interrupt Vector Register bit 8 to start receiving interrupts
     mem_write32(APIC_BASE+LAPIC_SVR,val);
@@ -42,6 +43,11 @@ int lapic_init(){
 }
 
 
+/**
+ * @description: 初始化cpu
+ * @param {u32} id
+ * @return {*}
+ */
 void lapic_send_init(u32 id){
     //参考 10.6.1 Interrupt Command Register (ICR)
     
@@ -56,19 +62,32 @@ void lapic_send_init(u32 id){
     mem_write32(APIC_BASE+LAPIC_ICRLO, ICR_INIT | ICR_PHYSICAL
         | ICR_ASSERT | ICR_EDGE | ICR_NO_SHORTHAND);
 
+    cpu_delay(200);
+
     //12 Delivery Status 0: Idle 1: Send Pending
     while (mem_read32(APIC_BASE+LAPIC_ICRLO) & ICR_SEND_PENDING)
         ;
 
 }
 
+/**
+ * @description: 启动cpu
+ * @param {u32} id  cpu的id
+ * @param {u32} vec 发送的中断号
+ * @return {*}
+ */
 void lapic_send_start(u32 id,u32 vec){
     //参考 10.6.1 Interrupt Command Register (ICR)
 
-    mem_write32(APIC_BASE+LAPIC_ICRHI, id << ICR_DESTINATION_SHIFT);
-    //8-10 Delivery Mode = b110: Start Up
-    mem_write32(APIC_BASE+LAPIC_ICRLO, vec | ICR_STARTUP
-        | ICR_PHYSICAL | ICR_ASSERT | ICR_EDGE | ICR_NO_SHORTHAND);
+    //触发两次
+    for(int i=0;i<2;i++){
+        mem_write32(APIC_BASE+LAPIC_ICRHI, id << ICR_DESTINATION_SHIFT);
+        //8-10 Delivery Mode = b110: Start Up
+        mem_write32(APIC_BASE+LAPIC_ICRLO, vec | ICR_STARTUP
+            | ICR_PHYSICAL | ICR_ASSERT | ICR_EDGE | ICR_NO_SHORTHAND);
+
+        cpu_delay(200);
+    }
 
     //12 Delivery Status 0: Idle 1: Send Pending
     while (mem_read32(APIC_BASE+LAPIC_ICRLO) & ICR_SEND_PENDING)
