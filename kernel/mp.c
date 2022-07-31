@@ -17,12 +17,14 @@ void mp_init() {
   // delay
   cpu_delay(200);
 
+  u32 entry=0x2000;
+
   // start all cpu
   for (int i = 0; i < cpu_nums; i++) {
     int id = cpu_get_index(i);
     if (current_cpu_id != id) {
       //启动cpu
-      cpu_start_id(id);
+      cpu_start_id(id,entry);
     }
   }
 

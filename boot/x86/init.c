@@ -140,18 +140,11 @@ void init_display() {
 }
 
 void* memmove(void* s1, const void* s2, u32 n) {
-  // char *dest, *src;
-  // u32 i;
-  // dest = (char*)s1;
-  // src = (char*)s2;
-  // for (i = 0; i < n; i++) dest[i] = src[i];
-  u16 *dest, *src;
-  int i;
-  dest = (u16*)s1;
-  src = (u16*)s2;
-  for (i = 0; i < n / 2; i++) {
-    dest[i] = src[i];
-  }
+  char *dest, *src;
+  u32 i;
+  dest = (char*)s1;
+  src = (char*)s2;
+  for (i = 0; i < n; i++) dest[i] = src[i];
   return s1;
 }
 
@@ -195,6 +188,37 @@ u8 disk_read_lba(u32 lba, u32 addr, u8* status) {
            cylinder, head, sector);
   }
   return ret;
+}
+
+void __attribute__((naked)) apu_boot(){
+#if defined(__WIN32__)
+asm("jmpl $0x0000, $_init_apu_boot\n");
+#else
+asm("jmpl $0x0000, $init_apu_boot\n");
+#endif
+}
+
+
+void init_apu_boot(){ 
+  cls();
+  printf("boot apu info addr %x\n\r", boot_info);
+  init_gdt();
+  init_cpu();
+
+  asm volatile(
+      "movl %0, %%esp\n"
+      "mov %%esp,%%ebp\n"
+      :
+      : "m"(kernel_stack_top));\
+
+#if defined(__WIN32__)      
+  asm("jmpl %0, $_start_apu_kernel" ::"i"(GDT_ENTRY_32BIT_CS * GDT_SIZE));
+#else
+  asm("jmpl %0, $start_apu_kernel" ::"i"(GDT_ENTRY_32BIT_CS * GDT_SIZE));
+#endif
+
+  for (;;)
+    ;
 }
 
 void read_kernel() {
@@ -244,6 +268,9 @@ void read_kernel() {
     for (;;)
       ;
   }
+
+  //move apu entry
+  memmove(0x2000,&apu_boot,32*8);
 }
 
 static inline void enable_a20() {
@@ -371,28 +398,6 @@ void init_boot() {
     ;
 }
 
-
-void init_apu_boot(){
-  cls();
-  printf("boot apu info addr %x\n\r", boot_info);
-  init_gdt();
-  init_cpu();
-
-  asm volatile(
-      "movl %0, %%esp\n"
-      "mov %%esp,%%ebp\n"
-      :
-      : "m"(kernel_stack_top));\
-
-#if defined(__WIN32__)      
-  asm("jmpl %0, $_start_apu_kernel" ::"i"(GDT_ENTRY_32BIT_CS * GDT_SIZE));
-#else
-  asm("jmpl %0, $start_apu_kernel" ::"i"(GDT_ENTRY_32BIT_CS * GDT_SIZE));
-#endif
-
-  for (;;)
-    ;
-}
 
 
 asm(".code32\n");
@@ -562,11 +567,3 @@ void start_apu_kernel() {
   envp[0] = boot_info;
   start(argc, argv, envp);
 }
-
-asm(".code16gcc\n");
-asm(".org 0x2000\n");
-#if defined(__WIN32__)
-asm("jmpl $0x0000, $_init_apu_boot\n");
-#else
-asm("jmpl $0x0000, $init_apu_boot\n");
-#endif
