@@ -129,7 +129,7 @@ void cpu_init() {
 
   kprintf("idt base %x\n", boot_info->pdt_base);
 
-  lapic_init();
+  acpi_init();
 }
 
 void cpu_halt() { asm("hlt\n"); }
@@ -319,8 +319,7 @@ u32 cpu_get_id(){
 }
 
 u32 cpu_get_index(int idx){
-
-  return 0;
+  return lapic_get_index(idx);
 }
 
 int cpu_init_id(u32 id){

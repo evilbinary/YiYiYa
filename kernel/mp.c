@@ -15,11 +15,14 @@ void mp_init(){
         }
     }
 
+    //delay
+    for(int i=0;i<10000;i++);
+
     //start all cpu
     for(int i=0;i<cpu_nums;i++){
         int id=cpu_get_index(i);
         if(current_cpu_id!=id){
-            cpu_start_id(id);
+        cpu_start_id(id);
         }
     }
 
