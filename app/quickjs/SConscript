@@ -52,9 +52,18 @@ source=[]
 
 source+=[
     'qjs.c',
-    'repl.c',
-    'qjscalc.c'
 ]
+
+if env['ARCHTYPE']=='arm':
+    source+=[
+        'arm/qjscalc.c',
+        'arm/repl.c'
+    ]
+elif env['ARCHTYPE']=='x86':
+    source+=[
+        'i386/qjscalc.c',
+        'i386/repl.c'
+    ]
 
 source+= [
     '../quickjs/libquickjs.a',
@@ -68,9 +77,10 @@ source+= [
 if env.get('MYLIB'):
     source.append(env.get('MYLIB'))
 
-env.Program('qjs', source,
-    CFLAGS='$CFLAGS $LIBCFLAGS  -Iapp/libgui/ -Iapp/libzlib/ -Iapp/libpng -Iapp/libjpeg -Iapp/libsdl2/ -Iapp/libsdl2/include '+cflags,
-    LINKFLAGS= '$LINKFLAGS $USER')
+if env['ARCHTYPE']=='x86':
+    env.Program('qjs', source,
+        CFLAGS='$CFLAGS $LIBCFLAGS  -Iapp/libgui/ -Iapp/libzlib/ -Iapp/libpng -Iapp/libjpeg -Iapp/libsdl2/ -Iapp/libsdl2/include '+cflags,
+        LINKFLAGS= '$LINKFLAGS $USER')
 
 
 

@@ -25,6 +25,10 @@ void kernel_init() {
   memory_init();
   kprintf("vfs init\n");
   vfs_init();
+#ifdef MP_ENABLE
+  kprintf("mp init\n");
+  mp_init();
+#endif
   kprintf("kernel init end\n");
 }
 

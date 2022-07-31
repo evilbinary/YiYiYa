@@ -128,5 +128,6 @@ void display_init() {
     screen_width = boot_info->disply.width;
     screen_height = boot_info->disply.height;
   }
+  io_add_write_channel(putch);
   test_display();
 }

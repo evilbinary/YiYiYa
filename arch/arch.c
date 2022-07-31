@@ -15,7 +15,6 @@ void arch_init(boot_info_t* boot) {
     boot_info = &boot_data;
     write_channel_number = 0;
     platform_init();
-    io_add_write_channel(putch);
     cpu_init();
     display_init();
     mm_init();

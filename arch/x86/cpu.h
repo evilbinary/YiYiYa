@@ -56,4 +56,10 @@ void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
                              
 void context_dump(context_t* c);
 
+
+int cpu_get_number();
+u32 cpu_get_id();
+int cpu_start_id(u32 id);
+int cpu_init_id(u32 id);
+
 #endif
