@@ -326,9 +326,9 @@ int cpu_init_id(u32 id){
   return lapic_send_init(id);
 }
 
-int cpu_start_id(u32 id){
+int cpu_start_id(u32 id,u32 entry){
   //start at 0x2000 at entry-point on boot init.c
-  return lapic_send_start(id,2);
+  return lapic_send_start(id,entry>>12);
 }
 
 void cpu_delay(int n){
