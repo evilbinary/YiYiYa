@@ -52,7 +52,7 @@ typedef struct context_t {
 void context_clone(context_t* context, context_t* src, u32* stack0, u32* stack3,
                    u32* old0, u32* old3);
 void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
-                  u32 level);
+                  u32 level,int cpu);
                              
 void context_dump(context_t* c);
 

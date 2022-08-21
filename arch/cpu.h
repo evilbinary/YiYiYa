@@ -48,7 +48,7 @@ void cpu_halt();
 
 
 void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
-                  u32 level);
+                  u32 level,int cpu);
 
 void context_switch(interrupt_context_t* context,context_t** current, 
                     context_t* next_context);

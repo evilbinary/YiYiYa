@@ -76,7 +76,8 @@
 
 
 // Interrupt Mask
-#define APIC_INTERRUPT_MASK				  0x010000
+#define	APIC_LVT_MASKED			(1<<16)
+#define	APIC_SPIV_APIC_ENABLED		(1<<8)
 
 // Timer Mode
 #define APIC_TIMER_MODE_PERIODIC			  0x020000
