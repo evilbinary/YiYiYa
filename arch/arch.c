@@ -9,18 +9,19 @@ boot_info_t* boot_info = NULL;
 boot_info_t boot_data={0};
 extern u32 write_channel_number;
 
-void arch_init(boot_info_t* boot,int cpu_id) {
-  if (cpu_id==0) {
+void arch_init(boot_info_t* boot,int cpu) {
+  if (cpu==0) {
     kmemmove(&boot_data,boot,sizeof(boot_info_t));
     boot_info = &boot_data;
     write_channel_number = 0;
     platform_init();
-    cpu_init();
+    cpu_init(cpu);
     display_init();
     mm_init();
-    interrupt_init();
+    interrupt_init(cpu);
     platform_end();
   } else {
-    cpu_init();
+    cpu_init(cpu);
+    interrupt_init(cpu);
   }
 }

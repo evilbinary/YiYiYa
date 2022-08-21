@@ -75,6 +75,13 @@
 #define ICR_DESTINATION_SHIFT           24
 
 
+// Interrupt Mask
+#define APIC_INTERRUPT_MASK				  0x010000
+
+// Timer Mode
+#define APIC_TIMER_MODE_PERIODIC			  0x020000
+#define APIC_TIMER_MODE_ONESHOT				  0x000000
+
 #define IA32_APIC_BASE            0x1B
 #define IA32_APIC_BASE_ENABLE_BIT 11
 
