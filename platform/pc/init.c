@@ -53,4 +53,5 @@ void platform_init() {
 }
 
 void platform_end(){
+    acpi_init();
  }

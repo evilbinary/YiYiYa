@@ -129,7 +129,6 @@ void cpu_init() {
 
   kprintf("idt base %x\n", boot_info->pdt_base);
 
-  acpi_init();
 }
 
 void cpu_halt() { asm("hlt\n"); }
