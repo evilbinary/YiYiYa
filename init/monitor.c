@@ -5,12 +5,27 @@
  ********************************************************************/
 #include "main.h"
 
+void do_kernel_thread(void) {
+  kprintf("mp init\n");
+  mp_init();
+
+  u32 i = 0;
+  u32 count = 0;
+  for (;;) {
+    count++;
+    if (i % 4 == 0){
+      i = 0;
+    }
+  }
+}
 
 void do_monitor_thread(void) {
   u32 i = 0;
   u32 count = 0;
   for (;;) {
     count++;
-    if (i % 4 == 0) i = 0;
+    if (i % 4 == 0) {
+      i = 0;
+    }
   }
 }

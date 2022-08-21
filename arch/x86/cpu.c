@@ -114,7 +114,8 @@ void cpu_init() {
   unsigned long cr0 = read_cr0();
   kprintf("cpu init cr0=%x\n", cr0);
 
-  u32 tss_base = (u32) & (boot_info->tss[0]);
+  int cpu=cpu_get_id();
+  u32 tss_base = (u32) & (boot_info->tss[cpu]);
   kprintf("tr base %x\n", tss_base);
 
   u64* gdt_addr = boot_info->gdt_base;

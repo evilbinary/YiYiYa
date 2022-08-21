@@ -17,6 +17,7 @@ boot_info_t* boot_info = NULL;
 boot_info_t boot_data;
 u8 kernel_stack[1024];  // 1k
 u8 kernel_stack_top[0];
+int cpu_id=0;
 
 void cls() {
   // clear screen
@@ -328,7 +329,7 @@ void init_gdt() {
   gdt_addr[GDT_ENTRY_32BIT_DS] = GDT_ENTRY(0, 0xfffff, 0xc092);  // 0x10
   gdt_addr[GDT_ENTRY_32BIT_FS] = GDT_ENTRY(0, 0xfffff, 0xc093);  // 0x18
 
-  u32 tss_base = (u32) & (boot_info->tss[0]);
+  u32 tss_base = (u32) & (boot_info->tss[cpu_id]);
   gdt_addr[GDT_ENTRY_32BIT_TSS] = GDT_ENTRY(tss_base, 0xfffff, 0xc089);  // 0x20
   gdt_addr[GDT_ENTRY_USER_32BIT_CS] =
       GDT_ENTRY(0, 0xfffff, 0xc09b | GDT_DPL(3));  // 0x28
@@ -548,6 +549,7 @@ void start_kernel() {
   char** argv = 0;
   char* envp[10];
   envp[0] = boot_info;
+  envp[1] = cpu_id++;
   start(argc, argv, envp);
 }
 
@@ -565,5 +567,6 @@ void start_apu_kernel() {
   char** argv = 0;
   char* envp[10];
   envp[0] = boot_info;
+  envp[1] = cpu_id++;
   start(argc, argv, envp);
 }
