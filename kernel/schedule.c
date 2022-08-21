@@ -63,6 +63,10 @@ thread_t* schedule(interrupt_context_t* interrupt_context) {
 }
 
 void do_schedule(interrupt_context_t* interrupt_context) {
+  int cpu=cpu_get_id();
+  if(cpu>0){
+    kprintf("do do_schedule with %d\n",cpu);
+  }
   thread_t* next=schedule(interrupt_context);
   timer_ticks++;
   timer_end();

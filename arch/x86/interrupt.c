@@ -13,7 +13,7 @@ extern boot_info_t* boot_info;
 idt_entry_t idt[IDT_NUMBER];
 interrupt_handler_t* interrutp_handlers[IDT_NUMBER];
 
-void interrupt_init() {
+void interrupt_init(int cpu) {
   boot_info->idt_base = idt;
   boot_info->idt_number = IDT_NUMBER;
   for (int i = 0; i < boot_info->idt_number; i++) {
@@ -29,26 +29,28 @@ void interrupt_init() {
   idt_ptr.base = (u32)boot_info->idt_base;
   __asm__("lidt	%0\n\t" ::"m"(idt_ptr));
 
-  // pic 8259
-  // icw1 init state
-  io_write8(0x20, 0x11);
-  io_write8(0xa0, 0x11);
+  if(cpu==0){
+    // pic 8259
+    // icw1 init state
+    io_write8(0x20, 0x11);
+    io_write8(0xa0, 0x11);
 
-  // icw2 map irqs  0-7 =>0x20-0x27 8-f => 0x28-0x2f
-  io_write8(0x21, 0x20);
-  io_write8(0xa1, 0x28);
+    // icw2 map irqs  0-7 =>0x20-0x27 8-f => 0x28-0x2f
+    io_write8(0x21, 0x20);
+    io_write8(0xa1, 0x28);
 
-  // icw3  IRQ2 is slave (0000 0100)
-  io_write8(0x21, 0x04);
-  io_write8(0xa1, 0x02);  //(0000 0010)
+    // icw3  IRQ2 is slave (0000 0100)
+    io_write8(0x21, 0x04);
+    io_write8(0xa1, 0x02);  //(0000 0010)
 
-  // icw4 8086mode
-  io_write8(0x21, 0x01);
-  io_write8(0xa1, 0x01);
+    // icw4 8086mode
+    io_write8(0x21, 0x01);
+    io_write8(0xa1, 0x01);
 
-  // // disable pic
-  // io_write8(0x21, 0xff);
-  // io_write8(0xa1, 0xff);
+    // // disable pic
+    // io_write8(0x21, 0xff);
+    // io_write8(0xa1, 0xff);
+  }
 }
 
 void timer_init(int hz) {

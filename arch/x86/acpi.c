@@ -20,6 +20,41 @@ u32 acpi_get_id(){
     return mem_read32(APIC_BASE+LAPIC_ID) >> 24;
 }
 
+
+void lapic_timer_init(){
+    //Divide Configuration Register 011: Divide by 16
+    mem_write32(APIC_BASE+LAPIC_TDCR,3);
+
+    //1193180/100 Hz
+    cpu_deplay_init(100);
+    //init count lvt timer
+    mem_write32(APIC_BASE+LAPIC_TICR,0xFFFFFFFF);
+
+    cpu_delay_sleep();
+
+    //mask 
+    u32 value=mem_read32(APIC_BASE+LAPIC_TIMER);
+    mem_write32(APIC_BASE+LAPIC_TIMER,value|APIC_INTERRUPT_MASK);
+    
+    //read count Current Count Registers
+    u32 count = mem_read32(LAPIC_TCCR);
+    u32 ticks = 0xFFFFFFFF - count ;
+
+    kprintf("time ticks %d\n",ticks);
+
+    //ticks = 1000;
+
+    //TSC-Deadline mode,vector 0x20, program target value in IA32_TSC_DEADLINE MSR.
+    value=0x20 | APIC_TIMER_MODE_PERIODIC;
+    mem_write32(APIC_BASE+LAPIC_TIMER,value) ;
+    mem_write32(APIC_BASE+LAPIC_TDCR,3);
+    mem_write32(APIC_BASE+LAPIC_TICR, ticks)  ;
+
+    //unmask
+    unsigned int data = mem_read32(APIC_BASE+ LAPIC_TIMER);
+    mem_write32( APIC_BASE+ LAPIC_TIMER, data &0xFFFEFFFF);
+}
+
 int lapic_init(){
 
     //clear interrupt
@@ -37,7 +72,7 @@ int lapic_init(){
 
     //8 Local-APIC is Enabled  (1=yes, 0=no)
     u32 val=mem_read32(APIC_BASE+LAPIC_SVR);
-    val|=0x100;//Spurious Interrupt Vector Register bit 8 to start receiving interrupts
+    val|=0x100|0xFF;//Spurious Interrupt Vector Register bit 8 to start receiving interrupts
     mem_write32(APIC_BASE+LAPIC_SVR,val);
 
     return 0;
@@ -103,6 +138,11 @@ u32 lapic_get_index(int idx){
     return lapic_cpus_id[idx];
 }
 
+void lapic_eoi(void){
+	mem_write32(APIC_BASE+LAPIC_EOI, 0);
+}
+
+
 
 void acpi_init(){
     //todo acpi 解析
@@ -113,4 +153,6 @@ void acpi_init(){
     }
     //使用local acpi初始化
     lapic_init();
+    //使用 apic timer
+    lapic_timer_init();
 }

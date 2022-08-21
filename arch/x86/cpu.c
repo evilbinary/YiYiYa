@@ -110,11 +110,10 @@ static inline void set_ldt(u16 tss) {
       "ltr %%ax\n" ::"r"(tss));
 }
 
-void cpu_init() {
+void cpu_init(int cpu) {
   unsigned long cr0 = read_cr0();
-  kprintf("cpu init cr0=%x\n", cr0);
+  kprintf("cpu %d init cr0=%x\n",cpu, cr0);
 
-  int cpu=cpu_get_id();
   u32 tss_base = (u32) & (boot_info->tss[cpu]);
   kprintf("tr base %x\n", tss_base);
 
@@ -127,8 +126,8 @@ void cpu_init() {
   gdt.limit = (boot_info->gdt_number * GDT_SIZE) - 1;
   gdt.base = (u32)boot_info->gdt_base;
   asm volatile("lgdtl %0\n" : : "m"(gdt));
-
-  kprintf("idt base %x\n", boot_info->pdt_base);
+  
+  kprintf("idt base %x\n", boot_info->idt_base);
 
 }
 
@@ -328,6 +327,28 @@ int cpu_init_id(u32 id){
 int cpu_start_id(u32 id,u32 entry){
   //start at 0x2000 at entry-point on boot init.c
   return lapic_send_start(id,entry>>12);
+}
+
+
+void cpu_deplay_init(int hz){
+  int val = 0;
+  unsigned int divisor = 1193182/hz;
+  val = (io_read8(0x61) & 0xfd) | 0x1;
+  io_write8(0x61, val);
+  io_write8(0x43, 0xb2);
+  io_write8(0x42,(unsigned char)(divisor & 0xFF));		// LSB
+  io_read8(0x60);
+	io_write8(0x42,(unsigned char)(divisor >> 8) & 0xFF); // MSB
+
+}
+
+void cpu_delay_sleep(){
+  int val = 0;
+  val = (io_read8(0x61) & 0xfe);
+  io_write8(0x61, val); // gate low
+  val = val | 1;
+  io_write8(0x61, val); // gate high
+  while((io_read8(0x61) & 0x20) == 0){}
 }
 
 void cpu_delay(int n){
