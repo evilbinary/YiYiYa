@@ -121,8 +121,4 @@ void interrutp_regist(u32 vec, interrupt_handler_t handler);
       :                             \
       : "m"(context->esp0))
 
-
-
-
-
 #endif

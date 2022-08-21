@@ -309,7 +309,6 @@ int TAS(volatile int* addr, int newval) {
 }
 
 
-
 int cpu_get_number(){
   return boot_info->tss_number;
 }

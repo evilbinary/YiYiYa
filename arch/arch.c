@@ -17,6 +17,9 @@ void arch_init(boot_info_t* boot) {
     platform_init();
     cpu_init();
     display_init();
+#ifdef MP_ENABLE
+  mp_init();
+#endif
     mm_init();
     interrupt_init();
     platform_end();

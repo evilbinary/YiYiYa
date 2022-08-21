@@ -1,6 +1,7 @@
 #include "cpu.h"
 #include "acpi.h"
 #include "../io.h"
+#include "mm.h"
 
 u32 lapic_cpus_id[MAX_CPU];
 
@@ -105,7 +106,8 @@ u32 lapic_get_index(int idx){
 
 void acpi_init(){
     //todo acpi 解析
-
+    // u32 address=APIC_BASE;
+    // map_page(address, address, PAGE_P | PAGE_USU | PAGE_RWW);
     for(int i=0;i<MAX_CPU;i++){
         lapic_cpus_id[i]=i;
     }

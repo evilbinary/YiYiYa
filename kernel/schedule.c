@@ -5,15 +5,12 @@
  ********************************************************************/
 #include "schedule.h"
 
-#include "thread.h"
-
 volatile u32 timer_ticks = 0;
-extern thread_t* current_thread;
 u32 schedule_lock = 0;
-
-context_t* current_context;
+context_t *current_context;
 
 thread_t* schedule_get_next() {
+  thread_t* current=thread_current();
   thread_t* next = NULL;
   thread_t* v = thread_head();
   // find next priority
@@ -22,7 +19,7 @@ thread_t* schedule_get_next() {
   // }
   for (; v != NULL; v = v->next) {
     //kprintf("v %d %d\n",v->id,v->state);
-    if(v==current_thread) continue;
+    if(v==current) continue;
     if (v->state != THREAD_RUNNING) continue;
     if(next==NULL){
       next=v;
@@ -39,30 +36,34 @@ thread_t* schedule_get_next() {
 
 void schedule_next(){
   cpu_cli();
-  thread_t* current=current_thread;
+  thread_t* current=thread_current();
   // interrupt_context_t* interrupt_context=current_thread->context.esp0;
   // schedule(interrupt_context);
-  for(;current!=current_thread;){
+  for(;current!=current;){
       cpu_sti();
   }
 }
 
-void schedule(interrupt_context_t* interrupt_context) {
+thread_t* schedule(interrupt_context_t* interrupt_context) {
   thread_t* next_thread = NULL;
   thread_t* prev_thread = NULL;
+  thread_t* current_thread=thread_current();
   next_thread = schedule_get_next();
-  // kprintf("schedule next %d\n",next_thread->id);
+  // kprintf("schedule next %s %d\n",next_thread->name,next_thread->id);
   if (next_thread == NULL) {
     kprintf("schedule error next\n");
     return;
   }
+  current_context=&current_thread->context;
   prev_thread = current_thread;
-  current_thread = next_thread;
+  current_thread = next_thread;  
   context_switch(interrupt_context,&current_context,&next_thread->context);
+  thread_set_current(current_thread);
+  return current_thread;
 }
 
 void do_schedule(interrupt_context_t* interrupt_context) {
-  schedule(interrupt_context);
+  thread_t* next=schedule(interrupt_context);
   timer_ticks++;
   timer_end();
 }
@@ -71,7 +72,6 @@ INTERRUPT_SERVICE
 void do_timer() {
   interrupt_entering_code(ISR_TIMER,0);
   interrupt_process(do_schedule);
-  //interrupt_exit();
   interrupt_exit_context(current_context);
 }
 
