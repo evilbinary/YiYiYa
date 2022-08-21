@@ -58,8 +58,8 @@ void context_dump(context_t* c);
 
 
 int cpu_get_number();
-u32 cpu_get_id();
 int cpu_start_id(u32 id,u32 entry);
 int cpu_init_id(u32 id);
+u32 cpu_get_id();
 
 #endif

@@ -6,8 +6,6 @@
 
 #include "kernel.h"
 
-extern context_t* current_context;
-
 void kernel_init() {
   kprintf("kernel init\n");
   kprintf("exception init\n");
@@ -23,13 +21,10 @@ void kernel_init() {
   memory_init();
   kprintf("vfs init\n");
   vfs_init();
-#ifdef MP_ENABLE
-  kprintf("mp init\n");
-  mp_init();
-#endif
   kprintf("kernel init end\n");
 }
 
 void kernel_run(){
-  context_restore(current_context);
+  context_t* context=thread_current_context();
+  context_restore(context);
 }

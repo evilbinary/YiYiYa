@@ -5,7 +5,6 @@
  ********************************************************************/
 #include "syscall.h"
 
-extern context_t* current_context;
 static void* syscall_table[SYSCALL_NUMBER] = {0};
 
 INTERRUPT_SERVICE
