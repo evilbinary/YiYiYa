@@ -21,6 +21,10 @@ void kernel_init() {
   memory_init();
   kprintf("vfs init\n");
   vfs_init();
+
+  kprintf("mp init\n");
+  mp_init();
+
   kprintf("kernel init end\n");
 }
 
