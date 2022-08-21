@@ -5,15 +5,20 @@
  ********************************************************************/
 #include "main.h"
 
-
 extern void driver_init();
 extern void do_shell_thread(void);
+extern void do_kernel_thread();
 extern void do_monitor_thread();
 
 void kstart(int argc, char* argv[], char** envp) {
   boot_info_t* boot_info = envp[0];
-  arch_init(boot_info);
-  kmain(argc, argv);
+  int cpu = envp[1];
+  arch_init(boot_info, cpu);
+  if (cpu == 0) {
+    kmain(argc, argv);
+  } else {
+    ksecondary(argc, argv);
+  }
   for (;;) {
     cpu_halt();
   }
@@ -21,15 +26,30 @@ void kstart(int argc, char* argv[], char** envp) {
 
 int kmain(int argc, char* argv[]) {
   kernel_init();
-  
+
   driver_init();
 
-  thread_t* t1 = thread_create_name("monitor", (u32*)&do_monitor_thread, NULL);
+  thread_t* t1 = thread_create_name("kernel", (u32*)&do_kernel_thread, NULL);
   thread_t* t2 = thread_create_name("shell", (u32*)&do_shell_thread, NULL);
   thread_run(t1);
   thread_run(t2);
 
   kprintf("kernel run\n");
+  kernel_run();
+
+  return 0;
+}
+
+int ksecondary(int argc, char* argv) {
+  // will start after main start
+  thread_t* t1 = thread_create_name("monitor", (u32*)&do_monitor_thread, NULL);
+  thread_run(t1);
+
+
+  thread_t* t2 = thread_create_name("monitor2", (u32*)&do_monitor_thread, NULL);
+  thread_run(t2);
+
+  kprintf("kernel run secondary\n");
   kernel_run();
 
   return 0;

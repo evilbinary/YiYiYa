@@ -179,7 +179,7 @@ void thread_reset_stack3(thread_t* thread, u32* stack3) {
               thread->level);
 }
 
-context_t* context_current(){
+context_t* context_current() {
   int cpu_id = cpu_get_id();
   return current_context[cpu_id];
 }
@@ -303,20 +303,20 @@ void thread_yield() {
   }
 }
 
-thread_t* thread_current() { 
-  int cpu_id=cpu_get_id();
-  thread_t* t=current_thread[cpu_id];
+thread_t* thread_current() {
+  int cpu_id = cpu_get_id();
+  thread_t* t = current_thread[cpu_id];
   return t;
 }
 
-void thread_set_current(thread_t* thread){
-  int cpu_id=cpu_get_id();
-  current_thread[cpu_id]=thread;
+void thread_set_current(thread_t* thread) {
+  int cpu_id = cpu_get_id();
+  current_thread[cpu_id] = thread;
 }
 
 context_t* thread_current_context() {
-  int cpu_id=cpu_get_id();
-  thread_t* t=current_thread[cpu_id];
+  int cpu_id = cpu_get_id();
+  thread_t* t = current_thread[cpu_id];
   return &t->context;
 }
 
@@ -475,20 +475,21 @@ void thread_dumps() {
                         "sleep"};
   char* str = "unkown";
   kprintf("id    pid     name                 state     cpu  counter\n");
-  for (thread_t* p = schedulable_head_thread[cpu_get_id()]; p != NULL;
-       p = p->next) {
-    if (p->state <= THREAD_SLEEP) {
-      str = state_str[p->state];
-    }
-    kprintf("%-6d ", p->id);
-    kprintf("%-6d ", p->pid);
+  for (int i = 0; i < MAX_CPU; i++) {
+    for (thread_t* p = schedulable_head_thread[i]; p != NULL; p = p->next) {
+      if (p->state <= THREAD_SLEEP) {
+        str = state_str[p->state];
+      }
+      kprintf("%-6d ", p->id);
+      kprintf("%-6d ", p->pid);
 
-    if (p->name != NULL) {
-      kprintf("%-20s ", p->name);
-    } else {
-      kprintf("   ");
+      if (p->name != NULL) {
+        kprintf("%-20s ", p->name);
+      } else {
+        kprintf("   ");
+      }
+      kprintf("%-8s %4d   %d\n", str, p->cpu_id, p->counter);
     }
-    kprintf("%-8s %4d   %d\n", str,p->cpu_id, p->counter);
   }
 }
 
