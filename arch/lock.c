@@ -13,7 +13,7 @@ void lock_init(lock_t* lock) {
 }
 
 void lock_acquire(lock_t* lock) {
-  int turn = FAA(&lock->ticket);
+  int turn = cpu_faa(&lock->ticket);
   while (lock->turn != turn)
     ;  // do
 }
@@ -21,7 +21,7 @@ void lock_acquire(lock_t* lock) {
 void lock_release(lock_t* lock) { lock->turn += 1; }
 
 void acquire(u32* lock) {
-  while (TAS(lock, 1) == 1)
+  while ((lock, 1) == 1)
     ;  // spin wait
 }
 void release(u32* lock) { *lock = 0; }

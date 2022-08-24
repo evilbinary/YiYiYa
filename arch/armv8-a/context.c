@@ -6,19 +6,6 @@
 #include "context.h"
 #include "cpu.h"
 
-extern boot_info_t* boot_info;
-
-void cpu_init() {
-
-
-}
-
-void cpu_halt() {
-  for (;;) {
-    
-  };
-}
-
 int context_get_mode(context_t* context) {
   int mode = 0;
   
@@ -48,21 +35,5 @@ void context_dump(context_t* c) {
 
 void context_clone(context_t* des, context_t* src, u32* stack0, u32* stack3,
                    u32* old0, u32* old3) {
-  
-}
-
-ulong cpu_get_cs(void) {
-  ulong result;
-
-  return result;
-}
-
-int cpu_tas(volatile int* addr, int newval) {
-  int result = newval;
-
-  return result;
-}
-
-void cpu_backtrace(void) {
   
 }
