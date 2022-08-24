@@ -294,7 +294,7 @@ ulong cpu_get_cs(void) {
   return result;
 }
 
-int TAS(volatile int* addr, int newval) {
+int cpu_tas(volatile int* addr, int newval) {
   int result = newval;
   // asm volatile("lock; xchg %0, %1"
   //              : "+m"(*addr), "=r"(result)

@@ -84,4 +84,36 @@ typedef struct interrupt_context {
 
 #define interrupt_exit2() interrupt_exit()
 
+
+#define context_switch_page(page_dir) \
+  cpu_set_page(page_dir)  // asm volatile("mov %0, %%cr3" : : "r" (page_dir))
+
+#define context_fn(context) context->r6
+#define context_ret(context) context->r0
+
+#define context_restore(duck_context)          \
+  asm volatile(                              \ 
+      "ldr r0,%0 \n"                           \
+      "ldmfd r0!,{r1,r2}\n"                    \
+      "ldmfd r0!,{r4-r11}\n"                   \
+      "ldr lr,[r0,#20 ]\n"                     \
+      "ldr r3,[r0,#24 ]\n"                     \
+      "msr psp, r0\n"                          \
+      "isb\n"                                  \
+      "mov r0, #2\n"                           \
+      "msr control, r0\n"                      \
+      "cpsie i\n"                              \
+      "bx r3\n"                                \
+                                             : \
+                                             : "m"(duck_context->esp))
+// interrupt_exit_context(duck_context)
+
+void context_clone(context_t* context, context_t* src, u32* stack0, u32* stack3,
+                   u32* old0, u32* old3);
+void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
+                  u32 level);
+void context_dump(context_t* c);
+
+
+
 #endif

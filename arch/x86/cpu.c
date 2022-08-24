@@ -133,7 +133,7 @@ void cpu_init(int cpu) {
 
 void cpu_halt() { asm("hlt\n"); }
 
-int TAS(volatile int* addr, int newval) {
+int cpu_tas(volatile int* addr, int newval) {
   int result = newval;
   asm volatile("lock; xchg %0, %1"
                : "+m"(*addr), "=r"(result)
