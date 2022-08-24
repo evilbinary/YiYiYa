@@ -40,7 +40,7 @@ void exception_info(interrupt_context_t *context) {
   }
   thread_t *current = thread_current();
   if (current != NULL) {
-    kprintf("tid:%d %s\n", current->id, current->name);
+    kprintf("tid:%d %s %d\n", current->id, current->name,current->cpu_id);
   }
   kprintf("ifsr: %x dfsr: %x dfar: %x\n", read_ifsr(), read_dfsr(),
           read_dfar());
@@ -70,7 +70,7 @@ void exception_info(interrupt_context_t *context) {
       kprintf("interrupt %d", context->no);
     }
     if (current != NULL) {
-      kprintf("\ntid %d %s ", current->id, current->name);
+      kprintf("\ntid %d %s cpu %d", current->id, current->name,current->cpu_id);
     }
     kprintf("\n----------------------------\n");
     context_dump_interrupt(context);

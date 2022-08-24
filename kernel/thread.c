@@ -162,7 +162,7 @@ void thread_init(thread_t* thread, void* entry, u32* stack0, u32* stack3,
   thread->level = level;
   thread->entry = entry;
   thread->cpu_id = cpu_get_id();
-  context_init(&thread->context, (u32*)entry, stack0_top, stack3_top, level);
+  context_init(&thread->context, (u32*)entry, stack0_top, stack3_top, level,thread->cpu_id);
 }
 
 void thread_reset_stack3(thread_t* thread, u32* stack3) {
