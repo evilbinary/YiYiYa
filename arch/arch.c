@@ -21,7 +21,6 @@ void arch_init(boot_info_t* boot,int cpu) {
     interrupt_init(cpu);
     platform_end();
   } else {
-    cpu_init(cpu);
-    interrupt_init(cpu);
+    ap_init(cpu);
   }
 }

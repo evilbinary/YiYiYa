@@ -2,6 +2,7 @@
 #include "acpi.h"
 #include "../io.h"
 #include "mm.h"
+#include "../interrupt.h"
 
 u32 lapic_cpus_id[MAX_CPU];
 
@@ -21,20 +22,29 @@ u32 acpi_get_id(){
 }
 
 
-void lapic_timer_init(){
-    //Divide Configuration Register 011: Divide by 16
-    mem_write32(APIC_BASE+LAPIC_TDCR,3);
+INTERRUPT_SERVICE
+void lapic_do_timer() {
+  interrupt_entering_code(0x60,0);
+  kprintf("lapic_do_timer\n");
+  //interrupt_process(do_schedule);
+//   interrupt_exit_context();
+    cpu_halt();
+}
 
-    //1193180/100 Hz
-    cpu_deplay_init(100);
+void lapic_timer_init(){
+    u32 value;
+
+    kprintf("init local timer of cpu %d\n",cpu_get_id());
+
+    //Divide Configuration Register 011: Divide by 16,111 divede by 1
+    mem_write32(APIC_BASE+LAPIC_TDCR,0xb);
+
     //init count lvt timer
     mem_write32(APIC_BASE+LAPIC_TICR,0xFFFFFFFF);
 
-    cpu_delay_sleep();
-
-    //mask 
-    u32 value=mem_read32(APIC_BASE+LAPIC_TIMER);
-    mem_write32(APIC_BASE+LAPIC_TIMER,value|APIC_INTERRUPT_MASK);
+    // //mask 
+    // u32 value=mem_read32(APIC_BASE+LAPIC_TIMER);
+    // mem_write32(APIC_BASE+LAPIC_TIMER,value|APIC_LVT_MASKED);
     
     //read count Current Count Registers
     u32 count = mem_read32(LAPIC_TCCR);
@@ -42,28 +52,54 @@ void lapic_timer_init(){
 
     kprintf("time ticks %d\n",ticks);
 
-    //ticks = 1000;
+    ticks = 1000;
 
     //TSC-Deadline mode,vector 0x20, program target value in IA32_TSC_DEADLINE MSR.
-    value=0x20 | APIC_TIMER_MODE_PERIODIC;
+    value=mem_read32(APIC_BASE+LAPIC_TIMER);
+    value &= (~APIC_LVT_MASKED);//unmask
+    value |=0x60 | APIC_TIMER_MODE_PERIODIC;
     mem_write32(APIC_BASE+LAPIC_TIMER,value) ;
     mem_write32(APIC_BASE+LAPIC_TDCR,3);
     mem_write32(APIC_BASE+LAPIC_TICR, ticks)  ;
 
-    //unmask
-    unsigned int data = mem_read32(APIC_BASE+ LAPIC_TIMER);
-    mem_write32( APIC_BASE+ LAPIC_TIMER, data &0xFFFEFFFF);
+	// mem_write32(APIC_BASE+LAPIC_SVR, mem_read32(APIC_BASE+LAPIC_SVR) | 0x60);
+    // lapic_eoi();
+
+    if ((mem_read32(APIC_BASE+LAPIC_TIMER) & APIC_LVT_MASKED) == 0)	{
+		kprintf("init local timer success\n");
+        interrutp_regist(0x60, lapic_do_timer);
+        
+        // mem_write32(APIC_BASE+LAPIC_ESR,0);
+
+        // value = mem_read32(APIC_BASE+LAPIC_SVR);	// Spurious Interrupt Vector reg
+        // value |= APIC_SPIV_APIC_ENABLED; // set enable bit explicitly
+        // mem_write32(APIC_BASE+LAPIC_SVR, value);
+
+        // lapic_eoi();        
+	} else {
+		for(;;){
+            cpu_halt();
+        }
+	}
 }
 
 int lapic_init(){
 
+    // mask all interrupts ([16] = 1)
+	mem_write32(APIC_BASE+LAPIC_TIMER, 0x10000);	// local timer
+	mem_write32(APIC_BASE+LAPIC_THERMAL, 0x10000);	// Thermal monitor 
+	mem_write32(APIC_BASE+LAPIC_PERF, 0x10000);	// Performance monitor
+	mem_write32(APIC_BASE+LAPIC_LINT1, 0x10000);	// Local INT #1
+	//mem_write32(APIC_BASE+LAPIC_LINT0, 0x10000);	// Local INT #0	
+	mem_write32(APIC_BASE+LAPIC_ERROR, 0x10000);	// Error
+
     //clear interrupt
-    mem_write32(APIC_BASE+LAPIC_TPR,0);
+    mem_write32(APIC_BASE+LAPIC_TPR,0);  
 
     // logical destination mode
     mem_write32(APIC_BASE+LAPIC_DFR, 0xffffffff);   // Flat mode
     mem_write32(APIC_BASE+LAPIC_LDR, 0x01000000);   // All cpus use logical id 1
-
+  
     //特权指令
     int msrh,msrl;
     ia32_msr_read(APIC_BASE,&msrl,&msrh);
@@ -72,8 +108,10 @@ int lapic_init(){
 
     //8 Local-APIC is Enabled  (1=yes, 0=no)
     u32 val=mem_read32(APIC_BASE+LAPIC_SVR);
-    val|=0x100|0xFF;//Spurious Interrupt Vector Register bit 8 to start receiving interrupts
+    val|=0x100;//Spurious Interrupt Vector Register bit 8 to start receiving interrupts
     mem_write32(APIC_BASE+LAPIC_SVR,val);
+
+  
 
     return 0;
 }
@@ -151,8 +189,10 @@ void acpi_init(){
     for(int i=0;i<MAX_CPU;i++){
         lapic_cpus_id[i]=i;
     }
+   
+
     //使用local acpi初始化
     lapic_init();
     //使用 apic timer
-    lapic_timer_init();
+    // lapic_timer_init();
 }

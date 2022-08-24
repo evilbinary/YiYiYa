@@ -25,8 +25,7 @@ void kernel_init() {
     vfs_init();
     kprintf("kernel init end\n");
   }else{
-    kprintf("schedule init\n");
-    //schedule_init();
+    kprintf("ap kernel init\n");
   }
 }
 
