@@ -49,7 +49,7 @@ extern module_t hello_module;
 
 #endif
 
-void driver_init(void) {
+void modules_init(void) {
   u32 i = 0;
   u32 count = 0;
 
