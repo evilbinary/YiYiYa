@@ -13,7 +13,7 @@ Import('env')
 linkflags=' $LINKFLAGS -Xlinker -Map=kernel.map -T'+env.get('LINKLD')
 
 libs=[
-     '../drivers/libdriver.a',
+     '../modules/libdriver.a',
     '../kernel/libyiyiya.a',
     '../arch/libarch.a',
     '../platform/libplatform.a',

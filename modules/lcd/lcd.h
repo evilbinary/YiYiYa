@@ -7,7 +7,7 @@
 #define LCD_H
 
 #include "kernel/kernel.h"
-#include "drivers/vga/vga.h"
+#include "vga/vga.h"
 
 
 

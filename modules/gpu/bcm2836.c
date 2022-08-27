@@ -1,5 +1,5 @@
 #include "bcm2836.h"
-#include "drivers/vga/vga.h"
+#include "vga/vga.h"
 
 #define RGB24_2_RGB565(r, g, b) \
   (u16)((((r) << 8) & 0xF800) | (((g) << 3) & 0x7E0) | (((b) >> 3)))

@@ -3,12 +3,12 @@
 #include "kernel/device.h"
 #include "kernel/memory.h"
 #include "kernel/stat.h"
-#include "drivers/rtc/rtc.h"
+#include "rtc/rtc.h"
 
 #ifdef ARM
-#include "drivers/mmc/sdhci.h"
+#include "mmc/sdhci.h"
 #else
-#include "drivers/ahci/ahci.h"
+#include "ahci/ahci.h"
 #endif
 
 enum {

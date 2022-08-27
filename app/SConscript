@@ -14,7 +14,7 @@ Import('env')
 linkflags=' $LINKFLAGS -T'+env.get('LINKLD')
 
 libs=[
-     '../drivers/libdriver.a',
+     '../modules/libdriver.a',
     '../kernel/libyiyiya.a',
     '../arch/libarch.a',
     '../platform/libplatform.a',

@@ -3,8 +3,8 @@
  * 作者: evilbinary on 01/01/20
  * 邮箱: rootdebug@163.com
  ********************************************************************/
-#include "context.h"
 #include "cpu.h"
+#include "context.h"
 
 extern boot_info_t* boot_info;
 
@@ -132,7 +132,6 @@ void cpu_disable_page() {
   asm volatile("mcr p15, 0, %0, c1, c0, #0" : : "r"(reg) : "cc");
 }
 
-
 void cpu_enable_smp_mode() {
   // Enable SMP mode for CPU0
   // asm volatile(
@@ -172,7 +171,6 @@ static void cpu_enable_ca7_smp(void) {
   }
 }
 
-
 inline void cpu_invalidate_tlbs(void) {
   asm("mcr p15, 0, r0, c8, c7, 0\n"
       "mcr p15,0,0,c7,c10,4\n"
@@ -181,80 +179,70 @@ inline void cpu_invalidate_tlbs(void) {
       : "r0", "memory");
 }
 
-static inline uint32_t get_ccsidr(void)
-{
-	uint32_t ccsidr;
+static inline uint32_t get_ccsidr(void) {
+  uint32_t ccsidr;
 
-	__asm__ __volatile__("mrc p15, 1, %0, c0, c0, 0" : "=r" (ccsidr));
-	return ccsidr;
+  __asm__ __volatile__("mrc p15, 1, %0, c0, c0, 0" : "=r"(ccsidr));
+  return ccsidr;
 }
 
-static inline void __v7_cache_flush_range(uint32_t start, uint32_t stop, uint32_t line)
-{
-	uint32_t mva;
+static inline void __v7_cache_flush_range(uint32_t start, uint32_t stop,
+                                          uint32_t line) {
+  uint32_t mva;
 
-	start &= ~(line - 1);
-	if(stop & (line - 1))
-		stop = (stop + line) & ~(line - 1);
-	for(mva = start; mva < stop; mva = mva + line)
-	{
-		__asm__ __volatile__("mcr p15, 0, %0, c7, c14, 1" : : "r" (mva));
-	}
+  start &= ~(line - 1);
+  if (stop & (line - 1)) stop = (stop + line) & ~(line - 1);
+  for (mva = start; mva < stop; mva = mva + line) {
+    __asm__ __volatile__("mcr p15, 0, %0, c7, c14, 1" : : "r"(mva));
+  }
 }
 
 /*
  * Flush range(clean & invalidate), affects the range [start, stop - 1]
  */
-void cpu_cache_flush_range(unsigned long start, unsigned long stop)
-{
-	uint32_t ccsidr;
-	uint32_t line;
+void cpu_cache_flush_range(unsigned long start, unsigned long stop) {
+  uint32_t ccsidr;
+  uint32_t line;
 
-	ccsidr = get_ccsidr();
-	line = ((ccsidr & 0x7) >> 0) + 2;
-	line += 2;
-	line = 1 << line;
-	__v7_cache_flush_range(start, stop, line);
-	dsb();
+  ccsidr = get_ccsidr();
+  line = ((ccsidr & 0x7) >> 0) + 2;
+  line += 2;
+  line = 1 << line;
+  __v7_cache_flush_range(start, stop, line);
+  dsb();
 }
 
-static inline void __v7_cache_inv_range(uint32_t start, uint32_t stop, uint32_t line)
-{
-	uint32_t mva;
+static inline void __v7_cache_inv_range(uint32_t start, uint32_t stop,
+                                        uint32_t line) {
+  uint32_t mva;
 
-	start &= ~(line - 1);
-	if(stop & (line - 1))
-		stop = (stop + line) & ~(line - 1);
-	for(mva = start; mva < stop; mva = mva + line)
-	{
-		__asm__ __volatile__("mcr p15, 0, %0, c7, c6, 1" : : "r" (mva));
-	}
+  start &= ~(line - 1);
+  if (stop & (line - 1)) stop = (stop + line) & ~(line - 1);
+  for (mva = start; mva < stop; mva = mva + line) {
+    __asm__ __volatile__("mcr p15, 0, %0, c7, c6, 1" : : "r"(mva));
+  }
 }
 /*
  * Invalidate range, affects the range [start, stop - 1]
  */
-void cache_inv_range(unsigned long start, unsigned long stop)
-{
-	uint32_t ccsidr;
-	uint32_t line;
+void cache_inv_range(unsigned long start, unsigned long stop) {
+  uint32_t ccsidr;
+  uint32_t line;
 
-	ccsidr = get_ccsidr();
-	line = ((ccsidr & 0x7) >> 0) + 2;
-	line += 2;
-	line = 1 << line;
-	__v7_cache_inv_range(start, stop, line);
-	dsb();
+  ccsidr = get_ccsidr();
+  line = ((ccsidr & 0x7) >> 0) + 2;
+  line += 2;
+  line = 1 << line;
+  __v7_cache_inv_range(start, stop, line);
+  dsb();
 }
 
-
-
-void mmu_inv_tlb(void)
-{
-	__asm__ __volatile__("mcr p15, 0, %0, c8, c7, 0" : : "r" (0));
-	__asm__ __volatile__("mcr p15, 0, %0, c8, c6, 0" : : "r" (0));
-	__asm__ __volatile__("mcr p15, 0, %0, c8, c5, 0" : : "r" (0));
-	dsb();
-	isb();
+void mmu_inv_tlb(void) {
+  __asm__ __volatile__("mcr p15, 0, %0, c8, c7, 0" : : "r"(0));
+  __asm__ __volatile__("mcr p15, 0, %0, c8, c6, 0" : : "r"(0));
+  __asm__ __volatile__("mcr p15, 0, %0, c8, c5, 0" : : "r"(0));
+  dsb();
+  isb();
 }
 
 void cpu_enable_page() {
@@ -265,13 +253,13 @@ void cpu_enable_page() {
   u32 reg;
   // read mmu
   asm("mrc p15, 0, %0, c1, c0, 0" : "=r"(reg) : : "cc");  // SCTLR
-  reg |= 0x1;                                  // M enable mmu
+  reg |= 0x1;                                             // M enable mmu
   // reg|=(1<<29);//AFE
   // reg |= 1 << 28; //TEX remap enable.
   reg |= 1 << 12;  // Instruction cache enable:
   reg |= 1 << 2;   // Cache enable.
   reg |= 1 << 1;   // Alignment check enable.
-  reg |= 1 << 11;  //Branch prediction enable
+  reg |= 1 << 11;  // Branch prediction enable
   asm volatile("mcr p15, 0, %0, c1, c0, #0" : : "r"(reg) : "cc");  // SCTLR
   dsb();
   isb();
@@ -324,33 +312,21 @@ void cpu_backtrace(void) {
   }
 }
 
+int cpu_get_number() { return boot_info->tss_number; }
 
-int cpu_get_number(){
-  return boot_info->tss_number;
-}
+u32 cpu_get_id() { return 0; }
 
-u32 cpu_get_id(){
-  
+u32 cpu_get_index(int idx) { return 0; }
+
+int cpu_init_id(u32 id) { return 0; }
+
+int cpu_start_id(u32 id, u32 entry) {
+  // start at 0x2000 at entry-point on boot init.c
+
   return 0;
 }
 
-u32 cpu_get_index(int idx){
-  
-  return 0;
-}
-
-int cpu_init_id(u32 id){
-  
-  return 0;
-}
-
-int cpu_start_id(u32 id,u32 entry){
-  //start at 0x2000 at entry-point on boot init.c
-  
-  return 0;
-}
-
-void cpu_delay(int n){
+void cpu_delay(int n) {
   for (int i = 0; i < 10000 * n; i++)
     ;
 }
