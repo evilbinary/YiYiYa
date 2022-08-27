@@ -240,7 +240,7 @@ u32 sys_exec(char* filename, char* const argv[], char* const envp[]) {
   // init pwd
   vnode_t* node = f->data;
   if (node == NULL) {
-    kprintf("sys read node is null\n");
+    kprintf("sys exec node is null pwd\n");
     return -1;
   }
   if (node->parent != NULL) {

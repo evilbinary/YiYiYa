@@ -39,7 +39,7 @@ void getch() {
       "int $0x16\n");
 }
 
-void print_char(char s) { asm("int $0x10\n" : : "a"(s | 0x0e00), "b"(0x0007)); }
+void putc(char s) { asm("int $0x10\n" : : "a"(s | 0x0e00), "b"(0x0007)); }
 
 void itoa(char* buf, int base, int d) {
   char* p = buf;
@@ -86,7 +86,7 @@ void printf(const char* format, ...) {
 
   while ((c = *format++) != 0) {
     if (c != '%')
-      print_char(c);
+      putc(c);
     else {
       char* p;
 
@@ -105,11 +105,11 @@ void printf(const char* format, ...) {
           if (!p) p = "(null)";
 
         string:
-          while (*p) print_char(*p++);
+          while (*p) putc(*p++);
           break;
 
         default:
-          print_char(*((int*)arg++));
+          putc(*((int*)arg++));
           break;
       }
     }

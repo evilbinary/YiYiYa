@@ -27,4 +27,8 @@ void* load_kernel();
 void init_memory();
 void init_kernel();
 
+typedef int (*entry)(int, char**, char**);
+#define getch() uart_getc()
+#define putc(s)  uart_send(s)
+
 #endif
