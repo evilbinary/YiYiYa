@@ -3,34 +3,30 @@
  * 作者: evilbinary on 01/01/20
  * 邮箱: rootdebug@163.com
  ********************************************************************/
-#include "lcd.h"
-#include "drivers/vga/vga.h"
+#include "gpu.h"
+#include "vga/vga.h"
 
-size_t lcd_read(device_t* dev, void* buf, size_t len) {
+size_t gpu_read(device_t* dev, void* buf, size_t len) {
   u32 ret = 0;
   return ret;
 }
 
-size_t lcd_write(device_t* dev, const void* buf, size_t len) {
+size_t gpu_write(device_t* dev, const void* buf, size_t len) {
   u32 ret = 0;
   vga_device_t* vga = dev->data;
   if (vga == NULL) {
-    kprintf("not found lcd\n");
+    kprintf("not found vga\n");
     return ret;
   }
-  if(vga->frambuffer!=NULL){
-    kstrncpy(vga->frambuffer, (const char*)buf, len);
-  }else{
-    vga->write(vga,buf,len);
-  }
+  kstrncpy(vga->frambuffer, (const char*)buf, len);
   return ret;
 }
 
-size_t lcd_ioctl(device_t* dev, u32 cmd, void* args) {
+size_t gpu_ioctl(device_t* dev, u32 cmd, void* args) {
   u32 ret = 0;
   vga_device_t* vga = dev->data;
   if (vga == NULL) {
-    kprintf("not found lcd\n");
+    kprintf("not found vga\n");
     return ret;
   }
   if (cmd == IOC_READ_FRAMBUFFER) {
@@ -54,28 +50,29 @@ size_t lcd_ioctl(device_t* dev, u32 cmd, void* args) {
   return ret;
 }
 
-void lcd_init_device(device_t* dev) {
+void gpu_init_device(device_t* dev) {
   vga_device_t* vga = kmalloc(sizeof(vga_device_t));
   vga->frambuffer = 0;
   dev->data = vga;
-  lcd_init_mode(vga, VGA_MODE_128x128x16);
-  kprintf("lcd_init_device end\n");
+  gpu_init_mode(vga, VGA_MODE_480x272x32);
+  // gpu_init_mode(vga, VGA_MODE_1024x768x32);
+  kprintf("gpu_init_device end\n");
 }
 
-int lcd_init(void) {
+int gpu_init(void) {
   device_t* dev = kmalloc(sizeof(device_t));
   dev->name = "vga";
-  dev->read = lcd_read;
-  dev->write = lcd_write;
-  dev->ioctl = lcd_ioctl;
+  dev->read = gpu_read;
+  dev->write = gpu_write;
+  dev->ioctl = gpu_ioctl;
   dev->id = DEVICE_VGA;
   dev->type = DEVICE_TYPE_VGA;
   device_add(dev);
 
-  lcd_init_device(dev);
+  gpu_init_device(dev);
   return 0;
 }
 
-void lcd_exit(void) { kprintf("lcd exit\n"); }
+void gpu_exit(void) { kprintf("gpu exit\n"); }
 
-module_t lcd_module = {.name = "vga", .init = lcd_init, .exit = lcd_exit};
+module_t gpu_module = {.name = "vga", .init = gpu_init, .exit = gpu_exit};

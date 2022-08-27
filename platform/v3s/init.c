@@ -1,6 +1,6 @@
 #include "init.h"
 
-#include "drivers/gpio/v3s.h"
+#include "gpio/v3s.h"
 #include "gpio.h"
 #include "v3s-reg-ccu.h"
 
@@ -141,6 +141,7 @@ u32 cpu_get_rate(u32 prate) {
 }
 
 void platform_init() {
+  io_add_write_channel(uart_send);
   cpu_clock_init();
   // sys_dram_init();
 }

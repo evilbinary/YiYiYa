@@ -1,6 +1,6 @@
 #include "v3s.h"
 
-#include "drivers/vga/vga.h"
+#include "vga/vga.h"
 #include "v3s-reg-ccu.h"
 #include "v3s-reg-de.h"
 #include "v3s-reg-tcon.h"

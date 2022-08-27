@@ -23,6 +23,7 @@ void timer_end() {
 
 void platform_init(){
     // kprintf("platform_init\n");
+    io_add_write_channel(uart_send);
 }
 
 void platform_end(){
