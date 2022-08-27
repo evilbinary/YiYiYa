@@ -117,7 +117,6 @@ typedef struct interrupt_context {
 #define context_ret(context) context->r0
 #define context_set_entry(context,entry) ((interrupt_context_t*)((context)->esp0))->lr=entry+4;
 
-
 #define context_restore(duck_context) \
   interrupt_exit_context(duck_context);
 

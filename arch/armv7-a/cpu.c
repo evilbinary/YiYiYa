@@ -4,9 +4,11 @@
  * 邮箱: rootdebug@163.com
  ********************************************************************/
 #include "cpu.h"
+
 #include "context.h"
 
 extern boot_info_t* boot_info;
+u32 cpus_id[MAX_CPU];
 
 // 31:14-N -> va[29:20] va[19:12]
 #define TTBCRN_4K 0b010
@@ -268,6 +270,10 @@ void cpu_enable_page() {
 void cpu_init() {
   // cpu_enable_smp_mode();
   // cpu_enable_ca7_smp();
+  for(int i=0;i<MAX_CPU;i++){
+        cpus_id[i]=i;
+  }
+   
 }
 
 void cpu_halt() {
@@ -314,9 +320,21 @@ void cpu_backtrace(void) {
 
 int cpu_get_number() { return boot_info->tss_number; }
 
-u32 cpu_get_id() { return 0; }
+u32 cpu_get_id() {
+  // int cpu = 0;
+  // __asm__ volatile("mrc p15, #0, %0, c0, c0, #5\n" : "=r"(cpu));
+  // cpu &= 0xf;
+  // return cpu;
+  return 0;
+}
 
-u32 cpu_get_index(int idx) { return 0; }
+u32 cpu_get_index(int idx) {
+  if (idx < 0 || idx > cpu_get_number()) {
+    kprintf("out of bound get cpu idx\n");
+    return 0;
+  }
+  return cpus_id[idx];
+}
 
 int cpu_init_id(u32 id) { return 0; }
 

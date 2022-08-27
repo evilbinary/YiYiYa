@@ -27,8 +27,6 @@ thread_t* thread_create_level(void* entry, void* data, u32 level) {
 
 thread_t* thread_create_name(char* name, void* entry, void* data) {
   thread_t* t = thread_create(entry, data);
-  // char* kname = kmalloc(kstrlen(name));
-  // kstrcpy(kname, name);
   t->name = name;
   return t;
 }
@@ -36,9 +34,7 @@ thread_t* thread_create_name(char* name, void* entry, void* data) {
 thread_t* thread_create_name_level(char* name, void* entry, void* data,
                                    u32 level) {
   thread_t* t = thread_create_level(entry, data, level);
-  char* kname = kmalloc(kstrlen(name));
-  kstrcpy(kname, name);
-  t->name = kname;
+  t->name = name;
   return t;
 }
 
@@ -163,6 +159,12 @@ void thread_init(thread_t* thread, void* entry, u32* stack0, u32* stack3,
   thread->entry = entry;
   thread->cpu_id = cpu_get_id();
   context_init(&thread->context, (u32*)entry, stack0_top, stack3_top, level,thread->cpu_id);
+}
+
+void thread_set_arg(thread_t* thread,void* arg){
+  if(thread==NULL) return;
+  interrupt_context_t* context = thread->context.esp;
+  context_ret(context) = arg;
 }
 
 void thread_reset_stack3(thread_t* thread, u32* stack3) {
