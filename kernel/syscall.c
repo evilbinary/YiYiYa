@@ -75,6 +75,7 @@ void syscall_init() {
 
   syscall_table[SYS_STAT]=&sys_stat;
   syscall_table[SYS_FSTAT]=&sys_fstat;
+  syscall_table[SYS_SELF]=&sys_self;
 
 
   

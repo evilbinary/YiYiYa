@@ -228,7 +228,6 @@ u32 sys_exec(char* filename, char* const argv[], char* const envp[]) {
   u8* vstack3 = STACK_ADDR;
   thread_t* t = thread_create_ex_name(filename, (u32*)&run_elf_thread,
                                       THREAD_STACK_SIZE, NULL, USER_MODE, 0);
-
   thread_reset_stack3(t, vstack3);
   t->context.kernel_page_dir = current->context.kernel_page_dir;
 #ifdef PAGE_CLONE
@@ -270,7 +269,6 @@ u32 sys_exec(char* filename, char* const argv[], char* const envp[]) {
   data->argc = argc;
   data->envp = envp;
   t->exec = data;
-
   // init fds
   for (int i = 0; i < 3; i++) {
     t->fds[i] = current->fds[i];
@@ -593,4 +591,13 @@ int sys_fstat(int fd, struct stat* stat) {
   u32 cmd=IOC_STAT;
   u32 ret = vioctl(node, cmd, stat);
   return ret;
+}
+
+
+int sys_self(void* t){
+  if(t==NULL) return -2;
+  thread_t* current = thread_current();
+  if(current==NULL) return -1;
+  kmemcpy(t,current,sizeof(thread_t));
+  return 1;
 }

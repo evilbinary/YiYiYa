@@ -11,7 +11,7 @@
 #include "thread.h"
 #include "vfs.h"
 
-int load_elf(Elf32_Ehdr* elf_header, u32 fd, page_dir_t* page) {
+int load_elf(Elf32_Ehdr* elf_header, u32 fd) {
   u32 offset = elf_header->e_phoff;
   if (elf_header->e_phnum > MAX_PHDR) {
     kprintf("phnum %d > MAX_PHDR\n", elf_header->e_phnum);
@@ -150,7 +150,13 @@ int load_elf(Elf32_Ehdr* elf_header, u32 fd, page_dir_t* page) {
 
 void run_elf_thread() {
   Elf32_Ehdr elf;
-  thread_t* current = thread_current();
+  thread_t thread;
+  thread_t* current=&thread;
+  u32 ret=syscall1(SYS_SELF,current);
+  if(ret<0){
+    kprintf("get current thread error\n");
+    return ;
+  }
   exec_t* exec = current->exec;
   u32 fd = syscall2(SYS_OPEN, exec->filename, 0);
   #ifdef LOAD_ELF_NAME_DEBUG
@@ -167,12 +173,12 @@ void run_elf_thread() {
   entry_fn entry = NULL;
   if (elf_header->e_ident[0] == ELFMAG0 || elf_header->e_ident[1] == ELFMAG1) {
     entry = elf_header->e_entry;
-    load_elf(elf_header, fd, current->context.page_dir);
+    load_elf(elf_header, fd);
   } else {
     kprintf("load faild not elf %s\n", exec->filename);
     entry = NULL;
   }
-  u32 ret = -1;
+  ret = -1;
   if (entry != NULL) {
 #ifdef LOAD_ELF_DEBUG
     kprintf("entry %x\n", entry);
