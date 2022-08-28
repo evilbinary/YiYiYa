@@ -31,21 +31,48 @@ void gic_init() {
   // iid=0x1c81008
   kprintf("GIC iid = %x %x\n", &gp->iid, gp->iid);
 
+  // init
+  gp->ctl = 0;
 
-
+  // clear
+  for (i = 0; i < 32; ++i) {
+    gp->icpend[i] = 0xffffffff;
+  }
+  for (i = 0; i < 8; ++i) {
+    gp->igroup[i] = 0;
+  }
+  
 }
 
-void gic_enable(int irq) {
+void gic_irq_enable(int irq) {
   int x = irq / 32;
   unsigned long mask = 1 << (irq % 32);
   //通过设置GICD_ICENABLERn寄存器，开启中断
   gic.dist->isenable[x] = mask;
 }
 
+void gic_enable(int cpu, int irq) {
+  gic_dist_t *gp = gic.dist;
+  //设置目标 cpu
+  gp->itargets[irq] |= (1 << cpu) & 0xff;
+  //优先级别设置
+  gp->ipriority[irq] = 0;
+
+  // set security
+  unsigned int mask = 1 << (irq & 0x1f);
+  unsigned int reg = irq / 32;
+  unsigned int value = gp->igroup[reg];
+  value &= ~mask;
+  gp->igroup[reg] = value;
+
+  // irq开启
+  gic_irq_enable(irq);
+}
+
 void gic_unpend(int irq) {
   int x = irq / 32;
   unsigned long mask = 1 << (irq % 32);
-  //GICD_ISPENDRn 寄存器，修改中断的pending状态
+  // GICD_ISPENDRn 寄存器，修改中断的pending状态
   gic.dist->icpend[x] = mask;
 }
 
@@ -56,10 +83,9 @@ void gic_irqack(int irq) {
   gic_unpend(irq);
 }
 
-
-void gic_send_sgi(int cpu,int intid){
+void gic_send_sgi(int cpu, int irq) {
   //通过 GICD_SGIR Software Generated Interrupt Register软中断
-  
-  intid&=0xf;//in the range 0-15
-  gic.dist->sgi= cpu<<16;
+  unsigned int mask = 1 << (cpu & 0xff);
+  irq &= 0xf;  // in the range 0-15
+  gic.dist->sgi = mask << 16;
 }
