@@ -18,6 +18,8 @@
 #define BOOT_VERSION 0x01
 
 
+#define SECOND_BOOT_ENTRY 0x2000
+
 #define debugger asm("xchg %bx,%bx\n")
 
 typedef int (*entry)(int, char**, char**);

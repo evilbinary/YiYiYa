@@ -1,4 +1,6 @@
+#include "config.h"
 #include "mp.h"
+extern boot_info_t* boot_info;
 
 // muti process init
 void mp_init() {
@@ -17,7 +19,7 @@ void mp_init() {
   // delay
   cpu_delay(200);
 
-  u32 entry=0x2000;
+  u32 entry=boot_info->second_boot_entry;
 
   // start all cpu
   for (int i = 0; i < cpu_nums; i++) {

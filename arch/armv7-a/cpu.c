@@ -342,8 +342,8 @@ int cpu_init_id(u32 id) {
 
 int cpu_start_id(u32 id, u32 entry) {
   // start at  at entry-point on boot init.c
-  kprintf("cpu start id %d\n", id);
-  ipi_send(id,0);
+  kprintf("cpu start id %d entry: %x\n", id,entry);
+  lcpu_send_start(id,entry);
   return 0;
 }
 

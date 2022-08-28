@@ -53,23 +53,44 @@ void timer_end() {
   }
 }
 
-void platform_init() { io_add_write_channel(uart_send); }
+void platform_init() {
+  io_add_write_channel(uart_send);
+}
 
 void platform_end() {}
 
 void ipi_enable(int cpu) {
   if (cpu < 0 || cpu > 4) return;
-  io_write32(CORE0_MBOX_IRQCNTL + cpu * 4, 1);
+  u32 addr = CORE0_MBOX_IRQCNTL + cpu * 4;
+  io_write32(addr, 1);
 }
 
-void ipi_send(int cpu,int vec) {
+void test_smp_entry() {
+  *((u32*) 0x8888 )=1+ *((u32*) 0x8888 );
+  for (;;) cpu_halt();
+}
+
+void lcpu_send_start(u32 cpu, u32 entry){
   if (cpu < 0 || cpu > 4) return;
-  io_write32(CORE0_MBOX0_SET + cpu * 4, 1);
+
+  u32 mailbox = 3;
+  u32 addr = CORE0_MBOX0_SET + cpu * 0x10 + 4 * mailbox;
+  kprintf("set addr %x\n", addr);
+  io_write32(addr, entry);
+  
+}
+
+void ipi_send(int cpu, int vec) {
+  if (cpu < 0 || cpu > 4) return;
+  //todo
 }
 
 void ipi_clear(int cpu) {
   if (cpu < 0 || cpu > 4) return;
-  int addr = CORE0_MBOX0_RDCLR + cpu * 0x10;
-  int val = io_read32(addr);
-  io_write32(addr, val);
+  // u32 mailbox = 3;
+  // int addr = CORE0_MBOX0_RDCLR + cpu * 0x10 + 4 * mailbox;
+  // kprintf("clear addr %x\n", addr);
+  // u32 val = io_read32(addr);
+  // val = -1;
+  // io_write32(addr, val);
 }

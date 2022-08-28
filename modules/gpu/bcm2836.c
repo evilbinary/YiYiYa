@@ -103,7 +103,7 @@ int gpu_init_mode(vga_device_t* vga, int mode) {
 
   vga->framebuffer_index = 0;
   vga->framebuffer_count = 1;
-  kprintf("fb addr:%x len:%x\n", vga->frambuffer, vga->framebuffer_length);
+  kprintf("fb addr:%x end:%x len:%x\n", vga->frambuffer,vga->frambuffer+vga->framebuffer_length, vga->framebuffer_length);
   u32 addr = vga->frambuffer;
   for (int i = 0; i < vga->framebuffer_length*8 / PAGE_SIZE; i++) {
     map_page(addr, addr, 0);
