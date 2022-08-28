@@ -335,14 +335,14 @@ u32 cpu_get_index(int idx) {
 }
 
 int cpu_init_id(u32 id) {
-  kprintf("cpu init id %d\n", id);
+  // kprintf("cpu init id %d\n", id);
   ipi_enable(id);
   return 0;
 }
 
 int cpu_start_id(u32 id, u32 entry) {
   // start at  at entry-point on boot init.c
-  kprintf("cpu start id %d entry: %x\n", id,entry);
+  // kprintf("cpu start id %d entry: %x\n", id,entry);
   lcpu_send_start(id,entry);
   return 0;
 }

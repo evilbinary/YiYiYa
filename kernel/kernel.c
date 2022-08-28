@@ -26,6 +26,7 @@ void kernel_init() {
     kprintf("kernel init end\n");
   }else{
     kprintf("ap kernel init\n");
+    schedule_init();
   }
 }
 

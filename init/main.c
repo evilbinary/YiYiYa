@@ -41,6 +41,8 @@ int kmain(int argc, char* argv[]) {
 }
 
 int ksecondary(int argc, char* argv) {
+  kernel_init();
+
   // will start after main start
   thread_t* t1 = thread_create_name("monitor", (u32*)&do_monitor_thread, NULL);
   thread_run(t1);
