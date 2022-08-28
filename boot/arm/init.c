@@ -242,6 +242,7 @@ void init_boot_info() {
   boot_info->kernel_base = KERNEL_BASE;
   boot_info->kernel_size = KERNEL_BLOCK_SIZE * READ_BLOCK_SIZE * 2;
   boot_info->tss_number = MAX_CPU;
+  boot_info->second_boot_entry = SECOND_BOOT_ENTRY;
 }
 
 void init_disk() {

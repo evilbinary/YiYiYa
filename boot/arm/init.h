@@ -20,6 +20,8 @@
 #define PDT_BASE 0x9000
 #define BOOT_VERSION 0x01
 
+#define SECOND_BOOT_ENTRY 0x8000 //qemu 0x1000 real board 0x8000
+ 
 void init_boot();
 void init_display();
 

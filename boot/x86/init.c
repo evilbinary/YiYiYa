@@ -271,7 +271,8 @@ void read_kernel() {
   }
 
   //move apu entry
-  memmove(0x2000,&apu_boot,32*8);
+  memmove(SECOND_BOOT_ENTRY,&apu_boot,32*8);
+  boot_info->second_boot_entry=SECOND_BOOT_ENTRY;
 }
 
 static inline void enable_a20() {
