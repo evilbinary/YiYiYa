@@ -4,8 +4,8 @@
  * 邮箱: rootdebug@163.com
  ********************************************************************/
 #include "cpu.h"
-
 #include "context.h"
+#include "gic2.h"
 
 extern boot_info_t* boot_info;
 u32 cpus_id[MAX_CPU];
@@ -270,10 +270,9 @@ void cpu_enable_page() {
 void cpu_init() {
   // cpu_enable_smp_mode();
   // cpu_enable_ca7_smp();
-  for(int i=0;i<MAX_CPU;i++){
-        cpus_id[i]=i;
+  for (int i = 0; i < MAX_CPU; i++) {
+    cpus_id[i] = i;
   }
-   
 }
 
 void cpu_halt() {
@@ -321,11 +320,10 @@ void cpu_backtrace(void) {
 int cpu_get_number() { return boot_info->tss_number; }
 
 u32 cpu_get_id() {
-  // int cpu = 0;
-  // __asm__ volatile("mrc p15, #0, %0, c0, c0, #5\n" : "=r"(cpu));
-  // cpu &= 0xf;
-  // return cpu;
-  return 0;
+  int cpu = 0;
+  __asm__ volatile("mrc p15, #0, %0, c0, c0, #5\n" : "=r"(cpu));
+  cpu &= 0xf;
+  return cpu;
 }
 
 u32 cpu_get_index(int idx) {
@@ -336,11 +334,16 @@ u32 cpu_get_index(int idx) {
   return cpus_id[idx];
 }
 
-int cpu_init_id(u32 id) { return 0; }
+int cpu_init_id(u32 id) {
+  kprintf("cpu init id %d\n", id);
+  ipi_enable(id);
+  return 0;
+}
 
 int cpu_start_id(u32 id, u32 entry) {
   // start at 0x2000 at entry-point on boot init.c
-
+  kprintf("cpu start id %d\n", id);
+  ipi_send(id);
   return 0;
 }
 

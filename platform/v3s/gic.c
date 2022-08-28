@@ -183,8 +183,9 @@ void gic_handler(void) {
     if (irq == IRQ_TIMER0) {
       timer_handler(0);
     }
-    cp->eoi = irq;
-    gic_unpend(IRQ_TIMER0);
+    gic_irqack(irq);
+    // cp->eoi = irq;
+    // gic_unpend(IRQ_TIMER0);
   }
 
   // ms_delay ( 5 );
