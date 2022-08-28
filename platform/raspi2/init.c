@@ -1,27 +1,28 @@
+#include "arch/arch.h"
 #include "gpio.h"
 #include "libs/include/types.h"
 
-static void io_write32(uint port, u32 data) {
-  *(u32 *) port = data;
-}
+static void io_write32(uint port, u32 data) { *(u32 *)port = data; }
 
 static u32 io_read32(uint port) {
   u32 data;
-  data=*(u32 *) port;
+  data = *(u32 *)port;
   return data;
 }
 
 static u32 cntfrq = 0;
 
 void uart_send(unsigned int c) {
-  while(io_read32(UART0_FR)&0x20){}
-  io_write32(UART0_DR,c);
+  while (io_read32(UART0_FR) & 0x20) {
+  }
+  io_write32(UART0_DR, c);
 }
 
 unsigned int uart_receive() {
   unsigned int c;
-  while(io_read32(UART0_FR) & 0x10){}
-  c=io_read32(UART0_DR);
+  while (io_read32(UART0_FR) & 0x10) {
+  }
+  c = io_read32(UART0_DR);
   return c;
 }
 
@@ -34,7 +35,7 @@ u32 read_core0timer_pending(void) {
 void timer_init(int hz) {
   kprintf("timer init\n");
   cntfrq = read_cntfrq();
-  cntfrq=cntfrq/hz;
+  cntfrq = cntfrq / hz;
   kprintf("cntfrq %d\n", cntfrq);
   write_cntv_tval(cntfrq);
 
@@ -52,10 +53,23 @@ void timer_end() {
   }
 }
 
+void platform_init() { io_add_write_channel(uart_send); }
 
-void platform_init(){
-    io_add_write_channel(uart_send);
+void platform_end() {}
+
+void ipi_enable(int cpu) {
+  if (cpu < 0 || cpu > 4) return;
+  io_write32(CORE0_MBOX_IRQCNTL + cpu * 4, 1);
 }
 
-void platform_end(){
+void ipi_send(int cpu) {
+  if (cpu < 0 || cpu > 4) return;
+  io_write32(CORE0_MBOX0_SET + cpu * 4, 1);
+}
+
+void ipi_clear(int cpu) {
+  if (cpu < 0 || cpu > 4) return;
+  int addr = CORE0_MBOX0_RDCLR + cpu * 0x10;
+  int val = io_read32(addr);
+  io_write32(addr, val);
 }
