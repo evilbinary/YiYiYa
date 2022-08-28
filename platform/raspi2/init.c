@@ -62,7 +62,7 @@ void ipi_enable(int cpu) {
   io_write32(CORE0_MBOX_IRQCNTL + cpu * 4, 1);
 }
 
-void ipi_send(int cpu) {
+void ipi_send(int cpu,int vec) {
   if (cpu < 0 || cpu > 4) return;
   io_write32(CORE0_MBOX0_SET + cpu * 4, 1);
 }
