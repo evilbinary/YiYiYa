@@ -322,8 +322,7 @@ int cpu_get_number() { return boot_info->tss_number; }
 u32 cpu_get_id() {
   int cpu = 0;
   __asm__ volatile("mrc p15, #0, %0, c0, c0, #5\n" : "=r"(cpu));
-  cpu &= 0xf;
-  return cpu;
+  return cpu&0xf;
 }
 
 u32 cpu_get_index(int idx) {
