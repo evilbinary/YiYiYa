@@ -18,7 +18,10 @@ void lock_acquire(lock_t* lock) {
     ;  // do
 }
 
-void lock_release(lock_t* lock) { lock->turn += 1; }
+void lock_release(lock_t* lock) { 
+    //lock->turn += 1; 
+    cpu_faa(&lock->turn);
+}
 
 void acquire(u32* lock) {
   while ((lock, 1) == 1)

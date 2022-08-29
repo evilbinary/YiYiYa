@@ -59,6 +59,7 @@ void mm_alloc_init() {
     // skip
     u32 addr = mem->base;
     u32 len = mem->length;
+    // mm_add_block(addr, len);
     u32 kernel_start = boot_info->kernel_base;
     u32 kernel_end = kernel_start + boot_info->kernel_size;
     if (is_line_intersect(addr, addr + len, kernel_start, kernel_end)) {

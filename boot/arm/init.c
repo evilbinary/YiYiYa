@@ -282,18 +282,26 @@ void init_memory() {
 #else
   //
   ptr->type = 1;
-  ptr->base = 0x00000000;
+  ptr->base = 0x0000000;
   ptr->length = boot_info->kernel_base;
   boot_info->total_memory += ptr->length;
   ptr++;
   count++;
 
-  ptr->type = 1;
-  ptr->base = (u32)boot_info->kernel_base + (u32)boot_info->kernel_size;
-  ptr->length = 0xf000000;  // 64M
+  ptr->type = 2;
+  ptr->base = (u32)boot_info->kernel_base;
+  ptr->length = (u32)boot_info->kernel_size;
   boot_info->total_memory += ptr->length;
   ptr++;
   count++;
+
+  ptr->type = 1;
+  ptr->base = (u32)boot_info->kernel_base+ (u32)boot_info->kernel_size;
+  ptr->length = 0xf000000;
+  boot_info->total_memory += ptr->length;
+  ptr++;
+  count++;
+
 #endif
   boot_info->memory_number = count;
   // page setup

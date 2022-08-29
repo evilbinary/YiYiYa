@@ -22,19 +22,22 @@ boot_source= ['boot_'+env['ARCH']+'.s']
 if env.get('MYLIB'):
     source.append(env.get('MYLIB'))
 
+env.GenerateKernelSize('config.h',['../../init/kernel'])
 
 if env['PLATFORM']=='stm32f4xx':
-    env.GenerateKernelSize('config.h',[])
     linkflags='-nostdlib -nostartfiles -T boot/arm/link-stm32f4xx.ld'
     source=['init_armv7.c']
     boot_source=['boot_armv7.s',]
     cflags+='-DNO_KSTART'
+
+elif env['PLATFORM']=='raspi2':
+    linkflags='-nostdlib -nostartfiles -T boot/arm/link-raspi2.ld'
 else:
-    env.GenerateKernelSize('config.h',['../../init/kernel'])
 
-    env.Object('boot.o',boot_source,ASFLAGS='')
+    pass
 
-    env.Program(target ='init.elf', source = source,
-        CFLAGS=cflags,
-        LINKFLAGS= linkflags)
-    env.Objcopy('init.bin','init.elf',OBJCOPYFLAGS='-O binary -S --strip-debug')
+env.Object('boot.o',boot_source,ASFLAGS='')
+env.Program(target ='init.elf', source = source,
+    CFLAGS=cflags,
+    LINKFLAGS= linkflags)
+env.Objcopy('init.bin','init.elf',OBJCOPYFLAGS='-O binary -S --strip-debug')
