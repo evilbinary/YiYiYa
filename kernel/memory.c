@@ -68,10 +68,12 @@ void* kmalloc(size_t size) {
 }
 
 void* kmalloc_alignment(size_t size, int alignment) {
+  // cpu_lock();
   // size=((size+4096)/4096)*4096;
   // use_kernel_page();
   void* addr = mm_alloc_zero_align(size, alignment);
   // use_user_page();
+  // cpu_unlock();
   return addr;
 }
 

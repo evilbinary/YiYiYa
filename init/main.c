@@ -17,7 +17,7 @@ void kstart(int argc, char* argv[], char** envp) {
   if (cpu == 0) {
     kmain(argc, argv);
   } else {
-    ksecondary(argc, argv);
+    ksecondary(cpu,argc, argv);
   }
   for (;;) {
     cpu_halt();
@@ -40,9 +40,11 @@ int kmain(int argc, char* argv[]) {
   return 0;
 }
 
-int ksecondary(int argc, char* argv) {
+int ksecondary(int cpu,int argc, char* argv) {
+
   kernel_init();
 
+  cpu_lock();
   // will start after main start
   thread_t* t1 = thread_create_name("monitor", (u32*)&do_monitor_thread, NULL);
   thread_run(t1);
@@ -51,7 +53,9 @@ int ksecondary(int argc, char* argv) {
   thread_t* t2 = thread_create_name("monitor2", (u32*)&do_monitor_thread, NULL);
   thread_run(t2);
 
-  kprintf("kernel run secondary\n");
+  
+  kprintf("kernel run secondary %d\n",cpu);
+  cpu_unlock();
   kernel_run();
 
   return 0;

@@ -352,11 +352,7 @@ void init_boot() {
 
 void init_apu_boot() {
   cls();
-  putc('a');
-  putc('p');
-  putc('u');
   printf("boot apu info addr %x\n\r", boot_info);
-
   start_apu_kernel();
   for (;;)
     ;

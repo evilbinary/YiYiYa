@@ -15,13 +15,14 @@ typedef struct {
 } lock_t;
 
 void lock_init(lock_t* lock);
-
 void lock_acquire(lock_t* lock);
-
 void lock_release(lock_t* lock);
 
 void acquire(u32* lock);
 void release(u32* lock);
 
+void cpu_lock_init();
+void cpu_lock();
+void cpu_unlock();
 
 #endif

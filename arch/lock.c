@@ -4,8 +4,9 @@
  * 邮箱: rootdebug@163.com
  ********************************************************************/
 #include "lock.h"
-
 #include "cpu.h"
+
+lock_t mp_cpu_lock;
 
 void lock_init(lock_t* lock) {
   lock->ticket = 0;
@@ -28,3 +29,16 @@ void acquire(u32* lock) {
     ;  // spin wait
 }
 void release(u32* lock) { *lock = 0; }
+
+
+void cpu_lock_init(){
+  lock_init(&mp_cpu_lock);
+}
+
+void cpu_lock(){
+  lock_acquire(&mp_cpu_lock);
+}
+
+void cpu_unlock(){
+  lock_release(&mp_cpu_lock);
+}
