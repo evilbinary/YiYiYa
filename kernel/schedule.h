@@ -11,7 +11,5 @@
 
 
 void schedule_init();
-thread_t* schedule(interrupt_context_t* interrupt_context);
-void schedule_next();
 
 #endif

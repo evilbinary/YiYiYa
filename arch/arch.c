@@ -10,6 +10,8 @@ boot_info_t boot_data={0};
 extern u32 write_channel_number;
 
 void arch_init(boot_info_t* boot,int cpu) {
+  cpu_lock_init();
+
   if (cpu==0) {
     kmemmove(&boot_data,boot,sizeof(boot_info_t));
     boot_info = &boot_data;
