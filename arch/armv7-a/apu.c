@@ -6,8 +6,6 @@
 #include "../arch.h"
 
 void ap_init(int cpu){
-    cpu_lock();
     cpu_init(cpu);
     interrupt_init(cpu);
-    cpu_unlock();
 }

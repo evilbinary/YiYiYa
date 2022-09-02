@@ -7,8 +7,6 @@
 
 #include "thread.h"
 
-extern context_t *current_context;
-
 interrupt_handler_t *exception_handlers[EXCEPTION_NUMBER];
 void exception_regist(u32 vec, interrupt_handler_t handler) {
   exception_handlers[vec] = handler;
@@ -267,17 +265,16 @@ void unuse_handler() {
 }
 
 void do_irq(interrupt_context_t *interrupt_context) {}
-extern context_t *current_context;
 
 INTERRUPT_SERVICE
 void irq_handler() {
   // interrupt_entering_code(0, 0);
   // interrupt_process(do_irq);
   // cpu_halt();
+  // interrupt_exit();
   interrupt_entering_code(ISR_TIMER, 0);
   interrupt_process(do_schedule);
-  // interrupt_exit();
-  interrupt_exit_context(current_context);
+  interrupt_exit_ret();
 }
 
 INTERRUPT_SERVICE

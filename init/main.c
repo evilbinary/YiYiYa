@@ -17,7 +17,7 @@ void kstart(int argc, char* argv[], char** envp) {
   if (cpu == 0) {
     kmain(argc, argv);
   } else {
-    ksecondary(cpu,argc, argv);
+    ksecondary(cpu, argc, argv);
   }
   for (;;) {
     cpu_halt();
@@ -26,10 +26,10 @@ void kstart(int argc, char* argv[], char** envp) {
 
 int kmain(int argc, char* argv[]) {
   kernel_init();
-
   modules_init();
 
-  thread_t* t1 = thread_create_name_level("kernel", (u32*)&do_kernel_thread, NULL,KERNEL_MODE);
+  thread_t* t1 = thread_create_name_level("kernel", (u32*)&do_kernel_thread,
+                                          NULL, KERNEL_MODE);
   thread_t* t2 = thread_create_name("shell", (u32*)&do_shell_thread, NULL);
   thread_run(t1);
   thread_run(t2);
@@ -40,22 +40,16 @@ int kmain(int argc, char* argv[]) {
   return 0;
 }
 
-int ksecondary(int cpu,int argc, char* argv) {
-
+int ksecondary(int cpu, int argc, char* argv) {
   kernel_init();
-
-  cpu_lock();
   // will start after main start
   thread_t* t1 = thread_create_name("monitor", (u32*)&do_monitor_thread, NULL);
   thread_run(t1);
 
-
   thread_t* t2 = thread_create_name("monitor2", (u32*)&do_monitor_thread, NULL);
   thread_run(t2);
 
-  
-  kprintf("kernel run secondary %d\n",cpu);
-  cpu_unlock();
+  kprintf("kernel run secondary %d\n", cpu);
   kernel_run();
 
   return 0;
