@@ -21,8 +21,4 @@ void lock_release(lock_t* lock);
 void acquire(u32* lock);
 void release(u32* lock);
 
-void cpu_lock_init();
-void cpu_lock();
-void cpu_unlock();
-
 #endif
