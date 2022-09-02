@@ -6,7 +6,6 @@
 #include "schedule.h"
 
 u32 timer_ticks[MAX_CPU] = {0};
-lock_t schedule_lock;
 
 thread_t* schedule_get_next() {
   thread_t* current = thread_current();
@@ -43,8 +42,7 @@ void schedule_next() {
   }
 }
 
-void do_schedule(interrupt_context_t* interrupt_context) {
-  lock_acquire(&schedule_lock);
+void* do_schedule(interrupt_context_t* interrupt_context) {
   int cpu = cpu_get_id();
   thread_t* next_thread = NULL;
   thread_t* prev_thread = NULL;
@@ -59,21 +57,20 @@ void do_schedule(interrupt_context_t* interrupt_context) {
   prev_thread = current_thread;
   current_thread = next_thread;
   context_switch(interrupt_context, &c, &next_thread->context);
-  thread_set_current(current_thread);
+  thread_set_current(next_thread);
   timer_ticks[cpu]++;
-  lock_release(&schedule_lock);
   timer_end();
-  interrupt_exit_context(c);
+  return c->esp0;
 }
 
 INTERRUPT_SERVICE
 void do_timer() {
   interrupt_entering_code(ISR_TIMER, 0);
   interrupt_process(do_schedule);
+  interrupt_exit_ret();
 }
 
 void schedule_init() {
-  lock_init(&schedule_lock);
   interrutp_regist(ISR_TIMER, do_timer);
   timer_init(1000);
 }

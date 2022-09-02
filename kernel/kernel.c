@@ -25,10 +25,8 @@ void kernel_init() {
     vfs_init();
     kprintf("kernel init end\n");
   }else{
-    cpu_lock();
     kprintf("ap kernel init\n");
     schedule_init();
-    cpu_unlock();
   }
 }
 
