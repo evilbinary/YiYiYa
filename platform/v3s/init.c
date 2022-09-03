@@ -1,6 +1,5 @@
 #include "init.h"
 
-#include "gpio/v3s.h"
 #include "gpio.h"
 #include "v3s-reg-ccu.h"
 
@@ -147,3 +146,20 @@ void platform_init() {
 }
 
 void platform_end() {}
+
+
+void ipi_enable(int cpu) {
+
+}
+
+void lcpu_send_start(u32 cpu, u32 entry) {
+
+}
+
+void ipi_send(int cpu, int vec) {
+
+}
+
+void ipi_clear(int cpu) {
+
+}

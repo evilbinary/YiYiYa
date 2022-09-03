@@ -13,7 +13,7 @@ Import('env')
 linkflags=' $LINKFLAGS -Xlinker -Map=kernel.map -T'+env.get('LINKLD')
 
 libs=[
-     '../modules/libdriver.a',
+     '../modules/libmodules.a',
     '../kernel/libyiyiya.a',
     '../arch/libarch.a',
     '../platform/libplatform.a',
@@ -36,8 +36,9 @@ if env.get('ARCHTYPE')=='xtensa':
     pass
 elif env.get('ARCHTYPE')=='arm':
     if env.get('ARCH')=='armv7':
-        kernel.append('../boot/arm/boot_armv7.s')
-        kernel.append('../boot/arm/init_armv7.c')
+        kernel.append('../boot/arm/boot.o')
+        kernel.append('../boot/arm/init.o')
+        pass
     else:
         pass
 if env.get('MYLIB'):
