@@ -10,6 +10,18 @@
 #include "libs/include/types.h"
 #include "platform/platform.h"
 
+
+typedef struct context_t {
+  u32 esp0, ss0, ds0;
+  u32 esp, ss, ds;
+  u32 eip;
+  tss_t* tss;
+  u32* page_dir;
+  u32* kernel_page_dir;
+  u32 level;
+} context_t;
+
+
 typedef struct interrupt_context {
   // manual push
   u32 no;
@@ -56,6 +68,18 @@ typedef struct interrupt_context {
       :                                    \
       : "i"(VEC), "i"(CODE))
 
+#define interrupt_exit_ret()   \
+  asm volatile(                              \ 
+      "mov r0,r0 \n"                           \
+      "ldmfd r0!,{r1,r2}\n"                    \
+      "ldmfd r0!,{r4-r11}\n"                   \
+      "msr psp, r0\n"                          \
+      "mov lr,#0xFFFFFFFD\n"                   \
+      "isb\n"                                  \
+      "bx lr\n"                                \
+                                             : \
+                                             : )
+
 #define interrupt_exit_context(duck_context)   \
   asm volatile(                              \ 
       "ldr r0,%0 \n"                           \
@@ -90,7 +114,9 @@ typedef struct interrupt_context {
 
 #define context_fn(context) context->r6
 #define context_ret(context) context->r0
-
+#define context_set_entry(context, entry) \
+  ((interrupt_context_t*)((context)->esp0))->lr = entry + 4;
+  
 #define context_restore(duck_context)          \
   asm volatile(                              \ 
       "ldr r0,%0 \n"                           \
@@ -111,7 +137,7 @@ typedef struct interrupt_context {
 void context_clone(context_t* context, context_t* src, u32* stack0, u32* stack3,
                    u32* old0, u32* old3);
 void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
-                  u32 level);
+                  u32 level, int cpu);
 void context_dump(context_t* c);
 
 

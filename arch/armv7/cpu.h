@@ -11,16 +11,6 @@
 
 #define debugger
 
-typedef struct context_t {
-  u32 esp0, ss0, ds0;
-  u32 esp, ss, ds;
-  u32 eip;
-  tss_t* tss;
-  u32* page_dir;
-  u32* kernel_page_dir;
-  u32 level;
-} context_t;
-
 typedef struct cpsr {
   union {
     struct {

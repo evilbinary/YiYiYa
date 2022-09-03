@@ -20,7 +20,7 @@ int context_get_mode(context_t* context) {
 }
 
 void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
-                  u32 level) {
+                  u32 level, int cpu) {
   if (context == NULL) {
     return;
   }

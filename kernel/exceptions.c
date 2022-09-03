@@ -208,7 +208,7 @@ INTERRUPT_SERVICE
 void sys_tick_handler() {
   interrupt_entering_code(2, 0);
   interrupt_process(do_schedule);
-  interrupt_exit_context(current_context);
+  interrupt_exit_ret();
 }
 
 INTERRUPT_SERVICE

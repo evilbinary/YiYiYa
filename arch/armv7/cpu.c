@@ -278,3 +278,8 @@ void cpu_backtrace(void) {
     topfp = fp;
   }
 }
+
+
+int cpu_get_id(){
+  return 0;
+}
