@@ -267,7 +267,7 @@ void cpu_enable_page() {
   isb();
 }
 
-void cpu_init() {
+void cpu_init(int cpu) {
   // cpu_enable_smp_mode();
   // cpu_enable_ca7_smp();
   for (int i = 0; i < MAX_CPU; i++) {

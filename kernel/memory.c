@@ -11,7 +11,12 @@
 queue_pool_t* kernel_pool;
 queue_pool_t* user_pool;
 
-void memory_init() { kpool_init(); }
+lock_t memory_lock;
+
+void memory_init() {
+  lock_init(&memory_lock);
+  kpool_init();
+}
 
 #ifdef MALLOC_TRACE
 
@@ -40,7 +45,7 @@ void* kmalloc_trace(size_t size, void* name, void* no, void* fun) {
 void* kmalloc_alignment_trace(size_t size, int alignment, void* name, void* no,
                               void* fun) {
   void* addr = mm_alloc_zero_align(size, alignment);
-  u32 tid=-1;
+  u32 tid = -1;
   thread_t* current = thread_current();
   if (current != NULL) {
     tid = current->id;
@@ -56,7 +61,7 @@ void* kmalloc(size_t size) {
   void* addr = NULL;
 #ifdef X86
   // size = ((size + PAGE_SIZE) / PAGE_SIZE) * PAGE_SIZE;
-  size=((size+1024)/1024)*1024;
+  size = ((size + 1024) / 1024) * 1024;
 #endif
   addr = mm_alloc(size);
   if (addr == NULL) {
@@ -192,7 +197,7 @@ void* kpool_poll() {
 }
 
 void use_kernel_page() {
-  context_t* context=thread_current_context();
+  context_t* context = thread_current_context();
   if (context != NULL && cpu_cpl() == KERNEL_MODE) {
     context->tss->cr3 = context->kernel_page_dir;
     context_switch_page(context->kernel_page_dir);
@@ -200,7 +205,7 @@ void use_kernel_page() {
 }
 
 void use_user_page() {
-  context_t* context=thread_current_context();
+  context_t* context = thread_current_context();
   if (context != NULL && cpu_cpl() == KERNEL_MODE) {
     context->tss->cr3 = context->page_dir;
     context_switch_page(context->page_dir);
@@ -209,7 +214,7 @@ void use_user_page() {
 
 void vmemory_area_free(vmemory_area_t* area) {
   if (area == NULL) return;
-  context_t* context=thread_current_context();
+  context_t* context = thread_current_context();
   u32 vaddr = area->vaddr;
   for (int i = 0; i < area->size / PAGE_SIZE; i++) {
     u32 phyaddr = virtual_to_physic(context->page_dir, vaddr);

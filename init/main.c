@@ -12,7 +12,8 @@ extern void do_monitor_thread();
 
 void kstart(int argc, char* argv[], char** envp) {
   boot_info_t* boot_info = envp[0];
-  int cpu = envp[1];
+  // int cpu = envp[1];
+  int cpu = cpu_get_id();
   arch_init(boot_info, cpu);
   if (cpu == 0) {
     kmain(argc, argv);

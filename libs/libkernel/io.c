@@ -9,8 +9,6 @@
 write_channel_fn write_channels[10];
 u32 write_channel_number = 0;
 
-char printf_buffer[512];
-
 void io_add_write_channel(write_channel_fn fn) {
   for (int i = 0; i < write_channel_number; i++) {
     if (fn == write_channels[i]) {
@@ -30,7 +28,8 @@ void print_char(u8 ch) {
 }
 
 void kprintf(const char* fmt, ...) {
-  kmemset(printf_buffer,0,512);
+  char printf_buffer[256];
+  kmemset(printf_buffer,0,256);
   int i;
 	va_list args;
 	va_start(args, fmt);

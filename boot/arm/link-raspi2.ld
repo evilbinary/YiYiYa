@@ -10,7 +10,7 @@ SECTIONS
     .data : {*(.data)}
     .bss : {*(.bss)}
     .stack :  ALIGN(4) {
-        . = 0x200000;
+        . = 0x6000;
         _estack = .;
         . = . + __stack_size;
         _stack_abt = .;
