@@ -25,6 +25,7 @@ env.Library('yiyiya', [
     'loader.c',
     'rw_queue.c',
     'pipe.c',
+    'mp.c',
     '../arch/libarch.a',
     '../libs/libalgorithm/libalgorithm.a',
     '../libs/libkernel/libkernel.a',

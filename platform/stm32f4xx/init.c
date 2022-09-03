@@ -163,6 +163,7 @@ void test_led() {
 }
 
 void platform_init() {
+  io_add_write_channel(uart_send);
   // init system
   system_init();
 

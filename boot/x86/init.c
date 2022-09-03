@@ -17,6 +17,7 @@ boot_info_t* boot_info = NULL;
 boot_info_t boot_data;
 u8 kernel_stack[1024];  // 1k
 u8 kernel_stack_top[0];
+int cpu_id=0;
 
 void cls() {
   // clear screen
@@ -38,7 +39,7 @@ void getch() {
       "int $0x16\n");
 }
 
-void print_char(char s) { asm("int $0x10\n" : : "a"(s | 0x0e00), "b"(0x0007)); }
+void putc(char s) { asm("int $0x10\n" : : "a"(s | 0x0e00), "b"(0x0007)); }
 
 void itoa(char* buf, int base, int d) {
   char* p = buf;
@@ -85,7 +86,7 @@ void printf(const char* format, ...) {
 
   while ((c = *format++) != 0) {
     if (c != '%')
-      print_char(c);
+      putc(c);
     else {
       char* p;
 
@@ -104,11 +105,11 @@ void printf(const char* format, ...) {
           if (!p) p = "(null)";
 
         string:
-          while (*p) print_char(*p++);
+          while (*p) putc(*p++);
           break;
 
         default:
-          print_char(*((int*)arg++));
+          putc(*((int*)arg++));
           break;
       }
     }
@@ -123,7 +124,7 @@ void init_boot_info() {
   boot_info->kernel_size = KERNEL_BLOCK_SIZE * READ_BLOCK_SIZE * 2;
   boot_info->gdt_number = GDT_NUMBER;
   boot_info->pdt_base = PDT_BASE;
-  boot_info->tss_number = MAX_CPU;
+  boot_info->tss_number = CPU_NUMBER;
 }
 
 void init_disk() {
@@ -140,18 +141,11 @@ void init_display() {
 }
 
 void* memmove(void* s1, const void* s2, u32 n) {
-  // char *dest, *src;
-  // u32 i;
-  // dest = (char*)s1;
-  // src = (char*)s2;
-  // for (i = 0; i < n; i++) dest[i] = src[i];
-  u16 *dest, *src;
-  int i;
-  dest = (u16*)s1;
-  src = (u16*)s2;
-  for (i = 0; i < n / 2; i++) {
-    dest[i] = src[i];
-  }
+  char *dest, *src;
+  u32 i;
+  dest = (char*)s1;
+  src = (char*)s2;
+  for (i = 0; i < n; i++) dest[i] = src[i];
   return s1;
 }
 
@@ -195,6 +189,37 @@ u8 disk_read_lba(u32 lba, u32 addr, u8* status) {
            cylinder, head, sector);
   }
   return ret;
+}
+
+void __attribute__((naked)) apu_boot(){
+#if defined(__WIN32__)
+asm("jmpl $0x0000, $_init_apu_boot\n");
+#else
+asm("jmpl $0x0000, $init_apu_boot\n");
+#endif
+}
+
+
+void init_apu_boot(){ 
+  cls();
+  printf("boot apu info addr %x\n\r", boot_info);
+  init_gdt();
+  init_cpu();
+
+  asm volatile(
+      "movl %0, %%esp\n"
+      "mov %%esp,%%ebp\n"
+      :
+      : "m"(kernel_stack_top));\
+
+#if defined(__WIN32__)      
+  asm("jmpl %0, $_start_apu_kernel" ::"i"(GDT_ENTRY_32BIT_CS * GDT_SIZE));
+#else
+  asm("jmpl %0, $start_apu_kernel" ::"i"(GDT_ENTRY_32BIT_CS * GDT_SIZE));
+#endif
+
+  for (;;)
+    ;
 }
 
 void read_kernel() {
@@ -244,6 +269,10 @@ void read_kernel() {
     for (;;)
       ;
   }
+
+  //move apu entry
+  memmove(SECOND_BOOT_ENTRY,&apu_boot,32*8);
+  boot_info->second_boot_entry=SECOND_BOOT_ENTRY;
 }
 
 static inline void enable_a20() {
@@ -301,7 +330,7 @@ void init_gdt() {
   gdt_addr[GDT_ENTRY_32BIT_DS] = GDT_ENTRY(0, 0xfffff, 0xc092);  // 0x10
   gdt_addr[GDT_ENTRY_32BIT_FS] = GDT_ENTRY(0, 0xfffff, 0xc093);  // 0x18
 
-  u32 tss_base = (u32) & (boot_info->tss[0]);
+  u32 tss_base = (u32) & (boot_info->tss[cpu_id]);
   gdt_addr[GDT_ENTRY_32BIT_TSS] = GDT_ENTRY(tss_base, 0xfffff, 0xc089);  // 0x20
   gdt_addr[GDT_ENTRY_USER_32BIT_CS] =
       GDT_ENTRY(0, 0xfffff, 0xc09b | GDT_DPL(3));  // 0x28
@@ -370,6 +399,8 @@ void init_boot() {
   for (;;)
     ;
 }
+
+
 
 asm(".code32\n");
 
@@ -519,5 +550,24 @@ void start_kernel() {
   char** argv = 0;
   char* envp[10];
   envp[0] = boot_info;
+  envp[1] = cpu_id++;
+  start(argc, argv, envp);
+}
+
+//start kernel
+void start_apu_kernel() {
+  asm volatile("cli\n");
+  asm volatile("movl %0, %%ss" : : "r"(GDT_ENTRY_32BIT_DS * GDT_SIZE));
+  asm volatile("movl %0, %%ds" : : "r"(GDT_ENTRY_32BIT_DS * GDT_SIZE));
+  asm volatile("movl %0, %%es" : : "r"(GDT_ENTRY_32BIT_DS * GDT_SIZE));
+  asm volatile("movl %0, %%gs" : : "r"(GDT_ENTRY_32BIT_DS * GDT_SIZE));
+  asm volatile("movl %0, %%fs" : : "r"(GDT_ENTRY_32BIT_FS * GDT_SIZE));
+  // print_string("load kernel\n\r");
+  entry start = boot_info->kernel_entry;
+  int argc = 0;
+  char** argv = 0;
+  char* envp[10];
+  envp[0] = boot_info;
+  envp[1] = cpu_id++;
   start(argc, argv, envp);
 }

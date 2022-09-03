@@ -6,6 +6,7 @@
 #ifndef KERNEL_H
 #define KERNEL_H
 
+#include "config.h"
 #include "arch/arch.h"
 #include "kernel/device.h"
 #include "kernel/memory.h"

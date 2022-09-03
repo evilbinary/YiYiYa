@@ -54,8 +54,11 @@ typedef struct thread {
     u32 level;
     u32 *entry;
     u32 stack_size;
+    u32 cpu_id;
 }thread_t;
 
+
+void thread_init();
 
 thread_t * thread_create(void* entry,void* data);
 thread_t * thread_create_name(char* name,void* entry,void* data);

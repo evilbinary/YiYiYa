@@ -10,15 +10,15 @@ Import('env')
 
 arch =env['ARCH']
 
-env.Library('arch', [
+source=[
     'arch.c',
     'lock.c',
     'mm.c',
-    arch+'/io.c',
-    arch+'/cpu.c',
-    arch+'/mm.c',
-    # arch+'/mmu_dump.c',
-    arch+'/display.c',
-    arch+'/interrupt.c',
+]
+
+source+=Glob(arch+'/*.c')
+
+
+env.Library('arch', source+[
     '../platform/libplatform.a'
     ])

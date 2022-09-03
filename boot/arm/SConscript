@@ -24,16 +24,23 @@ if env.get('MYLIB'):
 
 
 if env['PLATFORM']=='stm32f4xx':
-    env.GenerateKernelSize('config.h',[])
     linkflags='-nostdlib -nostartfiles -T boot/arm/link-stm32f4xx.ld'
     source=['init_armv7.c']
     boot_source=['boot_armv7.s',]
-    cflags+='-DNO_KSTART'
+    cflags+=' -DNO_KSTART '
+
+elif env['PLATFORM']=='raspi2':
+    linkflags='-nostdlib -nostartfiles -T boot/arm/link-raspi2.ld'
+else:
+
+    pass
+
+if env['PLATFORM']=='stm32f4xx':
+    env.Object('boot.o',boot_source,ASFLAGS='')
+    env.Object('init.o',source,ASFLAGS='', CFLAGS=cflags,LINKFLAGS= linkflags)
 else:
     env.GenerateKernelSize('config.h',['../../init/kernel'])
-
     env.Object('boot.o',boot_source,ASFLAGS='')
-
     env.Program(target ='init.elf', source = source,
         CFLAGS=cflags,
         LINKFLAGS= linkflags)

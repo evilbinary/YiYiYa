@@ -5,15 +5,11 @@
  ********************************************************************/
 #include "schedule.h"
 
-#include "thread.h"
-
-volatile u32 timer_ticks = 0;
-extern thread_t* current_thread;
-u32 schedule_lock = 0;
-
-context_t* current_context;
+u32 timer_ticks[MAX_CPU] = {0};
+lock_t schedule_lock;
 
 thread_t* schedule_get_next() {
+  thread_t* current = thread_current();
   thread_t* next = NULL;
   thread_t* v = thread_head();
   // find next priority
@@ -21,61 +17,62 @@ thread_t* schedule_get_next() {
   //   current_thread->counter=0;
   // }
   for (; v != NULL; v = v->next) {
-    //kprintf("v %d %d\n",v->id,v->state);
-    if(v==current_thread) continue;
+    // kprintf("v %d %d\n",v->id,v->state);
+    if (v == current) continue;
     if (v->state != THREAD_RUNNING) continue;
-    if(next==NULL){
-      next=v;
-    }else if( v->counter <= next->counter ) {
+    if (next == NULL) {
+      next = v;
+    } else if (v->counter <= next->counter) {
       next = v;
     }
   }
-  if(next ==NULL ){
-    next= thread_head();
+  if (next == NULL) {
+    next = thread_head();
   }
   next->counter++;
   return next;
 }
 
-void schedule_next(){
+void schedule_next() {
   cpu_cli();
-  thread_t* current=current_thread;
+  thread_t* current = thread_current();
   // interrupt_context_t* interrupt_context=current_thread->context.esp0;
   // schedule(interrupt_context);
-  for(;current!=current_thread;){
-      cpu_sti();
+  for (; current != current;) {
+    cpu_sti();
   }
 }
 
-void schedule(interrupt_context_t* interrupt_context) {
+void* do_schedule(interrupt_context_t* interrupt_context) {
+  int cpu = cpu_get_id();
   thread_t* next_thread = NULL;
   thread_t* prev_thread = NULL;
+  thread_t* current_thread = thread_current();
   next_thread = schedule_get_next();
-  // kprintf("schedule next %d\n",next_thread->id);
+  // kprintf("schedule next %s %d\n",next_thread->name,next_thread->id);
   if (next_thread == NULL) {
     kprintf("schedule error next\n");
     return;
   }
+  context_t* c = &current_thread->context;
   prev_thread = current_thread;
   current_thread = next_thread;
-  context_switch(interrupt_context,&current_context,&next_thread->context);
-}
-
-void do_schedule(interrupt_context_t* interrupt_context) {
-  schedule(interrupt_context);
-  timer_ticks++;
+  context_switch(interrupt_context, &c, &next_thread->context);
+  thread_set_current(next_thread);
+  timer_ticks[cpu]++;
   timer_end();
+  return c->esp0;
 }
 
 INTERRUPT_SERVICE
 void do_timer() {
-  interrupt_entering_code(ISR_TIMER,0);
+  interrupt_entering_code(ISR_TIMER, 0);
   interrupt_process(do_schedule);
-  //interrupt_exit();
-  interrupt_exit_context(current_context);
+  interrupt_exit_ret();
 }
 
 void schedule_init() {
+  lock_init(&schedule_lock);
   interrutp_regist(ISR_TIMER, do_timer);
   timer_init(1000);
 }

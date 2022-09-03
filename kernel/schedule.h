@@ -7,10 +7,9 @@
 #define SCHEDULE_H
 
 #include "arch/arch.h"
+#include "thread.h"
 
 
 void schedule_init();
-void schedule(interrupt_context_t* interrupt_context);
-void schedule_next();
 
 #endif

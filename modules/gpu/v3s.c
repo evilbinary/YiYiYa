@@ -1,6 +1,6 @@
 #include "v3s.h"
 
-#include "drivers/vga/vga.h"
+#include "vga/vga.h"
 #include "v3s-reg-ccu.h"
 #include "v3s-reg-de.h"
 #include "v3s-reg-tcon.h"
@@ -309,8 +309,8 @@ int gpu_init_mode(vga_device_t *vga, int mode) {
 
   v3s_lcd_init(vga);
 
-  kprintf("fb addr:%x vaddr:%x len:%x\n", vga->pframbuffer, vga->frambuffer,
-          vga->framebuffer_length);
+  kprintf("fb addr:%x end:%x len:%x\n", vga->frambuffer,vga->frambuffer+vga->framebuffer_length, vga->framebuffer_length);
+
 
   // u8 *buffer = vga->frambuffer;
   // for (int i = 0; i < vga->framebuffer_length / 8; i++) {

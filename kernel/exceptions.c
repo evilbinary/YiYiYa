@@ -7,14 +7,13 @@
 
 #include "thread.h"
 
-extern context_t *current_context;
-
 interrupt_handler_t *exception_handlers[EXCEPTION_NUMBER];
 void exception_regist(u32 vec, interrupt_handler_t handler) {
   exception_handlers[vec] = handler;
 }
 
 void exception_info(interrupt_context_t *context) {
+  int cpu = cpu_get_id();
 #ifdef ARM
 #ifdef ARMV7
   static const char *exception_msg[] = {
@@ -22,10 +21,10 @@ void exception_info(interrupt_context_t *context) {
       "NONE", "NONE",  "NONE", "SVC",  "NONE", "NONE", "SYS PENDSV", "SYS TICK",
   };
   if (context->no < sizeof exception_msg) {
-    kprintf("exception %d: %s\n----------------------------\n", context->no,
+    kprintf("exception cpu %d no %d: %s\n----------------------------\n",cpu, context->no,
             exception_msg[context->no]);
   } else {
-    kprintf("exception %d:\n----------------------------\n", context->no);
+    kprintf("exception cpu %d no %d:\n----------------------------\n",cpu, context->no);
   }
 
 #else
@@ -33,14 +32,14 @@ void exception_info(interrupt_context_t *context) {
                                         "PREF ABORT", "DATA ABORT", "NOT USE",
                                         "IRQ",        "FIQ"};
   if (context->no < sizeof exception_msg) {
-    kprintf("exception %d: %s\n----------------------------\n", context->no,
+    kprintf("exception cpu %d no %d: %s\n----------------------------\n",cpu, context->no,
             exception_msg[context->no]);
   } else {
-    kprintf("exception %d:\n----------------------------\n", context->no);
+    kprintf("exception cpu %d no %d:\n----------------------------\n",cpu, context->no);
   }
   thread_t *current = thread_current();
   if (current != NULL) {
-    kprintf("tid:%d %s\n", current->id, current->name);
+    kprintf("tid:%d %s cpu:%d\n", current->id, current->name,current->cpu_id);
   }
   kprintf("ifsr: %x dfsr: %x dfar: %x\n", read_ifsr(), read_dfsr(),
           read_dfar());
@@ -64,13 +63,13 @@ void exception_info(interrupt_context_t *context) {
   if (context->no != 14) {
     thread_t *current = thread_current();
     if (context->no < sizeof exception_msg) {
-      kprintf("exception %d: %s", context->no, exception_msg[context->no]);
+      kprintf("exception cpu %d no %d: %s",cpu, context->no, exception_msg[context->no]);
 
     } else {
-      kprintf("interrupt %d", context->no);
+      kprintf("interrupt cpu %d %d", cpu,context->no);
     }
     if (current != NULL) {
-      kprintf("\ntid %d %s ", current->id, current->name);
+      kprintf("\ntid %d %s cpu %d", current->id, current->name,current->cpu_id);
     }
     kprintf("\n----------------------------\n");
     context_dump_interrupt(context);
@@ -209,7 +208,7 @@ INTERRUPT_SERVICE
 void sys_tick_handler() {
   interrupt_entering_code(2, 0);
   interrupt_process(do_schedule);
-  interrupt_exit_context(current_context);
+  interrupt_exit_ret();
 }
 
 INTERRUPT_SERVICE
@@ -267,17 +266,16 @@ void unuse_handler() {
 }
 
 void do_irq(interrupt_context_t *interrupt_context) {}
-extern context_t *current_context;
 
 INTERRUPT_SERVICE
 void irq_handler() {
   // interrupt_entering_code(0, 0);
   // interrupt_process(do_irq);
   // cpu_halt();
+  // interrupt_exit();
   interrupt_entering_code(ISR_TIMER, 0);
   interrupt_process(do_schedule);
-  // interrupt_exit();
-  interrupt_exit_context(current_context);
+  interrupt_exit_ret();
 }
 
 INTERRUPT_SERVICE

@@ -15,7 +15,8 @@
 #include "libs/include/kernel/elf.h"
 #include "interrupt.h"
 #include "lock.h"
+#include "platform/platform.h"
 
-void arch_init(boot_info_t* boot_info);
+void arch_init(boot_info_t* boot,int cpu_id);
 
 #endif

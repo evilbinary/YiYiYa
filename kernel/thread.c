@@ -8,16 +8,20 @@
 #include "fd.h"
 #include "syscall.h"
 
-thread_t* current_thread = NULL;
-thread_t* schedulable_head_thread = NULL;
-thread_t* schedulable_tail_thread = NULL;
+thread_t* current_thread[MAX_CPU] = {0};
+thread_t* schedulable_head_thread[MAX_CPU] = {0};
+thread_t* schedulable_tail_thread[MAX_CPU] = {0};
 
 thread_t* recycle_head_thread = NULL;
 thread_t* recycle_tail_thread = NULL;
 u32 recycle_head_thread_count = 0;
 
 u32 thread_ids = 0;
-extern context_t* current_context;
+lock_t thread_lock;
+
+void thread_init(){
+    lock_init(&thread_lock);
+}
 
 thread_t* thread_create_level(void* entry, void* data, u32 level) {
   u32 size = THREAD_STACK_SIZE;
@@ -27,8 +31,6 @@ thread_t* thread_create_level(void* entry, void* data, u32 level) {
 
 thread_t* thread_create_name(char* name, void* entry, void* data) {
   thread_t* t = thread_create(entry, data);
-  // char* kname = kmalloc(kstrlen(name));
-  // kstrcpy(kname, name);
   t->name = name;
   return t;
 }
@@ -36,9 +38,7 @@ thread_t* thread_create_name(char* name, void* entry, void* data) {
 thread_t* thread_create_name_level(char* name, void* entry, void* data,
                                    u32 level) {
   thread_t* t = thread_create_level(entry, data, level);
-  char* kname = kmalloc(kstrlen(name));
-  kstrcpy(kname, name);
-  t->name = kname;
+  t->name = name;
   return t;
 }
 
@@ -67,9 +67,10 @@ thread_t* thread_create_ex(void* entry, u32 size, void* data, u32 level,
       thread = recycle_head_thread;
       recycle_head_thread = recycle_head_thread->next;
     }
+
     thread->fd_number = 0;
     thread_fill_fd(thread);
-    thread_init(thread, entry, thread->stack0, thread->stack3,
+    thread_init_self(thread, entry, thread->stack0, thread->stack3,
                 thread->stack_size, thread->level);
     if (page == 1) {
       thread->context.page_dir = page_alloc_clone(thread->context.page_dir);
@@ -96,11 +97,10 @@ thread_t* thread_create_ex(void* entry, u32 size, void* data, u32 level,
     // file description
     thread_fill_fd(thread);
 
-    thread_init(thread, entry, stack0, stack3, size, level);
+    thread_init_self(thread, entry, stack0, stack3, size, level);
     if (page == 1) {
       thread->context.page_dir = page_alloc_clone(thread->context.page_dir);
     }
-
     return thread;
   }
 }
@@ -124,7 +124,8 @@ void thread_sleep(thread_t* thread) {
 
 void thread_wait(thread_t* thread) {
 #ifdef DEBUG_THREAD
-  kprintf("thread %d wait==============> %d\n", current_thread->id, thread->id);
+  kprintf("thread %d wait==============> %d\n", current_thread[cpu_id]->id,
+          thread->id);
 #endif
   acquire(&thread->lock);
   thread->state = THREAD_WAITING;
@@ -134,7 +135,8 @@ void thread_wait(thread_t* thread) {
 
 void thread_wake(thread_t* thread) {
 #ifdef DEBUG_THREAD
-  kprintf("thread %d wake==============> %d\n", current_thread->id, thread->id);
+  kprintf("thread %d wake==============> %d\n", current_thread[cpu_id]->id,
+          thread->id);
 #endif
   acquire(&thread->lock);
   thread->state = THREAD_RUNNING;
@@ -142,7 +144,7 @@ void thread_wake(thread_t* thread) {
   schedule_next();
 }
 
-void thread_init(thread_t* thread, void* entry, u32* stack0, u32* stack3,
+void thread_init_self(thread_t* thread, void* entry, u32* stack0, u32* stack3,
                  u32 size, u32 level) {
   u8* stack0_top = stack0;
   stack0_top += size;
@@ -159,53 +161,67 @@ void thread_init(thread_t* thread, void* entry, u32* stack0, u32* stack3,
   thread->stack3_top = stack3_top;
   thread->level = level;
   thread->entry = entry;
-  context_init(&thread->context, (u32*)entry, stack0_top, stack3_top, level);
+  thread->cpu_id = cpu_get_id();
+  context_init(&thread->context, (u32*)entry, stack0_top, stack3_top, level,
+               thread->cpu_id);
+}
+
+void thread_set_arg(thread_t* thread, void* arg) {
+  if (thread == NULL) return;
+  interrupt_context_t* context = thread->context.esp;
+  context_ret(context) = arg;
 }
 
 void thread_reset_stack3(thread_t* thread, u32* stack3) {
-  //todo free stack3
-  // void* phy = virtual_to_physic(thread->context.page_dir, stack3);
-  // if(phy!=NULL){
-  //   kfree(phy);
-  // }else{
-  //   kfree(thread->stack3);
-  // }
+  // todo free stack3
+  //  void* phy = virtual_to_physic(thread->context.page_dir, stack3);
+  //  if(phy!=NULL){
+  //    kfree(phy);
+  //  }else{
+  //    kfree(thread->stack3);
+  //  }
   thread->stack3 = stack3;
   thread->stack3_top = stack3 + thread->stack_size;
-  thread_init(thread, thread->entry, thread->stack0, stack3, thread->stack_size,
+  thread_init_self(thread, thread->entry, thread->stack0, stack3, thread->stack_size,
               thread->level);
 }
 
 void thread_add(thread_t* thread) {
-  cpu_cli();
-  if (schedulable_head_thread == NULL) {
-    schedulable_head_thread = thread;
-    schedulable_tail_thread = thread;
+  lock_acquire(&thread_lock);
+  int cpu_id = cpu_get_id();
+  if (schedulable_head_thread[cpu_id] == NULL) {
+    schedulable_head_thread[cpu_id] = thread;
+    schedulable_tail_thread[cpu_id] = thread;
   } else {
-    schedulable_tail_thread->next = thread;
-    schedulable_tail_thread = thread;
+    schedulable_tail_thread[cpu_id]->next = thread;
+    schedulable_tail_thread[cpu_id] = thread;
   }
   thread->state = THREAD_RUNABLE;
-  if (current_thread == NULL) {
-    if (schedulable_head_thread == NULL) {
+  if (current_thread[cpu_id] == NULL) {
+    if (schedulable_head_thread[cpu_id] == NULL) {
       kprintf("no thread please create a thread\n");
       cpu_halt();
     }
-    current_thread = schedulable_head_thread;
-    current_context = &current_thread->context;
+    current_thread[cpu_id] = schedulable_head_thread[cpu_id];
+    // current_context = &current_thread[cpu_id]->context;
   }
+  lock_release(&thread_lock);
 }
 
 void thread_remove(thread_t* thread) {
-  thread_t* prev = schedulable_head_thread;
+  lock_acquire(&thread_lock);
+  int cpu_id = cpu_get_id();
+  thread_t* prev = schedulable_head_thread[cpu_id];
   thread_t* v = prev->next;
   thread->state = THREAD_STOPPED;
   thread->counter += 1000;
 
-  if (schedulable_head_thread == thread) {
-    schedulable_head_thread = NULL;
-    schedulable_tail_thread = NULL;
+  if (schedulable_head_thread[cpu_id] == thread) {
+    schedulable_head_thread[cpu_id] = NULL;
+    schedulable_tail_thread[cpu_id] = NULL;
     thread->next = NULL;
+    lock_release(&thread_lock);
+
     return;
   }
 
@@ -213,13 +229,15 @@ void thread_remove(thread_t* thread) {
     if (v == thread) {
       prev->next = v->next;
       v->next = NULL;
-      if (thread == schedulable_tail_thread) {
-        schedulable_tail_thread = prev;
+      if (thread == schedulable_tail_thread[cpu_id]) {
+        schedulable_tail_thread[cpu_id] = prev;
       }
       break;
     }
     prev = v;
   }
+  lock_release(&thread_lock);
+
 }
 
 void thread_destroy(thread_t* thread) {
@@ -235,6 +253,7 @@ void thread_destroy(thread_t* thread) {
 
 void thread_recycle(thread_t* thread) {
   thread_remove(thread);
+
   // add into cycle thread
   if (recycle_head_thread == NULL) {
     recycle_head_thread = thread;
@@ -255,7 +274,7 @@ void thread_stop(thread_t* thread) {
   // cpu_sti();
 }
 
-thread_t* thread_head() { return schedulable_head_thread; }
+thread_t* thread_head() { return schedulable_head_thread[cpu_get_id()]; }
 
 void thread_exit(thread_t* thread, int code) {
   if (thread == NULL) return;
@@ -264,7 +283,8 @@ void thread_exit(thread_t* thread, int code) {
 }
 
 thread_t* thread_find_next(thread_t* thread) {
-  thread_t* v = schedulable_head_thread;
+  thread_t* v = schedulable_head_thread[cpu_get_id()];
+
   for (; v; v = v->next) {
     if (v->next == thread) {
       return v;
@@ -283,7 +303,7 @@ void thread_run(thread_t* thread) {
 }
 
 void thread_yield() {
-  thread_t* current = thread_current;
+  thread_t* current = thread_current();
   if (current == NULL) {
     return;
   }
@@ -293,7 +313,28 @@ void thread_yield() {
   }
 }
 
-thread_t* thread_current() { return current_thread; }
+thread_t* thread_current() {
+  lock_acquire(&thread_lock);
+  int cpu_id = cpu_get_id();
+  thread_t* t = current_thread[cpu_id];
+  lock_release(&thread_lock);
+  return t;
+}
+
+void thread_set_current(thread_t* thread) {
+  lock_acquire(&thread_lock);
+  int cpu_id = cpu_get_id();
+  current_thread[cpu_id] = thread;
+  lock_release(&thread_lock);
+}
+
+context_t* thread_current_context() {
+  lock_acquire(&thread_lock);
+  int cpu_id = cpu_get_id();
+  thread_t* t = current_thread[cpu_id];
+  lock_release(&thread_lock);
+  return &t->context;
+}
 
 thread_t* thread_clone(thread_t* thread, u32* vstack3, u32 size) {
   if (thread == NULL) {
@@ -446,29 +487,30 @@ void thread_dump(thread_t* thread) {
 
 void thread_dumps() {
   char* state_str[6] = {"create", "running", "runnable", "stopped",
-                       "waitting"
-                       "sleep"};
+                        "waitting"
+                        "sleep"};
   char* str = "unkown";
-  kprintf("\n--------------threads--------------\n");
-  kprintf("id    pid     name                 state    counter\n");
-  for (thread_t* p = schedulable_head_thread; p != NULL; p = p->next) {
-    if (p->state <= THREAD_SLEEP) {
-      str = state_str[p->state];
-    }
-    kprintf("%-6d ", p->id);
-    kprintf("%-6d ", p->pid);
+  kprintf("id    pid     name                 state     cpu  counter\n");
+  for (int i = 0; i < MAX_CPU; i++) {
+    for (thread_t* p = schedulable_head_thread[i]; p != NULL; p = p->next) {
+      if (p->state <= THREAD_SLEEP) {
+        str = state_str[p->state];
+      }
+      kprintf("%-6d ", p->id);
+      kprintf("%-6d ", p->pid);
 
-    if (p->name != NULL) {
-      kprintf("%-20s ", p->name);
-    } else {
-      kprintf("   ");
+      if (p->name != NULL) {
+        kprintf("%-20s ", p->name);
+      } else {
+        kprintf("   ");
+      }
+      kprintf("%-8s %4d   %d\n", str, p->cpu_id, p->counter);
     }
-    kprintf("%-8s %d\n", str, p->counter);
   }
 }
 
 void thread_run_all() {
-  thread_t* v = schedulable_head_thread;
+  thread_t* v = schedulable_head_thread[cpu_get_id()];
   for (; v; v = v->next) {
     thread_run(v);
   }

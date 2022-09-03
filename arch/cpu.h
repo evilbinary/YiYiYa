@@ -47,16 +47,8 @@ void cpu_halt();
 #define GET_CPL(x) (((x)&0x03))  //0-3
 
 
-void context_init(context_t* context, u32* entry, u32* stack0, u32* stack3,
-                  u32 level);
+#define cpu_faa(ptr) __sync_fetch_and_add(ptr, 1)
 
-void context_switch(interrupt_context_t* context,context_t** current, 
-                    context_t* next_context);
-
-
-
-#define FAA(ptr) __sync_fetch_and_add(ptr, 1)
-
-int TAS(volatile int* addr, int newval);
+int cpu_tas(volatile int* addr, int newval);
 
 #endif

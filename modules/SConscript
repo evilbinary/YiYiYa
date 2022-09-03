@@ -12,7 +12,7 @@ arch_type=env['ARCHTYPE']
 
 platform=env['PLATFORM']
 
-driver=[]
+modules=[]
 other=[]
 if arch_type =='arm':
     if platform=='v3s':
@@ -55,7 +55,7 @@ if arch_type =='arm':
                 'lcd/st7735.c',
                 'serial/stm32.c',
                 ]
-    driver=[
+    modules=[
         'fat/fat.c',
         'fat/byteordering.c',
         'fat/partition.c',
@@ -70,7 +70,7 @@ if arch_type =='arm':
     ]+other
 
 elif arch_type=='x86':
-    driver=['pci.c',
+    modules=['pci.c',
     'pic/pic.c',
     'ahci/ahci.c',
     'dma/dma.c',
@@ -102,11 +102,11 @@ elif arch_type=='x86':
     ]
 
 elif arch_type=='xtensa':
-     driver=[
+     modules=[
           'hello/hello.c',
         ]
 
-source=driver+[
+source=modules+[
     '../kernel/libyiyiya.a',
     '../arch/libarch.a',
     '../libs/libalgorithm/libalgorithm.a',
@@ -115,5 +115,5 @@ source=driver+[
 if env.get('MYLIB'):
     source.append(env.get('MYLIB'))
 
-env.Library('driver', source,
-    CFLAGS='$CFLAGS -Idrivers/')
+env.Library('modules', source,
+    CFLAGS='$CFLAGS -Imodules/')

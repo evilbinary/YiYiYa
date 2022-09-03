@@ -40,4 +40,35 @@ u32 io_read32(uint port) {
   return data;
 }
 
+
+void mem_write8(uint port, u8 data) {
+  *(u8 *) port = data;
+}
+
+u8 mem_read8(uint port) {
+  u8 data;
+  data=*(u8 *) port;
+  return data;
+}
+
+void mem_write16(uint port, u16 data) {
+  *(u16 *) port = data;
+}
+
+u16 mem_read16(uint port) {
+  u16 data;
+  data=*(u16 *) port;
+  return data;
+}
+
+void mem_write32(uint port, u32 data) {
+  *(u32 *) port = data;
+}
+
+u32 mem_read32(uint port) {
+  u32 data;
+  data=*(u32 *) port;
+  return data;
+}
+
 #endif

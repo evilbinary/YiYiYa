@@ -991,7 +991,9 @@
             // },
             // "targetArchitecture": "arm",
             "MIMode": "gdb",
-            "miDebuggerPath": "C:\\Program Files (x86)\\GNU Arm Embedded Toolchain\\10 2021.10\\bin\\arm-none-eabi-gdb.exe",
+           
+            "miDebuggerPath": "/opt/local/bin/ggdb",
+            // "miDebuggerPath": "C:\\Program Files (x86)\\GNU Arm Embedded Toolchain\\10 2021.10\\bin\\arm-none-eabi-gdb.exe",
             // "miDebuggerPath": "D:\\Program Files\\gcc-arm-none-eabi-9\\bin\\arm-none-eabi-gdb.exe",
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
