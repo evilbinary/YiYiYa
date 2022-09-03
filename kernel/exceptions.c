@@ -13,6 +13,7 @@ void exception_regist(u32 vec, interrupt_handler_t handler) {
 }
 
 void exception_info(interrupt_context_t *context) {
+  int cpu = cpu_get_id();
 #ifdef ARM
 #ifdef ARMV7
   static const char *exception_msg[] = {
@@ -20,10 +21,10 @@ void exception_info(interrupt_context_t *context) {
       "NONE", "NONE",  "NONE", "SVC",  "NONE", "NONE", "SYS PENDSV", "SYS TICK",
   };
   if (context->no < sizeof exception_msg) {
-    kprintf("exception %d: %s\n----------------------------\n", context->no,
+    kprintf("exception cpu %d no %d: %s\n----------------------------\n",cpu, context->no,
             exception_msg[context->no]);
   } else {
-    kprintf("exception %d:\n----------------------------\n", context->no);
+    kprintf("exception cpu %d no %d:\n----------------------------\n",cpu, context->no);
   }
 
 #else
@@ -31,10 +32,10 @@ void exception_info(interrupt_context_t *context) {
                                         "PREF ABORT", "DATA ABORT", "NOT USE",
                                         "IRQ",        "FIQ"};
   if (context->no < sizeof exception_msg) {
-    kprintf("exception %d: %s\n----------------------------\n", context->no,
+    kprintf("exception cpu %d no %d: %s\n----------------------------\n",cpu, context->no,
             exception_msg[context->no]);
   } else {
-    kprintf("exception %d:\n----------------------------\n", context->no);
+    kprintf("exception cpu %d no %d:\n----------------------------\n",cpu, context->no);
   }
   thread_t *current = thread_current();
   if (current != NULL) {
@@ -62,10 +63,10 @@ void exception_info(interrupt_context_t *context) {
   if (context->no != 14) {
     thread_t *current = thread_current();
     if (context->no < sizeof exception_msg) {
-      kprintf("exception %d: %s", context->no, exception_msg[context->no]);
+      kprintf("exception cpu %d no %d: %s",cpu, context->no, exception_msg[context->no]);
 
     } else {
-      kprintf("interrupt %d", context->no);
+      kprintf("interrupt cpu %d %d", cpu,context->no);
     }
     if (current != NULL) {
       kprintf("\ntid %d %s cpu %d", current->id, current->name,current->cpu_id);

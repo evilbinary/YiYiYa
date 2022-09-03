@@ -6,6 +6,7 @@
 #include "schedule.h"
 
 u32 timer_ticks[MAX_CPU] = {0};
+lock_t schedule_lock;
 
 thread_t* schedule_get_next() {
   thread_t* current = thread_current();
@@ -71,6 +72,7 @@ void do_timer() {
 }
 
 void schedule_init() {
+  lock_init(&schedule_lock);
   interrutp_regist(ISR_TIMER, do_timer);
   timer_init(1000);
 }
