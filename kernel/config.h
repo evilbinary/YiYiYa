@@ -27,8 +27,6 @@
 
 #define PAGE_SIZE 0x1000
 
-#define MP_ENABLE 1 //多cpu
-
 #elif defined(ARMV7)
 
 #define MAX_FD_NUMBER 50
@@ -68,7 +66,6 @@
 #define THREAD_STACK_SIZE 4096*4
 #define PAGE_SIZE 0x1000
 
-#define MP_ENABLE 1 //多cpu
 #endif
 
 

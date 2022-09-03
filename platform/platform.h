@@ -13,12 +13,16 @@
 #define ISR_SYSCALL 2
 #define ISR_MOUSE 0x2c
 
+#define MP_ENABLE 1 //多cpu
+
 #elif defined(X86)
 
 #define ISR_TIMER 0x20
 #define ISR_KEYBOARD 0x21
 #define ISR_SYSCALL 0x30
 #define ISR_MOUSE 0x2c
+
+#define MP_ENABLE 1 //多cpu
 
 
 #elif defined(STM32F4XX)
