@@ -117,6 +117,20 @@ void interrutp_regist(u32 vec, interrupt_handler_t handler);
       :                  \
       :)
 
+#define interrupt_exit_ret() \
+  asm volatile(                     \
+      "mov %%eax,%%esp\n"           \
+      "pop %%gs\n"                  \
+      "pop %%fs\n"                  \
+      "pop %%es\n"                  \
+      "pop %%ds\n"                  \
+      "popal\n"                     \
+      "add $8,%%esp\n"              \
+      "sti\n"                       \
+      "iret\n"                      \
+      :                             \
+      : )
+
 #define interrupt_exit_context(context) \
   asm volatile(                     \
       "mov %0,%%esp\n"              \
