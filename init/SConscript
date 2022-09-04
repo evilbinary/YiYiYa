@@ -17,6 +17,7 @@ libs=[
     '../kernel/libyiyiya.a',
     '../arch/libarch.a',
     '../platform/libplatform.a',
+    '../libs/libarchcommon/libarchcommon.a',
     '../libs/libalgorithm/libalgorithm.a',
     '../libs/libkernel/libkernel.a'
 ]

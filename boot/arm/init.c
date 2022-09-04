@@ -151,6 +151,17 @@ char uart_getc() {
   // return r=='\r'?'\n':r;
 }
 
+#elif defined(RK3128)
+void init_uart() {}
+
+void uart_send(unsigned int c) {
+
+}
+
+char uart_getc() {
+
+}
+
 #endif
 
 void print_string(const unsigned char* str) {

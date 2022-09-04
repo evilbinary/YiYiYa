@@ -12,6 +12,7 @@ plt=env['PLATFORM']
 
 source=[]
 source+= Glob(plt+'/*.c')
+source+=['../libs/libarchcommon/libarchcommon.a',]
 if plt:
     env['CFLAGS']= """%s -Iplatform/%s  """%(env['CFLAGS'],plt)
 

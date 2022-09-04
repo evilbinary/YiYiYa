@@ -193,10 +193,10 @@ void mm_dump_print(mem_block_t* p) {
   }
   kprintf("total ");
   if (use >= 0) {
-    kprintf(" use: %dkb ", use / 1024);
+    kprintf(" use: %dkb %dmb", use / 1024,use/1024/1024);
   }
   if (free >= 0) {
-    kprintf(" free: %dkb ", free / 1024);
+    kprintf(" free: %dkb %dmb", free / 1024,free/1024/1024);
   }
   kprintf("\n");
 }

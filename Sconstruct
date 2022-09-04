@@ -13,20 +13,20 @@ plt = platform.system()
 # board select platform,选择你要编译的平台
 # platform='pc'
 # platform='v3s'
-platform='raspi2'
+# platform='raspi2'
 # platform='esp32'
 # platform='stm32f4xx'
 # platform='raspi3'
-# platform='rk3128'
+platform='rk3128'
 
 # gcc path,这里是gcc路径配置
-# cc_path=''
-# cc_prefix='i386-elf-'
-# cc_lib_path='/opt/local/lib/gcc/i386-elf/9.2.0/' 
-
 cc_path=''
-cc_prefix='arm-none-eabi-'
-cc_lib_path='/opt/local/lib/gcc/arm-none-eabi/9.2.0/' 
+cc_prefix='i386-elf-'
+cc_lib_path='/opt/local/lib/gcc/i386-elf/9.2.0/' 
+
+# cc_path=''
+# cc_prefix='arm-none-eabi-'
+# cc_lib_path='/opt/local/lib/gcc/arm-none-eabi/9.2.0/' 
 
 #/opt/local/lib/gcc/i386-elf/9.2.0/
 # D:\\app\\gcc\\lib\\gcc\\i686-elf\\7.1.0\\
@@ -176,6 +176,7 @@ if arch_type == 'arm':
         env['LINKLD']='xlinker/link-stm32f4xx.ld'
         arch='armv7e-m'
     else:
+        env['CFLAGS']= env['CFLAGS']+ ' -mcpu=cortex-a7  -mtune=cortex-a7 -mfpu=vfpv4  -mfloat-abi=softfp '
         env['LINKLD']='xlinker/link-'+platform+'.ld'
     #env['CFLAGS']= ' -march='+arch
 
@@ -243,6 +244,8 @@ SConscript(dirs=['platform'], exports='env')
 SConscript(dirs=['arch'], exports='env')
 SConscript(dirs=['kernel'], exports='env')
 SConscript(dirs=['libs/libkernel'], exports='env')
+SConscript(dirs=['libs/libarchcommon'], exports='env')
+
 SConscript(dirs=['modules'], exports='env')
 kernel=SConscript(dirs=['init'], exports='env')
 

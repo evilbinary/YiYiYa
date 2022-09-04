@@ -8,7 +8,6 @@
 
 #include "arch/boot.h"
 #include "libs/include/types.h"
-#include "arch/armv7-a/gic2.h"
 
 #define debugger
 

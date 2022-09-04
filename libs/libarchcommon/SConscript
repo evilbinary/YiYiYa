@@ -8,17 +8,14 @@ import os
 
 Import('env')
 
-arch =env['ARCH']
+arch_type= env['ARCHTYPE']
 
-source=[
-    'arch.c',
-    'lock.c',
-    'mm.c',
-]
+source=[]
+source+=Glob(arch_type+'/*.c')
 
-source+=Glob(arch+'/*.c')
+print(source)
 
-env.Library('arch', source+[
-    '../libs/libarchcommon/libarchcommon.a',
-    '../platform/libplatform.a'
-    ],CFLAGS='$CFLAGS  -Ilibs/include/archcommon')
+env.Library('libarchcommon.a', source,CFLAGS='$CFLAGS  -Ilibs/include/archcommon')
+
+
+ 

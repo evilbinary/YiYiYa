@@ -52,12 +52,13 @@ void mm_init_default() {
   kprintf("- %x\n", address);
 
   map_page(MMIO_BASE, MMIO_BASE, 0);
-  map_page(UART0_DR, UART0_DR, 0);
 
 #ifdef RASPI2
+  map_page(UART0_DR, UART0_DR, 0);
   map_page(CORE0_TIMER_IRQCNTL & ~0xfff, CORE0_TIMER_IRQCNTL & ~0xfff, 0);
 #endif
 #ifdef V3S
+  map_page(UART0_DR, UART0_DR, 0);
   map_page(CORE0_TIMER_IRQCNTL, CORE0_TIMER_IRQCNTL, 0);
   // memory
   address = 0x40000000;

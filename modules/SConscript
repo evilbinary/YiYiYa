@@ -55,6 +55,19 @@ if arch_type =='arm':
                 'lcd/st7735.c',
                 'serial/stm32.c',
                 ]
+    elif platform=='rk3128':
+            other=[
+                'gpu/rk3128.c',
+                'mmc/rk3128.c',
+                'serial/rk3128.c',
+                'mouse/rk3128.c',
+                'i2c/i2c.c',
+                'i2c/rk3128.c',
+                'gpio/gpio.c',
+                'gpio/rk3128.c',
+                'spi/spi.c',
+                'spi/rk3128.c',
+                ]
     modules=[
         'fat/fat.c',
         'fat/byteordering.c',

@@ -32,7 +32,7 @@ if env['PLATFORM']=='stm32f4xx':
 elif env['PLATFORM']=='raspi2':
     linkflags='-nostdlib -nostartfiles -T boot/arm/link-raspi2.ld'
 else:
-
+    linkflags='-nostdlib -nostartfiles -T boot/arm/link-'+env['PLATFORM']+'.ld'
     pass
 
 if env['PLATFORM']=='stm32f4xx':

@@ -5,7 +5,8 @@
  ********************************************************************/
 #ifndef GIC2_H
 #define GIC2_H
-#include "cpu.h"
+
+#include "libs/include/types.h"
 
 //GIC v2 版本专用 gic400
 
@@ -98,5 +99,9 @@ typedef struct gic{
 
 
 void gic_init_base(void *cpu_addr, void *dist_addr);
+void gic_enable(int cpu, int irq);
+void gic_init();
+void gic_send_sgi(int cpu, int irq);
+
 
 #endif
