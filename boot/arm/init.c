@@ -155,11 +155,14 @@ char uart_getc() {
 void init_uart() {}
 
 void uart_send(unsigned int c) {
-
+  while (((io_read32(0x20000000 + 0x60014)) & 0x20) == 0);	
+			io_write32(0x20000000 + 0x60000,c);
 }
 
 char uart_getc() {
-
+  if((io_read32(0x20000000 + 0x60014) & 0x01) == 0)
+		return 0;
+	return io_read32(0x20000000 + 0x60000);
 }
 
 #endif

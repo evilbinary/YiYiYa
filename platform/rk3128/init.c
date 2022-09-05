@@ -2,12 +2,19 @@
 #include "libs/include/archcommon/gic2.h"
 #include "gpio.h"
 
+static void io_write32(uint port, u32 data) { *(u32 *)port = data; }
+
+static u32 io_read32(uint port) {
+  u32 data;
+  data = *(u32 *)port;
+  return data;
+}
+
+
 
 void uart_send_ch(unsigned int c) {
-  // unsigned int addr = 0x01c28000;  // UART0
-  // while ((io_read32(addr + 0x14) & (0x1 << 6)) == 0)
-  //   ;
-  // io_write32(addr + 0x00, c);
+  while (((io_read32(MMIO_BASE + 0x60014)) & 0x20) == 0);	
+			io_write32(MMIO_BASE + 0x60000,c);
 }
 
 void uart_send(unsigned int c) {
@@ -19,7 +26,7 @@ void uart_send(unsigned int c) {
 }
 
 void platform_init() {
-  // io_add_write_channel(uart_send);
+  io_add_write_channel(uart_send);
   //  gic_set_base();
   gic_init();
 }
