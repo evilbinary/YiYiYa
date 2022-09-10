@@ -174,11 +174,16 @@ u32 cpu_get_rate(u32 prate) {
 
 void platform_init() {
   io_add_write_channel(uart_send);
-  cpu_clock_init();
+  uart_send('P');
+  uart_send('\n');
+  // cpu_clock_init();
   // sys_dram_init();
 }
 
-void platform_end() {}
+void platform_end() {
+  uart_send('E');
+  uart_send('\n');
+}
 
 
 void ipi_enable(int cpu) {

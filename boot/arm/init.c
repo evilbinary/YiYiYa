@@ -292,7 +292,13 @@ void init_memory() {
   boot_info->total_memory += ptr->length;
   ptr++;
   count++;
-
+#elif defined(CUBIEBOARD2)
+  ptr->base = 0x40000000;
+  ptr->length = 0x10000000*4;//256m*4
+  ptr->type = 1;
+  boot_info->total_memory += ptr->length;
+  ptr++;
+  count++;
 #else
   //
   ptr->type = 1;
@@ -336,7 +342,7 @@ void init_boot() {
   putc('o');
   putc('t');
   putc('\n');
-
+  putc('\r');
   printf("boot info addr %x\n\r", boot_info);
 
   print_string("init display\n\r");
