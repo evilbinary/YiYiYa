@@ -1,0 +1,57 @@
+/*
+ * Simple U-Boot uImage source file containing a single kernel
+ */
+
+/dts-v1/;
+
+/ {
+	description = "Simple image with single duck kernel";
+	#address-cells = <1>;
+
+	images {
+		setup {
+			description = "YiYiYa init";
+			data = /incbin/("../boot/arm/init.bin");
+			type = "kernel";
+			arch = "arm";
+			os = "linux";
+			compression = "none";
+			load = <0x00000>;
+			entry = <0x00000>;
+			hash-2 {
+				algo = "sha1";
+			};
+		};
+		kernel {
+			description = "YiYiYa kernel";
+			data = /incbin/("../init/kernel.elf");
+			type = "ramdisk";
+			arch = "arm";
+			os = "linux";
+			compression = "none";
+			load  = <0x40000000>;
+			entry = <0x40000000>;
+			hash-1 {
+				algo = "crc32";
+			};
+			hash-2 {
+				algo = "sha1";
+			};
+		};
+		
+	};
+
+	configurations {
+		default = "config-1";
+		config-1 {
+			description = "YiYiYa init";
+			kernel = "setup";
+			ramdisk="kernel";
+		};
+		 config-2 {
+			description = "YiYiYa kernel";
+			kernel = "kernel";
+    	};
+	};
+	
+};

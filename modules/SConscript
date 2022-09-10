@@ -28,6 +28,19 @@ if arch_type =='arm':
             'spi/spi.c',
             'spi/v3s.c',
         ]
+    elif platform=='cubieboard2':
+        other=[
+            'gpu/v3s.c',
+            'mmc/v3s.c',
+            'serial/v3s.c',
+            'mouse/v3s.c',
+            'i2c/i2c.c',
+            'i2c/v3s.c',
+            'gpio/gpio.c',
+            'gpio/v3s.c',
+            'spi/spi.c',
+            'spi/v3s.c',
+        ]
     elif platform=='raspi2':
         other=[
             'gpu/bcm2836.c',

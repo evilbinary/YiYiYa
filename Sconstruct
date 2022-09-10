@@ -17,16 +17,17 @@ plt = platform.system()
 # platform='esp32'
 # platform='stm32f4xx'
 # platform='raspi3'
-platform='rk3128'
+# platform='rk3128'
+platform='cubieboard2'
 
 # gcc path,这里是gcc路径配置
-cc_path=''
-cc_prefix='i386-elf-'
-cc_lib_path='/opt/local/lib/gcc/i386-elf/9.2.0/' 
-
 # cc_path=''
-# cc_prefix='arm-none-eabi-'
-# cc_lib_path='/opt/local/lib/gcc/arm-none-eabi/9.2.0/' 
+# cc_prefix='i386-elf-'
+# cc_lib_path='/opt/local/lib/gcc/i386-elf/9.2.0/' 
+
+cc_path=''
+cc_prefix='arm-none-eabi-'
+cc_lib_path='/opt/local/lib/gcc/arm-none-eabi/9.2.0/' 
 
 #/opt/local/lib/gcc/i386-elf/9.2.0/
 # D:\\app\\gcc\\lib\\gcc\\i686-elf\\7.1.0\\
@@ -56,7 +57,8 @@ support_platform={
     'esp32':'lx6',
     'v3s':'armv7-a',
     'raspi3':'armv8-a',
-    'rk3128':'armv7-a'
+    'rk3128':'armv7-a',
+    'cubieboard2': 'armv7-a',
 }
 
 

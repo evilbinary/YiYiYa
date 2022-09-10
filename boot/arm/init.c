@@ -21,7 +21,7 @@ u32 io_read32(uint port) {
 
 void cls() {}
 
-#ifdef V3S
+#if defined(V3S) || defined(CUBIEBOARD2)
 void init_uart() {
   u32 addr;
   u32 val;

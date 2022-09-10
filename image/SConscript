@@ -176,7 +176,10 @@ elif env.get('run')=='debug' or env.get('run')=='d':
 
 elif env.get('run')=='v3s':
   build_duck_fit()
-  env.Command('v3s', 'duck.fit','~/dev/c/sunxi-tools/sunxi-fel -v uboot ~/dev/c/u-boot-v3s/u-boot-sunxi-with-spl.bin  write 0x41000000 ~/dev/c/YiYiYa/image/duck.fit')
+  env.Command('v3s', 'duck.fit','~/dev/c/sunxi-tools/sunxi-fel version uboot ~/dev/c/u-boot-v3s/u-boot-sunxi-with-spl.bin  write 0x41000000 ~/dev/c/YiYiYa/image/duck.fit')
+elif env.get('run')=='cubieboard2':
+  build_duck_fit()
+  env.Command('cubieboard2', 'duck.fit','~/dev/c/sunxi-tools/sunxi-fel version uboot ~/dev/c/u-boot-v3s/u-boot-sunxi-with-spl.bin  write 0x41000000 ~/dev/c/YiYiYa/image/duck.fit')
   
 elif env.get('run')=='stm32f4xx':
   # build_duck_fit()
