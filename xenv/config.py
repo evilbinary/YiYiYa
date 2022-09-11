@@ -8,7 +8,7 @@
 default_libc='libc'# libmusl libc
 
 # board select platform,选择你要编译的平台
-platform='dummy' ##dmulator pc v3s raspi2 esp32 stm32f4xx raspi3 rk3128 cubieboard2 dummy
+platform='dmulator' ##dmulator pc v3s raspi2 esp32 stm32f4xx raspi3 rk3128 cubieboard2 dummy
 
 # 是否要构建应用
 default_apps=True
@@ -44,9 +44,6 @@ AR='i386-elf-ar'
 OBJCOPY='i386-elf-objcopy'
 RANLIB='i386-elf-ranlib'
 CFLAGS='-march=i486'
-# LINKLD=' -T xlinker/link.ld'
-# LINKFLAGS='-nostdlib -nostartfiles -e start  -g '
-
 default_apps=False
 
 ## osx arm 配置实例

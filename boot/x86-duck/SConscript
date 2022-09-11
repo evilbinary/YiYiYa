@@ -6,12 +6,20 @@
 # ********************************************************************
 import os
 
-Import('env')               
+from xenv.config import CFLAGS
 
-env.GenerateKernelSize('config.h',['../../init/kernel'])
-env.Program('init.elf', 
-    ['init.c','config.h'],
-    CFLAGS='$CFLAGS -I. -Iinclude  -Iarch -std=c99 -std=gnu99 -w  ',
-    LINKFLAGS= '$LINKFLAGS  ') #-Ttext 0x0500 -Wl,-section-start=.apu_boot=0x1000
+Import('env')
 
-env.Objcopy('init.bin','init.elf',OBJCOPYFLAGS='-j .text -O binary -S')
+gcc_env = Environment(CC='gcc-mp-8',tools=['default'],ENV=os.environ)
+
+env.GenerateKernelSize('config.h', ['../../init/kernel'])
+
+gcc_env.ParseConfig('sdl2-config --cflags --libs')
+
+CFLAGS=' -D'+env['ARCHTYPE'].upper()
+CC_LIB_PATH= env['CC_LIB_PATH']
+
+gcc_env.Program('init.elf', ['init.c',
+CC_LIB_PATH+'libgcc.a'
+],CFLAGS='$CFLAGS -I. -Iinclude  -Iarch -std=c99 -std=gnu99 -w  '+CFLAGS,
+LINKFLAGS='$LINKFLAGS '+CFLAGS)

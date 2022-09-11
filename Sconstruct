@@ -115,6 +115,7 @@ env = Environment(
         ARCHS=archs,
         ARCHTYPE=arch_type,
         DEFAULT_LIBC=default_libc,
+        CC_LIB_PATH=CC_LIB_PATH
         )
 if plt=='Linux':
     if arch =='x86':
