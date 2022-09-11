@@ -66,7 +66,7 @@ void* do_schedule(interrupt_context_t* interrupt_context) {
   // kprintf("schedule next %s %d\n",next_thread->name,next_thread->id);
   if (next_thread == NULL) {
     kprintf("schedule error next\n");
-    return;
+    return NULL;
   }
   context_t* c = &current_thread->context;
   prev_thread = current_thread;

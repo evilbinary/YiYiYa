@@ -389,7 +389,7 @@ size_t fat_op_ioctl(struct vnode *node, u32 cmd, void *args){
 void get_datetime(uint16_t* year, uint8_t* month, uint8_t* day, uint8_t* hour, uint8_t* min, uint8_t* sec){
   int time_fd=-1;
   time_fd = sys_open("/dev/time", 0);
-  if (time_fd < 0) return 0;
+  if (time_fd < 0) return ;
 
    rtc_time_t time;
   time.day = 1;
@@ -410,7 +410,6 @@ void get_datetime(uint16_t* year, uint8_t* month, uint8_t* day, uint8_t* hour, u
   *min=time.minute;
   *sec=time.second;
 }
-
 
 voperator_t fat_op = {
     .read = fat_op_read,

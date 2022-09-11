@@ -3,32 +3,12 @@
  * 作者: evilbinary on 01/01/20
  * 邮箱: rootdebug@163.com
  ********************************************************************/
-#ifndef INTERRUPT_H
-#define INTERRUPT_H
+#ifndef ARCH_INTERRUPT_H
+#define ARCH_INTERRUPT_H
 
 #include "boot.h"
 #include "libs/include/types.h"
-
-
-#ifdef ARM
-  #ifdef ARMV7_A
-    #include "armv7-a/context.h"
-  #elif defined(ARMV7)
-    #include "armv7/context.h"
-  #elif ARMV5
-    #include "armv5/context.h"
-#elif defined(ARMV8_A)
-    #include "armv8-a/context.h"
-  #else
-    #error "no support arm"
-  #endif
-#elif defined(X86)
-  #include "x86/context.h"
-#elif defined(LX6)
-  #include "lx6/context.h"
-#else
-    #error "no support"
-#endif
+#include "context.h"
 
 typedef void (*interrupt_handler_t)(interrupt_context_t* context);
 

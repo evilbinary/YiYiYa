@@ -23,7 +23,11 @@
     #error "no support arm"
   #endif
 #elif defined(X86)
-  #include "x86/cpu.h"
+  #ifdef X86_DUCK
+    #include "x86-duck/cpu.h"
+  #else
+    #include "x86/cpu.h"
+  #endif
 #elif defined(LX6)
   #include "lx6/cpu.h"
 #else

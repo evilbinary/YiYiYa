@@ -21,4 +21,4 @@ source+=Glob(arch+'/*.c')
 env.Library('arch', source+[
     '../libs/libarchcommon/libarchcommon.a',
     '../platform/libplatform.a'
-    ],CFLAGS='$CFLAGS  -Ilibs/include/archcommon')
+    ],CFLAGS='$CFLAGS  -Iarch -Ilibs/include/archcommon')

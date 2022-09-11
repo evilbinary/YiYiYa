@@ -59,7 +59,7 @@ void cd_command(char* cmd, int count) {
   char* ptr = kstrtok(cmd, split);
   ptr = kstrtok(NULL, split);
   print_string(ptr);
-  return syscall1(SYS_CHDIR, ptr);
+  syscall1(SYS_CHDIR, ptr);
 }
 
 void pwd_command() {

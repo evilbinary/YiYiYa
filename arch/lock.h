@@ -4,8 +4,8 @@
  * 邮箱: rootdebug@163.com
  ********************************************************************/
 
-#ifndef LOCK_H
-#define LOCK_H
+#ifndef ARCH_LOCK_H
+#define ARCH_LOCK_H
 
 #include "libs/include/types.h"
 

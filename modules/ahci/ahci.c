@@ -423,7 +423,7 @@ int ahci_init(void) {
   pci_device_t* pdev = pci_find_class(0x0106);
   if (pdev == NULL) {
     kprintf("can not find ahci device\n");
-    return;
+    return 0;
   }
   //获取bar5的地址，别问为什么，规范说bar5是pci为0x24的AHCI Base Address <BAR5>，获取后可以通过内存操作ata设备
   u32 bar5 = pci_dev_read32(pdev, PCI_BASE_ADDR5) & 0xFFFFFFF0;

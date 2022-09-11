@@ -10,12 +10,12 @@ plt = platform.system()
 
 Import('env')
 
-linkflags=' $LINKFLAGS -Xlinker -Map=kernel.map -T'+env.get('LINKLD')
+linkflags=' $LINKFLAGS -Xlinker '+env.get('LINKLD')
 
 libs=[
-     '../modules/libmodules.a',
     '../kernel/libyiyiya.a',
     '../arch/libarch.a',
+    '../modules/libmodules.a',
     '../platform/libplatform.a',
     '../libs/libarchcommon/libarchcommon.a',
     '../libs/libalgorithm/libalgorithm.a',

@@ -3,8 +3,8 @@
  * 作者: evilbinary on 01/01/20
  * 邮箱: rootdebug@163.com
  ********************************************************************/
-#ifndef MM_H
-#define MM_H
+#ifndef ARCH_MM_H
+#define ARCH_MM_H
 
 #include "boot.h"
 #include "libs/include/types.h"
@@ -53,5 +53,8 @@ void mm_init();
 void* mm_alloc(size_t size);
 void mm_free(void* p);
 void* mm_alloc_zero_align(size_t size, u32 alignment);
+void mm_alloc_init();
+void mm_dump_phy();
+void mm_dump();
 
 #endif

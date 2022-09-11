@@ -3,8 +3,8 @@
 * 作者: evilbinary on 01/01/20
 * 邮箱: rootdebug@163.com
 ********************************************************************/
-#ifndef BOOT_H
-#define BOOT_H
+#ifndef ARCH_BOOT_H
+#define ARCH_BOOT_H
 
 #include "libs/include/types.h"
 

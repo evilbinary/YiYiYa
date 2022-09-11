@@ -4,8 +4,9 @@
  * 作者: evilbinary on 01/01/20
  * 邮箱: rootdebug@163.com
  ********************************************************************/
-#ifndef CONTEXT_H
-#define CONTEXT_H
+#ifndef ARCH_CONTEXT_H
+#define ARCH_CONTEXT_H
+
 
 #ifdef ARM
   #ifdef ARMV7_A
@@ -20,7 +21,11 @@
     #error "no support arm"
   #endif
 #elif defined(X86)
-  #include "x86/context.h"
+  #ifdef X86_DUCK
+    #include "x86-duck/context.h"
+  #else
+    #include "x86/context.h"
+  #endif
 #elif defined(LX6)
   #include "lx6/context.h"
 #else

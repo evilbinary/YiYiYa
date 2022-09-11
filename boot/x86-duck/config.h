@@ -1,0 +1,5 @@
+#ifndef BOOT_X86-DUCK_CONFIG_H
+#define BOOT_X86-DUCK_CONFIG_H
+#define KERNEL_BLOCK_SIZE 98
+#define KERNEL_SIZE 99592
+#endif

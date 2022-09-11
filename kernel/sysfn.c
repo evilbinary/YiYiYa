@@ -96,7 +96,7 @@ u32 sys_open(char* name, int attr) {
   return f;
 }
 
-void sys_close(u32 fd) {
+int sys_close(u32 fd) {
   thread_t* current = thread_current();
   fd_t* f = thread_find_fd_id(current, fd);
   if (f == NULL) {

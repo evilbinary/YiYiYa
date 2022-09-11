@@ -10,44 +10,14 @@ import platform
 import sys
 plt = platform.system()
 
-# board select platform,选择你要编译的平台
-# platform='pc'
-# platform='v3s'
-# platform='raspi2'
-# platform='esp32'
-# platform='stm32f4xx'
-# platform='raspi3'
-# platform='rk3128'
-platform='cubieboard2'
-
-# gcc path,这里是gcc路径配置
-# cc_path=''
-# cc_prefix='i386-elf-'
-# cc_lib_path='/opt/local/lib/gcc/i386-elf/9.2.0/' 
-
-cc_path=''
-cc_prefix='arm-none-eabi-'
-cc_lib_path='/opt/local/lib/gcc/arm-none-eabi/9.2.0/' 
-
-#/opt/local/lib/gcc/i386-elf/9.2.0/
-# D:\\app\\gcc\\lib\\gcc\\i686-elf\\7.1.0\\
-# D:\\Program Files\\gcc-arm-none-eabi-9\\lib\\gcc\\arm-none-eabi\\9.2.1\\  
-# /opt/local/lib/gcc/arm-none-eabi/9.2.0/
-# lib/gcc/arm-none-eabi/9.2.1/
-
-# cc_path='~/.espressif/tools/xtensa-esp32-elf/esp-2021r1-8.4.0/xtensa-esp32-elf/bin/'
-# cc_prefix='xtensa-esp32-elf-gcc'
-# cc_lib_path='/Users/evil/.espressif/tools/xtensa-esp32-elf/esp-2021r1-8.4.0/xtensa-esp32-elf/lib/gcc/xtensa-esp32-elf/8.4.0/' 
-
-
-# default libc 默认libc 选择
-default_libc='libc'# libmusl libc
+from xenv.config import *
 
 supports_archs={
     'arm': ['armv5','armv6','armv7','armv7-a','armv8-a'],
-    'x86': ['x86','x86_64'],
+    'x86': ['x86','x86_64','x86-duck'],
     'xtensa':  ['lx6'],
-    'riscv':['riscv']
+    'riscv':['riscv'],
+    'dummy':['dummy']
 }
 
 support_platform={
@@ -59,6 +29,8 @@ support_platform={
     'raspi3':'armv8-a',
     'rk3128':'armv7-a',
     'cubieboard2': 'armv7-a',
+    'dmulator':'x86-duck',
+    'dummy':'dummy'
 }
 
 
@@ -96,13 +68,13 @@ DefaultEnvironment(tools=[])
 env = Environment(ENV = {}, tools=['gcc'])
 
 if plt=='Linux':
-    if len(cc_path)==0:
-        cc_path='/usr/bin/'
+    if len(CC_PATH)==0:
+        CC_PATH='/usr/bin/'
 elif plt=='Darwin':
-    if len(cc_path)==0:
-        cc_path='/opt/local/bin/'
-    if len(cc_prefix)==0:
-        cc_prefix='i386-elf-'
+    if len(CC_PATH)==0:
+        CC_PATH='/opt/local/bin/'
+    if CC_PREFIX==None:
+        CC_PREFIX='i386-elf-'
     pass
 elif plt=='Windows':
     pass
@@ -110,31 +82,32 @@ else:
     print('no support ^_^! '+plt)
 
 if arch_type == 'arm':
-    cc_prefix='arm-none-eabi-'
+    CC_PREFIX='arm-none-eabi-'
 elif arch_type=='xtensa':
-    cc_prefix='xtensa-esp32-elf-'
-    cc_path='~/.espressif/tools/xtensa-esp32-elf/esp-2021r1-8.4.0/xtensa-esp32-elf/bin/'
+    CC_PREFIX='xtensa-esp32-elf-'
+    CC_PATH='~/.espressif/tools/xtensa-esp32-elf/esp-2021r1-8.4.0/xtensa-esp32-elf/bin/'
 
-gcc= cc_path+cc_prefix
+
 env = Environment(
         ENV=os.environ,
         APP=True,
-        CC = gcc+'gcc',
-        LD=gcc+'ld',
-        CXX=gcc+'g++',
-        AR= gcc+'ar',
-        STRIP=gcc+"strip",
-        RANLIB=gcc+'ranlib',
-        OBJCOPY=gcc+'objcopy',
-        AS=gcc+'as',
-        CFLAGS='-DDUCK -DX86 -march=i486 -I. -I./include -Ilibs/include -g -nostdlib -nostdinc  -fno-builtin -m32 -c -std=c99 -std=gnu99 -w -D'+platform.upper(),
+        CC = CC,
+        LD= LD,
+        CXX=CXX,
+        AR= AR,
+        STRIP=STRIP,
+        RANLIB=RANLIB,
+        OBJCOPY=OBJCOPY,
+        AS= AS,
+        ARFLAGS=ARFLAGS,
+        CFLAGS=CFLAGS+ ' -DDUCK -DX86 -D'+arch.upper().replace('-','_')+' -I. -I./include -Ilibs/include -g -nostdlib -nostdinc  -fno-builtin -m32 -c -std=c99 -std=gnu99 -w -D'+platform.upper(),
         #PATH= os.environ['PATH'],
-        LIBPATH=['.','../arch/','../driver','../libs/'],
-        LINKFLAGS='-nostdlib -nostartfiles -e start  -g ',
-        OBJCOPYFLAGS='-S -g',
+        LIBPATH=['.','../arch/','../modules','../libs/'],
+        LINKFLAGS=LINKFLAGS,
+        OBJCOPYFLAGS=OBJCOPYFLAGS,
         ARCH=arch,
         PLATFORM=platform,
-        LINKLD='xlinker/link.ld',
+        LINKLD=LINKLD,
         MYLIB=None,
         LIBC=libc,
         LIBCFLAGS=libcflags,
@@ -147,19 +120,26 @@ if plt=='Linux':
     if arch =='x86':
         env['LINKFLAGS']= env['LINKFLAGS']+' -m32'
     env['CFLAGS']= env['CFLAGS']+' -no-pie -fno-pic -Llibgcc.a '
-    #env['MYLIB']= ''
+    if CC_LIB_PATH!=None:
+        env['MYLIB']=CC_LIB_PATH+'libgcc.a'
     pass
 elif plt=='Windows':
     env['LINKFLAGS']='-nostdlib  ',
     env['CFLAGS']= env['CFLAGS']+' -fno-stack-protector -mno-stack-arg-probe ' #-ffreestanding -nostdlib  
     env['USER']='--entry main -Txlinker/user.ld   '
-    env['MYLIB']=cc_lib_path+'libgcc.a'
+    env['MYLIB']=CC_LIB_PATH+'libgcc.a'
     env['PROGSUFFIX'] = ''
 elif plt=='Darwin':
-    env['MYLIB']=cc_lib_path+'libgcc.a'
+    env['MYLIB']=CC_LIB_PATH+'libgcc.a'
 
 
-if arch_type == 'arm':
+if arch_type == 'x86':
+    if platform=='x86_duck':
+        env['CFLAGS']+=' -m32 -march=native '
+    else:
+        env['CFLAGS']+=' -march=i486 '
+    pass
+elif arch_type == 'arm':
     env['APP']=True
     env['USER']=' --entry main -Txlinker/user-arm.ld '
     env['CFLAGS']=' -D'+arch.upper().replace('-','_') + '  -DARM -I. -I./include  -Ilibs/include -g -c -std=c99 -std=gnu99 -w  -D'+platform.upper() # -nostdlib -nostdinc -fno-builtin -DMALLOC_TRACE -mcpu=cortex-a7  -mtune=cortex-a7 -mfpu=vfpv4 -mfloat-abi=hard -mfloat-abi=softfp
@@ -217,7 +197,7 @@ def generate_kernel_size(env,target,source):
     file_out=str(target[0])
     get_kernel_size(env,target,source)
     kernel_header=file_out.upper().rsplit('/',1)[-1].replace('.','_')
-    kernel_header=file_out.upper().rsplit('\\',1)[-1].replace('.','_')
+    kernel_header=file_out.upper().rsplit('\\',1)[-1].replace('.','_').replace('/','_')
     f = open(file_out, 'w')
     content="""#ifndef %s
 #define %s
@@ -265,9 +245,9 @@ Depends(image, boot)
 Depends(image, kernel)
 
 
-
-# SConscript(dirs=['libs/libc'], exports='env')
-# app=SConscript(dirs=['app'], exports='env')
+if default_apps:
+    SConscript(dirs=['libs/libc'], exports='env')
+    app=SConscript(dirs=['app'], exports='env')
 
 
 

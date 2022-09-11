@@ -99,5 +99,8 @@ thread_t* thread_head();
 void thread_run_all();
 void thread_reset_stack3(thread_t* thread, u32* stack3);
 
+void thread_fill_fd(thread_t* thread);
+void thread_init_self(thread_t* thread, void* entry, u32* stack0, u32* stack3,
+                      u32 size, u32 level);
 
 #endif
