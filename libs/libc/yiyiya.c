@@ -235,6 +235,11 @@ int ya_fstat(int fd, struct stat *buf) { return syscall2(SYS_STAT, fd,buf); }
 int ya_stat(const char *path, struct stat *buf) { return syscall2(SYS_STAT, path,buf); }
 
 
+int ya_nanosleep(const struct timespec *req, struct timespec *rem){
+	return syscall4(SYS_CLOCK_NANOSLEEP,1, 0, req, rem);
+}
+
+
 void __main() {
   // printf("main call\n");
 }

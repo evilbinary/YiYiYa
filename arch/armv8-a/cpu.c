@@ -19,6 +19,11 @@ void cpu_halt() {
   };
 }
 
+
+void cpu_wait(){
+
+}
+
 ulong cpu_get_cs(void) {
   ulong result;
 

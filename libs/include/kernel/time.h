@@ -4,6 +4,11 @@
 #include "types.h"
 #include "type.h"
 
+struct timespec {
+  time_t tv_sec;
+  time_t tv_nsec;
+};
+
 struct timeval {
   time_t tv_sec;
   suseconds_t tv_usec;

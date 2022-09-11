@@ -5,7 +5,7 @@
  ********************************************************************/
 #include "main.h"
 
-#define VERSION "1.1"
+#define VERSION "1.2"
 
 const char* logo =
     " _  _  _ _  _  _      \n"
@@ -128,6 +128,9 @@ void do_shell_thread(void) {
         buf[count++] = ch;
         syscall3(SYS_WRITE, 1, &ch, 1);
       }
+    }else{
+      u32 tv[2] = { 1, 0 };
+      syscall4(SYS_CLOCK_NANOSLEEP,0,0,&tv,&tv);
     }
   }
 }

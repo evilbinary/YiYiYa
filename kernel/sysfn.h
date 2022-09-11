@@ -8,6 +8,7 @@
 
 #include "kernel.h"
 #include "types.h"
+#include "kernel/time.h"
 
 #if defined(ARM)|| defined(X86)
 enum {
@@ -47,6 +48,7 @@ enum {
   SYS_GETDENTS64=217,
   SYS_MUNMAP=91,
   SYS_FCNT64=221,
+  SYS_CLOCK_NANOSLEEP=230,
   SYS_SET_THREAD_AREA=243,
   SYS_PRINT = 400,
   SYS_PRINT_AT = 401,
@@ -61,6 +63,7 @@ enum {
   SYS_VHEAP = 410,
   SYS_DUMPS=411,
   SYS_SELF= 412,
+  
 };
 
 #else
@@ -101,6 +104,7 @@ enum {
   SYS_GETDENTS64=217,
   SYS_MUNMAP=91,
   SYS_FCNT64=221,
+  SYS_CLOCK_NANOSLEEP=230,
   SYS_SET_THREAD_AREA=243,
   SYS_PRINT = 400,
   SYS_PRINT_AT = 401,

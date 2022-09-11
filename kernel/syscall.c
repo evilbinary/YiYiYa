@@ -17,68 +17,7 @@ void syscall_handler() {
 
 void syscall_init() {
   interrutp_regist(ISR_SYSCALL, syscall_handler);
-  syscall_table[SYS_READ] = &sys_read;
-  syscall_table[SYS_WRITE] = &sys_write;
-  syscall_table[SYS_YIELD] = &sys_yeild;
-  syscall_table[SYS_PRINT] = &sys_print;
-  syscall_table[SYS_PRINT_AT] = &sys_print_at;
-  syscall_table[SYS_IOCTL] = &sys_ioctl;
-  syscall_table[SYS_OPEN] = &sys_open;
-  syscall_table[SYS_CLOSE] = &sys_close;
-  syscall_table[SYS_DEV_READ] = &dev_read;
-  syscall_table[SYS_DEV_WRITE] = &dev_write;
-  syscall_table[SYS_DEV_IOCTL] = &dev_ioctl;
-  syscall_table[SYS_EXEC] = &sys_exec;
-  syscall_table[SYS_TEST] = &sys_test;
-  syscall_table[SYS_EXIT] = &sys_exit;
-  syscall_table[SYS_MAP] = &sys_vmap;
-  syscall_table[SYS_UMAP] = &sys_vumap;
-  syscall_table[SYS_SEEK] = &sys_seek;
-  syscall_table[SYS_VALLOC] = &sys_valloc;
-  syscall_table[SYS_VFREE] = &sys_vfree;
-  syscall_table[SYS_VHEAP] = &sys_vheap;
-  syscall_table[SYS_FORK] = &sys_fork;
-  syscall_table[SYS_PIPE] = &sys_pipe;
-  syscall_table[SYS_GETPID] = &sys_getpid;
-  syscall_table[SYS_GETPPID] = &sys_getppid;
-  syscall_table[SYS_DUP] = &sys_dup;
-  syscall_table[SYS_DUP2] = &sys_dup2;
-  syscall_table[SYS_READDIR] = &sys_readdir;
-  syscall_table[SYS_BRK] = &sys_brk;
-  syscall_table[SYS_READV] = &sys_readv;
-  syscall_table[SYS_WRITEV] = &sys_writev;
-  syscall_table[SYS_CHDIR] = &sys_chdir;
-  syscall_table[SYS_MMAP2] = &sys_mmap2;
-  syscall_table[SYS_MPROTECT] = &sys_mprotect;
-  syscall_table[SYS_RT_SIGPROCMASK] = &sys_rt_sigprocmask;
-
-  syscall_table[SYS_ALARM] = &sys_alarm;
-  syscall_table[SYS_UNLINK] = &sys_unlink;
-  syscall_table[SYS_RENAME] = &sys_rename;
-
-  syscall_table[SYS_RENAME] = &sys_rename;
-
-  syscall_table[SYS_SET_THREAD_AREA]=&sys_set_thread_area;
-  syscall_table[SYS_DUMPS] = &sys_dumps;
-
-  syscall_table[SYS_GETDENTS64] = &sys_getdents64;
-  syscall_table[SYS_MUNMAP] = &sys_munmap;
-
-  syscall_table[SYS_FCNT64] = &sys_fcntl64;
-  syscall_table[SYS_GETCWD] =&sys_getcwd;
-  syscall_table[SYS_CHDIR]=&sys_chdir;
-  syscall_table[SYS_FCHDIR]=&sys_fchdir;
-  syscall_table[SYS_CLONE]=&sys_clone;
-  syscall_table[SYS_LLSEEK]=&sys_llseek;
-
-  syscall_table[SYS_UMASK]=&sys_umask;
-
-  syscall_table[SYS_STAT]=&sys_stat;
-  syscall_table[SYS_FSTAT]=&sys_fstat;
-  syscall_table[SYS_SELF]=&sys_self;
-
-
-  
+  sys_fn_init(syscall_table);
 }
 
 void* do_syscall(interrupt_context_t* context) {

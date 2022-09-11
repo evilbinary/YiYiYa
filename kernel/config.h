@@ -68,6 +68,7 @@
 
 #endif
 
+#define SCHEDULE_FREQUENCY 1000
 
 //是否打印加载ELF信息
 // #define LOAD_ELF_DEBUG

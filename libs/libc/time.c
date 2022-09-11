@@ -523,9 +523,8 @@ static char *_add(const char *str, char *pt, const char *ptlim) {
   return pt;
 }
 
-int nanosleep(const struct timespec *req, struct timespec *rem) {
-  printf("not imple nanosleep\n");
-  return 0;
+int nanosleep(const struct timespec *req, struct timespec *rem) {  
+  return ya_nanosleep(req,rem);
 }
 
 int clock_gettime(clockid_t clockid, struct timespec *ts) {

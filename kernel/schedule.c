@@ -33,21 +33,35 @@ thread_t* schedule_get_next() {
   return next;
 }
 
-void schedule_next() {
-  cpu_cli();
+void schedule_next(){
+
+}
+
+void schedule_sleep(u32 nsec) {
   thread_t* current = thread_current();
-  // interrupt_context_t* interrupt_context=current_thread->context.esp0;
-  // schedule(interrupt_context);
-  for (; current != current;) {
-    cpu_sti();
+  thread_sleep(current,nsec/SCHEDULE_FREQUENCY*1000);
+}
+
+void schedule_state(int cpu){
+  thread_t* v = thread_head();
+  for (; v != NULL; v = v->next) {
+    if(v->sleep_counter<0){
+      thread_wake(v);
+    }
+    if(v->state==THREAD_SLEEP){
+      u32 ticks=timer_ticks[cpu];
+      v->sleep_counter-= ticks-v->counter;
+    }
   }
 }
+
 
 void* do_schedule(interrupt_context_t* interrupt_context) {
   int cpu = cpu_get_id();
   thread_t* next_thread = NULL;
   thread_t* prev_thread = NULL;
   thread_t* current_thread = thread_current();
+  schedule_state(cpu);
   next_thread = schedule_get_next();
   // kprintf("schedule next %s %d\n",next_thread->name,next_thread->id);
   if (next_thread == NULL) {
@@ -74,5 +88,5 @@ void do_timer() {
 void schedule_init() {
   lock_init(&schedule_lock);
   interrutp_regist(ISR_TIMER, do_timer);
-  timer_init(1000);
+  timer_init(SCHEDULE_FREQUENCY);
 }

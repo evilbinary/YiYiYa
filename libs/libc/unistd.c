@@ -2,8 +2,8 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <support.h>
-#include <unistd.h>
-
+#include "unistd.h"
+#include "time.h"
 #include "limits.h"
 #include "stdarg.h"
 #include "syscall.h"
@@ -130,9 +130,10 @@ int rmdir(const char *directory) {
 }
 
 unsigned int sleep(unsigned int seconds) {
-  unsigned int rc;
-
-  return rc;
+  struct timespec tv = { .tv_sec = seconds, .tv_nsec = 0 };
+	if (nanosleep(&tv, &tv))
+		return tv.tv_sec;
+	return 0;
 }
 
 int truncate(const char *filename, off_t offset) {
@@ -286,9 +287,12 @@ int fsync(int fd) {
   return 1;
 }
 
-int usleep(unsigned i) {
-  UNIMPL();
-  return 1;
+int usleep(unsigned useconds) {
+	struct timespec tv = {
+		.tv_sec = useconds/1000000,
+		.tv_nsec = (useconds%1000000)*1000
+	};
+	return nanosleep(&tv, &tv);
 }
 
 int lockf(int fd, int op, off_t size) {

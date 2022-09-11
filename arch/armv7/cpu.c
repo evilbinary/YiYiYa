@@ -243,6 +243,10 @@ void cpu_halt() {
   };
 }
 
+void cpu_wait(){
+  asm("wfi");
+}
+
 ulong cpu_get_cs(void) {
   ulong result;
 

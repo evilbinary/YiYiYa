@@ -35,6 +35,7 @@ typedef struct thread {
     int priority;
     int counter;
     int state;
+    int sleep_counter;
     void* stack0;
     void* stack3;
     void* stack0_top;
@@ -71,7 +72,7 @@ thread_t* thread_create_ex(void* entry, u32 size,
 thread_t* thread_create_ex_name(char* name,void* entry,u32 size,
                            void* data,u32 level,u32 page);
 
-void thread_sleep(thread_t * thread);
+void thread_sleep(thread_t* thread,u32 count);
 
 void thread_wake(thread_t * thread);
 
