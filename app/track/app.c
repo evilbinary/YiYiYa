@@ -60,7 +60,7 @@ int main(int argc, char **argv) {
       tickets = 0;
     }
     lv_task_handler();
-    // usleep(5000);
+    usleep(5000);
     // delay_ms(LVGL_TICK);
     tickets++;
   }
