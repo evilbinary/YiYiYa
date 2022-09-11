@@ -34,7 +34,6 @@ void sys_dumps() {
 }
 
 int sys_print_at(char* s, u32 x, u32 y) {
-  set_cursor(x, y);
   kprintf("%s", s);
   return 0;
 }

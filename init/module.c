@@ -80,6 +80,9 @@ void modules_init(void) {
 
 #endif
 
+#elif defined(DUMMY)
+  module_regist(&hello_module);
+
 #elif defined(X86)
   module_regist(&pci_module);
   module_regist(&serial_module);

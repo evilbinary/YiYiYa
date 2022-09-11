@@ -8,7 +8,7 @@
 default_libc='libc'# libmusl libc
 
 # board select platform,选择你要编译的平台
-platform='dmulator' ## pc v3s raspi2 esp32 stm32f4xx raspi3 rk3128 cubieboard2
+platform='dummy' ##dmulator pc v3s raspi2 esp32 stm32f4xx raspi3 rk3128 cubieboard2 dummy
 
 # 是否要构建应用
 default_apps=True
@@ -43,6 +43,7 @@ LD='i386-elf-ld'
 AR='i386-elf-ar'
 OBJCOPY='i386-elf-objcopy'
 RANLIB='i386-elf-ranlib'
+CFLAGS='-march=i486'
 # LINKLD=' -T xlinker/link.ld'
 # LINKFLAGS='-nostdlib -nostartfiles -e start  -g '
 
@@ -55,11 +56,16 @@ default_apps=False
 
 ## osx i368 配置实例
 
-# CC_PATH=''
 # CC_PREFIX='i386-elf-'
-# CC= CC_PREFIX+'gcc'
-# LD='i386-elf-ld'
+# CC='i386-elf-gcc'
 # CC_LIB_PATH ='/opt/local/lib/gcc/i386-elf/9.2.0/' 
+# AR='i386-elf-ar'
+# LD='i386-elf-ld'
+# AR='i386-elf-ar'
+# OBJCOPY='i386-elf-objcopy'
+# RANLIB='i386-elf-ranlib'
+# CFLAGS='-march=i486'
+
 
 ## windows arm 配置实例
 

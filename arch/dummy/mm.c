@@ -4,11 +4,9 @@
  * 邮箱: rootdebug@163.com
  ********************************************************************/
 #include "arch/mm.h"
-
 #include "arch/cpu.h"
 #include "arch/display.h"
 #include "cpu.h"
-#include "gpio.h"
 
 #define PAGE_DIR_NUMBER 4096 * 4
 
@@ -24,17 +22,12 @@ void map_page(u32 virtualaddr, u32 physaddr, u32 flags) {
 }
 
 void mm_init_default() {
-  
   // init map
   kprintf("map page end\n");
  
   //init page
-  cpu_set_domain(0x07070707);
-  cpu_set_page(page_dir);
-
   kprintf("enable page\n");
 
-  cpu_enable_page();
   kprintf("paging pae scucess\n");
 }
 

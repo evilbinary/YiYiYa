@@ -14,7 +14,6 @@ void kernel_init() {
     exception_init();
     kprintf("syscall init\n");
     syscall_init();
-    cls();
     kprintf("schedule init\n");
     schedule_init();
     kprintf("module init\n");

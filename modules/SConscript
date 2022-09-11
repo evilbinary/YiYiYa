@@ -131,6 +131,10 @@ elif arch_type=='xtensa':
      modules=[
           'hello/hello.c',
         ]
+else:
+    modules=[
+          'hello/hello.c',
+    ]
 
 source=modules+[
     '../kernel/libyiyiya.a',
