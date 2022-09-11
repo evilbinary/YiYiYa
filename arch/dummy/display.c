@@ -9,10 +9,7 @@
 #include "../lock.h"
 
 
-extern boot_info_t* boot_info;
-
+//显示点信息
 void display_init() {
   kprintf("Hello,YiYiYa OS\n");
-  if (boot_info->disply.mode == 1) {
-  }
 }

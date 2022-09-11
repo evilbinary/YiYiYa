@@ -15,6 +15,7 @@ extern boot_info_t* boot_info;
 interrupt_handler_t* interrutp_handlers[IDT_NUMBER];
 u32 idt[IDT_NUMBER * 2] __attribute__((aligned(32)));
 
+//中断初始化
 void interrupt_init() {
   kprintf("interrupt init\n");
   boot_info->idt_base = idt;
@@ -25,15 +26,13 @@ void interrupt_init() {
   u32 val = idt;
   
 }
- 
+
+//注册中断
 void interrutp_regist(u32 vec, interrupt_handler_t handler) {
   interrutp_handlers[vec] = handler;
   interrutp_set(vec);
 }
 
 void interrutp_set(int i) {
-  idt[i] = 0xe59ff000 +
-           (IDT_NUMBER-2) * 4;  // ldr	pc, [pc, #24] 0x24=36=4*8=32+4
-  u32 base = (u32)interrutp_handlers[i];
-  idt[i + IDT_NUMBER] = base;
+  
 }
