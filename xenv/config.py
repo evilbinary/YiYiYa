@@ -44,6 +44,9 @@ AR='i386-elf-ar'
 OBJCOPY='i386-elf-objcopy'
 RANLIB='i386-elf-ranlib'
 CFLAGS='-march=i486'
+
+LINKLD='-Map=kernel.map -T xlinker/link-dmulator.ld'
+
 default_apps=False
 
 ## osx arm 配置实例

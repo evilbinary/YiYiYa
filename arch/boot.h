@@ -118,7 +118,7 @@ typedef struct boot_info {
   u32* kernel_origin_base;
   u32* kernel_base;
   u32* kernel_size;
-  u32* kernel_entry;
+  void* kernel_entry;
   u32* second_boot_entry;
   tss_t tss[MAX_CPU];
 
