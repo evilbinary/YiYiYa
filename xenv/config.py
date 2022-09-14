@@ -73,7 +73,7 @@ default_apps = False
 # CC_LIB_PATH ='/opt/local/lib/gcc/i386-elf/9.2.0/'
 # AR='i386-elf-ar'
 # LD='i386-elf-ld'
-# AR='i386-elf-ar'
+# AS='i386-elf-as'
 # OBJCOPY='i386-elf-objcopy'
 # RANLIB='i386-elf-ranlib'
 # CFLAGS='-march=i486'
@@ -84,21 +84,46 @@ default_apps = False
 # CC_PATH=''
 # CC_PREFIX='arm-none-eabi-'
 # CC_LIB_PATH='D:\\Program Files\\gcc-arm-none-eabi-9\\lib\\gcc\\arm-none-eabi\\9.2.1\\'
+# CC = CC_PREFIX+'gcc'
+# AR = CC_PREFIX+'ar'
+# LD = CC_PREFIX+'ld'
+# AS = CC_PREFIX+'as'
+# OBJCOPY = CC_PREFIX+'objcopy'
+# RANLIB = CC_PREFIX+'ranlib'
+
 
 # windows i386 配置实例
 
 # CC_PATH=''
 # CC_PREFIX='i686-elf-'
 # CC_LIB_PATH ='D:\\app\\gcc\\lib\\gcc\\i686-elf\\7.1.0\\'
+# CC = CC_PREFIX+'gcc'
+# AR = CC_PREFIX+'ar'
+# LD = CC_PREFIX+'ld'
+# AS = CC_PREFIX+'as'
+# OBJCOPY = CC_PREFIX+'objcopy'
+# RANLIB = CC_PREFIX+'ranlib'
 
 # windows arm 配置实例
 
 # CC_PATH=''
 # CC_PREFIX='i686-elf-'
 # CC_LIB_PATH ='D:\\app\\gcc\\lib\\gcc\\i686-elf\\7.1.0\\'
+# CC = CC_PREFIX+'gcc'
+# AR = CC_PREFIX+'ar'
+# LD = CC_PREFIX+'ld'
+# AS = CC_PREFIX+'as'
+# OBJCOPY = CC_PREFIX+'objcopy'
+# RANLIB = CC_PREFIX+'ranlib'
 
 # osx xteansa 配置实例
 
 # CC_PATH='~/.espressif/tools/xtensa-esp32-elf/esp-2021r1-8.4.0/xtensa-esp32-elf/bin/'
 # CC_PREFIX='xtensa-esp32-elf-gcc'
 # CC_LIB_PATH='/Users/evil/.espressif/tools/xtensa-esp32-elf/esp-2021r1-8.4.0/xtensa-esp32-elf/lib/gcc/xtensa-esp32-elf/8.4.0/'
+# CC = CC_PREFIX+'gcc'
+# AR = CC_PREFIX+'ar'
+# LD = CC_PREFIX+'ld'
+# AS = CC_PREFIX+'as'
+# OBJCOPY = CC_PREFIX+'objcopy'
+# RANLIB = CC_PREFIX+'ranlib'
