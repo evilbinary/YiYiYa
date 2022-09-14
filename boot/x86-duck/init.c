@@ -89,7 +89,7 @@ void init_memory() {
 }
 
 void map_segment(char* name, void* addr, u32 size) {
-  printf("start to %s at %p size: 0x%x\n", name, addr, boot_info->kernel_size);
+  printf("===>mmap start to %s at %p size: 0x%x\n", name, addr, size);
   int fd = -1;
   if (access(name, 0) == 0) {
     fd = open(name, O_RDWR, 0777);
@@ -249,10 +249,11 @@ void read_kernel() {
   //       ;
   //   }
 
-  boot_info->kernel_origin_base = malloc(boot_info->kernel_size);
+  u32 read_size = (u32)boot_info->kernel_size * 4;
+  boot_info->kernel_origin_base = malloc(read_size);
   FILE* fp = fopen("init/kernel.elf", "r+");
   if (fp != NULL) {
-    fread(boot_info->kernel_origin_base, boot_info->kernel_size, 1, fp);
+    fread(boot_info->kernel_origin_base, read_size, 1, fp);
     fclose(fp);
   }
 
@@ -347,6 +348,8 @@ void* memmove32(void* s1, const void* s2, u32 n) {
 
 void load_elf(Elf32_Ehdr* elf_header) {
   printf("e_phnum:%d\n\r", elf_header->e_phnum);
+  printf("e_shnum:%d\n\r", elf_header->e_shnum);
+
   void* elf = elf_header;
   Elf32_Phdr* phdr = (elf + elf_header->e_phoff);
   printf("addr %x elf=%x\n\r", phdr, elf);
@@ -369,14 +372,13 @@ void load_elf(Elf32_Ehdr* elf_header) {
           printf("load start:%p vaddr:%p size:%x %d \n\r", start, vaddr,
                  phdr[i].p_filesz, phdr[i].p_filesz);
 
-          map_segment("txt_mmap", vaddr, phdr[i].p_filesz);
+          char buf[64];
+          sprintf(buf, "txt%d_mmap", i);
+          map_segment(buf, vaddr, phdr[i].p_filesz);
 
           entry = vaddr;
 
-          printf("====>load start:%p vaddr:%p size:%x %d \n\r", start, vaddr,
-                 phdr[i].p_filesz, phdr[i].p_filesz);
-
-          print_hex(start);
+          // print_hex(start);
           memmove(vaddr, start, phdr[i].p_filesz);
           // memmove32(vaddr,start ,phdr[i].p_filesz);
           printf("move end\n\r");
@@ -388,18 +390,16 @@ void load_elf(Elf32_Ehdr* elf_header) {
           char* vaddr = phdr[i].p_vaddr;
           printf("load start:%p vaddr:%p size:%x %d \n\r", start, vaddr,
                  phdr[i].p_filesz, phdr[i].p_filesz);
-
-          map_segment("txt_mmap", vaddr, phdr[i].p_filesz);
+          char buf[64];
+          sprintf(buf, "txt%d_mmap", i);
+          map_segment(buf, vaddr, phdr[i].p_filesz);
 
           entry = vaddr;
 
-          printf("====>load start:%p vaddr:%p size:%x %d \n\r", start, vaddr,
-                 phdr[i].p_filesz, phdr[i].p_filesz);
-
-          print_hex(start);
+          // print_hex(start);
           memmove(vaddr, start, phdr[i].p_filesz);
           // memmove32(vaddr,start ,phdr[i].p_filesz);
-          printf("move end\n\r");
+          printf("move2 end\n\r");
         }
         break;
       }
@@ -410,7 +410,6 @@ void load_elf(Elf32_Ehdr* elf_header) {
   }
 
   Elf32_Shdr* shdr = (elf + elf_header->e_shoff);
-  ;
   for (int i = 0; i < elf_header->e_shnum; i++) {
     if (SHT_NOBITS == shdr[i].sh_type) {
       char* vaddr = shdr[i].sh_addr;
@@ -418,15 +417,27 @@ void load_elf(Elf32_Ehdr* elf_header) {
 
       printf("load shdr nobits start:%x vaddr:%x size:%x \n\r", start, vaddr,
              shdr[i].sh_size);
-      memset(vaddr, 0, shdr[i].sh_size);
-      // map_alignment(page,vaddr,buf,shdr[i].sh_size);
-    } else if (entry != shdr[i].sh_addr && SHT_PROGBITS == shdr[i].sh_type &&
-               shdr[i].sh_flags & SHF_ALLOC && shdr[i].sh_flags) {
+
+      char buf[64];
+      sprintf(buf, "data%d_mmap", i);
+      map_segment(buf, vaddr, shdr[i].sh_size);
+
+      // memset(vaddr, 0, shdr[i].sh_size);
+      //  map_alignment(page,vaddr,buf,shdr[i].sh_size);
+    } else if (entry != shdr[i].sh_addr &&
+               (shdr[i].sh_type & SHT_PROGBITS == SHT_PROGBITS) &&
+               (shdr[i].sh_flags & SHF_ALLOC == SHF_ALLOC) &&
+               (shdr[i].sh_flags & SHF_WRITE == SHF_WRITE)) {
       char* start = shdr[i].sh_offset;
       char* vaddr = shdr[i].sh_addr;
-      printf("load shdr start:%x vaddr:%x size:%x \n\r", start, vaddr,
-             shdr[i].sh_size);
+      printf("load shdr %s start:%x vaddr:%x size:%x \n\r", shdr[i].sh_name,
+             start, vaddr, shdr[i].sh_size);
       u32* phstart = (u32)elf + shdr[i].sh_offset;
+
+      char buf[64];
+      sprintf(buf, "data%d_mmap", i);
+      map_segment(buf, vaddr, shdr[i].sh_size);
+
       memmove(phstart, vaddr, shdr[i].sh_size);
     }
   }
