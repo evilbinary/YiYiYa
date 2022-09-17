@@ -84,4 +84,18 @@
 
 #include "logger.h"
 
+//是否打印加载ELF信息
+// #define LOAD_ELF_DEBUG
+
+//打印加载elf名字
+// #define LOAD_ELF_NAME_DEBUG 1
+
+//打印 sysfn信息
+// #define LOG_DEBUG 0
+
+#define MAX_PATH_BUFFER 256 //最长文件路径
+
+
+#include "logger.h"
+
 #endif

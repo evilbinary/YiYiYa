@@ -36,15 +36,6 @@ void mouse_handler() {
   interrupt_exit();
 }
 
-void mouse_wait(u8 type) {
-  u32 time_out = 1000000;
-  for (; time_out > 0; time_out--) {
-    if ((io_read8(MOUSE_STATUS) & (1 + type)) == (1 - type)) {
-      break;
-    }
-  }
-}
-
 u8 mouse_read() {
   mouse_wait(0);
   return io_read8(MOUSE_DATA);
@@ -57,6 +48,14 @@ void mouse_write(u8 data) {
   io_write8(MOUSE_DATA, data);
 }
 
+void mouse_wait(u8 type) {
+  u32 time_out = 1000000;
+  for (; time_out > 0; time_out--) {
+    if ((io_read8(MOUSE_STATUS) & (1 + type)) == (1 - type)) {
+      break;
+    }
+  }
+}
 
 int mouse_init(void) {
   device_t* dev = kmalloc(sizeof(device_t));
