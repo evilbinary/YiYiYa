@@ -1,0 +1,187 @@
+# coding:utf-8
+# *******************************************************************
+# * Copyright 2021-2080 evilbinary
+# * 作者: evilbinary on 01/01/20
+# * 邮箱: rootdebug@163.com
+# ********************************************************************
+import os
+
+Import('env')
+
+arch_type=env['ARCHTYPE']
+
+platform=env['PLATFORM']
+
+modules=[]
+other=[]
+if arch_type =='arm':
+    if platform=='v3s':
+        other=[
+            'gpu/v3s.c',
+            'mmc/v3s.c',
+            'serial/v3s.c',
+            'mouse/v3s.c',
+            'i2c/i2c.c',
+            'i2c/v3s.c',
+            'gpio/gpio.c',
+            'gpio/v3s.c',
+            'spi/spi.c',
+            'spi/v3s.c',
+        ]
+    elif platform=='cubieboard2':
+        other=[
+            'gpu/v3s.c',
+            'mmc/v3s.c',
+            'serial/v3s.c',
+            'mouse/v3s.c',
+            'i2c/i2c.c',
+            'i2c/v3s.c',
+            'gpio/gpio.c',
+            'gpio/v3s.c',
+            'spi/spi.c',
+            'spi/v3s.c',
+        ]
+    elif platform=='orangepi-pc':
+        other=[
+            'gpu/v3s.c',
+            'mmc/v3s.c',
+            'serial/v3s.c',
+            'mouse/v3s.c',
+            'i2c/i2c.c',
+            'i2c/v3s.c',
+            'gpio/gpio.c',
+            'gpio/v3s.c',
+            'spi/spi.c',
+            'spi/v3s.c',
+        ]
+    elif platform=='raspi2':
+        other=[
+            'gpu/bcm2836.c',
+            'gpu/mailbox.c',
+            'mmc/bcm2836.c',
+            'mmc/bcm2835_vc.c',
+            'serial/bcm2836.c',
+            'mouse/bcm2836.c',
+            'i2c/i2c.c',
+            'i2c/bcm2836.c',
+            'gpio/gpio.c',
+            'gpio/bcm2836.c',
+            'spi/spi.c',
+            'spi/bcm2836.c',
+            ]
+    elif platform=='stm32f4xx':
+            other=[
+                'gpio/gpio.c',
+                'gpio/stm32.c',
+                'i2c/i2c.c',
+                'i2c/stm32.c',
+                'spi/spi.c',
+                'spi/stm32.c',
+                'lcd/lcd.c',
+                'lcd/st7735.c',
+                'serial/stm32.c',
+                ]
+    elif platform=='rk3128':
+            other=[
+                'gpu/rk3128.c',
+                'mmc/rk3128.c',
+                'serial/rk3128.c',
+                'mouse/rk3128.c',
+                'i2c/i2c.c',
+                'i2c/rk3128.c',
+                'gpio/gpio.c',
+                'gpio/rk3128.c',
+                'spi/spi.c',
+                'spi/rk3128.c',
+                ]
+    elif platform=='rk3288':
+            other=[
+                'gpu/rk3128.c',
+                'mmc/rk3128.c',
+                'serial/rk3128.c',
+                'mouse/rk3128.c',
+                'i2c/i2c.c',
+                'i2c/rk3128.c',
+                'gpio/gpio.c',
+                'gpio/rk3128.c',
+                'spi/spi.c',
+                'spi/rk3128.c',
+                ]
+    modules=[
+        'fat/fat.c',
+        'fat/byteordering.c',
+        'fat/partition.c',
+        'fat/mod.c',
+        # 'fat32/fat32.c',
+        
+        'gpu/gpu.c',
+        'mmc/sdhci.c',
+        'hello/hello.c',
+        'dev/devfs.c',
+        'pty/pty.c'
+    ]+other
+
+elif arch_type=='x86':
+    modules=['pci.c',
+    'pic/pic.c',
+    'ahci/ahci.c',
+    'dma/dma.c',
+
+    'hello/hello.c',
+    'serial/serial.c',
+    'dev/devfs.c',
+    'rtc/rtc.c',
+    'pty/pty.c',
+    'vga/vga.c',
+    'vga/mode.c',
+    'vga/qemu.c',
+    'mouse/mouse.c',
+    'keyboard/keyboard.c',
+    'fat32/fat32.c',
+    
+    'fat/fat.c',
+    'fat/byteordering.c',
+    'fat/partition.c',
+    'fat/mod.c',
+
+    'sound/sb16.c',
+    'net/net.c',
+    'net/e1000.c',
+
+    'test/test.c',
+    'test/test-ahci.c',
+    'test/test-fat.c',
+    ]
+
+elif arch_type=='xtensa':
+     modules=[
+          'hello/hello.c',
+        ]
+else:
+    modules=[
+          'hello/hello.c',
+    ]
+
+libs=[
+    '../kernel/libyiyiya.a',
+    '../arch/libarch.a',
+    '../libs/libalgorithm/libalgorithm.a',
+    '../libs/libkernel/libkernel.a'
+    ]
+include=[
+        '.',
+        '../',
+        '../libs/include',
+        '../platform',
+        '../kernel',
+        '../../',
+        '../platform/'+env.get('PLATFORM') 
+    ]
+
+source=modules
+
+env.Library('modules',
+    source,
+    CPPPATH=include,
+    LIBS=libs,
+    CFLAGS='$CFLAGS')

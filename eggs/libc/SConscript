@@ -1,0 +1,64 @@
+# coding:utf-8
+# *******************************************************************
+# * Copyright 2021-2080 evilbinary
+# * 作者: evilbinary on 01/01/20
+# * 邮箱: rootdebug@163.com
+# ********************************************************************
+import os
+
+Import('env')
+
+source=[
+    'string.c',
+    'malloc.c',
+    'vsprintf.c',
+    'stdio.c',
+    'stdlib.c',
+    'syscall.c',
+    'errno.c',
+    'ctype.c',
+    'support.c',
+    'unistd.c',
+    'fcntl.c',
+    'yiyiya.c',
+    'time.c',
+    'setjmp.c',
+    'signal.c',
+    'timeb.c',
+    'strings.c',
+    'gettimeofday.c',
+    'math.c',
+    'getopt.c',
+    'ioctl.c',
+    'dirent.c',
+    'assert.c',
+    'locale.c',
+    'vsscanf.c',
+    'strntoumax.c',
+    'vsnprintf.c',
+    'vfscanf.c',
+    'dlfcn.c',
+    'password.c',
+    'fenv.c',
+    'alloc.c'
+]
+
+source+= Glob('math/*.c')
+source+= Glob('environ/*.c')
+source+= Glob('sys/*.c')
+
+if env['ARCHTYPE'] =='arm':
+    source=source+[
+        'arm/longjmp.S',
+        'arm/setjmp.S'
+    ]
+elif env['ARCHTYPE']=='x86':
+    source=source+[
+        'i386/longjmp.s',
+        'i386/setjmp.s'
+    ]
+
+if env.get('MYLIB'):
+    source.append(env.get('MYLIB'))
+    
+env.Library('c',source ,CFLAGS='$CFLAGS -Ilibs/include/c/')

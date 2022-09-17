@@ -9,7 +9,7 @@ default_libc = 'libc'  # libmusl libc
 
 # board select platform,选择你要编译的平台
 # dmulator pc v3s raspi2 esp32 stm32f4xx raspi3 rk3128 rk3288 cubieboard2 dummy rk3288 orangepi-pc
-platform = 'orangepi-pc'
+platform = 'raspi2'
 
 # 是否要构建应用
 default_apps = True
@@ -60,11 +60,12 @@ LD = CC_PREFIX+'ld'
 AS = CC_PREFIX+'as'
 OBJCOPY = CC_PREFIX+'objcopy'
 RANLIB = CC_PREFIX+'ranlib'
-CFLAGS = '-DRK3128 '
-LINKLD = '-Map=kernel.map -T xlinker/link-rk3128.ld'
+CFLAGS = ''
+LDFLAGS='-Map=kernel.map '
+LINKLD = 'xlinker/link-'+platform+'.ld'
 
 
-default_apps = False
+default_apps = True
 
 # osx i368 配置实例
 

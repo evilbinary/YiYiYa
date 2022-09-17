@@ -1,0 +1,26 @@
+# coding:utf-8
+# *******************************************************************
+# * Copyright 2021-2080 evilbinary
+# * 作者: evilbinary on 01/01/20
+# * 邮箱: rootdebug@163.com
+# ********************************************************************
+import os
+
+Import('env')
+
+
+include=[
+    '.',
+    '../include/algorithm',
+    '../include/kernel',
+    '../include',
+    '../../',
+]
+
+
+env.Library('kernel', 
+    ['string.c',
+    'vsprintf.c',
+    'common.c',
+    'io.c',
+    ],CPPPATH=include,CFLAGS='$CFLAGS')

@@ -1,1 +1,0 @@
-#include "etk_gconf.h"

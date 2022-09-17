@@ -1,0 +1,30 @@
+# coding:utf-8
+# *******************************************************************
+# * Copyright 2021-2080 evilbinary
+# * 作者: evilbinary on 01/01/20
+# * 邮箱: rootdebug@163.com
+# ********************************************************************
+import os
+
+Import('env')
+
+arch_type= env['ARCHTYPE']
+
+source=[]
+source+=Glob(arch_type+'/*.c')
+
+print(source)
+
+include=[
+    '.',
+    "%s"""%(env.get('ARCHTYPE')),
+    '../',
+    '../include',
+    '../../',
+    '../include/archcommon',
+]
+
+env.Library('libarchcommon.a',source,CPPPATH=include,CFLAGS='$CFLAGS')
+
+
+ 

@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=SDL2-GNUBoy
+Icon=gameboy
+Categories=Education;
+Terminal=true
+X-AppImage-Version=0.1.09

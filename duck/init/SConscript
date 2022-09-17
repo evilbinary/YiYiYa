@@ -1,0 +1,77 @@
+# coding:utf-8
+# *******************************************************************
+# * Copyright 2021-2080 evilbinary
+# * 作者: evilbinary on 01/01/20
+# * 邮箱: rootdebug@163.com
+# ********************************************************************
+import os
+import platform 
+plt = platform.system()
+
+Import('env')
+
+current=Dir('.').srcnode().path+'/../'
+
+linkflags=' $LINKFLAGS -Xlinker '+current+env.get('LINKLD')
+
+include= [
+        '../',
+        '../libs/include',
+        '../platform',
+        env.get('LINKLD'),
+    ]
+
+libs=[
+    'yiyiya',
+    'modules',
+    'arch',
+    'platform',
+    'archcommon',
+    'algorithm',
+    'kernel'
+]
+
+libpath=[
+    '../kernel/',
+    '../modules',
+    '../arch/',
+    '../platform/',
+    '../libs/libarchcommon/',
+    '../libs/libalgorithm/',
+    '../libs/libkernel/',
+]
+
+kernel=[
+    'main.c',
+    'module.c',
+    'shell.c',
+    'monitor.c',
+    'test.c'
+    ]
+
+
+if env.get('ARCHTYPE')=='xtensa':
+    # libs.append('../app/libgui/libgui.a')
+    # libs.append('../libs/libc/libc.a')
+    pass
+elif env.get('ARCHTYPE')=='arm':
+    if env.get('ARCH')=='armv7':
+        kernel.append('../boot/arm/boot.o')
+        kernel.append('../boot/arm/init.o')
+        pass
+    else:
+        pass
+if env.get('MYLIB'):
+    libs.append(env.get('MYLIB'))
+    libpath.append(env.get('CC_LIB_PATH'))
+
+env.Program('kernel.elf',kernel,
+    CPPPATH=include,
+    LIBPATH=libpath,
+    LIBS=libs,
+    LINKFLAGS = linkflags)
+
+env.Objcopy('kernel','kernel.elf',OBJCOPYFLAGS='-S')
+env.Objcopy('kernel.dbg','kernel.elf',OBJCOPYFLAGS='--only-keep-debug')
+# env.Objcopy('kernel.hex','kernel.elf',OBJCOPYFLAGS='-S -O ihex')
+env.Objcopy('kernel.bin','kernel.elf',OBJCOPYFLAGS='-S -O binary')
