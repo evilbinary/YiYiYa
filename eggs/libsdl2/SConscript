@@ -55,10 +55,9 @@ source+=Glob('src/video/yuv2rgb/*.c')
 
 source +=[
     '../libgui/libgui.a',
-    ]+env['LIBC']
+    ]
 
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
+
 
 env.Library('sdl2', source,
     CFLAGS='$CFLAGS $LIBCFLAGS -DBSD -D__YIYIYA__ -Iapp/libgui/ -Iapp/libjpeg -Iapp/libsdl2 -Iapp/libsdl2/include -I.',

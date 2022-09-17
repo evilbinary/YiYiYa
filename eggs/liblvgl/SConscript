@@ -29,5 +29,5 @@ sources+= Glob('src/extra/**/**/*.c')
 env.Library('lvgl', sources+[
     '../libjpeg/libjpeg.a',
     '../libgui/libgui.a',
-    ]+env['LIBC'],
+    ],
     CFLAGS='$CFLAGS -DLV_CONF_INCLUDE_SIMPLE  -Iapp/liblvgl/ $LIBCFLAGS -Iapp/libgui/ -Iapp/libjpeg/',)

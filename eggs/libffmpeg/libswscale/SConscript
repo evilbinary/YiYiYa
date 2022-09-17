@@ -41,12 +41,18 @@ elif env['ARCHTYPE']=='x86':
 else:
     print('libswscale not support',env['ARCHTYPE'])
 
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
+
 
 
 source+= [
-    ]+env['LIBC']
+    ]
+
+include = [
+    '../',
+    '../../include/c',
+    '../../include/'
+]
 
 env.Library('swscale', source,
+    CPPPATH=env.get('CPPPATH')+include,
     CFLAGS='$CFLAGS  $LIBCFLAGS -Iapp/libffmpeg/ ',)

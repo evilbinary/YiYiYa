@@ -52,13 +52,27 @@ source+= ['c/statics.c',
 source+= Glob(type+'/*.h')
 
 
+include = [
+    'src',
+    'include',
+    '.',
+    '../eggs/libuuid',
+    '../eggs/liblz4/lib',
+    '../eggs/libzlib',
+    'c',
+    type,
+    '../'+type
+]
 
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
+libs=[
+    'libzlib.a',
+    'liblz4.a',
+    'libuuid.a'
+]
+libpath=[
+    
+]
 
 
-env.Library('chez', source+[
-        '../libzlib/libzlib.a',
-        '../liblz4/liblz4.a',
-        '../libuuid/libuuid.a',
-]+env['LIBC'],CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libuuid -Iapp/liblz4/lib -Iapp/libzlib -Iapp/libchez/'+type+' -I. '+cflags )
+
+env.Library('chez', source,CFLAGS='$CFLAGS $LIBCFLAGS '+cflags )

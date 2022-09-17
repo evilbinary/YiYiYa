@@ -31,7 +31,7 @@ CFLAGS = ''
 ARFLAGS = 'rc'
 OBJCOPYFLAGS = ' -S -g'
 LINKFLAGS = '-nostdlib -nostartfiles -e start  -g '
-LINKLD = '-Map=kernel.map -T xlinker/link.ld'
+LINKLD = ' -T xlinker/link.ld'
 
 # ******************************************************************** #
 
@@ -61,8 +61,8 @@ AS = CC_PREFIX+'as'
 OBJCOPY = CC_PREFIX+'objcopy'
 RANLIB = CC_PREFIX+'ranlib'
 CFLAGS = ''
-LDFLAGS='-Map=kernel.map '
-LINKLD = 'xlinker/link-'+platform+'.ld'
+LDFLAGS=' '
+LINKLD = 'link-'+platform+'.ld'+ '' # -Map=kernel.map 
 
 
 default_apps = True

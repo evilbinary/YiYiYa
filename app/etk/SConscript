@@ -8,6 +8,12 @@ import os
 
 Import('env')
 
+libs=[
+    'libetk.a',
+    'libjpeg.a',
+    'libgui.a',
+    'libc.a'
+]
 
 source=[
     'main.c',
@@ -19,17 +25,12 @@ source=[
     'power.c',
     'temhum.c',
     'status.c',
-    '../libetk/libetk.a',
-    '../libjpeg/libjpeg.a',
-    '../libgui/libgui.a',
-    ]+env['LIBC']
-
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
+    ]
 
 
 env.Program('etk', source,
-    CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libgui/ -Iapp/libjpeg/ -Iapp/libetk/',
+    LIBS=env.get('LIBS')+libs,
+    CFLAGS='$CFLAGS $LIBCFLAGS ',
     LINKFLAGS= '$LINKFLAGS $USER')
 
 # env.Objcopy('etk','etk',OBJCOPYFLAGS='-S')

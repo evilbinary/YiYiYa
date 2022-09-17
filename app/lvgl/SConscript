@@ -8,6 +8,13 @@ import os
 
 Import('env')
 
+libs=[
+    'liblvgl.a',
+    'libgui.a',
+    'libimage.a',
+    'libpng.a',
+]
+
 source= [
     'lvgl.c',
     'lv_demo_widgets.c',
@@ -25,17 +32,10 @@ source= [
     'assets/img_benchmark_cogwheel_chroma_keyed.c',
     'assets/img_benchmark_cogwheel_alpha16.c',
 
-
-
-    '../liblvgl/liblvgl.a',
-    '../libgui/libgui.a',
-    '../libgui/libimage.a',
-    '../libpng/libpng.a',
-    ]+env['LIBC']
+    ]
     
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
 
 env.Program('lvgl', source,
-    CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/liblvgl -Iapp/libgui/ -Iapp/libjpeg -DLV_LVGL_H_INCLUDE_SIMPLE=1',
+    LIBS=libs+env.get('LIBS'),
+    CFLAGS='$CFLAGS $LIBCFLAGS -DLV_LVGL_H_INCLUDE_SIMPLE=1',
     LINKFLAGS= '$LINKFLAGS $USER')

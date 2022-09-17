@@ -17,16 +17,18 @@ source =[
     'InfoNES_System_YiYiYa.c',
     'joypad_input.c',
     
-    '../libgui/libgui.a',
-    '../libgui/libimage.a',
-    '../libjpeg/libjpeg.a',
-    '../libpng/libpng.a',
-    '../libzlib/libzlib.a',
-    ]+env['LIBC']
+   
+    ]
 
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
+libs=[
+    'libgui.a',
+    'libimage.a',
+    'libjpeg.a',
+    'libpng.a',
+    'libzlib.a',
+]
 
 env.Program('infones', source,
-    CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libgui/ -Iapp/libjpeg -Iapp/infones -I.',
+    LIBS=libs+env.get('LIBS'),
+    CFLAGS='$CFLAGS $LIBCFLAGS',
     LINKFLAGS= '$LINKFLAGS $USER')

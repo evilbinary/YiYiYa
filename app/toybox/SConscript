@@ -22,11 +22,10 @@ source+= [
 ]
 
 source+=[ 
-    ]+env['LIBC']
+    ]
     
 
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
+
 
 
 env.Program('toybox', source,

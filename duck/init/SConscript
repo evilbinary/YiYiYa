@@ -10,7 +10,7 @@ plt = platform.system()
 
 Import('env')
 
-current=Dir('.').srcnode().path+'/../'
+current=Dir('.').srcnode().path+'/../xlinker/'
 
 linkflags=' $LINKFLAGS -Xlinker '+current+env.get('LINKLD')
 

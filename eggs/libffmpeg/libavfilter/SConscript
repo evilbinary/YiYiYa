@@ -28,12 +28,18 @@ source+= [
     'video.c',     
 ]
 
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
+
 
 
 source+= [
-    ]+env['LIBC']
+    ]
+
+include = [
+    '../',
+    '../../include/c',
+    '../../include/'
+]
 
 env.Library('avfilter', source,
-    CFLAGS='$CFLAGS  $LIBCFLAGS -Iapp/libffmpeg/ ',)
+    CPPPATH=env.get('CPPPATH')+include,
+    CFLAGS='$CFLAGS  $LIBCFLAGS',)

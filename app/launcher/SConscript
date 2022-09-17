@@ -59,16 +59,18 @@ source= [
     'assets/appletv.c',
     'assets/applestore.c',
 
-    '../liblvqrcode/liblvqrcode.a',
-    '../liblvgl/liblvgl.a',
-    '../libgui/libgui.a',
-    '../libgui/libimage.a',
-    '../libpng/libpng.a',
-    ]+env['LIBC']
-    
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
+    ]
+
+libs=[
+    'liblvqrcode.a',
+    'liblvgl.a',
+    'libgui.a',
+    'libimage.a',
+    'libpng.a',
+]
 
 env.Program('launcher', source,
-    CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/liblvgl -Iapp/libgui/ -Iapp/libjpeg -DLV_LVGL_H_INCLUDE_SIMPLE=1',
+    LIBS=libs+env.get('LIBS'),
+
+    CFLAGS='$CFLAGS $LIBCFLAGS -DLV_LVGL_H_INCLUDE_SIMPLE=1',
     LINKFLAGS= '$LINKFLAGS $USER')

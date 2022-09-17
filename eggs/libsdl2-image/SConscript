@@ -33,11 +33,19 @@ source +=[
     # '../libsdl2/libsdl2.a',
     # '../libzlib/libzlib.a',
     # '../libwebp/libwebp.a',
-    ]+env['LIBC']
+    ]
 
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
+include = [
+    '.',
+    '../',
+    '../include/c',
+    '../include/',
+    '../libsdl2/include',
+    '../libpng',
+    '../libwebp/src'
+]
 
 env.Library('sdl2-image', source,
+    CPPPATH=env.get('CPPPATH')+include,
     CFLAGS='$CFLAGS $LIBCFLAGS -DBSD -D__YIYIYA__  '+cflags,
     LINKFLAGS= '$LINKFLAGS $USER')

@@ -20,9 +20,8 @@ source+= [
 ]
 
 
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
+
 
 
 env.Library('lz4', source+[
-]+env['LIBC'],CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libzlib -Iapp/liblz4 -Iapp/liblz4/lib -I. '+cflags )
+],CFLAGS='$CFLAGS $LIBCFLAGS'+cflags )

@@ -14,12 +14,16 @@ source+= [
     'postprocess.c'
 ]
 
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
 
 
-source+= [
-    ]+env['LIBC']
+include = [
+    '../',
+    '../../include/c',
+    '../../include/'
+]
+
 
 env.Library('postproc', source,
+    CPPPATH=env.get('CPPPATH')+include,
+
     CFLAGS='$CFLAGS  $LIBCFLAGS -Iapp/libffmpeg/ ',)

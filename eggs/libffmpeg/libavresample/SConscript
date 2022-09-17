@@ -12,12 +12,15 @@ source=[]
 
 source+= Glob('*.c')
 
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
 
 
-source+= [
-    ]+env['LIBC']
+include = [
+    '../',
+    '../../include/c',
+    '../../include/'
+]
+
 
 env.Library('avresample', source,
-    CFLAGS='$CFLAGS  $LIBCFLAGS -Iapp/libffmpeg/ ',)
+    CPPPATH=env.get('CPPPATH')+include,
+    CFLAGS='$CFLAGS  $LIBCFLAGS ',)

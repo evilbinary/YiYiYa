@@ -21,21 +21,32 @@ source=[
 
 source+= Glob('*.c')
 
+libs=[
+    'liblvgl.a',
+    'libgui.a',
+    'libimage.a',
+    'libpng.a',
+]
+
+libpath=[
+ 
+]
+include=[
+    '.',
+    'xtrack/Pages',
+    'xtrack/Pages/Config',
+    'xtrack/Pages/Resource',
+    'xtrack/'
+]+libpath
 
 
-source += [
-     '../liblvgl/liblvgl.a',
-    '../libgui/libgui.a',
-    '../libgui/libimage.a',
-    '../libpng/libpng.a'
-    ]+env['LIBC']
-
-cflags=' -Iapp/liblvgl/ -Iapp/libgui/ -Iapp/libjpeg -DLV_LVGL_H_INCLUDE_SIMPLE=1 -Iapp/xtrack/Pages -Iapp/xtrack/Pages/Config -Iapp/xtrack/Pages/Resource -Iapp/xtrack/'
-
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
+cflags='  -DLV_LVGL_H_INCLUDE_SIMPLE=1 '
 
 env.Program('track', source,
+    LIBS=libs+env.get('LIBS'),
+    LIBPATH=env.get('LIBPATH')+libpath,
+    CPPPATH=env.get('CPPPATH')+include,
+
     CFLAGS='$CFLAGS $LIBCFLAGS '+cflags,
     LINKFLAGS= '$LINKFLAGS $USER')
 

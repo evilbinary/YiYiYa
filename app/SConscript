@@ -11,24 +11,50 @@ plt = platform.system()
 
 Import('env')
 
-linkflags=' $LINKFLAGS -T'+env.get('LINKLD')
 
-libs=[
-     '../modules/libdriver.a',
-    '../kernel/libyiyiya.a',
-    '../arch/libarch.a',
-    '../platform/libplatform.a',
-    '../libs/libalgorithm/libalgorithm.a',
-    '../libs/libkernel/libkernel.a'
+env['CPPPATH']+= [
+    '../../eggs/include',
+    '../../eggs/include/c',
+    '../../eggs/libc',
+    '../../eggs/libgui',
+    '../../eggs/libjpeg',
+    '../../eggs/libzlib',
+    '../../eggs/libpng',
+    '../../eggs/libetk',
+    '../../eggs/libcmocka/include',
+    '../../eggs/liblvgl',
+    '../../eggs/libsdl2/include',
+
+    '../../eggs/',
+    '../include/c',
+    '.',
+    '../libs/include/',
+    '../include/c',
+    '../include/',
+    '../../duck/libs/include'
 ]
 
-if env.get('ARCHTYPE')=='xtensa':
-    # libs.append('../app/libgui/libgui.a')
-    # libs.append('../libs/libc/libc.a')
-    pass
+env['LIBPATH']+=[
+    '../../eggs/',
+    '../../eggs/libc/',
+    '../../eggs/libgui',
+    '../../eggs/libimage',
+    '../../eggs/libjpeg',
+    '../../eggs/libpng',
+    '../../eggs/libzlib',
+    '../../eggs/libetk',
+    '../../eggs/libcmocka',
+    '../../eggs/liblz4',
+    '../../eggs/libuuid',
+    '../../eggs/liblvgl',
+    '../../eggs/liblvqrcode',
+
+]
+
+env['LIBS']+=env['LIBC']
 
 if env.get('MYLIB'):
-    libs.append(env.get('MYLIB'))
+    env['LIBS'].append(env.get('MYLIB'))
 
 def check_exit(apps):
     new_list = copy.deepcopy(apps)
@@ -38,36 +64,6 @@ def check_exit(apps):
             apps.remove(app)
 
 if env.get('APP'):
-    SConscript(dirs=['libjpeg'], exports='env')
-    SConscript(dirs=['libgui'], exports='env')
-    SConscript(dirs=['libetk'], exports='env')
-    SConscript(dirs=['libzlib'], exports='env')
-    SConscript(dirs=['libpng'], exports='env')
-    SConscript(dirs=['liblvgl'], exports='env')
-    SConscript(dirs=['libuuid'], exports='env')
-    SConscript(dirs=['liblvqrcode'], exports='env')
-    SConscript(dirs=['liblz4'], exports='env')
-    SConscript(dirs=['libfreetype'], exports='env')
-    SConscript(dirs=['libwebp'], exports='env')
-    SConscript(dirs=['libsdl2'], exports='env')
-    SConscript(dirs=['libsdl2-image'], exports='env')
-    SConscript(dirs=['libsdl2-ttf'], exports='env')
-    SConscript(dirs=['liblua'], exports='env')
-    SConscript(dirs=['libchez'], exports='env')
-    SConscript(dirs=['libcmocka'], exports='env')
-
-
-    SConscript(dirs=[
-        'libffmpeg/libavformat',
-        'libffmpeg/libavcodec',
-        'libffmpeg/libavdevice',
-        'libffmpeg/libavfilter',
-        'libffmpeg/libswscale',
-        'libffmpeg/libavresample',
-        'libffmpeg/libavutil',
-        'libffmpeg/libpostproc',
-        'libffmpeg/libswresample',
-        ], exports='env')
 
     SConscript(dirs=['hello'], exports='env')
     SConscript(dirs=['gui'], exports='env')
@@ -81,12 +77,12 @@ if env.get('APP'):
     SConscript(dirs=['infones'], exports='env')
     SConscript(dirs=['launcher'], exports='env')
     SConscript(dirs=['mgba'], exports='env')
-    SConscript(dirs=['lua'], exports='env')
-    SConscript(dirs=['scheme'], exports='env')
+    # SConscript(dirs=['lua'], exports='env')
+    # SConscript(dirs=['scheme'], exports='env')
 
     SConscript(dirs=['quickjs'], exports='env')
 
-    SConscript(dirs=['gnuboy'], exports='env')
+    # SConscript(dirs=['gnuboy'], exports='env')
 
 
     apps=['hello/hello',
@@ -119,14 +115,14 @@ if env.get('APP'):
             'sdl2/showfont',
             'mgba/mgba',
             'mgba/miniunz',
-            'gnuboy/gnuboy',
+            # 'gnuboy/gnuboy',
 
-            'lua/lua',
-            'lua/luat',
-            'lua/hello.lua',
-            'scheme/scheme',
-            'scheme/petite.boot',
-            'scheme/scheme.boot',
+            # 'lua/lua',
+            # 'lua/luat',
+            # 'lua/hello.lua',
+            # 'scheme/scheme',
+            # 'scheme/petite.boot',
+            # 'scheme/scheme.boot',
 
             'quickjs/qjs',
             'quickjs/qjsc',

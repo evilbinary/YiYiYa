@@ -165,8 +165,7 @@ cflags = '-DHAVE_CONFIG_H -DNDEBUG -DXTSTRINGDEFINES -fPIC -Iapp/libncurses/incl
 
 
 
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
+
 
 env.Library('ncurses', source+[
-]+env['LIBC'],CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libncurses/ -I. ' + cflags)
+],CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libncurses/ -I. ' + cflags)

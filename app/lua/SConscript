@@ -18,40 +18,46 @@ env = env.Clone(
 source=[
     'lua.c',
     ]
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
 
+include = [
+    'src',
+    'include',
+    '.',
+]
 
-source+=['../../app/liblua/liblua.a',
-        # '../libmusl/lib/libm.a',
-        # '/opt/local/lib/gcc/arm-none-eabi/9.2.0/libgcc.a'
+libs=[
+    'liblua.a'
+]
+libpath=[
+    '../../eggs/liblua/src/'
+]
 
-]+env['LIBC']
-    
 source2=[
     'luac.c',
-    '../../app/liblua/liblua.a',
-    ]+env['LIBC']
+    ]
 
 source_luat=[
     'luat.c',
-    '../../app/liblua/liblua.a',
-    ]+env['LIBC']
-
-if env.get('MYLIB'):
-    source_luat.append(env.get('MYLIB'))
-    source.append(env.get('MYLIB'))
-    source2.append(env.get('MYLIB'))
+    ]
    
 
 env.Program('lua', source,
-    CFLAGS='$CFLAGS $LIBCFLAGS  -frounding-math -Iapp/liblua/src/',
+    LIBS=libs+env.get('LIBS'),
+    LIBPATH=env.get('LIBPATH')+libpath,
+    CPPPATH=env.get('CPPPATH')+include,
+    CFLAGS='$CFLAGS $LIBCFLAGS  -frounding-math ',
     LINKFLAGS= '$LINKFLAGS $USER')
 
 env.Program('luac', source2,
-    CFLAGS='$CFLAGS $LIBCFLAGS -lgcc -Iapp/liblua/src/',
+    LIBS=libs+env.get('LIBS'),
+    LIBPATH=env.get('LIBPATH')+libpath,
+    CPPPATH=env.get('CPPPATH')+include,
+    CFLAGS='$CFLAGS $LIBCFLAGS  ',
     LINKFLAGS= '$LINKFLAGS $USER')
 
 env.Program('luat', source_luat,
-    CFLAGS='$CFLAGS $LIBCFLAGS -lgcc -Iapp/liblua/src/',
+    LIBS=libs+env.get('LIBS'),
+    LIBPATH=env.get('LIBPATH')+libpath,
+    CPPPATH=env.get('CPPPATH')+include,
+    CFLAGS='$CFLAGS $LIBCFLAGS ',
     LINKFLAGS= '$LINKFLAGS $USER')

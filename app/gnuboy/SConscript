@@ -9,26 +9,51 @@ import os
 Import('env')
 
 
-source=[]
-source+=Glob('src/*.c')
-source+=Glob('sys/sdl2/*.c')
-source+=Glob('lib/gz/*.c')
-source+=Glob('lib/xz/*.c')
-source+=Glob('sys/yiyiya/*.c')
+source = []
+source += Glob('src/*.c')
+source += Glob('sys/sdl2/*.c')
+source += Glob('lib/gz/*.c')
+source += Glob('lib/xz/*.c')
+source += Glob('sys/yiyiya/*.c')
 
-source +=[
-    
-    '../libsdl2/libsdl2.a',  
-    '../libgui/libgui.a',
-    '../libgui/libimage.a',
-    '../libjpeg/libjpeg.a',
-    '../libpng/libpng.a',
-    '../libzlib/libzlib.a',
-    ]+env['LIBC']
+source += [
 
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
+
+]
+libs = [
+    'libsdl2.a',
+    'libgui.a',
+    'libimage.a',
+    'libjpeg.a',
+    'libpng.a',
+    'libzlib.a',
+]
+
+include = [
+    '../../eggs/libsdl2-image/',
+    '../../eggs/libsdl2-ttf/',
+    '../../eggs/libjpeg/',
+    '../../eggs/libfreetype/include',
+    '../../eggs/libzlib',
+
+    'include',
+    '.',
+    'sys/sdl2/'
+]
+
+libpath = [
+    '../../eggs/libsdl2/',
+    '../../eggs/libsdl2-image/',
+    '../../eggs/libsdl2-ttf/',
+    '../../eggs/libfreetype',
+
+    '../../eggs/libwebp/',
+
+]
 
 env.Program('gnuboy', source,
-    CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libgui/ -Iapp/libsdl2/ -Iapp/libsdl2/include -Iapp/libjpeg -Iapp/gnuboy/include -Iapp/gnuboy/ -Iapp/gnuboy/sys/sdl2/ -I.',
-    LINKFLAGS= '$LINKFLAGS $USER')
+            LIBS=libs+env.get('LIBS'),
+            LIBPATH=env.get('LIBPATH')+libpath,
+            CPPPATH=env.get('CPPPATH')+include,
+            CFLAGS='$CFLAGS $LIBCFLAGS ',
+            LINKFLAGS='$LINKFLAGS $USER')

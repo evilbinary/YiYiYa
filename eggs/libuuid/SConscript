@@ -26,9 +26,8 @@ source+= [
 ]
 
 
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
+
 
 
 env.Library('uuid', source+[
-]+env['LIBC'],CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libzlib -Iapp/libuuid  -I. '+cflags )
+],CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libzlib -Iapp/libuuid  -I. '+cflags )

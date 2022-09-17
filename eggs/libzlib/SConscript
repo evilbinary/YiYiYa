@@ -25,4 +25,4 @@ env.Library('zlib', [
     "trees.c",
     "uncompr.c",
     "zutil.c",
-]+env['LIBC'],CFLAGS='$CFLAGS $LIBCFLAGS')
+],CFLAGS='$CFLAGS $LIBCFLAGS')

@@ -15,10 +15,9 @@ source=[
     '../libzlib/libzlib.a',
     '../liblz4/liblz4.a',
     '../libuuid/libuuid.a',
-    ]+env['LIBC']
+    ]
 
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
+
 
 
 type='a6le'

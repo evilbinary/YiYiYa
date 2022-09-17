@@ -46,13 +46,11 @@ source=[
     'etk_canvas_ex.c',
     '../libjpeg/libjpeg.a',
     '../libgui/libgui.a',
-    ]+env['LIBC']
+    ]
 
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
 
 env.Library('etk', source,
-    CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libgui/ -Iapp/libjpeg/',)
+    CFLAGS='$CFLAGS $LIBCFLAGS',)
 
 
 

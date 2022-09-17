@@ -9,92 +9,157 @@ import os
 Import('env')
 
 
-
-source= [
+source = [
     'main.c',
-    '../libsdl2/libsdl2.a',  
-    '../libgui/libgui.a',
-    '../libgui/libimage.a',
-    '../libjpeg/libjpeg.a',
-    '../libpng/libpng.a',
-    '../libzlib/libzlib.a',
-    ]+env['LIBC']
-    
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
 
+]
+
+libs = [
+    'libsdl2.a',
+    'libgui.a',
+    'libimage.a',
+    'libjpeg.a',
+    'libpng.a',
+    'libzlib.a',
+]
+
+libpath = [
+    '../../eggs/libsdl2/',
+]
 
 env.Program('sdl2', source,
-    CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libsdl2/ -Iapp/libsdl2/include',
-    LINKFLAGS= '$LINKFLAGS $USER')
+            LIBS=libs+env.get('LIBS'),
+            LIBPATH=env.get('LIBPATH')+libpath,
+            CFLAGS='$CFLAGS $LIBCFLAGS ',
+            LINKFLAGS='$LINKFLAGS $USER')
 
 
-source= [
+source = [
     'player.c',
 
-    '../libsdl2/libsdl2.a', 
-    '../libgui/libgui.a', 
-    '../libffmpeg/libavdevice/libavdevice.a',
-    '../libffmpeg/libavfilter/libavfilter.a',
-    '../libffmpeg/libavformat/libavformat.a', 
-    '../libffmpeg/libswscale/libswscale.a', 
-    '../libffmpeg/libavcodec/libavcodec.a',  
-    '../libffmpeg/libavutil/libavutil.a',
 
-    ]+env['LIBC']
-    
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
+
+]
+
+libpath = [
+    '../../eggs/libsdl2/',
+    '../../eggs/libffmpeg/libavdevice/',
+    '../../eggs/libffmpeg/libavfilter/',
+    '../../eggs/libffmpeg/libavformat/',
+    '../../eggs/libffmpeg/libswscale/',
+    '../../eggs/libffmpeg/libavcodec/',
+    '../../eggs/libffmpeg/libavutil/',
+]
+libs = [
+    'libsdl2.a',
+    'libgui.a',
+    'libavdevice.a',
+    'libavfilter.a',
+    'libavformat.a',
+    'libswscale.a',
+    'libavcodec.a',
+    'libavutil.a',
+]
+
+include = [
+    '../../eggs/libffmpeg/',
+]
 
 env.Program('player', source,
-    CFLAGS='$CFLAGS $LIBCFLAGS  -Iapp/libsdl2/ -Iapp/libsdl2/include -Iapp/libffmpeg/',
-    LINKFLAGS= '$LINKFLAGS $USER')
+            LIBS=libs+env.get('LIBS'),
+            LIBPATH=env.get('LIBPATH')+libpath,
+            CPPPATH=env.get('CPPPATH')+include,
+            CFLAGS='$CFLAGS $LIBCFLAGS -DHAVE_CBRT -DHAVE_ERF -DHAVE_HYPOT -DHAVE_TRUNC -DHAVE_RINT',
+            LINKFLAGS='$LINKFLAGS $USER')
 
 
+# showimage
 
-#showimage
-
-source= [
+source = [
     'showimage.c',
 
-    '../libsdl2/libsdl2.a',   
-    '../libsdl2-image/libsdl2-image.a',
-    '../libgui/libgui.a',
-    '../libjpeg/libjpeg.a',
-    '../libpng/libpng.a',
-    '../libzlib/libzlib.a',
-    '../libwebp/libwebp.a',
-    
-    ]+env['LIBC']
-    
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
+
+]
+libs = [
+
+    'libsdl2.a',
+    'libsdl2-image.a',
+    'libgui.a',
+    'libjpeg.a',
+    'libpng.a',
+    'libzlib.a',
+    'libwebp.a',
+]
+include = [
+    '../../eggs/libsdl2-image/',
+]
+
+libpath = [
+    '../../eggs/libsdl2/',
+    '../../eggs/libsdl2-image/',
+    '../../eggs/libwebp/',
+
+    '../../eggs/libffmpeg/libavdevice/',
+    '../../eggs/libffmpeg/libavfilter/',
+    '../../eggs/libffmpeg/libavformat/',
+    '../../eggs/libffmpeg/libswscale/',
+    '../../eggs/libffmpeg/libavcodec/',
+    '../../eggs/libffmpeg/libavutil/',
+]
 
 env.Program('showimage', source,
-    CFLAGS='$CFLAGS $LIBCFLAGS  -Iapp/libsdl2/ -Iapp/libjpeg/ -Iapp/libpng/ -Iapp/libsdl2/include -Iapp/libsdl2-image/',
-    LINKFLAGS= '$LINKFLAGS $USER')
+            LIBS=libs+env.get('LIBS'),
+            LIBPATH=env.get('LIBPATH')+libpath,
+            CPPPATH=env.get('CPPPATH')+include,
+            CFLAGS='$CFLAGS $LIBCFLAGS ',
+            LINKFLAGS='$LINKFLAGS $USER')
 
 
-#showfont
+# showfont
 
-source= [
+source = [
     'showfont.c',
+]
 
-    '../libsdl2/libsdl2.a',   
-    '../libsdl2-image/libsdl2-image.a',
-    '../libsdl2-ttf/libsdl2-ttf.a',
-    '../libfreetype/libfreetype.a',
-    '../libgui/libgui.a',
-    '../libjpeg/libjpeg.a',
-    '../libpng/libpng.a',
-    '../libzlib/libzlib.a',
-    '../libwebp/libwebp.a',
-    
-    ]+env['LIBC']
-    
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
+libs = [
+    'libsdl2.a',
+    'libsdl2-image.a',
+    'libsdl2-ttf.a',
+    'libfreetype.a',
+    'libgui.a',
+    'libjpeg.a',
+    'libpng.a',
+    'libzlib.a',
+    'libwebp.a',
+]
 
+include = [
+    '../../eggs/libsdl2-image/',
+    '../../eggs/libsdl2-ttf/',
+    '../../eggs/libfreetype/include',
+
+]
+
+libpath = [
+    '../../eggs/libsdl2/',
+    '../../eggs/libsdl2-image/',
+    '../../eggs/libsdl2-ttf/',
+    '../../eggs/libfreetype',
+
+    '../../eggs/libwebp/',
+
+    '../../eggs/libffmpeg/libavdevice/',
+    '../../eggs/libffmpeg/libavfilter/',
+    '../../eggs/libffmpeg/libavformat/',
+    '../../eggs/libffmpeg/libswscale/',
+    '../../eggs/libffmpeg/libavcodec/',
+    '../../eggs/libffmpeg/libavutil/',
+]
+
+# -Iapp/libsdl2/ -Iapp/libjpeg/ -Iapp/libpng/ -Iapp/libsdl2-ttf/ -Iapp/libsdl2/include -Iapp/libfreetype/include -Iapp/libsdl2-image/
 env.Program('showfont', source,
-    CFLAGS='$CFLAGS $LIBCFLAGS  -Iapp/libsdl2/ -Iapp/libjpeg/ -Iapp/libpng/ -Iapp/libsdl2-ttf/ -Iapp/libsdl2/include -Iapp/libfreetype/include -Iapp/libsdl2-image/',
-    LINKFLAGS= '$LINKFLAGS $USER')
+            LIBS=libs+env.get('LIBS'),
+            LIBPATH=env.get('LIBPATH')+libpath,
+            CPPPATH=env.get('CPPPATH')+include,
+            CFLAGS='$CFLAGS $LIBCFLAGS  ',
+            LINKFLAGS='$LINKFLAGS $USER')

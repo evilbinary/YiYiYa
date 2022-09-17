@@ -8,18 +8,44 @@ import os
 
 Import('env')
 
+
+libs=[
+    'libjpeg.a',
+    'libpng.a',
+    'libalgorithm.a',
+    'libc.a'
+]
+libpath=[
+    '../libjpeg/',
+    '../libpng/',
+    '../../duck/libs/libalgorithm'
+]
+include=[
+    '.',
+    '../libs/include/',
+    '../include/c',
+    '../include/',
+    '../../duck/libs/include'
+]+libpath
+
 env.Library('gui', [
     'screen.c',
     'event.c',
-]+env['LIBC'],CFLAGS='$CFLAGS $LIBCFLAGS')
+    ],
+    LIBS=libs,
+    LIBPATH=env.get('LIBPATH')+libpath,
+    CPPPATH=env.get('CPPPATH')+include,
+    CFLAGS='$CFLAGS ')
 
 env.Library('image', [
     'image.c',
     'jpeg_decoder.c',
-    'png_decoder.c',
-    '../libjpeg/libjpeg.a',
-    '../libpng/libpng.a',
-]+env['LIBC'],CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libjpeg -Iapp/libpng')
+    'png_decoder.c',  
+    ],
+    LIBS=libs,
+    LIBPATH=env.get('LIBPATH')+libpath,
+    CPPPATH=env.get('CPPPATH')+include,
+    CFLAGS='$CFLAGS')
 
 # env.Objcopy('gui','gui',OBJCOPYFLAGS='-S --strip-all')
 #env.Objcopy('gui.dbg','gui',OBJCOPYFLAGS='--only-keep-debug')

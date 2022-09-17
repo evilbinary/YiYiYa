@@ -9,14 +9,18 @@ import os
 Import('env')
 
 
-source=[]
-source+= Glob('src/*.c')
+source = []
+source += Glob('src/*.c')
 
 
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
+include = [
+    'src',
+    'include',
+    '.',
+    '../include/c',
+    '../include'
+]
 
-env.Library('lua', source+[
-    # '../libmusl/lib/libm.a',
-    # '/opt/local/lib/gcc/arm-none-eabi/9.2.0/libgcc.a'
-]+env['LIBC'],CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/liblua/src/ -I.')
+env.Library('lua', source,
+            CPPPATH=env.get('CPPPATH')+include,
+            CFLAGS='$CFLAGS $LIBCFLAGS')

@@ -25,4 +25,4 @@ env.Library('png', [
     "pngwrite.c",
     "pngwtran.c",
     "pngwutil.c",
-]+env['LIBC'],CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libzlib/ -I.')
+],CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libzlib/ -I.')

@@ -21,12 +21,11 @@ source+=[
     'swresample_frame.c',
 ]
 
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
+
 
 
 source+= [
-    ]+env['LIBC']
+    ]
 
 env.Library('swresample', source,
     CFLAGS='$CFLAGS  $LIBCFLAGS -Iapp/libffmpeg/ ',)

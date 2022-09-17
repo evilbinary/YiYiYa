@@ -12,4 +12,4 @@ Import('env')
 env.Library('lvqrcode', [
     'lv_qrcode.c',
     'qrcodegen.c',
-]+env['LIBC'],CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/liblvgl  -Iapp/libzlib/ -I. -DLV_LVGL_H_INCLUDE_SIMPLE=1')
+],CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/liblvgl  -Iapp/libzlib/ -I. -DLV_LVGL_H_INCLUDE_SIMPLE=1')

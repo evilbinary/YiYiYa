@@ -8,15 +8,7 @@ import os
 
 Import('env')
 
-cflags=' -Iapp/libgui/ \
-        -Iapp/libjpeg/ \
-        -Iapp/libsdl2/ \
-        -Iapp/libsdl2/include \
-        -Iapp/libfreetype/include \
-        -I. \
-        -Iapp/libpng/ \
-        -Iapp/libwebp/src \
-        '
+cflags=''
 
 source=[]
 
@@ -30,11 +22,21 @@ source +=[
     # '../libsdl2/libsdl2.a',
     # '../libzlib/libzlib.a',
     # '../libwebp/libwebp.a',
-    ]+env['LIBC']
+    ]
 
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
+include = [
+    '.',
+    '../',
+    '../include/c',
+    '../include/',
+    '../libsdl2/include',
+    '../libpng',
+    '../libwebp/src',
+    '../libfreetype/include',
+
+]
 
 env.Library('freetype', source,
+    CPPPATH=env.get('CPPPATH')+include,
     CFLAGS='$CFLAGS $LIBCFLAGS -DBSD -D__YIYIYA__  '+cflags,
     LINKFLAGS= '$LINKFLAGS $USER')

@@ -17,11 +17,11 @@ source=[]
 source+=Glob('src/*.c')
 
 source +=[
-    ]+env['LIBC']
+    ]
 
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
+libs=['libc.a']
 
 env.Library('cmocka', source,
+    LIBS=env.get('LIBS')+libs,
     CFLAGS='$CFLAGS $LIBCFLAGS -DBSD -D__YIYIYA__  '+cflags,
     LINKFLAGS= '$LINKFLAGS $USER')

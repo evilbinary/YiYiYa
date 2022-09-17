@@ -57,8 +57,5 @@ elif env['ARCHTYPE']=='x86':
         'i386/longjmp.s',
         'i386/setjmp.s'
     ]
-
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
     
-env.Library('c',source ,CFLAGS='$CFLAGS -Ilibs/include/c/')
+env.Library('c',source ,CFLAGS='$CFLAGS')

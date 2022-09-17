@@ -17,72 +17,57 @@ env = env.Clone(
 
 source=[
     'ls.c',
-    ]+env['LIBC']
-
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
+    ]
 
 env.Program('ls', source,
-    CFLAGS='$CFLAGS $LIBCFLAGS ',
+    CFLAGS='$CFLAGS ',
     LINKFLAGS= '$LINKFLAGS $USER')
 
 
 source=[
     'echo.c',
-    ]+env['LIBC']
-
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
+    ]
 
 env.Program('echo', source,
-    CFLAGS='$CFLAGS $LIBCFLAGS ',
+    CFLAGS='$CFLAGS',
     LINKFLAGS= '$LINKFLAGS $USER')
 
 
 
 source=[
     'cat.c',
-    ]+env['LIBC']
+    ]
 
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
 
 env.Program('cat', source,
-    CFLAGS='$CFLAGS $LIBCFLAGS ',
+    CFLAGS='$CFLAGS ',
     LINKFLAGS= '$LINKFLAGS $USER')
 
 
 source=[
     'hexdump.c',
-    ]+env['LIBC']
+    ]
 
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
 
 env.Program('hexdump', source,
-    CFLAGS='$CFLAGS $LIBCFLAGS ',
+    CFLAGS='$CFLAGS ',
     LINKFLAGS= '$LINKFLAGS $USER')
 
 
 source=[
     'touch.c',
-    ]+env['LIBC']
+    ]
 
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
 
 env.Program('touch', source,
-    CFLAGS='$CFLAGS $LIBCFLAGS ',
+    CFLAGS='$CFLAGS  ',
     LINKFLAGS= '$LINKFLAGS $USER')
 
 
 source=[
     'date.c',
-    ]+env['LIBC']
-
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
+    ]
 
 env.Program('date', source,
-    CFLAGS='$CFLAGS $LIBCFLAGS ',
+    CFLAGS='$CFLAGS',
     LINKFLAGS= '$LINKFLAGS $USER')

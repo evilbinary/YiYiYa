@@ -39,4 +39,4 @@ env.Library('jpeg', [
     "jdmainct.c",
     "jdapimin.c",
     "jmemsysextern.c",
-]+env['LIBC'],CFLAGS='$CFLAGS $LIBCFLAGS')
+],CFLAGS='$CFLAGS $LIBCFLAGS')

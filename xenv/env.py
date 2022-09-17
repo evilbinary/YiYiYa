@@ -44,8 +44,8 @@ support_platform={
 
 project_path=os.path.abspath(os.curdir)
 
-libc=[project_path+'/libs/libc/libc.a',project_path+'/libs/libalgorithm/libalgorithm.a']
-libcflags='-Ilibs/include/c/ -DLIBYC'
+libc=['libc.a']
+libcflags='-DLIBYC'
 
 
 def get_arch(arch):
@@ -95,7 +95,7 @@ elif arch_type=='xtensa':
 
 env = Environment(
         ENV=os.environ,
-        APP=True,
+        APP=default_apps,
         CC = CC,
         LD= LD,
         CXX=CXX,
@@ -117,9 +117,11 @@ env = Environment(
         MYLIB=None,
         LIBC=libc,
         LIBCFLAGS=libcflags,
-        USER='--entry main -Txlinker/user.ld',
+        USER='--entry main -Tapp/xlinker/user.ld',
         ARCHS=archs,
         ARCHTYPE=arch_type,
+        CPPPATH=[],
+        LIBS=[],
         DEFAULT_LIBC=default_libc,
         CC_LIB_PATH=CC_LIB_PATH
         )
@@ -133,7 +135,7 @@ if plt=='Linux':
 elif plt=='Windows':
     env['LINKFLAGS']='-nostdlib  ',
     env['CFLAGS']= env['CFLAGS']+' -fno-stack-protector -mno-stack-arg-probe ' #-ffreestanding -nostdlib  
-    env['USER']='--entry main -Txlinker/user.ld   '
+    env['USER']='--entry main -Tapp/xlinker/user.ld   '
     env['MYLIB']='libgcc.a'
     env['PROGSUFFIX'] = ''
 elif plt=='Darwin':
@@ -147,8 +149,7 @@ if arch_type == 'x86':
         env['CFLAGS']+=' -march=i486 '
     pass
 elif arch_type == 'arm':
-    env['APP']=True
-    env['USER']=' --entry main -Txlinker/user-arm.ld '
+    env['USER']=' --entry main -Tapp/xlinker/user-arm.ld '
     # -nostdlib -nostdinc -fno-builtin -DMALLOC_TRACE -mcpu=cortex-a7  -mtune=cortex-a7 -mfpu=vfpv4 -mfloat-abi=hard -mfloat-abi=softfp
 
     #env['CFLAGS']= env['CFLAGS']+ ' -fno-omit-fram e-pointer -mapcs -mno-sched-prolog ' #for debug backtrace
@@ -161,7 +162,7 @@ elif arch_type == 'arm':
         env['LINKLD']='xlinker/link-'+platform+'.ld'
         arch='armv7e-m'
     else:
-        env['USER']='--entry main -Txlinker/user-'+platform+'.ld'
+        env['USER']='--entry main -Tapp/xlinker/user-'+platform+'.ld'
         env['CFLAGS']= env['CFLAGS']+ ' -mcpu=cortex-a7  -mtune=cortex-a7 -mfpu=vfpv4  -mfloat-abi=softfp '
         env['LINKLD']='xlinker/link-'+platform+'.ld'
     #env['CFLAGS']= ' -march='+arch

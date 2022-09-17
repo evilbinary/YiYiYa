@@ -91,12 +91,18 @@ elif env['ARCHTYPE']=='x86':
 else:
     print('libavutil not support',env['ARCHTYPE'])
 
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
+
 
 
 source+= [
-    ]+env['LIBC']
+    ]
+
+include = [
+    '../',
+    '../../include/c',
+    '../../include/'
+]
 
 env.Library('avutil', source,
-    CFLAGS='$CFLAGS  $LIBCFLAGS -Iapp/libffmpeg/  ',)
+    CPPPATH=env.get('CPPPATH')+include,
+    CFLAGS='$CFLAGS  $LIBCFLAGS ',)

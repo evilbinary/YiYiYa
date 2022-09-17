@@ -9,7 +9,7 @@ import os
 Import('env')
 
 
-cflags=' -DUSE_FILE32API -Iapp/mgba/src/libgba -Iapp/mgba/include -Iapp/libzlib/ -Iapp/mgba/src -Iapp/mgba/include/mgba-util -Iapp/mgba/src/third-party/zlib/contrib/ -Iapp/mgba/src/third-party/zlib/contrib/minizip/'
+cflags=' -DUSE_FILE32API '
 
 
 source=[]
@@ -61,21 +61,50 @@ source+=[
 source+=Glob('src/third-party/inih/*.c')
 
 source+=Glob('src/third-party/blip_buf/*.c')
-
-source+= [
-
-    '../libsdl2/libsdl2.a',
-    '../libgui/libgui.a',
-    '../libgui/libimage.a',
-    '../libpng/libpng.a',
-    '../libzlib/libzlib.a',
-    ]+env['LIBC']
     
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
+libs = [
+    'libsdl2.a',  
+    'libgui.a',
+    'libimage.a',
+    'libjpeg.a',
+    'libpng.a',
+    'libzlib.a',
+]
+
+include = [
+    '../../eggs/libsdl2-image/',
+    '../../eggs/libsdl2-ttf/',
+    '../../eggs/libjpeg/',
+    '../../eggs/libfreetype/include',
+    '../../eggs/ibzlib',
+
+    'include/mgba-util',
+    'src/third-party/zlib/contrib/',
+    'src/third-party/zlib/contrib/minizip/',
+    'src',
+    'include',
+    '.',
+    'sys/sdl2/',
+    'src/libgba',
+
+]
+
+libpath = [
+    '../../eggs/libsdl2/',
+    '../../eggs/libsdl2-image/',
+    '../../eggs/libsdl2-ttf/',
+    '../../eggs/libfreetype',
+
+    '../../eggs/libwebp/',
+
+]
+
 
 env.Program('mgba', source,
-    CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/liblvgl -Iapp/libgui/ -Iapp/libzlib/ -Iapp/libpng -Iapp/libjpeg -Iapp/libsdl2/ -Iapp/libsdl2/include '+cflags,
+    LIBS=libs+env.get('LIBS'),
+    LIBPATH=env.get('LIBPATH')+libpath,
+    CPPPATH=env.get('CPPPATH')+include,
+    CFLAGS='$CFLAGS $LIBCFLAGS '+cflags,
     LINKFLAGS= '$LINKFLAGS $USER')
 
 # build miniunz
@@ -88,16 +117,12 @@ source=[
     # 'src/third-party/zlib/contrib/minizip/minizip.c',
         ]
 
-source+= [
-    '../libgui/libgui.a',
-    '../libgui/libimage.a',
-    '../libpng/libpng.a',
-    '../libzlib/libzlib.a',
-    ]+env['LIBC']
 
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
+
 
 env.Program('miniunz', source,
-    CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/liblvgl -Iapp/libgui/ -Iapp/libzlib/ -Iapp/libpng -Iapp/libjpeg -Iapp/libsdl2/ -Iapp/libsdl2/include '+cflags,
+    LIBS=libs+env.get('LIBS'),
+    LIBPATH=env.get('LIBPATH')+libpath,
+    CPPPATH=env.get('CPPPATH')+include,
+    CFLAGS='$CFLAGS $LIBCFLAGS '+cflags,
     LINKFLAGS= '$LINKFLAGS $USER')

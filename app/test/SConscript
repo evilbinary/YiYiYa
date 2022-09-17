@@ -17,113 +17,100 @@ env = env.Clone(
 
 source = [
     'test.c',
-    '../libcmocka/libcmocka.a'
-]+env['LIBC']
+]
 
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
+libs = [
+    'libcmocka.a',
+    'libc.a'
+]
+
 
 env.Program('test', source,
-            CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libcmocka/include',
+            LIBS=env.get('LIBS')+libs,
+            CFLAGS='$CFLAGS $LIBCFLAGS',
             LINKFLAGS='$LINKFLAGS $USER')
 
 if env.get('DEFAULT_LIBC') == 'libmusl':
     source = [
         'test-musl.c',
-        '../libcmocka/libcmocka.a',
-    ]+env['LIBC']
+    ]
     if env.get('MYLIB'):
         source.append(env.get('MYLIB'))
 
     env.Program('test-musl', source,
-                CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libcmocka/include',
+                LIBS=env.get('LIBS')+libs,
+                CFLAGS='$CFLAGS $LIBCFLAGS',
                 LINKFLAGS='$LINKFLAGS $USER')
 
 
 source = [
     'test-file.c',
-
-    '../libcmocka/libcmocka.a',
-]+env['LIBC']
-
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
-
+]
 
 env.Program('test-file', source,
-            CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libcmocka/include',
+            LIBS=env.get('LIBS')+libs,
+
+            CFLAGS='$CFLAGS $LIBCFLAGS ',
             LINKFLAGS='$LINKFLAGS $USER')
 
 
 source = [
     'test-mem.c',
-
-    '../libcmocka/libcmocka.a',
-]+env['LIBC']
-
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
+]
 
 
 env.Program('test-mem', source,
-            CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libcmocka/include',
-            LINKFLAGS='$LINKFLAGS $USER')
+            LIBS=env.get('LIBS')+libs,
 
+            CFLAGS='$CFLAGS $LIBCFLAGS ',
+            LINKFLAGS='$LINKFLAGS $USER')
 
 
 source = [
     'test-uncompress.c',
-    '../libzlib/libzlib.a',
-    '../liblz4/liblz4.a',
-    '../libuuid/libuuid.a',
-    '../libcmocka/libcmocka.a',
-]+env['LIBC']
-
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
+]
 
 
-cflags=''
+cflags = ''
 
 env.Program('test-uncompress', source,
-            CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libcmocka/include -Iapp/libzlib/',
+            LIBS=env.get('LIBS')+libs+[
+            'libzlib.a',
+            'liblz4.a',
+            'libuuid.a',
+            'libcmocka.a',
+            ],
+            CFLAGS='$CFLAGS $LIBCFLAGS',
             LINKFLAGS='$LINKFLAGS $USER')
 
 
 source = [
     'test-string.c',
-    '../libcmocka/libcmocka.a',
-]+env['LIBC']
-
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
+]
 
 env.Program('test-string', source,
-            CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libcmocka/include ',
+            LIBS=env.get('LIBS')+libs,
+            CFLAGS='$CFLAGS $LIBCFLAGS ',
             LINKFLAGS='$LINKFLAGS $USER')
 
 
 source = [
     'test-stdlib.c',
-    '../libcmocka/libcmocka.a',
-]+env['LIBC']
+]
 
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
 
 env.Program('test-stdlib', source,
-            CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libcmocka/include ',
+            LIBS=env.get('LIBS')+libs,
+
+            CFLAGS='$CFLAGS $LIBCFLAGS',
             LINKFLAGS='$LINKFLAGS $USER')
 
 
 source = [
     'test-stdio.c',
-    '../libcmocka/libcmocka.a',
-]+env['LIBC']
-
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
+]
 
 env.Program('test-stdio', source,
-            CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libcmocka/include ',
+            LIBS=env.get('LIBS')+libs,
+            CFLAGS='$CFLAGS $LIBCFLAGS',
             LINKFLAGS='$LINKFLAGS $USER')

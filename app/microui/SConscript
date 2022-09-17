@@ -14,19 +14,22 @@ env = env.Clone(
   PATH= [os.environ['PATH'],'/opt/local/bin' ],
   )
 
+
+libs=[
+    'libgui.a',
+    'libc.a'
+]
+
 source= [
     'main.c',
     'microui.c',
     'renderer.c',
-    '../libgui/libgui.a',
-    ]+env['LIBC']
-
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
+    ]
 
 
 env.Program('microui',source,
-    CFLAGS='$CFLAGS $LIBCFLAGS -Iapp/libgui/',
+    LIBS=env.get('LIBS')+libs,
+    CFLAGS='$CFLAGS $LIBCFLAGS',
     LINKFLAGS= '$LINKFLAGS $USER')
 
 # env.Objcopy('microui','microui',OBJCOPYFLAGS='-S')
