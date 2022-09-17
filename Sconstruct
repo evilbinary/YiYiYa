@@ -32,6 +32,7 @@ support_platform={
     'dmulator':'x86-duck',
     'dummy':'dummy',
     'rk3288':'armv7-a',
+    'orangepi-pc':'armv7-a'
 }
 
 

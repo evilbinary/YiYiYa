@@ -8,8 +8,8 @@
 default_libc = 'libc'  # libmusl libc
 
 # board select platform,选择你要编译的平台
-# dmulator pc v3s raspi2 esp32 stm32f4xx raspi3 rk3128 rk3288 cubieboard2 dummy
-platform = 'rk3288'
+# dmulator pc v3s raspi2 esp32 stm32f4xx raspi3 rk3128 rk3288 cubieboard2 dummy rk3288 orangepi-pc
+platform = 'orangepi-pc'
 
 # 是否要构建应用
 default_apps = True

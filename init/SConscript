@@ -14,8 +14,8 @@ linkflags=' $LINKFLAGS -Xlinker '+env.get('LINKLD')
 
 libs=[
     '../kernel/libyiyiya.a',
-    '../arch/libarch.a',
     '../modules/libmodules.a',
+    '../arch/libarch.a',
     '../platform/libplatform.a',
     '../libs/libarchcommon/libarchcommon.a',
     '../libs/libalgorithm/libalgorithm.a',
