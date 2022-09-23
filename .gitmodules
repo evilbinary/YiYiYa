@@ -1,0 +1,3 @@
+[submodule "eggs"]
+	path = eggs
+	url = https://github.com/evilbinary/eggs.git
