@@ -8,8 +8,18 @@ import os
 
 Import('env')               
 
+current=Dir('.').srcnode().path+'/../'
+
 linkflags='-nostdlib -nostartfiles -T boot/arm/link.ld'
-cflags= '$CFLAGS -I. -Iinclude'
+cflags= '$CFLAGS'
+
+include=[
+    '.',
+    'include',
+    '../../duck',
+    '../../duck/platform/'+env['PLATFORM']
+]
+
 
 source=[ 
     'boot.o',
@@ -17,10 +27,12 @@ source=[
     'config.h'
     ]
 
+
 boot_source= ['boot_'+env['ARCH']+'.s']
 
-if env.get('MYLIB'):
-    source.append(env.get('MYLIB'))
+
+# if env.get('MYLIB'):
+#     source.append(env.get('MYLIB'))
 
 
 if env['PLATFORM']=='stm32f4xx':
@@ -39,9 +51,10 @@ if env['PLATFORM']=='stm32f4xx':
     env.Object('boot.o',boot_source,ASFLAGS='')
     env.Object('init.o',source,ASFLAGS='', CFLAGS=cflags,LINKFLAGS= linkflags)
 else:
-    env.GenerateKernelSize('config.h',['../../init/kernel'])
+    env.GenerateKernelSize('config.h',['../../duck/init/kernel'])
     env.Object('boot.o',boot_source,ASFLAGS='')
     env.Program(target ='init.elf', source = source,
+        CPPPATH=include,
         CFLAGS=cflags,
         LINKFLAGS= linkflags)
     env.Objcopy('init.bin','init.elf',OBJCOPYFLAGS='-O binary -S --strip-debug')

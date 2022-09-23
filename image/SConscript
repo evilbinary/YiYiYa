@@ -36,7 +36,7 @@ env = env.Clone(
   )
 # export PATH=$PATH:/Volumes/android/u-boot/scripts/dtc/:/Volumes/android/u-boot/tools/
 env.AppendENVPath('PATH', ['/Volumes/android/u-boot/scripts/dtc/','/Volumes/android/u-boot/tools/'])
-env.KernelSize(['size'],['../init/kernel'])
+env.KernelSize(['size'],['../duck/init/kernel'])
 
 
 run_qemu_cmd=''
@@ -78,7 +78,7 @@ def build_duck_image():
       ''
       '../boot/x86/boot',
       '../boot/x86/init.bin',
-      '../init/kernel' ],
+      '../duck/init/kernel' ],
       [
         'dd if=/dev/zero bs=512 count=2880 conv=notrunc of=$TARGET',
         'dd if=${SOURCES[0]} bs=512 count=1 conv=notrunc of=$TARGET',
@@ -90,7 +90,7 @@ def build_duck_image():
         env.Command('duck.img',[
           ''
           '../boot/arm/init.bin',
-          '../init/kernel'
+          '../duck/init/kernel'
         ],[
           'dd if=/dev/zero bs=512 count=2880 conv=notrunc of=$TARGET',
           'tools/mksunxi/mksunxiboot ${SOURCES[0]} boot/arm/init-spl.bin',
@@ -101,7 +101,7 @@ def build_duck_image():
         env.Command('duck.img', 
         [
         ''
-        '../init/kernel' 
+        '../duck/init/kernel' 
         ],
         [
          
@@ -111,7 +111,7 @@ def build_duck_image():
         [
         ''
         '../boot/arm/init.bin',
-        '../init/kernel' 
+        '../duck/init/kernel' 
         ],
         [
           'dd if=/dev/zero bs=512 count=2880 conv=notrunc of=$TARGET',
@@ -121,7 +121,7 @@ def build_duck_image():
   elif env.get('ARCHTYPE')=='xtensa':
     env.Command('esp32', 
     [ '../boot/xtensa/init.elf',
-      '../init/kernel'
+      '../duck/init/kernel'
     ],
     [
       'source ~/dev/c/esp/esp-idf/export.sh && esptool.py --chip esp32 elf2image --flash_mode="dio" --flash_freq "40m" --flash_size "4MB" -o boot/xtensa/init.bin  ${SOURCES[0]}',
@@ -133,7 +133,7 @@ def build_duck_fit():
   if env.get('ARCHTYPE') =='arm':
     env.Command('duck.fit', 
     ['kernel-'+env.get('PLATFORM')+'.its',
-    '../init/kernel.elf', 
+    '../duck/init/kernel.elf', 
     '../boot/arm/init.bin'
     ],
     ['mkimage -f ${SOURCES[0]} $TARGET'
@@ -141,7 +141,7 @@ def build_duck_fit():
   elif env.get('ARCHTYPE')=='x86':
     env.Command('duck.fit', 
       ['kernel.its',
-      '../init/kernel.bin', 
+      '../duck/init/kernel.bin', 
       '../boot/x86/init.bin'
       ],
       ['mkimage -f ${SOURCES[0]} $TARGET'
@@ -160,12 +160,12 @@ def debug_duck():
 if env.get('build')=='uImage':
   if env.get('ARCHTYPE')=='x86':
     env.Command('uImage.img', 
-      ['../init/kernel' ],
+      ['../duck/init/kernel' ],
       ['mkimage -n YiYiYa -A x86 -O u-boot -T kernel -C none -a 0x30008000 -e 0x30008000 -d ${SOURCES[0]} $TARGET'
     ])
   elif env.get('ARCHTYPE') =='arm':
     env.Command('uImage.img', 
-      ['../init/kernel' ],
+      ['../duck/init/kernel' ],
       ['mkimage -n YiYiYa -A arm -O u-boot -T kernel -C none -a 0x41000000 -e 0x1000000 -d ${SOURCES[0]} $TARGET'
     ])
 
@@ -190,13 +190,13 @@ elif env.get('run')=='cubieboard2':
   env.Command('cubieboard2', 'duck.fit','~/dev/c/sunxi-tools/sunxi-fel version uboot ~/dev/c/u-boot-sunxi/u-boot-sunxi-with-spl.bin  write 0x42000000 ~/dev/c/YiYiYa/image/duck.fit')
 elif env.get('run')=='stm32f4xx':
   # build_duck_fit()
-  env.Command('stm32f4xx', '../init/kernel.bin','JLink.exe -device stm32f401cc -speed 4000 -CommanderScript xconfig/stm32f4xx.jlink')
+  env.Command('stm32f4xx', '../duck/init/kernel.bin','JLink.exe -device stm32f401cc -speed 4000 -CommanderScript xconfig/stm32f4xx.jlink')
   
 
 elif env.get('run')=='esp32':
   env.Command('esp32', 
     [ '../boot/xtensa/init.elf',
-      '../init/kernel'
+      '../duck/init/kernel'
     ],
     ['esptool.py --chip esp32 elf2image --flash_mode="dio" --flash_freq "40m" --flash_size "4MB" -o boot/xtensa/init.bin  ${SOURCES[0]}',
     # 'esptool.py --chip esp32 elf2image --flash_mode="dio" --flash_freq "40m" --flash_size "4MB" -o init/kernel.bin  ${SOURCES[1]}',

@@ -1,5 +1,0 @@
-XSym
-0008
-50fbac6394f4e1f8aa0d6b41eea8753d
-curses.h
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
