@@ -1,3 +1,6 @@
 [submodule "eggs"]
 	path = eggs
 	url = https://github.com/evilbinary/eggs.git
+[submodule "duck"]
+	path = duck
+	url = https://github.com/evilbinary/duck.git
