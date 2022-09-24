@@ -9,7 +9,7 @@ default_libc = 'libc'  # libmusl libc
 
 # board select platform,选择你要编译的平台
 # dmulator pc v3s raspi2 esp32 stm32f4xx raspi3 rk3128 rk3288 cubieboard2 dummy rk3288 orangepi-pc
-platform = 'raspi2'
+platform = 'pc'
 
 # 是否要构建应用
 default_apps = True
@@ -51,34 +51,33 @@ LINKLD = ' -T xlinker/link.ld'
 # default_apps=False
 
 # osx arm 配置实例
-CC_PATH = ''
-CC_PREFIX = 'arm-none-eabi-'
-CC_LIB_PATH = '/opt/local/lib/gcc/arm-none-eabi/9.2.0/'
-CC = CC_PREFIX+'gcc'
-AR = CC_PREFIX+'ar'
-LD = CC_PREFIX+'ld'
-AS = CC_PREFIX+'as'
-OBJCOPY = CC_PREFIX+'objcopy'
-RANLIB = CC_PREFIX+'ranlib'
-CFLAGS = ''
-LDFLAGS=' '
-LINKLD = 'link-'+platform+'.ld'+ '' # -Map=kernel.map 
-
-
-default_apps = True
+# CC_PATH = ''
+# CC_PREFIX = 'arm-none-eabi-'
+# CC_LIB_PATH = '/opt/local/lib/gcc/arm-none-eabi/9.2.0/'
+# CC = CC_PREFIX+'gcc'
+# AR = CC_PREFIX+'ar'
+# LD = CC_PREFIX+'ld'
+# AS = CC_PREFIX+'as'
+# OBJCOPY = CC_PREFIX+'objcopy'
+# RANLIB = CC_PREFIX+'ranlib'
+# CFLAGS = ''
+# LDFLAGS=' '
+# LINKLD = 'link-'+platform+'.ld'+ '' # -Map=kernel.map 
+# default_apps = True
 
 # osx i368 配置实例
 
-# CC_PREFIX='i386-elf-'
-# CC='i386-elf-gcc'
-# CC_LIB_PATH ='/opt/local/lib/gcc/i386-elf/9.2.0/'
-# AR='i386-elf-ar'
-# LD='i386-elf-ld'
-# AS='i386-elf-as'
-# OBJCOPY='i386-elf-objcopy'
-# RANLIB='i386-elf-ranlib'
-# CFLAGS='-march=i486'
-
+CC_PREFIX='i386-elf-'
+CC='i386-elf-gcc'
+CC_LIB_PATH ='/opt/local/lib/gcc/i386-elf/9.2.0/'
+AR='i386-elf-ar'
+LD='i386-elf-ld'
+AS='i386-elf-as'
+OBJCOPY='i386-elf-objcopy'
+RANLIB='i386-elf-ranlib'
+CFLAGS='-march=i486'
+LDFLAGS=' '
+LINKLD = 'link.ld'+ '' # -Map=kernel.map 
 
 # windows arm 配置实例
 
