@@ -187,7 +187,7 @@
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
             // "program": "${workspaceRoot}/app/hello/hello",
-            "program": "${workspaceRoot}/app/test/test",
+            "program": "${workspaceRoot}/app/test/test-mem",
             "cwd": "${workspaceRoot}",
             "args": [],
             "sourceFileMap": {

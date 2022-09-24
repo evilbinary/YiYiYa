@@ -59,16 +59,6 @@ arch=support_platform[platform]
 arch_type=get_arch(arch)
 archs=supports_archs[arch_type]
 
-
-if default_libc=='libmusl':
-    libc=[project_path+'/app/libmusl/lib/libc.a']#'/opt/local/lib/gcc/i386-elf/9.2.0/libgcc.a'
-    libcflags=' -D__LIB_MUSL__ -Iapp/libmusl/include/ -Iapp/libmusl/obj/include/ -Iapp/libmusl/arch/generic/ '
-    if arch=='x86':
-        libcflags+=' -Iapp/libmusl/arch/i386/ '
-    elif arch_type=='arm':
-        libcflags+=' -Iapp/libmusl/arch/arm/ '
-    else:
-        print('no support libmusl type %s'%(arch))
 print('welcome to yiyiya os build')
 print('your select platform: %s arch: %s  support archs: %s build env:%s'%(platform,arch, archs, plt))
 
@@ -96,6 +86,7 @@ elif arch_type=='xtensa':
 env = Environment(
         ENV=os.environ,
         APP=default_apps,
+        CC_PREFIX=CC_PREFIX,
         CC = CC,
         LD= LD,
         CXX=CXX,

@@ -79,6 +79,8 @@ CFLAGS='-march=i486'
 LDFLAGS=' '
 LINKLD = 'link.ld'+ '' # -Map=kernel.map 
 
+default_libc = 'libmusl'
+
 # windows arm 配置实例
 
 # CC_PATH=''
