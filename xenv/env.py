@@ -216,4 +216,9 @@ env.Append(BUILDERS={
                })
 
 
+bootEnv = env.Clone()
+appEnv = env.Clone()
+
+Export('bootEnv')
+Export('appEnv')
 Export('env')
