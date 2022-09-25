@@ -11,7 +11,7 @@
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
             // "program": "${workspaceRoot}/app/hello/hello",
-            "program": "${workspaceRoot}/app/hello/hello",
+            "program": "${workspaceRoot}/app/cmd/ls",
             "cwd": "${workspaceRoot}",
             "args": [],
             "sourceFileMap": {
@@ -444,7 +444,7 @@
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
             // "program": "${workspaceRoot}/app/hello/hello",
-            "program": "${workspaceRoot}/init/kernel.elf",
+            "program": "${workspaceRoot}/duck/init/kernel.elf",
             "cwd": "${workspaceRoot}",
             "args": [],
             "sourceFileMap": {
