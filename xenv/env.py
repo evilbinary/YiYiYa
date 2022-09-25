@@ -45,8 +45,7 @@ support_platform={
 project_path=os.path.abspath(os.curdir)
 
 libc=['libc.a']
-libcflags='-DLIBYC'
-
+libcflags=''
 
 def get_arch(arch):
     archs={}
@@ -108,7 +107,7 @@ env = Environment(
         MYLIB=None,
         LIBC=libc,
         LIBCFLAGS=libcflags,
-        USER='--entry main -Tapp/xlinker/user.ld',
+        USER=' -Tapp/xlinker/user.ld',
         ARCHS=archs,
         ARCHTYPE=arch_type,
         CPPPATH=[],
@@ -132,6 +131,8 @@ elif plt=='Windows':
 elif plt=='Darwin':
     env['MYLIB']='libgcc.a'
 
+if env.get('DEFAULT_LIBC') == 'libmusl':
+    env['CFLAGS']+=' -DLIBC_POSIX '
 
 if arch_type == 'x86':
     if platform=='x86_duck':
@@ -140,7 +141,7 @@ if arch_type == 'x86':
         env['CFLAGS']+=' -march=i486 '
     pass
 elif arch_type == 'arm':
-    env['USER']=' --entry main -Tapp/xlinker/user-arm.ld '
+    env['USER']=' -Tapp/xlinker/user-arm.ld '
     # -nostdlib -nostdinc -fno-builtin -DMALLOC_TRACE -mcpu=cortex-a7  -mtune=cortex-a7 -mfpu=vfpv4 -mfloat-abi=hard -mfloat-abi=softfp
 
     #env['CFLAGS']= env['CFLAGS']+ ' -fno-omit-fram e-pointer -mapcs -mno-sched-prolog ' #for debug backtrace
@@ -153,7 +154,7 @@ elif arch_type == 'arm':
         env['LINKLD']='xlinker/link-'+platform+'.ld'
         arch='armv7e-m'
     else:
-        env['USER']='--entry main -Tapp/xlinker/user-'+platform+'.ld'
+        env['USER']=' -Tapp/xlinker/user-'+platform+'.ld'
         env['CFLAGS']= env['CFLAGS']+ ' -mcpu=cortex-a7  -mtune=cortex-a7 -mfpu=vfpv4  -mfloat-abi=softfp '
         env['LINKLD']='xlinker/link-'+platform+'.ld'
     #env['CFLAGS']= ' -march='+arch
