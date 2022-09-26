@@ -9,7 +9,7 @@ default_libc = 'libc'  # libmusl libc
 
 # board select platform,选择你要编译的平台
 # dmulator pc v3s raspi2 esp32 stm32f4xx raspi3 rk3128 rk3288 cubieboard2 dummy rk3288 orangepi-pc
-platform = 'pc'
+platform = 'raspi2'
 
 # 是否要构建应用
 default_apps = True
@@ -83,30 +83,32 @@ LINKLD = ' -T xlinker/link.ld'
 
 # windows arm 配置实例
 
-# CC_PATH=''
-# CC_PREFIX='arm-none-eabi-'
-# CC_LIB_PATH='D:\\Program Files\\gcc-arm-none-eabi-9\\lib\\gcc\\arm-none-eabi\\9.2.1\\'
-# CC = CC_PREFIX+'gcc'
-# AR = CC_PREFIX+'ar'
-# LD = CC_PREFIX+'ld'
-# AS = CC_PREFIX+'as'
-# OBJCOPY = CC_PREFIX+'objcopy'
-# RANLIB = CC_PREFIX+'ranlib'
-
-
-# windows i386 配置实例
-CC_PATH='D:\\app\\gcc\\bin\\'
-CC_PREFIX='i686-elf-'
-CC = CC_PATH+CC_PREFIX+'gcc'
-CC_LIB_PATH ='D:\\app\\gcc\\lib\\gcc\\i686-elf\\7.1.0\\'
-AR =  CC_PATH+CC_PREFIX+'ar'
-LD=  CC_PATH+CC_PREFIX+'ld'
-AS= CC_PATH+CC_PREFIX+'as'
-OBJCOPY =  CC_PATH+CC_PREFIX+'objcopy'
-RANLIB = CC_PATH+CC_PREFIX+'ranlib'
-CFLAGS='-march=i486'
+CC_PATH=''
+CC_PREFIX='arm-none-eabi-'
+CC_LIB_PATH='D:\\Program Files\\gcc-arm-none-eabi-9\\lib\\gcc\\arm-none-eabi\\9.2.1\\'
+CC = CC_PREFIX+'gcc'
+AR = CC_PREFIX+'ar'
+LD = CC_PREFIX+'ld'
+AS = CC_PREFIX+'as'
+OBJCOPY = CC_PREFIX+'objcopy'
+RANLIB = CC_PREFIX+'ranlib'
 LDFLAGS=' '
 LINKLD = 'link.ld'+ '' # -Map=kernel.map 
+CFLAGS=''
+
+# windows i386 配置实例
+# CC_PATH='D:\\app\\gcc\\bin\\'
+# CC_PREFIX='i686-elf-'
+# CC = CC_PATH+CC_PREFIX+'gcc'
+# CC_LIB_PATH ='D:\\app\\gcc\\lib\\gcc\\i686-elf\\7.1.0\\'
+# AR =  CC_PATH+CC_PREFIX+'ar'
+# LD=  CC_PATH+CC_PREFIX+'ld'
+# AS= CC_PATH+CC_PREFIX+'as'
+# OBJCOPY =  CC_PATH+CC_PREFIX+'objcopy'
+# RANLIB = CC_PATH+CC_PREFIX+'ranlib'
+# CFLAGS='-march=i486'
+# LDFLAGS=' '
+# LINKLD = 'link.ld'+ '' # -Map=kernel.map 
 
 # windows arm 配置实例
 
