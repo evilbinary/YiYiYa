@@ -123,7 +123,6 @@ if plt=='Linux':
         env['MYLIB']='libgcc.a'
     pass
 elif plt=='Windows':
-    env['LINKFLAGS']='-nostdlib  ',
     env['CFLAGS']= env['CFLAGS']+' -fno-stack-protector -mno-stack-arg-probe ' #-ffreestanding -nostdlib  
     env['USER']='--entry main -Tapp/xlinker/user.ld   '
     env['MYLIB']='libgcc.a'
