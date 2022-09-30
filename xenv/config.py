@@ -51,19 +51,19 @@ LINKLD = ' -T xlinker/link.ld'
 # default_apps=False
 
 # osx arm 配置实例
-# CC_PATH = ''
-# CC_PREFIX = 'arm-none-eabi-'
-# CC_LIB_PATH = '/opt/local/lib/gcc/arm-none-eabi/9.2.0/'
-# CC = CC_PREFIX+'gcc'
-# AR = CC_PREFIX+'ar'
-# LD = CC_PREFIX+'ld'
-# AS = CC_PREFIX+'as'
-# OBJCOPY = CC_PREFIX+'objcopy'
-# RANLIB = CC_PREFIX+'ranlib'
-# CFLAGS = ''
-# LDFLAGS=' '
-# LINKLD = 'link-'+platform+'.ld'+ '' # -Map=kernel.map 
-# default_apps = True
+CC_PATH = ''
+CC_PREFIX = 'arm-none-eabi-'
+CC_LIB_PATH = '/opt/local/lib/gcc/arm-none-eabi/9.2.0/'
+CC = CC_PREFIX+'gcc'
+AR = CC_PREFIX+'ar'
+LD = CC_PREFIX+'ld'
+AS = CC_PREFIX+'as'
+OBJCOPY = CC_PREFIX+'objcopy'
+RANLIB = CC_PREFIX+'ranlib'
+CFLAGS = ''
+LDFLAGS=' '
+LINKLD = 'link-'+platform+'.ld'+ '' # -Map=kernel.map 
+default_apps = True
 
 # osx i368 配置实例
 
@@ -83,18 +83,18 @@ LINKLD = ' -T xlinker/link.ld'
 
 # windows arm 配置实例
 
-CC_PATH=''
-CC_PREFIX='arm-none-eabi-'
-CC_LIB_PATH='D:\\Program Files\\gcc-arm-none-eabi-9\\lib\\gcc\\arm-none-eabi\\9.2.1\\'
-CC = CC_PREFIX+'gcc'
-AR = CC_PREFIX+'ar'
-LD = CC_PREFIX+'ld'
-AS = CC_PREFIX+'as'
-OBJCOPY = CC_PREFIX+'objcopy'
-RANLIB = CC_PREFIX+'ranlib'
-LDFLAGS=' '
-LINKLD = 'link.ld'+ '' # -Map=kernel.map 
-CFLAGS=''
+# CC_PATH=''
+# CC_PREFIX='arm-none-eabi-'
+# CC_LIB_PATH='D:\\Program Files\\gcc-arm-none-eabi-9\\lib\\gcc\\arm-none-eabi\\9.2.1\\'
+# CC = CC_PREFIX+'gcc'
+# AR = CC_PREFIX+'ar'
+# LD = CC_PREFIX+'ld'
+# AS = CC_PREFIX+'as'
+# OBJCOPY = CC_PREFIX+'objcopy'
+# RANLIB = CC_PREFIX+'ranlib'
+# LDFLAGS=' '
+# LINKLD = 'link.ld'+ '' # -Map=kernel.map 
+# CFLAGS=''
 
 # windows i386 配置实例
 # CC_PATH='D:\\app\\gcc\\bin\\'
