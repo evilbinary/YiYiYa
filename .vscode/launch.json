@@ -6,12 +6,83 @@
     "configurations": [
         
         {
-            "name": "hello with GDB",
+            "name": "cmd with GDB",
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
             // "program": "${workspaceRoot}/app/hello/hello",
             "program": "${workspaceRoot}/app/cmd/ls",
+            "cwd": "${workspaceRoot}",
+            "args": [],
+            "sourceFileMap": {
+                "<source-path>": "<target-path>"
+            },
+            "targetArchitecture": "x86",
+            "MIMode": "gdb",
+            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerArgs": "",
+            "customLaunchSetupCommands": [
+                // {
+                //     "text": "target remote localhost:1234",
+                //     "description": "Connect to QEMU remote debugger"
+                // }
+            ],
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "text": "set architecture i386:intel ",
+                    "description": "set architecture i386"
+                },
+               
+            ],
+            "preLaunchTask": "Build and run"
+        },
+        {
+            "name": "hello with GDB",
+            "type": "cppdbg",
+            "request": "launch",
+            "miDebuggerServerAddress": "localhost:1234",
+            "program": "${workspaceRoot}/app/hello/hello",
+            "cwd": "${workspaceRoot}",
+            "args": [],
+            "sourceFileMap": {
+                "<source-path>": "<target-path>"
+            },
+            "targetArchitecture": "x86",
+            "MIMode": "gdb",
+            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerArgs": "",
+            "customLaunchSetupCommands": [
+                // {
+                //     "text": "target remote localhost:1234",
+                //     "description": "Connect to QEMU remote debugger"
+                // }
+            ],
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "text": "set architecture i386:intel ",
+                    "description": "set architecture i386"
+                },
+               
+            ],
+            "preLaunchTask": "Build and run"
+        },
+        {
+            "name": "gnuboy with GDB",
+            "type": "cppdbg",
+            "request": "launch",
+            "miDebuggerServerAddress": "localhost:1234",
+            // "program": "${workspaceRoot}/app/hello/hello",
+            "program": "${workspaceRoot}/app/gnuboy/gnuboy",
             "cwd": "${workspaceRoot}",
             "args": [],
             "sourceFileMap": {
@@ -295,6 +366,42 @@
             "miDebuggerServerAddress": "localhost:1234",
             // "program": "${workspaceRoot}/app/hello/hello",
             "program": "${workspaceRoot}/app/sdl2/player",
+            "cwd": "${workspaceRoot}",
+            "args": [],
+            "sourceFileMap": {
+                "<source-path>": "<target-path>"
+            },
+            "targetArchitecture": "x86",
+            "MIMode": "gdb",
+            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerArgs": "",
+            "customLaunchSetupCommands": [
+                // {
+                //     "text": "target remote localhost:1234",
+                //     "description": "Connect to QEMU remote debugger"
+                // }
+            ],
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "text": "set architecture i386:intel ",
+                    "description": "set architecture i386"
+                },
+               
+            ],
+            "preLaunchTask": "Build and run"
+        },
+        {
+            "name": "sdl2 with GDB",
+            "type": "cppdbg",
+            "request": "launch",
+            "miDebuggerServerAddress": "localhost:1234",
+            // "program": "${workspaceRoot}/app/hello/hello",
+            "program": "${workspaceRoot}/app/sdl2/sdl2",
             "cwd": "${workspaceRoot}",
             "args": [],
             "sourceFileMap": {
