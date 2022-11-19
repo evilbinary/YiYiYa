@@ -151,12 +151,10 @@ elif arch_type == 'arm':
     elif platform =='stm32f4xx':
         env['APP']=False
         env['CFLAGS']= env['CFLAGS']+ ' -specs=nosys.specs -mcpu=cortex-m4 -nolibc -nostdlib -nostdinc -fno-builtin -DUSE_HAL_DRIVER   -mthumb -mthumb-interwork  -mfloat-abi=soft -mfpu=vfpv4-d16 -DSTM32F401xC'# -DSTM32F401xC  -Wl,--gc-sections -fdata-sections -ffunction-sections    -mfpu=fpv4-sp-d16  -mcpu=cortex-m4  -ffreestanding -nostdlib  -mfloat-abi=hard -mfpu=fpv4-sp-d16   # -mfloat-abi=hard -mfloat-abi=softfp  -mfloat-abi=softfp
-        env['LINKLD']='xlinker/link-'+platform+'.ld'
         arch='armv7e-m'
     else:
         env['USER']=' -Tapp/xlinker/user-'+platform+'.ld'
         env['CFLAGS']= env['CFLAGS']+ ' -mcpu=cortex-a7  -mtune=cortex-a7 -mfpu=vfpv4  -mfloat-abi=softfp '
-        env['LINKLD']='xlinker/link-'+platform+'.ld'
     #env['CFLAGS']= ' -march='+arch
 
 elif arch_type=='xtensa':

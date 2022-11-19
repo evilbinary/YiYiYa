@@ -9,7 +9,7 @@ default_libc = 'libc'  # libmusl libc
 
 # board select platform,选择你要编译的平台
 # dmulator pc v3s raspi2 esp32 stm32f4xx raspi3 rk3128 rk3288 cubieboard2 dummy rk3288 orangepi-pc
-platform = 'raspi2'
+platform = 'v3s'
 
 # 是否要构建应用
 default_apps = True
@@ -31,7 +31,7 @@ CFLAGS = ''
 ARFLAGS = 'rc'
 OBJCOPYFLAGS = ' -S -g'
 LINKFLAGS = '-nostdlib -nostartfiles -e start  -g '
-LINKLD = ' -T xlinker/link.ld'
+LINKLD = 'link-'+platform+'.ld'+ '' # -Map=kernel.map 
 
 # ******************************************************************** #
 
@@ -60,10 +60,10 @@ LD = CC_PREFIX+'ld'
 AS = CC_PREFIX+'as'
 OBJCOPY = CC_PREFIX+'objcopy'
 RANLIB = CC_PREFIX+'ranlib'
-CFLAGS = ''
+CFLAGS = '-DMALLOC_TRACE'
 LDFLAGS=' '
 LINKLD = 'link-'+platform+'.ld'+ '' # -Map=kernel.map 
-default_apps = True
+default_apps = False
 
 # osx i368 配置实例
 
@@ -75,11 +75,12 @@ default_apps = True
 # AS='i386-elf-as'
 # OBJCOPY='i386-elf-objcopy'
 # RANLIB='i386-elf-ranlib'
-# CFLAGS='-march=i486'
+# CFLAGS='-march=i486 -DMALLOC_TRACE' #-DMALLOC_TRACE -fsanitize=leak  -fsanitize=address -lasan -fno-omit-frame-pointer
 # LDFLAGS=' '
-# LINKLD = 'link.ld'+ '' # -Map=kernel.map 
+# LINKLD = 'link.ld'+ ' -Xlinker -Map=kernel.map ' # 
 
-# default_libc = 'libmusl'
+# # default_libc = 'libmusl'
+# default_apps = True
 
 # windows arm 配置实例
 
