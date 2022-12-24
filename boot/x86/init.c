@@ -17,7 +17,7 @@ boot_info_t* boot_info = NULL;
 boot_info_t boot_data;
 u8 kernel_stack[1024];  // 1k
 u8 kernel_stack_top[0];
-int cpu_id=0;
+int cpu_id = 0;
 
 void cls() {
   // clear screen
@@ -125,6 +125,9 @@ void init_boot_info() {
   boot_info->gdt_number = GDT_NUMBER;
   boot_info->pdt_base = PDT_BASE;
   boot_info->tss_number = CPU_NUMBER;
+  boot_info->segments_number = 0;
+  boot_info->kernel_stack=kernel_stack;
+  boot_info->kernel_stack_size=kernel_stack_top -kernel_stack;
 }
 
 void init_disk() {
@@ -152,8 +155,7 @@ void* memmove(void* s1, const void* s2, u32 n) {
 u8 disk_read(u16 disk, u16 head, u16 cylinder, u16 sector, u16 number, u32 addr,
              u8* status) {
   u8 carry = 0;
-  u16 cx =
-      ((cylinder & 0xff) << 8) | (sector & 0xff);
+  u16 cx = ((cylinder & 0xff) << 8) | (sector & 0xff);
   u16 bx = (addr & 0xffff);
   u16 es = ((addr >> 4) & 0xf000);
   u16 dx = (head << 8) | disk;
@@ -180,7 +182,8 @@ u8 disk_read_lba(u32 lba, u32 addr, u8* status) {
   u32 sector = (lba % boot_info->disk.spt) + 1;
 
   // todo read by disk type
-  //printf("addr:%x lba:%d CHS = (%d, %d, %d)\r\n", addr,lba,cylinder,head,sector);
+  // printf("addr:%x lba:%d CHS = (%d, %d, %d)\r\n",
+  // addr,lba,cylinder,head,sector);
   u8 ret = disk_read(0, head, cylinder, sector, 1, addr, status);
   if (ret == 0) {
     // printf("addr %x ", addr);
@@ -191,16 +194,15 @@ u8 disk_read_lba(u32 lba, u32 addr, u8* status) {
   return ret;
 }
 
-void __attribute__((naked)) apu_boot(){
+void __attribute__((naked)) apu_boot() {
 #if defined(__WIN32__)
-asm("jmpl $0x0000, $_init_apu_boot\n");
+  asm("jmpl $0x0000, $_init_apu_boot\n");
 #else
-asm("jmpl $0x0000, $init_apu_boot\n");
+  asm("jmpl $0x0000, $init_apu_boot\n");
 #endif
 }
 
-
-void init_apu_boot(){ 
+void init_apu_boot() {
   cls();
   printf("boot apu info addr %x\n\r", boot_info);
   init_gdt();
@@ -210,9 +212,9 @@ void init_apu_boot(){
       "movl %0, %%esp\n"
       "mov %%esp,%%ebp\n"
       :
-      : "m"(kernel_stack_top));\
+      : "m"(kernel_stack_top));
 
-#if defined(__WIN32__)      
+#if defined(__WIN32__)
   asm("jmpl %0, $_start_apu_kernel" ::"i"(GDT_ENTRY_32BIT_CS * GDT_SIZE));
 #else
   asm("jmpl %0, $start_apu_kernel" ::"i"(GDT_ENTRY_32BIT_CS * GDT_SIZE));
@@ -270,9 +272,9 @@ void read_kernel() {
       ;
   }
 
-  //move apu entry
-  memmove(SECOND_BOOT_ENTRY,&apu_boot,32*8);
-  boot_info->second_boot_entry=SECOND_BOOT_ENTRY;
+  // move apu entry
+  memmove(SECOND_BOOT_ENTRY, &apu_boot, 32 * 8);
+  boot_info->second_boot_entry = SECOND_BOOT_ENTRY;
 }
 
 static inline void enable_a20() {
@@ -387,9 +389,9 @@ void init_boot() {
       "movl %0, %%esp\n"
       "mov %%esp,%%ebp\n"
       :
-      : "m"(kernel_stack_top));\
-      
-#if defined(__WIN32__)      
+      : "m"(kernel_stack_top));
+
+#if defined(__WIN32__)
   asm("jmpl %0, $_start_kernel" ::"i"(GDT_ENTRY_32BIT_CS * GDT_SIZE));
 #else
   asm("jmpl %0, $start_kernel" ::"i"(GDT_ENTRY_32BIT_CS * GDT_SIZE));
@@ -399,8 +401,6 @@ void init_boot() {
   for (;;)
     ;
 }
-
-
 
 asm(".code32\n");
 
@@ -444,6 +444,12 @@ void* memmove32(void* s1, const void* s2, u32 n) {
   }
 }
 
+void* memset(void* s, int c, size_t n) {
+  int i;
+  for (i = 0; i < n; i++) ((char*)s)[i] = c;
+  return s;
+}
+
 void load_elf(Elf32_Ehdr* elf_header) {
   // printf("e_phnum:%d\n\r", elf_header->e_phnum);
   u16* elf = elf_header;
@@ -453,11 +459,16 @@ void load_elf(Elf32_Ehdr* elf_header) {
   for (int i = 0; i < elf_header->e_phnum; i++) {
     // printf("type:%d\n\r", phdr[i].p_type);
     switch (phdr[i].p_type) {
-      case PT_NULL:
+      case PT_NULL: {
+        char* vaddr = phdr[i].p_vaddr;
         // printf(" %s %x %x %x %s %x %x \r\n", "NULL", phdr[i].p_offset,
         //        phdr[i].p_vaddr, phdr[i].p_paddr, "", phdr[i].p_filesz,
         //        phdr[i].p_memsz);
-        break;
+        int num = boot_data.segments_number++;
+        boot_data.segments[num].start = vaddr;
+        boot_data.segments[num].size = phdr[i].p_memsz;
+        boot_data.segments[num].type = 1;
+      } break;
       case PT_LOAD: {
         // printf(" %s %x %x %x %s %x %x \r\n", "LOAD", phdr[i].p_offset,
         //        phdr[i].p_vaddr, phdr[i].p_paddr, "", phdr[i].p_filesz,
@@ -467,6 +478,11 @@ void load_elf(Elf32_Ehdr* elf_header) {
         // printf("load start:%x vaddr:%x size:%x \n\r", start, vaddr,
         //        phdr[i].p_filesz);
         memmove32(vaddr, start, phdr[i].p_filesz);
+
+        int num = boot_data.segments_number++;
+        boot_data.segments[num].start = vaddr;
+        boot_data.segments[num].size = phdr[i].p_memsz;
+        boot_data.segments[num].type = 1;
         // printf("move end\n\r");
       } break;
       // case PT_DYNAMIC:
@@ -533,6 +549,32 @@ void load_elf(Elf32_Ehdr* elf_header) {
         break;
     }
   }
+  Elf32_Shdr* shdr = (elf + elf_header->e_shoff / 2);
+  for (int i = 0; i < elf_header->e_shnum; i++) {
+    if (SHT_NOBITS == shdr[i].sh_type) {
+      char* vaddr = shdr[i].sh_addr;
+      char* start = shdr[i].sh_offset;
+      if (shdr[i].sh_flags & SHF_ALLOC) {
+        memset(vaddr, 0, shdr[i].sh_size);
+        int num = boot_data.segments_number++;
+        boot_data.segments[num].start = vaddr;
+        boot_data.segments[num].size = shdr[i].sh_size;
+        boot_data.segments[num].type = 1;
+      }
+    } else if ((shdr[i].sh_type & SHT_PROGBITS == SHT_PROGBITS) &&
+               (shdr[i].sh_flags &
+                SHF_ALLOC == SHF_ALLOC)) {  //&& (shdr[i].sh_flags &
+                                            // SHF_WRITE==SHF_WRITE)
+      char* start = shdr[i].sh_offset;
+      char* vaddr = shdr[i].sh_addr;
+      //memmove32(vaddr, start, shdr[i].sh_size);
+
+      int num = boot_data.segments_number++;
+      boot_data.segments[num].start = vaddr;
+      boot_data.segments[num].size = shdr[i].sh_size;
+      boot_data.segments[num].type = 1;
+    }
+  }
 }
 
 // start kernel
@@ -554,7 +596,7 @@ void start_kernel() {
   start(argc, argv, envp);
 }
 
-//start kernel
+// start kernel
 void start_apu_kernel() {
   asm volatile("cli\n");
   asm volatile("movl %0, %%ss" : : "r"(GDT_ENTRY_32BIT_DS * GDT_SIZE));

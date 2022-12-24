@@ -45,8 +45,7 @@ support_platform={
 project_path=os.path.abspath(os.curdir)
 
 libc=['libc.a']
-libcflags='-DLIBYC'
-
+libcflags=''
 
 def get_arch(arch):
     archs={}
@@ -59,16 +58,6 @@ arch=support_platform[platform]
 arch_type=get_arch(arch)
 archs=supports_archs[arch_type]
 
-
-if default_libc=='libmusl':
-    libc=[project_path+'/app/libmusl/lib/libc.a']#'/opt/local/lib/gcc/i386-elf/9.2.0/libgcc.a'
-    libcflags=' -D__LIB_MUSL__ -Iapp/libmusl/include/ -Iapp/libmusl/obj/include/ -Iapp/libmusl/arch/generic/ '
-    if arch=='x86':
-        libcflags+=' -Iapp/libmusl/arch/i386/ '
-    elif arch_type=='arm':
-        libcflags+=' -Iapp/libmusl/arch/arm/ '
-    else:
-        print('no support libmusl type %s'%(arch))
 print('welcome to yiyiya os build')
 print('your select platform: %s arch: %s  support archs: %s build env:%s'%(platform,arch, archs, plt))
 
@@ -96,6 +85,7 @@ elif arch_type=='xtensa':
 env = Environment(
         ENV=os.environ,
         APP=default_apps,
+        CC_PREFIX=CC_PREFIX,
         CC = CC,
         LD= LD,
         CXX=CXX,
@@ -117,7 +107,7 @@ env = Environment(
         MYLIB=None,
         LIBC=libc,
         LIBCFLAGS=libcflags,
-        USER='--entry main -Tapp/xlinker/user.ld',
+        USER=' -Tapp/xlinker/user.ld',
         ARCHS=archs,
         ARCHTYPE=arch_type,
         CPPPATH=[],
@@ -133,14 +123,16 @@ if plt=='Linux':
         env['MYLIB']='libgcc.a'
     pass
 elif plt=='Windows':
-    env['LINKFLAGS']='-nostdlib  ',
-    env['CFLAGS']= env['CFLAGS']+' -fno-stack-protector -mno-stack-arg-probe ' #-ffreestanding -nostdlib  
+    if arch=='x86':
+        env['CFLAGS']= env['CFLAGS']+' -fno-stack-protector -mno-stack-arg-probe ' #-ffreestanding -nostdlib  
     env['USER']='--entry main -Tapp/xlinker/user.ld   '
     env['MYLIB']='libgcc.a'
     env['PROGSUFFIX'] = ''
 elif plt=='Darwin':
     env['MYLIB']='libgcc.a'
 
+if env.get('DEFAULT_LIBC') == 'libmusl':
+    env['CFLAGS']+=' -DLIBC_POSIX '
 
 if arch_type == 'x86':
     if platform=='x86_duck':
@@ -149,7 +141,7 @@ if arch_type == 'x86':
         env['CFLAGS']+=' -march=i486 '
     pass
 elif arch_type == 'arm':
-    env['USER']=' --entry main -Tapp/xlinker/user-arm.ld '
+    env['USER']=' -Tapp/xlinker/user-arm.ld '
     # -nostdlib -nostdinc -fno-builtin -DMALLOC_TRACE -mcpu=cortex-a7  -mtune=cortex-a7 -mfpu=vfpv4 -mfloat-abi=hard -mfloat-abi=softfp
 
     #env['CFLAGS']= env['CFLAGS']+ ' -fno-omit-fram e-pointer -mapcs -mno-sched-prolog ' #for debug backtrace
@@ -159,12 +151,10 @@ elif arch_type == 'arm':
     elif platform =='stm32f4xx':
         env['APP']=False
         env['CFLAGS']= env['CFLAGS']+ ' -specs=nosys.specs -mcpu=cortex-m4 -nolibc -nostdlib -nostdinc -fno-builtin -DUSE_HAL_DRIVER   -mthumb -mthumb-interwork  -mfloat-abi=soft -mfpu=vfpv4-d16 -DSTM32F401xC'# -DSTM32F401xC  -Wl,--gc-sections -fdata-sections -ffunction-sections    -mfpu=fpv4-sp-d16  -mcpu=cortex-m4  -ffreestanding -nostdlib  -mfloat-abi=hard -mfpu=fpv4-sp-d16   # -mfloat-abi=hard -mfloat-abi=softfp  -mfloat-abi=softfp
-        env['LINKLD']='xlinker/link-'+platform+'.ld'
         arch='armv7e-m'
     else:
-        env['USER']='--entry main -Tapp/xlinker/user-'+platform+'.ld'
+        env['USER']=' -Tapp/xlinker/user-'+platform+'.ld'
         env['CFLAGS']= env['CFLAGS']+ ' -mcpu=cortex-a7  -mtune=cortex-a7 -mfpu=vfpv4  -mfloat-abi=softfp '
-        env['LINKLD']='xlinker/link-'+platform+'.ld'
     #env['CFLAGS']= ' -march='+arch
 
 elif arch_type=='xtensa':
@@ -224,4 +214,9 @@ env.Append(BUILDERS={
                })
 
 
+bootEnv = env.Clone()
+appEnv = env.Clone()
+
+Export('bootEnv')
+Export('appEnv')
 Export('env')

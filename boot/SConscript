@@ -16,4 +16,4 @@ if arch_type in 'arm':
 elif arch_type in 'xtensa':
     boot=SConscript(dirs=['xtensa'], exports='env')
 else:
-    boot=SConscript(dirs=[arch], exports='env')
+    boot=SConscript(dirs=[arch_type], exports='env')

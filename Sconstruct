@@ -13,9 +13,9 @@ from xenv.env import *
 
 Import('env')
 
-duck=SConscript(dirs=['duck'], exports='env')
-boot=SConscript(dirs=['boot'], exports='env')
-image=SConscript(dirs=['image'], exports='env')
+duck=SConscript(dirs=['duck'])
+boot=SConscript(dirs=['boot'])
+image=SConscript(dirs=['image'])
 
 Depends(boot, duck)
 Depends(image, boot)
@@ -23,8 +23,8 @@ Depends(image, duck)
 
 
 if default_apps:
-    eggs=SConscript(dirs=['eggs'], exports='env')
-    app=SConscript(dirs=['app'], exports='env')
+    eggs=SConscript(dirs=['eggs'])
+    app=SConscript(dirs=['app'])
     Depends(app, eggs)
 
 

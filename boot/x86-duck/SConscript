@@ -12,7 +12,7 @@ Import('env')
 
 gcc_env = Environment(CC='gcc-mp-8',tools=['default'],ENV=os.environ)
 
-env.GenerateKernelSize('config.h', ['../../init/kernel'])
+env.GenerateKernelSize('config.h',['../../duck/init/kernel'])
 
 gcc_env.ParseConfig('sdl2-config --cflags --libs')
 

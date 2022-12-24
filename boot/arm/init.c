@@ -155,14 +155,14 @@ char uart_getc() {
 void init_uart() {}
 
 void uart_send(unsigned int c) {
-  while (((io_read32(0x20000000 + 0x60014)) & 0x20) == 0);	
-			io_write32(0x20000000 + 0x60000,c);
+  while (((io_read32(0x20000000 + 0x60014)) & 0x20) == 0)
+    ;
+  io_write32(0x20000000 + 0x60000, c);
 }
 
 char uart_getc() {
-  if((io_read32(0x20000000 + 0x60014) & 0x01) == 0)
-		return 0;
-	return io_read32(0x20000000 + 0x60000);
+  if ((io_read32(0x20000000 + 0x60014) & 0x01) == 0) return 0;
+  return io_read32(0x20000000 + 0x60000);
 }
 
 #endif
@@ -249,6 +249,8 @@ void printf(const char* format, ...) {
   }
 }
 
+extern void* _stack_svc;
+
 void init_boot_info() {
   boot_info = &boot_data;
   boot_info->version = BOOT_VERSION;
@@ -257,6 +259,8 @@ void init_boot_info() {
   boot_info->kernel_size = KERNEL_BLOCK_SIZE * READ_BLOCK_SIZE * 2;
   boot_info->tss_number = MAX_CPU;
   boot_info->second_boot_entry = SECOND_BOOT_ENTRY;
+  boot_info->segments_number = 0;
+  boot_info->kernel_stack = _stack_svc;
 }
 
 void init_disk() {
@@ -294,7 +298,7 @@ void init_memory() {
   count++;
 #elif defined(CUBIEBOARD2)
   ptr->base = 0x40000000;
-  ptr->length = 0x10000000*4;//256m*4
+  ptr->length = 0x10000000 * 4;  // 256m*4
   ptr->type = 1;
   boot_info->total_memory += ptr->length;
   ptr++;
@@ -316,7 +320,7 @@ void init_memory() {
   count++;
 
   ptr->type = 1;
-  ptr->base = (u32)boot_info->kernel_base+ (u32)boot_info->kernel_size;
+  ptr->base = (u32)boot_info->kernel_base + (u32)boot_info->kernel_size;
   ptr->length = 0xf000000;
   boot_info->total_memory += ptr->length;
   ptr++;
@@ -403,11 +407,17 @@ void load_elf(Elf32_Ehdr* elf_header) {
   for (int i = 0; i < elf_header->e_phnum; i++) {
     printf("type:%d\n\r", phdr[i].p_type);
     switch (phdr[i].p_type) {
-      case PT_NULL:
+      case PT_NULL:{
+        char* vaddr = phdr[i].p_vaddr;
         // printf(" %s %x %x %x %s %x %x \r\n", "NULL", phdr[i].p_offset,
         //        phdr[i].p_vaddr, phdr[i].p_paddr, "", phdr[i].p_filesz,
         //        phdr[i].p_memsz);
-        break;
+
+        // int num = boot_data.segments_number++;
+        // boot_data.segments[num].start = vaddr;
+        // boot_data.segments[num].size = phdr[i].p_memsz;
+        // boot_data.segments[num].type = 1;
+       } break;
       case PT_LOAD: {
         // printf(" %s %x %x %x %s %x %x \r\n", "LOAD", phdr[i].p_offset,
         //        phdr[i].p_vaddr, phdr[i].p_paddr, "", phdr[i].p_filesz,
@@ -419,6 +429,12 @@ void load_elf(Elf32_Ehdr* elf_header) {
                phdr[i].p_filesz);
         memmove32(vaddr, start, phdr[i].p_memsz);
         printf("move end\n\r");
+
+        int num = boot_data.segments_number++;
+        boot_data.segments[num].start = vaddr;
+        boot_data.segments[num].size = phdr[i].p_memsz;
+        boot_data.segments[num].type = 1;
+
       } break;
       default:
         break;
@@ -431,6 +447,12 @@ void load_elf(Elf32_Ehdr* elf_header) {
     if (SHT_NOBITS == shdr[i].sh_type) {
       char* vaddr = shdr[i].sh_addr;
       memset(vaddr, 0, shdr[i].sh_size);
+
+      // int num = boot_data.segments_number++;
+      // boot_data.segments[num].start = vaddr;
+      // boot_data.segments[num].size = phdr[i].p_memsz;
+      // boot_data.segments[num].type = 1;
+
       // map_alignment(page,vaddr,buf,shdr[i].sh_size);
     } else if (entry != shdr[i].sh_addr && SHT_PROGBITS == shdr[i].sh_type &&
                shdr[i].sh_flags & SHF_ALLOC && shdr[i].sh_flags) {
@@ -441,6 +463,11 @@ void load_elf(Elf32_Ehdr* elf_header) {
       u32* phstart = (u32)elf + shdr[i].sh_offset;
       memset(vaddr, 0, shdr->sh_size);
       memmove32(phstart, vaddr, shdr[i].sh_size);
+
+      // int num = boot_data.segments_number++;
+      // boot_data.segments[num].start = vaddr;
+      // boot_data.segments[num].size = phdr[i].p_memsz;
+      // boot_data.segments[num].type = 1;
     }
   }
 }
