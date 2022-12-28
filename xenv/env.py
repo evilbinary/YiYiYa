@@ -214,6 +214,61 @@ env.Append(BUILDERS={
                })
 
 
+def add_libc(e):
+    if e.get('DEFAULT_LIBC') == 'libmusl':
+        e['CFLAGS'] += ' -D__LIB_MUSL__  -static '
+        e['LIBPATH'] += ['../../eggs/libmusl/lib/']
+        e['CPPPATH'] += [
+            '#/eggs/libmusl',
+            '#/eggs/libmusl/include',
+            '#/eggs/libmusl/obj/include/',
+            '#/eggs/libmusl/arch/generic/',
+            '#/eggs/ibmusl/arch/generic/bits'
+        ]
+        e['LIBC'] = ['libm.a','libmusl.a']
+        e['LINKFLAGS']+='  eggs/libmusl/lib/crt1.o '
+
+        if e['ARCHTYPE'] == 'x86':
+            e['CPPPATH'] += [
+                '#/eggs/libmusl/arch/i386/',
+                '#/eggs/libmusl/arch/i386/bits']
+        elif e['ARCHTYPE'] == 'arm':
+            e['CPPPATH'] += ['../../eggs/libmusl/arch/arm/']
+        else:
+            print('no support libmusl type %s' % (arch))
+    elif e.get('DEFAULT_LIBC') == 'libnewlib':
+        e['CFLAGS'] += ' -D__LIB_NEWLIB__ -D_LIBC  -static '
+        e['LIBPATH'] += ['#/eggs/libnewlib/lib/']
+        
+        e['CPPPATH'] += [
+            '#/eggs/libnewlib',
+            '#/eggs/include/c',
+        ]
+        e['LIBC'] = ['libm.a', 'libnewlib.a','libcygmon.a']
+
+        if e['ARCHTYPE'] == 'x86':
+            e['CPPPATH'] += [
+                '#/eggs/libnewlib/lib/i386-elf/include',
+                '#/eggs/libnewlib/lib/i386-elf/lib',
+            ]
+            e['LIBPATH'] += [ '#/eggs/libnewlib/lib/i386-elf/lib',]
+        elif e['ARCHTYPE'] == 'arm':
+            e['CPPPATH'] += [
+                '#/eggs/libnewlib/lib/arm-eabi/include',]
+        else:
+            print('no support libmusl type %s' % (e['ARCHTYPE']))
+    else:
+        e['LIBPATH'] += ['../../eggs/libc/']
+        e['CPPPATH'] += [
+            '#/eggs/include/c',
+            '#/eggs/include/',
+            '.'
+        ]
+        e['CFLAGS'] += '  -DLIBYC '
+        e['LINKFLAGS']+='  eggs/libc/crt/crt.o '
+        e['LIBC'] = ['libc.a']
+
+
 bootEnv = env.Clone()
 appEnv = env.Clone()
 
