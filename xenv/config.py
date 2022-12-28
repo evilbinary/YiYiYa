@@ -5,11 +5,11 @@
 # * 邮箱: rootdebug@163.com
 # ********************************************************************
 # default libc 默认libc 选择
-default_libc = 'libc'  # libmusl libc
+default_libc = 'libmusl'  # libmusl libc libnewlib
 
 # board select platform,选择你要编译的平台
 # dmulator pc v3s raspi2 esp32 stm32f4xx raspi3 rk3128 rk3288 cubieboard2 dummy rk3288 orangepi-pc
-platform = 'v3s'
+platform = 'pc'
 
 # 是否要构建应用
 default_apps = True
@@ -51,36 +51,37 @@ LINKLD = 'link-'+platform+'.ld'+ '' # -Map=kernel.map
 # default_apps=False
 
 # osx arm 配置实例
-CC_PATH = ''
-CC_PREFIX = 'arm-none-eabi-'
-CC_LIB_PATH = '/opt/local/lib/gcc/arm-none-eabi/9.2.0/'
-CC = CC_PREFIX+'gcc'
-AR = CC_PREFIX+'ar'
-LD = CC_PREFIX+'ld'
-AS = CC_PREFIX+'as'
-OBJCOPY = CC_PREFIX+'objcopy'
-RANLIB = CC_PREFIX+'ranlib'
-CFLAGS = '-DMALLOC_TRACE'
-LDFLAGS=' '
-LINKLD = 'link-'+platform+'.ld'+ '' # -Map=kernel.map 
-default_apps = False
+# CC_PATH = ''
+# CC_PREFIX = 'arm-none-eabi-'
+# CC_LIB_PATH = '/opt/local/lib/gcc/arm-none-eabi/9.2.0/'
+# CC = CC_PREFIX+'gcc'
+# AR = CC_PREFIX+'ar'
+# LD = CC_PREFIX+'ld'
+# AS = CC_PREFIX+'as'
+# OBJCOPY = CC_PREFIX+'objcopy'
+# RANLIB = CC_PREFIX+'ranlib'
+# CFLAGS = '-DMALLOC_TRACE'
+# LDFLAGS=' '
+# LINKLD = 'link-'+platform+'.ld'+ '' # -Map=kernel.map 
+
+# default_apps = True
 
 # osx i368 配置实例
 
-# CC_PREFIX='i386-elf-'
-# CC='i386-elf-gcc'
-# CC_LIB_PATH ='/opt/local/lib/gcc/i386-elf/9.2.0/'
-# AR='i386-elf-ar'
-# LD='i386-elf-ld'
-# AS='i386-elf-as'
-# OBJCOPY='i386-elf-objcopy'
-# RANLIB='i386-elf-ranlib'
-# CFLAGS='-march=i486 -DMALLOC_TRACE' #-DMALLOC_TRACE -fsanitize=leak  -fsanitize=address -lasan -fno-omit-frame-pointer
-# LDFLAGS=' '
-# LINKLD = 'link.ld'+ ' -Xlinker -Map=kernel.map ' # 
+CC_PREFIX='i386-elf-'
+CC='i386-elf-gcc'
+CC_LIB_PATH ='/opt/local/lib/gcc/i386-elf/9.2.0/'
+AR='i386-elf-ar'
+LD='i386-elf-ld'
+AS='i386-elf-as'
+OBJCOPY='i386-elf-objcopy'
+RANLIB='i386-elf-ranlib'
+CFLAGS='-march=i486 -DMALLOC_TRACE' #-DMALLOC_TRACE -fsanitize=leak  -fsanitize=address -lasan -fno-omit-frame-pointer
+LDFLAGS=' '
+LINKLD = 'link.ld'+ ' -Xlinker -Map=kernel.map ' # 
 
 # # default_libc = 'libmusl'
-# default_apps = True
+default_apps = True
 
 # windows arm 配置实例
 
