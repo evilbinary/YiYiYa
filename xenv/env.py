@@ -215,6 +215,9 @@ env.Append(BUILDERS={
 
 
 def add_libc(e):
+    if e.get('HAS_LIBC'):
+        return
+    e['HAS_LIBC']=True
     if e.get('DEFAULT_LIBC') == 'libmusl':
         e['CFLAGS'] += ' -D__LIB_MUSL__  -static '
         e['LIBPATH'] += ['../../eggs/libmusl/lib/']
@@ -233,18 +236,21 @@ def add_libc(e):
                 '#/eggs/libmusl/arch/i386/',
                 '#/eggs/libmusl/arch/i386/bits']
         elif e['ARCHTYPE'] == 'arm':
-            e['CPPPATH'] += ['../../eggs/libmusl/arch/arm/']
+            e['CPPPATH'] += [
+                '#/eggs/libmusl/arch/arm/',
+                '#/eggs/libmusl/arch/arm/bits']
         else:
             print('no support libmusl type %s' % (arch))
     elif e.get('DEFAULT_LIBC') == 'libnewlib':
         e['CFLAGS'] += ' -D__LIB_NEWLIB__ -D_LIBC  -static '
         e['LIBPATH'] += ['#/eggs/libnewlib/lib/']
-        
+        e['USER']='--entry main -Tapp/xlinker/cygmon.ld   '
         e['CPPPATH'] += [
             '#/eggs/libnewlib',
             '#/eggs/include/c',
+            '#/eggs/include/',
         ]
-        e['LIBC'] = ['libm.a', 'libnewlib.a','libcygmon.a']
+        e['LIBC'] = ['libm.a', 'libc.a','libcygmon.a']
 
         if e['ARCHTYPE'] == 'x86':
             e['CPPPATH'] += [
