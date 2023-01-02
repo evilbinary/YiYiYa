@@ -113,7 +113,8 @@ env = Environment(
         CPPPATH=[],
         LIBS=[],
         DEFAULT_LIBC=default_libc,
-        CC_LIB_PATH=CC_LIB_PATH
+        CC_LIB_PATH=CC_LIB_PATH,
+        MODULES=modules
         )
 if plt=='Linux':
     if arch =='x86':
@@ -162,6 +163,10 @@ elif arch_type=='xtensa':
     env['LINKLD']='xlinker/link-'+platform+'.ld'
     pass
 
+
+if env.get('MODULES'):
+    for module in env.get('MODULES'):
+        env['CFLAGS'] = env['CFLAGS']+' -D'+module.upper()+'_MODULE '
 
 def generate_bin(source, target, env, for_signature):
     return '$OBJCOPY %s %s %s'%(env['OBJCOPYFLAGS'],source[0], target[0])
