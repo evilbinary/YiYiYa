@@ -147,7 +147,7 @@ elif arch_type == 'arm':
 
     #env['CFLAGS']= env['CFLAGS']+ ' -fno-omit-fram e-pointer -mapcs -mno-sched-prolog ' #for debug backtrace
     if platform=='raspi2': 
-        env['CFLAGS']= env['CFLAGS']+ ' -nostdlib -nostdinc --specs=nosys.specs -mcpu=cortex-a7  -mtune=cortex-a7 -mfpu=vfpv4  -mfloat-abi=softfp '
+        env['CFLAGS']= env['CFLAGS']+ ' -nostdlib -nostdinc --specs=nosys.specs -mcpu=cortex-a7  -mtune=cortex-a7 -mfpu=vfpv4 -mfloat-abi=softfp '
         pass
     elif platform =='stm32f4xx':
         env['APP']=False

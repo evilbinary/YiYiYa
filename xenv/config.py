@@ -55,6 +55,7 @@ LINKLD = 'link-'+platform+'.ld'+ '' # -Map=kernel.map
 # default_apps=False
 
 # osx arm 配置实例
+
 CC_PATH = ''
 CC_PREFIX = 'arm-none-eabi-'
 CC_LIB_PATH = '/opt/local/lib/gcc/arm-none-eabi/9.2.0/'
@@ -64,7 +65,7 @@ LD = CC_PREFIX+'ld'
 AS = CC_PREFIX+'as'
 OBJCOPY = CC_PREFIX+'objcopy'
 RANLIB = CC_PREFIX+'ranlib'
-CFLAGS = ' ' #-DMALLOC_TRACE
+CFLAGS = ' -mapcs-frame -fstack-protector ' #-fstack-protector-all  -DMALLOC_TRACE -fno-omit-frame-pointer
 LDFLAGS=' '
 LINKLD = 'link-'+platform+'.ld'+ '' # -Map=kernel.map 
 
@@ -74,6 +75,7 @@ default_apps = True
 
 # CC_PREFIX='i386-elf-'
 # CC='i386-elf-gcc'
+# CXX = 'i386-elf-gcc'
 # CC_LIB_PATH ='/opt/local/lib/gcc/i386-elf/9.2.0/'
 # AR='i386-elf-ar'
 # LD='i386-elf-ld'
@@ -84,7 +86,7 @@ default_apps = True
 # LDFLAGS=' '
 # LINKLD = 'link.ld'+ ' -Xlinker -Map=kernel.map ' # 
 
-# # # default_libc = 'libmusl'
+# default_libc = 'libmusl'
 # default_apps = True
 
 # windows arm 配置实例
