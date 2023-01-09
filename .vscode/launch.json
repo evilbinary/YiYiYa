@@ -690,11 +690,11 @@
             "preLaunchTask": "Build and run"
         },
         {
-            "name": "cmd arm with GDB",
+            "name": "gnuboy arm with GDB",
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            "program": "${workspaceRoot}/app/cmd/ls",
+            "program": "${workspaceRoot}/app/gnuboy/gnuboy",
             "cwd": "${workspaceRoot}",
             "args": [],
             "sourceFileMap": {
@@ -761,6 +761,75 @@
             ],
             "preLaunchTask": "Build and run"
         },
+        
+
+        {
+            "name": "cmd arm with GDB",
+            "type": "cppdbg",
+            "request": "launch",
+            "miDebuggerServerAddress": "localhost:1234",
+            "program": "${workspaceRoot}/app/cmd/ls",
+            "cwd": "${workspaceRoot}",
+            "args": [],
+            "sourceFileMap": {
+                "<source-path>": "<target-path>"
+            },
+            // "logging": {
+            //     "engineLogging": true
+            // },
+            "targetArchitecture": "arm",
+            "MIMode": "gdb",
+            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerArgs": "",
+            "customLaunchSetupCommands": [
+                // {
+                //     "text": "target remote localhost:1234",
+                //     "description": "Connect to QEMU remote debugger"
+                // }
+            ],
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+            ],
+            "preLaunchTask": "Build and run"
+        },
+        {
+            "name": "test arm with GDB",
+            "type": "cppdbg",
+            "request": "launch",
+            "miDebuggerServerAddress": "localhost:1234",
+            "program": "${workspaceRoot}/app/test/test-stdio",
+            "cwd": "${workspaceRoot}",
+            "args": [],
+            "sourceFileMap": {
+                "<source-path>": "<target-path>"
+            },
+            // "logging": {
+            //     "engineLogging": true
+            // },
+            "targetArchitecture": "arm",
+            "MIMode": "gdb",
+            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerArgs": "",
+            "customLaunchSetupCommands": [
+                // {
+                //     "text": "target remote localhost:1234",
+                //     "description": "Connect to QEMU remote debugger"
+                // }
+            ],
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+            ],
+            "preLaunchTask": "Build and run"
+        },
+
         {
             "name": "hello arm with GDB",
             "type": "cppdbg",
@@ -940,7 +1009,8 @@
             // },
             "targetArchitecture": "arm",
             "MIMode": "gdb",
-            "miDebuggerPath": "C:\\Program Files (x86)\\GNU Arm Embedded Toolchain\\10 2021.10\\bin\\arm-none-eabi-gdb.exe",
+            "miDebuggerPath": "/opt/local/bin/ggdb",
+            // "miDebuggerPath": "C:\\Program Files (x86)\\GNU Arm Embedded Toolchain\\10 2021.10\\bin\\arm-none-eabi-gdb.exe",
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
                 // {

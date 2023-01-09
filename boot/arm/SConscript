@@ -11,7 +11,7 @@ Import('env')
 current=Dir('.').srcnode().path+'/../'
 
 linkflags='-nostdlib -nostartfiles -T boot/arm/link.ld'
-cflags= '$CFLAGS'
+cflags= '$CFLAGS -fno-stack-protector  '
 
 include=[
     '.',
