@@ -30,13 +30,12 @@ include=[
     '../../duck/platform/'+env['PLATFORM']
 ]
 
-
 source=['init.c','config.h']
 
 env.Program('init.elf', 
     source,
     CPPPATH=include,
-    CFLAGS='$CFLAGS -I. -Iinclude  -Iarch -std=c99 -std=gnu99 -w  ',
+    CFLAGS='$CFLAGS -fno-stack-protector  -I. -Iinclude  -Iarch -std=c99 -std=gnu99 -w  ',
     LINKFLAGS= '$LINKFLAGS  -T boot/x86/link.ld ') #-Ttext 0x0500 -Wl,-section-start=.apu_boot=0x1000
 
 env.Objcopy('init.bin','init.elf',OBJCOPYFLAGS='-j .text -O binary -S')

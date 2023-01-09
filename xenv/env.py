@@ -113,7 +113,8 @@ env = Environment(
         CPPPATH=[],
         LIBS=[],
         DEFAULT_LIBC=default_libc,
-        CC_LIB_PATH=CC_LIB_PATH
+        CC_LIB_PATH=CC_LIB_PATH,
+        MODULES=modules
         )
 if plt=='Linux':
     if arch =='x86':
@@ -146,7 +147,7 @@ elif arch_type == 'arm':
 
     #env['CFLAGS']= env['CFLAGS']+ ' -fno-omit-fram e-pointer -mapcs -mno-sched-prolog ' #for debug backtrace
     if platform=='raspi2': 
-        env['CFLAGS']= env['CFLAGS']+ ' -nostdlib -nostdinc --specs=nosys.specs -mcpu=cortex-a7  -mtune=cortex-a7 -mfpu=vfpv4  -mfloat-abi=softfp '
+        env['CFLAGS']= env['CFLAGS']+ ' -nostdlib -nostdinc --specs=nosys.specs -mcpu=cortex-a7  -mtune=cortex-a7 -mfpu=vfpv4 -mfloat-abi=softfp '
         pass
     elif platform =='stm32f4xx':
         env['APP']=False
@@ -162,6 +163,10 @@ elif arch_type=='xtensa':
     env['LINKLD']='xlinker/link-'+platform+'.ld'
     pass
 
+
+if env.get('MODULES'):
+    for module in env.get('MODULES'):
+        env['CFLAGS'] = env['CFLAGS']+' -D'+module.upper()+'_MODULE '
 
 def generate_bin(source, target, env, for_signature):
     return '$OBJCOPY %s %s %s'%(env['OBJCOPYFLAGS'],source[0], target[0])
@@ -212,6 +217,67 @@ env.Append(BUILDERS={
                ),
     'KernelSize': get_kernel_size
                })
+
+
+def add_libc(e):
+    if e.get('HAS_LIBC'):
+        return
+    e['HAS_LIBC']=True
+    if e.get('DEFAULT_LIBC') == 'libmusl':
+        e['CFLAGS'] += ' -D__LIB_MUSL__  -static '
+        e['LIBPATH'] += ['../../eggs/libmusl/lib/']
+        e['CPPPATH'] += [
+            '#/eggs/libmusl',
+            '#/eggs/libmusl/include',
+            '#/eggs/libmusl/obj/include/',
+            '#/eggs/libmusl/arch/generic/',
+            '#/eggs/ibmusl/arch/generic/bits'
+        ]
+        e['LIBC'] = ['libm.a','libmusl.a']
+        e['LINKFLAGS']+='  eggs/libmusl/lib/crt1.o '
+
+        if e['ARCHTYPE'] == 'x86':
+            e['CPPPATH'] += [
+                '#/eggs/libmusl/arch/i386/',
+                '#/eggs/libmusl/arch/i386/bits']
+        elif e['ARCHTYPE'] == 'arm':
+            e['CPPPATH'] += [
+                '#/eggs/libmusl/arch/arm/',
+                '#/eggs/libmusl/arch/arm/bits']
+        else:
+            print('no support libmusl type %s' % (arch))
+    elif e.get('DEFAULT_LIBC') == 'libnewlib':
+        e['CFLAGS'] += ' -D__LIB_NEWLIB__ -D_LIBC  -static '
+        e['LIBPATH'] += ['#/eggs/libnewlib/lib/']
+        e['USER']='--entry main -Tapp/xlinker/cygmon.ld   '
+        e['CPPPATH'] += [
+            '#/eggs/libnewlib',
+            '#/eggs/include/c',
+            '#/eggs/include/',
+        ]
+        e['LIBC'] = ['libm.a', 'libc.a','libcygmon.a']
+
+        if e['ARCHTYPE'] == 'x86':
+            e['CPPPATH'] += [
+                '#/eggs/libnewlib/lib/i386-elf/include',
+                '#/eggs/libnewlib/lib/i386-elf/lib',
+            ]
+            e['LIBPATH'] += [ '#/eggs/libnewlib/lib/i386-elf/lib',]
+        elif e['ARCHTYPE'] == 'arm':
+            e['CPPPATH'] += [
+                '#/eggs/libnewlib/lib/arm-eabi/include',]
+        else:
+            print('no support libmusl type %s' % (e['ARCHTYPE']))
+    else:
+        e['LIBPATH'] += ['../../eggs/libc/']
+        e['CPPPATH'] += [
+            '#/eggs/include/c',
+            '#/eggs/include/',
+            '.'
+        ]
+        e['CFLAGS'] += '  -DLIBYC '
+        e['LINKFLAGS']+='  eggs/libc/crt/crt.o '
+        e['LIBC'] = ['libc.a']
 
 
 bootEnv = env.Clone()

@@ -37,7 +37,6 @@
                     "text": "set architecture i386:intel ",
                     "description": "set architecture i386"
                 },
-               
             ],
             "preLaunchTask": "Build and run"
         },
@@ -509,7 +508,7 @@
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
             // "program": "${workspaceRoot}/app/hello/hello",
-            "program": "${workspaceRoot}/app/gui/gui",
+            "program": "${workspaceRoot}/app/microui/microui",
             "cwd": "${workspaceRoot}",
             "args": [],
             "sourceFileMap": {
@@ -535,14 +534,14 @@
                     "text": "set architecture i386:intel ",
                     "description": "set architecture i386"
                 },
-                {
-                    "text": "file ${workspaceRoot}/app/hello/hello",
-                    "description": "Load binary."
-                },
-                {
-                    "text": "file ${workspaceRoot}/boot/x86/init",
-                    "description": "Load binary."
-                },
+                // {
+                //     "text": "file ${workspaceRoot}/app/hello/hello",
+                //     "description": "Load binary."
+                // },
+                // {
+                //     "text": "file ${workspaceRoot}/boot/x86/init",
+                //     "description": "Load binary."
+                // },
             ],
             "preLaunchTask": "Build and run"
         },
@@ -690,7 +689,39 @@
             ],
             "preLaunchTask": "Build and run"
         },
-
+        {
+            "name": "gnuboy arm with GDB",
+            "type": "cppdbg",
+            "request": "launch",
+            "miDebuggerServerAddress": "localhost:1234",
+            "program": "${workspaceRoot}/app/gnuboy/gnuboy",
+            "cwd": "${workspaceRoot}",
+            "args": [],
+            "sourceFileMap": {
+                "<source-path>": "<target-path>"
+            },
+            // "logging": {
+            //     "engineLogging": true
+            // },
+            "targetArchitecture": "arm",
+            "MIMode": "gdb",
+            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerArgs": "",
+            "customLaunchSetupCommands": [
+                // {
+                //     "text": "target remote localhost:1234",
+                //     "description": "Connect to QEMU remote debugger"
+                // }
+            ],
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+            ],
+            "preLaunchTask": "Build and run"
+        },
         {
             "name": "track arm with GDB",
             "type": "cppdbg",
@@ -730,6 +761,75 @@
             ],
             "preLaunchTask": "Build and run"
         },
+        
+
+        {
+            "name": "cmd arm with GDB",
+            "type": "cppdbg",
+            "request": "launch",
+            "miDebuggerServerAddress": "localhost:1234",
+            "program": "${workspaceRoot}/app/cmd/ls",
+            "cwd": "${workspaceRoot}",
+            "args": [],
+            "sourceFileMap": {
+                "<source-path>": "<target-path>"
+            },
+            // "logging": {
+            //     "engineLogging": true
+            // },
+            "targetArchitecture": "arm",
+            "MIMode": "gdb",
+            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerArgs": "",
+            "customLaunchSetupCommands": [
+                // {
+                //     "text": "target remote localhost:1234",
+                //     "description": "Connect to QEMU remote debugger"
+                // }
+            ],
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+            ],
+            "preLaunchTask": "Build and run"
+        },
+        {
+            "name": "test arm with GDB",
+            "type": "cppdbg",
+            "request": "launch",
+            "miDebuggerServerAddress": "localhost:1234",
+            "program": "${workspaceRoot}/app/test/test-stdio",
+            "cwd": "${workspaceRoot}",
+            "args": [],
+            "sourceFileMap": {
+                "<source-path>": "<target-path>"
+            },
+            // "logging": {
+            //     "engineLogging": true
+            // },
+            "targetArchitecture": "arm",
+            "MIMode": "gdb",
+            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerArgs": "",
+            "customLaunchSetupCommands": [
+                // {
+                //     "text": "target remote localhost:1234",
+                //     "description": "Connect to QEMU remote debugger"
+                // }
+            ],
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+            ],
+            "preLaunchTask": "Build and run"
+        },
+
         {
             "name": "hello arm with GDB",
             "type": "cppdbg",
@@ -909,7 +1009,8 @@
             // },
             "targetArchitecture": "arm",
             "MIMode": "gdb",
-            "miDebuggerPath": "C:\\Program Files (x86)\\GNU Arm Embedded Toolchain\\10 2021.10\\bin\\arm-none-eabi-gdb.exe",
+            "miDebuggerPath": "/opt/local/bin/ggdb",
+            // "miDebuggerPath": "C:\\Program Files (x86)\\GNU Arm Embedded Toolchain\\10 2021.10\\bin\\arm-none-eabi-gdb.exe",
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
                 // {
@@ -1072,7 +1173,8 @@
             // },
             // "targetArchitecture": "arm",
             "MIMode": "gdb",
-            "miDebuggerPath": "C:\\Program Files (x86)\\GNU Arm Embedded Toolchain\\10 2021.10\\bin\\arm-none-eabi-gdb.exe",
+            "miDebuggerPath": "/opt/local/bin/ggdb",
+            // "miDebuggerPath": "C:\\Program Files (x86)\\GNU Arm Embedded Toolchain\\10 2021.10\\bin\\arm-none-eabi-gdb.exe",
             // "miDebuggerPath": "D:\\Program Files\\gcc-arm-none-eabi-9\\bin\\arm-none-eabi-gdb.exe",
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
