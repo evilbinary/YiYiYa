@@ -25,6 +25,8 @@ Depends(image, duck)
 if default_apps:
     eggs=SConscript(dirs=['eggs'])
     app=SConscript(dirs=['app'])
-    Depends(app, eggs)
-
+    for i in app:
+        for j in eggs:
+            print('depends ',i,j)
+            Depends(i, j)
 
