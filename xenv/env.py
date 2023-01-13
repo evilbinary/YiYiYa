@@ -5,7 +5,6 @@
 # * 邮箱: rootdebug@163.com
 # ********************************************************************
 import os
-import math
 import platform 
 import sys
 from SCons.Environment import *
@@ -17,6 +16,7 @@ plt = platform.system()
 
 from xenv.config import *
 
+import autoconfig,make,autogen
 
 supports_archs={
     'arm': ['armv5','armv6','armv7','armv7-a','armv8-a'],
@@ -28,7 +28,7 @@ supports_archs={
 
 support_platform={
     'stm32f4xx':'armv7',
-    'pc':'x86',
+    'i386-pc':'x86',
     'raspi2':'armv7-a',
     'esp32':'lx6',
     'v3s':'armv7-a',
@@ -82,6 +82,9 @@ elif arch_type=='xtensa':
     CC_PATH='~/.espressif/tools/xtensa-esp32-elf/esp-2021r1-8.4.0/xtensa-esp32-elf/bin/'
 
 
+def macro_fmt(a):
+    return a.upper().replace('-','_')
+
 env = Environment(
         ENV=os.environ,
         APP=default_apps,
@@ -96,7 +99,7 @@ env = Environment(
         AS= AS,
         ARFLAGS=ARFLAGS,
         LDFLAGS=LDFLAGS,
-        CFLAGS='%s -DDUCK -D%s -D%s -I. -I./include -Ilibs/include -g -nostdlib -nostdinc  -fno-builtin  -c -std=c99 -std=gnu99 -w -D%s'%(CFLAGS,arch_type.upper(),arch.upper().replace('-','_'),platform.upper()),
+        CFLAGS='%s -DDUCK -D%s -D%s -I. -I./include -Ilibs/include -g -nostdlib -nostdinc  -fno-builtin  -c -std=c99 -std=gnu99 -w -D%s'%(CFLAGS,arch_type.upper(),macro_fmt(arch),macro_fmt(platform)),
         #PATH= os.environ['PATH'],
         LIBPATH=['.','../arch/','../modules','../libs/'],
         LINKFLAGS=LINKFLAGS,
@@ -114,8 +117,13 @@ env = Environment(
         LIBS=[],
         DEFAULT_LIBC=default_libc,
         CC_LIB_PATH=CC_LIB_PATH,
-        MODULES=modules
+        MODULES=modules,
         )
+
+autogen.generate(env)
+autoconfig.generate(env)
+make.generate(env)
+
 if plt=='Linux':
     if arch =='x86':
         env['LINKFLAGS']= env['LINKFLAGS']+' -m32'
@@ -167,56 +175,6 @@ elif arch_type=='xtensa':
 if env.get('MODULES'):
     for module in env.get('MODULES'):
         env['CFLAGS'] = env['CFLAGS']+' -D'+module.upper()+'_MODULE '
-
-def generate_bin(source, target, env, for_signature):
-    return '$OBJCOPY %s %s %s'%(env['OBJCOPYFLAGS'],source[0], target[0])
-    
-env.Append(BUILDERS={
-    'Objcopy': Builder(
-               generator=generate_bin,
-               suffix='',)})
-
-def get_kernel_size(env,target,source):
-    if source:
-        file_name=str(source[0])
-        file_out=str(target[0])
-        if os.path.exists(file_name):
-            size=os.stat(file_name).st_size
-            env['KERNEL_SIZE'] = str(size)
-            env['KERNEL_BLOCK_SIZE'] = str(int(math.ceil(size/1024.0)))
-            print('kernel size:',env.get('KERNEL_SIZE'))
-        else :
-            print('file %s not exist'%(file_name))
-    else:
-      env['KERNEL_SIZE'] = str(1024)
-      env['KERNEL_BLOCK_SIZE'] = str(int(math.ceil(1024/1024.0)))
-    return ''
-
-def generate_kernel_size(env,target,source):
-    file_out=str(target[0])
-    get_kernel_size(env,target,source)
-    kernel_header=file_out.upper().rsplit('/',1)[-1].replace('.','_')
-    kernel_header=file_out.upper().rsplit('\\',1)[-1].replace('.','_').replace('/','_')
-    f = open(file_out, 'w')
-    content="""#ifndef %s
-#define %s
-#define KERNEL_BLOCK_SIZE %s
-#define KERNEL_SIZE %s
-#endif
-"""%(kernel_header,
-    kernel_header,
-    env.get('KERNEL_BLOCK_SIZE'),
-    env.get('KERNEL_SIZE'))
-    f.write(content)
-    f.close()
-    return ''
-
-env.Append(BUILDERS={
-    'GenerateKernelSize': Builder(
-               action=generate_kernel_size
-               ),
-    'KernelSize': get_kernel_size
-               })
 
 
 def add_libc(e):

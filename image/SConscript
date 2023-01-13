@@ -42,6 +42,7 @@ env.KernelSize(['size'],['../duck/init/kernel'])
 run_qemu_cmd=''
 debug_qemu_cmd=''
 
+
 if env.get('ARCHTYPE')=='x86':
   if env.get('ARCH')=='x86-duck':
     run_qemu_cmd='boot/x86-duck/init.elf'
@@ -148,14 +149,22 @@ def build_duck_fit():
       ['mkimage -f ${SOURCES[0]} $TARGET'
     ])
 
+
+def build_disk():
+  if not os.path.exists('disk.img'):
+    print('make disk.img')
+    env.Execute('qemu-img create disk.img 256m && mkfs.vfat disk.img')
+
 def run_duck():
   print('run start')
   build_duck_image()
+  build_disk()
   env.Command('qemu', 'duck.img',run_qemu_cmd)
 
 def debug_duck():
   print('debug start')
   build_duck_image()
+  build_disk()
   env.Command('qemu','duck.img',debug_qemu_cmd)
 
 if env.get('build')=='uImage':
