@@ -18,7 +18,7 @@ scons
 ### 运行
 
 ```
-scons -Q init && scons --run=qemu
+scons --run=qemu
 ```
 
 
