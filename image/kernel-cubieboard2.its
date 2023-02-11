@@ -24,7 +24,7 @@
 		};
 		kernel {
 			description = "YiYiYa kernel";
-			data = /incbin/("../init/kernel.elf");
+			data = /incbin/("../duck/init/kernel.elf");
 			type = "ramdisk";
 			arch = "arm";
 			os = "linux";

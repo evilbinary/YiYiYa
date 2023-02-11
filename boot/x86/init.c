@@ -126,8 +126,8 @@ void init_boot_info() {
   boot_info->pdt_base = PDT_BASE;
   boot_info->tss_number = CPU_NUMBER;
   boot_info->segments_number = 0;
-  boot_info->kernel_stack=kernel_stack;
-  boot_info->kernel_stack_size=kernel_stack_top -kernel_stack;
+  boot_info->kernel_stack = kernel_stack;
+  boot_info->kernel_stack_size = kernel_stack_top - kernel_stack;
 }
 
 void init_disk() {
@@ -470,19 +470,29 @@ void load_elf(Elf32_Ehdr* elf_header) {
         boot_data.segments[num].type = 1;
       } break;
       case PT_LOAD: {
-        // printf(" %s %x %x %x %s %x %x \r\n", "LOAD", phdr[i].p_offset,
-        //        phdr[i].p_vaddr, phdr[i].p_paddr, "", phdr[i].p_filesz,
-        //        phdr[i].p_memsz);
         char* start = elf + phdr[i].p_offset / 2;
         char* vaddr = phdr[i].p_vaddr;
-        // printf("load start:%x vaddr:%x size:%x \n\r", start, vaddr,
-        //        phdr[i].p_filesz);
-        memmove32(vaddr, start, phdr[i].p_filesz);
+        if ((phdr[i].p_flags & PF_X) == PF_X) {
+          // printf(" %s %x %x %x %s %x %x \r\n", "LOAD", phdr[i].p_offset,
+          //        phdr[i].p_vaddr, phdr[i].p_paddr, "", phdr[i].p_filesz,
+          //        phdr[i].p_memsz);
 
-        int num = boot_data.segments_number++;
-        boot_data.segments[num].start = vaddr;
-        boot_data.segments[num].size = phdr[i].p_memsz;
-        boot_data.segments[num].type = 1;
+          // printf("load start:%x vaddr:%x size:%x \n\r", start, vaddr,
+          //        phdr[i].p_filesz);
+          memmove32(vaddr, start, phdr[i].p_filesz);
+
+          int num = boot_data.segments_number++;
+          boot_data.segments[num].start = vaddr;
+          boot_data.segments[num].size = phdr[i].p_memsz;
+          boot_data.segments[num].type = 1;
+
+        } else {
+          int num = boot_data.segments_number++;
+          boot_data.segments[num].start = vaddr;
+          boot_data.segments[num].size = phdr[i].p_memsz;
+          boot_data.segments[num].type = 2;
+        }
+
         // printf("move end\n\r");
       } break;
       // case PT_DYNAMIC:
@@ -567,7 +577,7 @@ void load_elf(Elf32_Ehdr* elf_header) {
                                             // SHF_WRITE==SHF_WRITE)
       char* start = shdr[i].sh_offset;
       char* vaddr = shdr[i].sh_addr;
-      //memmove32(vaddr, start, shdr[i].sh_size);
+      // memmove32(vaddr, start, shdr[i].sh_size);
 
       int num = boot_data.segments_number++;
       boot_data.segments[num].start = vaddr;

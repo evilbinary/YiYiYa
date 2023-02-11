@@ -407,7 +407,7 @@ void load_elf(Elf32_Ehdr* elf_header) {
   for (int i = 0; i < elf_header->e_phnum; i++) {
     printf("type:%d\n\r", phdr[i].p_type);
     switch (phdr[i].p_type) {
-      case PT_NULL:{
+      case PT_NULL: {
         char* vaddr = phdr[i].p_vaddr;
         // printf(" %s %x %x %x %s %x %x \r\n", "NULL", phdr[i].p_offset,
         //        phdr[i].p_vaddr, phdr[i].p_paddr, "", phdr[i].p_filesz,
@@ -417,23 +417,31 @@ void load_elf(Elf32_Ehdr* elf_header) {
         // boot_data.segments[num].start = vaddr;
         // boot_data.segments[num].size = phdr[i].p_memsz;
         // boot_data.segments[num].type = 1;
-       } break;
+      } break;
       case PT_LOAD: {
-        // printf(" %s %x %x %x %s %x %x \r\n", "LOAD", phdr[i].p_offset,
-        //        phdr[i].p_vaddr, phdr[i].p_paddr, "", phdr[i].p_filesz,
-        //        phdr[i].p_memsz);
         char* start = elf + phdr[i].p_offset / 2;
         char* vaddr = phdr[i].p_vaddr;
-        entry = vaddr;
-        printf("load start:%x vaddr:%x size:%x \n\r", start, vaddr,
-               phdr[i].p_filesz);
-        memmove32(vaddr, start, phdr[i].p_memsz);
-        printf("move end\n\r");
+        if ((phdr[i].p_flags & PF_X) == PF_X) {
+          // printf(" %s %x %x %x %s %x %x \r\n", "LOAD", phdr[i].p_offset,
+          //        phdr[i].p_vaddr, phdr[i].p_paddr, "", phdr[i].p_filesz,
+          //        phdr[i].p_memsz);
 
-        int num = boot_data.segments_number++;
-        boot_data.segments[num].start = vaddr;
-        boot_data.segments[num].size = phdr[i].p_memsz;
-        boot_data.segments[num].type = 1;
+          entry = vaddr;
+          printf("load start:%x vaddr:%x size:%x \n\r", start, vaddr,
+                 phdr[i].p_filesz);
+          memmove32(vaddr, start, phdr[i].p_memsz);
+          printf("move end\n\r");
+
+          int num = boot_data.segments_number++;
+          boot_data.segments[num].start = vaddr;
+          boot_data.segments[num].size = phdr[i].p_memsz;
+          boot_data.segments[num].type = 1;
+        } else {
+          int num = boot_data.segments_number++;
+          boot_data.segments[num].start = vaddr;
+          boot_data.segments[num].size = phdr[i].p_memsz;
+          boot_data.segments[num].type = 2;
+        }
 
       } break;
       default:
