@@ -472,7 +472,7 @@ void load_elf(Elf32_Ehdr* elf_header) {
       case PT_LOAD: {
         char* start = elf + phdr[i].p_offset / 2;
         char* vaddr = phdr[i].p_vaddr;
-        if ((phdr[i].p_flags & PF_X) == PF_X) {
+         
           // printf(" %s %x %x %x %s %x %x \r\n", "LOAD", phdr[i].p_offset,
           //        phdr[i].p_vaddr, phdr[i].p_paddr, "", phdr[i].p_filesz,
           //        phdr[i].p_memsz);
@@ -486,12 +486,13 @@ void load_elf(Elf32_Ehdr* elf_header) {
           boot_data.segments[num].size = phdr[i].p_memsz;
           boot_data.segments[num].type = 1;
 
-        } else {
-          int num = boot_data.segments_number++;
-          boot_data.segments[num].start = vaddr;
-          boot_data.segments[num].size = phdr[i].p_memsz;
-          boot_data.segments[num].type = 2;
-        }
+        
+        // else if ((phdr[i].p_flags & PF_X) == PF_R) {
+        //   int num = boot_data.segments_number++;
+        //   boot_data.segments[num].start = vaddr;
+        //   boot_data.segments[num].size = phdr[i].p_memsz;
+        //   boot_data.segments[num].type = 2;
+        // }
 
         // printf("move end\n\r");
       } break;
