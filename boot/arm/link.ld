@@ -24,6 +24,9 @@ SECTIONS
         . = . + __stack_size;
         _stack_svc = .;
 
+        . = . + __stack_size;
+        _stack_sys = .;
+
 
         . = . + __stack_size*4*4 ;
         _stack_other = .;
