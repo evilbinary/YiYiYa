@@ -23,7 +23,8 @@ supports_archs={
     'x86': ['x86','x86_64','x86-duck'],
     'xtensa':  ['lx6'],
     'riscv':['riscv'],
-    'dummy':['dummy']
+    'dummy':['dummy'],
+    'general': ['general'],
 }
 
 support_platform={
@@ -35,7 +36,7 @@ support_platform={
     'raspi3':'armv8-a',
     'rk3128':'armv7-a',
     'cubieboard2': 'armv7-a',
-    'dmulator':'x86-duck',
+    'dmulator':'general',
     'dummy':'dummy',
     'rk3288':'armv7-a',
     'orangepi-pc':'armv7-a'
@@ -127,9 +128,10 @@ make.generate(env)
 if plt=='Linux':
     if arch =='x86':
         env['LINKFLAGS']= env['LINKFLAGS']+' -m32'
-    env['CFLAGS']= env['CFLAGS']+' -no-pie -fno-pic -Llibgcc.a '
-    if CC_LIB_PATH!=None:
+    env['CFLAGS']= env['CFLAGS']+' -no-pie -fno-pic '
+    if CC_LIB_PATH:
         env['MYLIB']='libgcc.a'
+        env['CFLAGS']=  env['CFLAGS']+' -Llibgcc.a '
     pass
 elif plt=='Windows':
     if arch=='x86':
@@ -138,7 +140,8 @@ elif plt=='Windows':
     env['MYLIB']='libgcc.a'
     env['PROGSUFFIX'] = ''
 elif plt=='Darwin':
-    env['MYLIB']='libgcc.a'
+    if CC_LIB_PATH:
+        env['MYLIB']='libgcc.a'
 
 if env.get('DEFAULT_LIBC') == 'libmusl':
     env['CFLAGS']+=' -DLIBC_POSIX '

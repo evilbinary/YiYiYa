@@ -9,7 +9,7 @@ default_libc = 'libmusl'  # libmusl libc libnewlib
 
 # board select platform,选择你要编译的平台
 # dmulator i386-pc v3s raspi2 esp32 stm32f4xx raspi3 rk3128 rk3288 cubieboard2 dummy rk3288 orangepi-pc
-platform = 'raspi2'
+platform = 'dmulator'
 
 # 是否要构建应用
 default_apps = True
@@ -56,20 +56,20 @@ LINKLD = 'link-'+platform+'.ld'+ '' # -Map=kernel.map
 
 # osx arm 配置实例
 
-CC_PATH = ''
-CC_PREFIX = 'arm-none-eabi-'
-CC_LIB_PATH = '/opt/local/lib/gcc/arm-none-eabi/9.2.0/'
-CC = CC_PREFIX+'gcc'
-AR = CC_PREFIX+'ar'
-LD = CC_PREFIX+'ld'
-AS = CC_PREFIX+'as'
-OBJCOPY = CC_PREFIX+'objcopy'
-RANLIB = CC_PREFIX+'ranlib'
-CFLAGS = '-fstack-protector ' #-fstack-protector -mapcs-frame mov ip, sp 特权模式下 -fstack-protector   -fstack-protector-all  -DMALLOC_TRACE -fno-omit-frame-pointer
-LDFLAGS=' '
-LINKLD = 'link-'+platform+'.ld'+ '' # -Map=kernel.map 
+# CC_PATH = ''
+# CC_PREFIX = 'arm-none-eabi-'
+# CC_LIB_PATH = '/opt/local/lib/gcc/arm-none-eabi/9.2.0/'
+# CC = CC_PREFIX+'gcc'
+# AR = CC_PREFIX+'ar'
+# LD = CC_PREFIX+'ld'
+# AS = CC_PREFIX+'as'
+# OBJCOPY = CC_PREFIX+'objcopy'
+# RANLIB = CC_PREFIX+'ranlib'
+# CFLAGS = '-fstack-protector ' #-fstack-protector -mapcs-frame mov ip, sp 特权模式下 -fstack-protector   -fstack-protector-all  -DMALLOC_TRACE -fno-omit-frame-pointer
+# LDFLAGS=' '
+# LINKLD = 'link-'+platform+'.ld'+ '' # -Map=kernel.map 
 
-default_apps = True
+# default_apps = False
 
 # osx i368 配置实例
 
@@ -87,7 +87,47 @@ default_apps = True
 # LINKLD = 'link.ld'+ ' -Xlinker -Map=kernel.map ' # 
 
 # default_libc = 'libmusl'
-# default_apps = True
+# default_apps = False
+
+
+# osx x86-64 for demulator 配置实例
+
+# CC_PREFIX=''
+# CC='gcc-mp-8'
+# CXX = 'gcc-mp-8'
+# CC_LIB_PATH ='/opt/local/lib/gcc/x86_64-elf/9.2.0/'
+# AR='gcc-ar-mp-8'
+# LD='i386-elf-ld'
+# AS='i386-elf-as'
+# OBJCOPY='i386-elf-objcopy'
+# RANLIB='i386-elf-ranlib'
+# CFLAGS=' ' #-DMALLOC_TRACE -fsanitize=leak  -fsanitize=address -lasan -fno-omit-frame-pointer
+# LDFLAGS=' '
+# LINKLD = '' # link.ld'+ ' -Xlinker -Map=kernel.map 
+
+# default_libc = 'libmusl'
+# default_apps = False
+
+# clang
+CC_PREFIX=''
+CC='gcc -m32 '
+CXX = 'gcc -m32 '
+CC_LIB_PATH =''
+AR='ar'
+LD='ld'
+AS='as'
+OBJCOPY=''
+RANLIB='ranlib'
+CFLAGS=' -I/usr/include/ -D_XOPEN_SOURCE' #-DMALLOC_TRACE -fsanitize=leak  -fsanitize=address -lasan -fno-omit-frame-pointer
+LDFLAGS=''
+LINKLD = '' # link.ld'+ ' -Xlinker -Map=kernel.map
+ARFLAGS='-rv'
+LINKFLAGS = '-e start  -g '
+
+default_libc = 'libmusl'
+default_apps = False
+
+
 
 # windows arm 配置实例
 
