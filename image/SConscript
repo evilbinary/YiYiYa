@@ -73,6 +73,9 @@ elif env.get('ARCHTYPE')=='xtensa':
 elif env.get('ARCHTYPE')=='general':
   run_qemu_cmd ='duck/init/kernel.elf'
   debug_qemu_cmd = 'lldb '+run_qemu_cmd
+elif env.get('ARCHTYPE')=='riscv':
+  run_qemu_cmd='qemu-system-riscv32 -name YiYiYa -M virt -bios none -rtc base=localtime -kernel image/duck.img -drive id=disk,file=image/disk.img -serial stdio -D ./qemu.log   ' #-serial stdio -d in_asm -d cpu_reset -d in_asm,int,mmu
+  debug_qemu_cmd =run_qemu_cmd+' -S -s -monitor tcp:127.0.0.1:55555,server,nowait'
 else:
   print('no support run')
 
@@ -133,6 +136,20 @@ def build_duck_image():
     # 'esptool.py --chip esp32 elf2image --flash_mode="dio" --flash_freq "40m" --flash_size "4MB" -o init/kernel.bin  ${SOURCES[1]}',
     'source ~/dev/c/esp/esp-idf/export.sh && esptool.py --chip esp32 merge_bin --fill-flash-size 4MB -o image/flash_image.bin 0x1000 boot/xtensa/init.bin 0x10000 init/kernel',
   ])
+  elif env.get('ARCHTYPE')=='riscv':
+    env.Command('duck.img', 
+        [
+        ''
+        '../boot/riscv/init.bin',
+        '../duck/init/kernel' 
+        ],
+        [
+          'dd if=/dev/zero bs=512 count=2880 conv=notrunc of=$TARGET',
+          'dd if=${SOURCES[0]} bs=512 count=11 seek=0 conv=notrunc of=$TARGET',
+          'dd if=${SOURCES[1]} bs=512 count=%s seek=12  conv=notrunc of=$TARGET'%(env.get('KERNEL_SIZE'))
+      ])
+  else:
+    print('not support build duck image')
 
 def build_duck_fit():
   if env.get('ARCHTYPE') =='arm':

@@ -651,12 +651,51 @@
                 // },
             ],
             "preLaunchTask": "Build and run"
-        },{
+        }
+        ,{
+            "name": "init riscv with GDB",
+            "type": "cppdbg",
+            "request": "launch",
+            "miDebuggerServerAddress": "localhost:1234",
+            "program": "${workspaceRoot}/boot/riscv/init.elf",
+            "cwd": "${workspaceRoot}",
+            "args": [],
+            "sourceFileMap": {
+                "<source-path>": "<target-path>"
+            },
+            // "targetArchitecture": "riscv:rv32",
+            "MIMode": "gdb",
+            "miDebuggerPath": "riscv64-unknown-elf-gdb",
+            "miDebuggerArgs": "",
+            "customLaunchSetupCommands": [
+                // {
+                //     "text": "target remote localhost:1234",
+                //     "description": "Connect to QEMU remote debugger"
+                // }
+            ],
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "text": "set architecture riscv:rv32 ",
+                    "description": "set architecture riscv:rv32"
+                },
+                // {
+                //     "text": "file ${workspaceRoot}/boot/x86/init",
+                //     "description": "file on setup."
+                // },
+            ],
+            "preLaunchTask": "Build and run"
+        },
+        {
             "name": "init arm with GDB",
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            "program": "${workspaceRoot}/boot/arm/init",
+            "program": "${workspaceRoot}/boot/arm/init.elf",
             "cwd": "${workspaceRoot}",
             "args": [],
             "sourceFileMap": {
@@ -1174,6 +1213,70 @@
             // "targetArchitecture": "arm",
             "MIMode": "gdb",
             "miDebuggerPath": "/opt/local/bin/ggdb",
+            // "miDebuggerPath": "C:\\Program Files (x86)\\GNU Arm Embedded Toolchain\\10 2021.10\\bin\\arm-none-eabi-gdb.exe",
+            // "miDebuggerPath": "D:\\Program Files\\gcc-arm-none-eabi-9\\bin\\arm-none-eabi-gdb.exe",
+            "miDebuggerArgs": "",
+            "customLaunchSetupCommands": [
+                // {
+                //     "text": "target remote localhost:1234",
+                //     "description": "Connect to QEMU remote debugger"
+                // }
+            ],
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                // {
+                //     "text": "set architecture i386:intel ",
+                //     "description": "set architecture i386"
+                // },
+                // {
+                //     "text": "target remote :1234",
+                //     "description": "connect the port"
+                // },
+                // {
+                //     "text": "file ./boot/x86/setup.bin",
+                //     "description": "file on setup."
+                // },
+                // {
+                //     "text": "break _start",
+                //     "description": "Break on exception handler."
+                // },
+                // {
+                //     "text": "break start",
+                //     "description": "Break on exception handler."
+                // },
+            ],
+            "preLaunchTask": "Build and run"
+        },
+        {
+            "name": "kernel riscv with GDB",
+            "type": "cppdbg",
+            "request": "launch",
+            "miDebuggerServerAddress": "localhost:1234",
+            "program": "${workspaceRoot}/duck/init/kernel.elf",
+            // "program": "${workspaceRoot}/app/launcher/launcher",
+
+            // "program": "${workspaceRoot}/app/hello/hello",
+            // "program": "${workspaceRoot}/app/gui/gui",
+            // "program": "${workspaceRoot}/app/file/file",
+            // "program": "${workspaceRoot}/app/microui/microui",
+
+            // "program": "${workspaceRoot}/boot/x86/init",
+            "cwd": "${workspaceRoot}",
+            "args": [],
+            "sourceFileMap": {
+                "<source-path>": "<target-path>"
+            },
+            // "logging": {
+            //     "engineLogging": true
+            // },
+            // "targetArchitecture": "arm",
+            "MIMode": "gdb",
+           
+            "miDebuggerPath": "riscv64-unknown-elf-gdb",
             // "miDebuggerPath": "C:\\Program Files (x86)\\GNU Arm Embedded Toolchain\\10 2021.10\\bin\\arm-none-eabi-gdb.exe",
             // "miDebuggerPath": "D:\\Program Files\\gcc-arm-none-eabi-9\\bin\\arm-none-eabi-gdb.exe",
             "miDebuggerArgs": "",

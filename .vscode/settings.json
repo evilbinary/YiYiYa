@@ -121,5 +121,6 @@
     "sdl_stdinc.h": "c",
     "sdl_config.h": "c",
     "fixed_dsp.h": "c"
-  }
+  },
+  "git.ignoreLimitWarning": true
 }

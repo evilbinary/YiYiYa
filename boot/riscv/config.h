@@ -1,0 +1,5 @@
+#ifndef BOOT_RISCV_CONFIG_H
+#define BOOT_RISCV_CONFIG_H
+#define KERNEL_BLOCK_SIZE 73
+#define KERNEL_SIZE 74440
+#endif

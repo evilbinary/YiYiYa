@@ -8,8 +8,8 @@
 default_libc = 'libmusl'  # libmusl libc libnewlib
 
 # board select platform,选择你要编译的平台
-# dmulator i386-pc v3s raspi2 esp32 stm32f4xx raspi3 rk3128 rk3288 cubieboard2 dummy rk3288 orangepi-pc
-platform = 'dmulator'
+#riscv-virt dmulator i386-pc v3s raspi2 esp32 stm32f4xx raspi3 rk3128 rk3288 cubieboard2 dummy rk3288 orangepi-pc
+platform = 'riscv-virt'
 
 # 是否要构建应用
 default_apps = True
@@ -71,6 +71,28 @@ LINKLD = 'link-'+platform+'.ld'+ '' # -Map=kernel.map
 
 # default_apps = False
 
+
+# osx riscv 配置实例
+
+CC_PATH = ''
+CC_PREFIX = 'riscv64-unknown-elf-'
+CC_LIB_PATH = ''
+CC = CC_PREFIX+'gcc'
+AR = CC_PREFIX+'ar'
+LD = CC_PREFIX+'ld'
+AS = CC_PREFIX+'as'
+OBJCOPY = CC_PREFIX+'objcopy'
+RANLIB = CC_PREFIX+'ranlib'
+CFLAGS = '-fstack-protector -nostdlib -nostdinc  -fno-builtin -mcmodel=medany  -march=rv32imac -mabi=ilp32 -g -Wall' #-fstack-protector -mapcs-frame mov ip, sp 特权模式下 -fstack-protector   -fstack-protector-all  -DMALLOC_TRACE -fno-omit-frame-pointer
+LDFLAGS='  -nostdlib -march=rv32imac -mabi=ilp32  -mcmodel=medany '
+LINKFLAGS='   '
+LINKLD = 'link-'+platform+'.ld'+ '' # -Map=kernel.map 
+ASFLAGS= ' -march=rv32imac -mabi=ilp32 '
+
+
+default_apps = False
+
+
 # osx i368 配置实例
 
 # CC_PREFIX='i386-elf-'
@@ -109,23 +131,23 @@ LINKLD = 'link-'+platform+'.ld'+ '' # -Map=kernel.map
 # default_apps = False
 
 # clang
-CC_PREFIX=''
-CC='gcc -m32 '
-CXX = 'gcc -m32 '
-CC_LIB_PATH =''
-AR='ar'
-LD='ld'
-AS='as'
-OBJCOPY=''
-RANLIB='ranlib'
-CFLAGS=' -I/usr/include/ -D_XOPEN_SOURCE' #-DMALLOC_TRACE -fsanitize=leak  -fsanitize=address -lasan -fno-omit-frame-pointer
-LDFLAGS=''
-LINKLD = '' # link.ld'+ ' -Xlinker -Map=kernel.map
-ARFLAGS='-rv'
-LINKFLAGS = '-e start  -g '
+# CC_PREFIX=''
+# CC='gcc -m32 '
+# CXX = 'gcc -m32 '
+# CC_LIB_PATH =''
+# AR='ar'
+# LD='ld'
+# AS='as'
+# OBJCOPY=''
+# RANLIB='ranlib'
+# CFLAGS=' -I/usr/include/ -D_XOPEN_SOURCE' #-DMALLOC_TRACE -fsanitize=leak  -fsanitize=address -lasan -fno-omit-frame-pointer
+# LDFLAGS=''
+# LINKLD = '' # link.ld'+ ' -Xlinker -Map=kernel.map
+# ARFLAGS='-rv'
+# LINKFLAGS = '-e start  -g '
 
-default_libc = 'libmusl'
-default_apps = False
+# default_libc = 'libmusl'
+# default_apps = False
 
 
 

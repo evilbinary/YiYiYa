@@ -12,6 +12,10 @@ from SCons.Builder  import *
 
 from SCons.Script import *
 
+base_path= os.getcwd()
+sys.path.append(base_path)
+sys.path.append(base_path+'/xenv')
+
 plt = platform.system()
 
 from xenv.config import *
@@ -39,7 +43,8 @@ support_platform={
     'dmulator':'general',
     'dummy':'dummy',
     'rk3288':'armv7-a',
-    'orangepi-pc':'armv7-a'
+    'orangepi-pc':'armv7-a',
+    'riscv-virt':'riscv'
 }
 
 
@@ -98,6 +103,7 @@ env = Environment(
         RANLIB=RANLIB,
         OBJCOPY=OBJCOPY,
         AS= AS,
+        ASFLAGS= ASFLAGS,
         ARFLAGS=ARFLAGS,
         LDFLAGS=LDFLAGS,
         CFLAGS='%s -DDUCK -D%s -D%s -I. -I./include -Ilibs/include -g -nostdlib -nostdinc  -fno-builtin  -c -std=c99 -std=gnu99 -w -D%s'%(CFLAGS,arch_type.upper(),macro_fmt(arch),macro_fmt(platform)),
@@ -166,7 +172,7 @@ elif arch_type == 'arm':
         arch='armv7e-m'
     else:
         env['USER']=' -Tapp/xlinker/user-'+platform+'.ld'
-        env['CFLAGS']= env['CFLAGS']+ ' -mcpu=cortex-a7  -mtune=cortex-a7 -mfpu=vfpv4  -mfloat-abi=softfp '
+        env['CFLAGS']= env['CFLAGS']+ ' -mcpu=cortex-a7  -mtune=cortex-a7 -mfloat-abi=hard   -mfpu=vfpv4 '#-mfpu=vfpv4  -mfloat-abi=softfp
     #env['CFLAGS']= ' -march='+arch
 
 elif arch_type=='xtensa':

@@ -1,0 +1,40 @@
+# coding:utf-8
+# *******************************************************************
+# * Copyright 2021-2080 evilbinary
+# * 作者: evilbinary on 01/01/20
+# * 邮箱: rootdebug@163.com
+# ********************************************************************
+import os
+
+Import('env')               
+
+current=Dir('.').srcnode().path+'/../'
+
+linkflags=' $LDFLAGS -nostdlib -nostartfiles -T boot/riscv/link.ld'
+cflags= '$CFLAGS -fno-stack-protector  '
+
+include=[
+    '.',
+    'include',
+    '../../duck',
+    '../../duck/platform/'+env['PLATFORM']
+]
+
+
+source=[ 
+    'boot.o',
+    'init.c',
+    'config.h'
+    ]
+
+
+boot_source= ['boot.s']
+
+
+env.GenerateKernelSize('config.h',['../../duck/init/kernel'])
+env.Object('boot.o',boot_source,ASFLAGS='$ASFLAGS')
+env.Program(target ='init.elf', source = source,
+    CPPPATH=include,
+    CFLAGS=cflags,
+    LINKFLAGS= linkflags)
+env.Objcopy('init.bin','init.elf',OBJCOPYFLAGS='-O binary -S --strip-debug')
