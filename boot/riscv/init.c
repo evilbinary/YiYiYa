@@ -7,8 +7,12 @@
 
 #include "gpio.h"
 
-boot_info_t* boot_info = NULL;
-boot_info_t boot_data;
+#ifdef SBI
+#include "sbi.h"
+#endif
+
+static boot_info_t* boot_info = NULL;
+static boot_info_t boot_data;
 int cpu_id = 0;
 
 void io_write32(uint port, u32 data) { *(u32*)port = data; }
@@ -27,9 +31,14 @@ u8 io_read8(uint port) {
   return data;
 }
 
-void cls() {}
-
 #if defined(RISCV_VIRT)
+#ifdef SBI
+void init_uart() {}
+
+void uart_send_ch(unsigned int c) { sbi_console_putchar(c); }
+
+char uart_get_ch() { return sbi_console_getchar(); }
+#else
 void init_uart() {
   io_write8(UART_BASE + REG_IER, 0);
   io_write8(UART_BASE + REG_LCR, 0x80);
@@ -42,13 +51,13 @@ void init_uart() {
   io_write8(UART_BASE + REG_LCR, 1);
 }
 
-void uart_send(unsigned int c) {
+void uart_send_ch(unsigned int c) {
   while ((io_read8(UART_BASE + REG_LSR) & (1 << 5)) == 0)
     ;
   io_write32(UART_BASE + REG_THR, c);
 }
 
-char uart_getc() {
+char uart_get_ch() {
   char c;
   c = io_read8(UART_BASE + REG_LSR);
 
@@ -57,26 +66,26 @@ char uart_getc() {
   }
   return -1;
 }
-
+#endif
 #else
 void init_uart() {}
 
-void uart_send(unsigned int c) {
+void uart_send_ch(unsigned int c) {
   while (((io_read32(0x20000000 + 0x60014)) & 0x20) == 0)
     ;
   io_write32(0x20000000 + 0x60000, c);
 }
 
-char uart_getc() {
+char uart_get_ch() {
   if ((io_read32(0x20000000 + 0x60014) & 0x01) == 0) return 0;
   return io_read32(0x20000000 + 0x60000);
 }
 
 #endif
 
-void print_string(const unsigned char* str) {
+static void print_string(const unsigned char* str) {
   while (*str) {
-    uart_send(*str);
+    uart_send_ch(*str);
     ++str;
   }
 }
@@ -126,7 +135,7 @@ void printf(const char* format, ...) {
 
   while ((c = *format++) != 0) {
     if (c != '%')
-      putc(c);
+      uart_send_ch(c);
     else {
       char* p;
 
@@ -145,11 +154,11 @@ void printf(const char* format, ...) {
           if (!p) p = "(null)";
 
         string:
-          while (*p) putc(*p++);
+          while (*p) uart_send_ch(*p++);
           break;
 
         default:
-          putc(*((int*)arg++));
+          uart_send_ch(*((int*)arg++));
           break;
       }
     }
@@ -197,12 +206,21 @@ void init_memory() {
   // boot_info->total_memory += ptr->length;
   // ptr++;
   // count++;
+#ifdef SBI
+  ptr->base = 0x80100000;
+  ptr->length = 0x1000000 * 4;  // 16M*4
+  ptr->type = 1;
+  boot_info->total_memory += ptr->length;
+  ptr++;
+  count++;
+#else
   ptr->base = 0x80000000;
   ptr->length = 0x1000000 * 4;  // 16M*4
   ptr->type = 1;
   boot_info->total_memory += ptr->length;
   ptr++;
   count++;
+#endif
 #else
   //
   ptr->type = 1;
@@ -237,16 +255,24 @@ void init_cpu() {
 void read_kernel() {}
 
 void init_boot() {
-  init_uart();
+#ifdef SBI
 
+#else
+  // pmp配置
+  asm("csrw pmpcfg0, 0xf\n"
+      "li t0, 0x80000000\n"
+      "csrw pmpaddr0, t0\n");
+
+#endif
+
+  init_uart();
   init_boot_info();
-  cls();
-  putc('b');
-  putc('o');
-  putc('o');
-  putc('t');
-  putc('\n');
-  putc('\r');
+  uart_send_ch('b');
+  uart_send_ch('o');
+  uart_send_ch('o');
+  uart_send_ch('t');
+  uart_send_ch('\n');
+  uart_send_ch('\r');
   printf("boot info addr %x\n\r", boot_info);
 
   print_string("init display\n\r");
@@ -275,7 +301,6 @@ void init_boot() {
 }
 
 void init_apu_boot() {
-  cls();
   printf("boot apu info addr %x\n\r", boot_info);
   start_apu_kernel();
   for (;;)
@@ -298,7 +323,7 @@ void* memmove32(void* s1, const void* s2, u32 n) {
   }
 }
 
-void load_elf(Elf32_Ehdr* elf_header) {
+static void load_elf(Elf32_Ehdr* elf_header) {
   // printf("e_phnum:%d\n\r", elf_header->e_phnum);
   u16* elf = elf_header;
   Elf32_Phdr* phdr = (elf + elf_header->e_phoff / 2);
@@ -331,7 +356,6 @@ void load_elf(Elf32_Ehdr* elf_header) {
                phdr[i].p_filesz);
         memmove32(vaddr, start, phdr[i].p_memsz);
         printf("move end\n\r");
-
         int num = boot_data.segments_number++;
         boot_data.segments[num].start = vaddr;
         boot_data.segments[num].size = phdr[i].p_memsz;
@@ -371,7 +395,6 @@ void load_elf(Elf32_Ehdr* elf_header) {
       u32* phstart = (u32)elf + shdr[i].sh_offset;
       memset(vaddr, 0, shdr->sh_size);
       memmove32(phstart, vaddr, shdr[i].sh_size);
-
       // int num = boot_data.segments_number++;
       // boot_data.segments[num].start = vaddr;
       // boot_data.segments[num].size = phdr[i].p_memsz;
@@ -414,13 +437,30 @@ void* load_kernel() {
     return elf;
   }
 }
+#ifdef SINGLE_KERNEL
+extern int __bss_start__, __bss_end__;
+extern int __start, __end;
+
+void get_segment() {
+  int num = boot_data.segments_number++;
+  boot_data.segments[num].start = &__start;
+  boot_data.segments[num].size = &__end - &__start;
+  boot_data.segments[num].type = 1;
+}
+#endif
 
 // start kernel
 void start_kernel() {
+#ifdef SINGLE_KERNEL
+  get_segment();
+  extern void kstart(int argc, char* argv[], char** envp);
+  entry start = kstart;
+#else
   boot_info->kernel_entry = load_kernel();
   entry start = boot_info->kernel_entry;
   printf("kernel entry %x\n\r", boot_info->kernel_entry);
   // print_hex(boot_info->kernel_entry);
+#endif
 
   int argc = 0;
   char** argv = 0;

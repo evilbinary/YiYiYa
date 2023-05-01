@@ -36,6 +36,7 @@ ARFLAGS = 'rc'
 OBJCOPYFLAGS = ' -S -g'
 LINKFLAGS = '-nostdlib -nostartfiles -e start  -g '
 LINKLD = 'link-'+platform+'.ld'+ '' # -Map=kernel.map 
+SINGLE_KERNEL = False
 
 # ******************************************************************** #
 
@@ -83,12 +84,13 @@ LD = CC_PREFIX+'ld'
 AS = CC_PREFIX+'as'
 OBJCOPY = CC_PREFIX+'objcopy'
 RANLIB = CC_PREFIX+'ranlib'
-CFLAGS = '-fstack-protector -nostdlib -nostdinc  -fno-builtin -mcmodel=medany  -march=rv32imac -mabi=ilp32 -g -Wall' #-fstack-protector -mapcs-frame mov ip, sp 特权模式下 -fstack-protector   -fstack-protector-all  -DMALLOC_TRACE -fno-omit-frame-pointer
-LDFLAGS='  -nostdlib -march=rv32imac -mabi=ilp32  -mcmodel=medany '
+CFLAGS = ' -fstack-protector -nostdlib -nostdinc  -fno-builtin -mcmodel=medany  -march=rv32imaczicsr -mabi=ilp32 -g -Wall' #-fstack-protector -mapcs-frame mov ip, sp 特权模式下 -fstack-protector   -fstack-protector-all  -DMALLOC_TRACE -fno-omit-frame-pointer -DSBI 
+LDFLAGS='  -nostdlib -march=rv32imaczicsr -mabi=ilp32  -mcmodel=medany '
 LINKFLAGS='   '
-LINKLD = 'link-'+platform+'.ld'+ '' # -Map=kernel.map 
-ASFLAGS= ' -march=rv32imac -mabi=ilp32 '
 
+LINKLD = 'link-'+platform+'-sbi.ld'+ '' # -Map=kernel.map 
+ASFLAGS= ' -march=rv32imaczicsr -mabi=ilp32 '
+# SINGLE_KERNEL= True
 
 default_apps = False
 

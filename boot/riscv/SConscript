@@ -31,10 +31,20 @@ source=[
 boot_source= ['boot.s']
 
 
-env.GenerateKernelSize('config.h',['../../duck/init/kernel'])
-env.Object('boot.o',boot_source,ASFLAGS='$ASFLAGS')
-env.Program(target ='init.elf', source = source,
-    CPPPATH=include,
-    CFLAGS=cflags,
-    LINKFLAGS= linkflags)
-env.Objcopy('init.bin','init.elf',OBJCOPYFLAGS='-O binary -S --strip-debug')
+
+if env.get('SINGLE_KERNEL'):
+    source=[ 
+    'init.c',
+    ]
+    env.Object('boot.o',boot_source,ASFLAGS='$ASFLAGS')
+    env.Object('init.o',source,ASFLAGS='$ASFLAGS $CFLAGS',CPPPATH=include,
+        CFLAGS=cflags,
+        LINKFLAGS= linkflags)
+else:
+    env.GenerateKernelSize('config.h',['../../duck/init/kernel'])
+    env.Object('boot.o',boot_source,ASFLAGS='$ASFLAGS')
+    env.Program(target ='init.elf', source = source,
+        CPPPATH=include,
+        CFLAGS=cflags,
+        LINKFLAGS= linkflags)
+    env.Objcopy('init.bin','init.elf',OBJCOPYFLAGS='-O binary -S --strip-debug')

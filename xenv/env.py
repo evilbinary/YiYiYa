@@ -125,6 +125,7 @@ env = Environment(
         DEFAULT_LIBC=default_libc,
         CC_LIB_PATH=CC_LIB_PATH,
         MODULES=modules,
+        SINGLE_KERNEL= SINGLE_KERNEL,
         )
 
 autogen.generate(env)
@@ -151,6 +152,9 @@ elif plt=='Darwin':
 
 if env.get('DEFAULT_LIBC') == 'libmusl':
     env['CFLAGS']+=' -DLIBC_POSIX '
+
+if env.get('SINGLE_KERNEL'):
+    env['CFLAGS']+=' -DSINGLE_KERNEL '
 
 if arch_type == 'x86':
     if platform=='x86_duck':

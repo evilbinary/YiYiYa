@@ -74,7 +74,12 @@ elif env.get('ARCHTYPE')=='general':
   run_qemu_cmd ='duck/init/kernel.elf'
   debug_qemu_cmd = 'lldb '+run_qemu_cmd
 elif env.get('ARCHTYPE')=='riscv':
-  run_qemu_cmd='qemu-system-riscv32 -name YiYiYa -M virt -bios none -rtc base=localtime -kernel image/duck.img -drive id=disk,file=image/disk.img -serial stdio -D ./qemu.log   ' #-serial stdio -d in_asm -d cpu_reset -d in_asm,int,mmu
+  kernel='image/duck.img'
+  bios='none'
+  if env.get('SINGLE_KERNEL'):
+    kernel='duck/init/kernel.elf'
+    bios='default'
+  run_qemu_cmd='qemu-system-riscv32 -name YiYiYa -M virt -bios %s -rtc base=localtime -kernel %s -drive id=disk,file=image/disk.img -serial stdio -D ./qemu.log   '%(bios,kernel) #-serial stdio -d in_asm -d cpu_reset -d in_asm,int,mmu
   debug_qemu_cmd =run_qemu_cmd+' -S -s -monitor tcp:127.0.0.1:55555,server,nowait'
 else:
   print('no support run')
