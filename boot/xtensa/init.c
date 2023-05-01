@@ -362,10 +362,17 @@ void start_kernel() {
 			DPORT_FLASH_MMU_TABLE_INVALID_VAL;
 	}
 
-
+#ifdef SINGLE_KERNEL
+  // get_segment();
+  extern void kstart(int argc, char* argv[], char** envp);
+  entry start = kstart;
+#else
   boot_info->kernel_entry = load_kernel();
   entry start = boot_info->kernel_entry;
   printf("kernel entry %x\n", boot_info->kernel_entry);
+#endif
+
+
 
   DPORT_REG_CLR_BIT(DPORT_PRO_CACHE_CTRL1_REG,
 			(DPORT_PRO_CACHE_MASK_IRAM0) |
