@@ -9,7 +9,7 @@ default_libc = 'libmusl'  # libmusl libc libnewlib
 
 # board select platform,选择你要编译的平台
 #riscv-virt dmulator i386-pc v3s raspi2 esp32 stm32f4xx raspi3 rk3128 rk3288 cubieboard2 dummy rk3288 orangepi-pc
-platform = 'stm32f4xx'
+platform = 'esp32'
 
 # 是否要构建应用
 default_apps = True
@@ -98,21 +98,21 @@ LDFLAGS=''
 
 # osx armv7 配置实例
 
-CC_PATH = ''
-CC_PREFIX = 'arm-none-eabi-'
-CC_LIB_PATH = ''
-CC = CC_PREFIX+'gcc'
-AR = CC_PREFIX+'ar'
-LD = CC_PREFIX+'ld'
-AS = CC_PREFIX+'as'
-OBJCOPY = CC_PREFIX+'objcopy'
-RANLIB = CC_PREFIX+'ranlib'
-CFLAGS = '-DSTM32F401xC -fstack-protector -nostdlib -nostdinc  -fno-builtin' #-fstack-protector -mapcs-frame -fstack-protector   -fstack-protector-all  -DMALLOC_TRACE -fno-omit-frame-pointer -DSTM32F401xC -DSTM32F429xx
-LDFLAGS=' -nostdlib '
-LINKLD = 'link-'+platform+'.ld'+ ' -Wl,-Map=kernel.map ' # -Map=kernel.map 
-SINGLE_KERNEL= True #单个文件 kernel.elf
+# CC_PATH = ''
+# CC_PREFIX = 'arm-none-eabi-'
+# CC_LIB_PATH = ''
+# CC = CC_PREFIX+'gcc'
+# AR = CC_PREFIX+'ar'
+# LD = CC_PREFIX+'ld'
+# AS = CC_PREFIX+'as'
+# OBJCOPY = CC_PREFIX+'objcopy'
+# RANLIB = CC_PREFIX+'ranlib'
+# CFLAGS = '-DSTM32F401xC -fstack-protector -nostdlib -nostdinc  -fno-builtin' #-fstack-protector -mapcs-frame -fstack-protector   -fstack-protector-all  -DMALLOC_TRACE -fno-omit-frame-pointer -DSTM32F401xC -DSTM32F429xx
+# LDFLAGS=' -nostdlib '
+# LINKLD = 'link-'+platform+'.ld'+ ' -Wl,-Map=kernel.map ' # -Map=kernel.map 
+# SINGLE_KERNEL= True #单个文件 kernel.elf
 
-default_apps = False
+# default_apps = False
 
 
 # osx i368 配置实例
@@ -216,12 +216,18 @@ default_apps = False
 
 # osx xteansa 配置实例
 
-# CC_PATH='~/.espressif/tools/xtensa-esp32-elf/esp-2021r1-8.4.0/xtensa-esp32-elf/bin/'
-# CC_PREFIX='xtensa-esp32-elf-gcc'
-# CC_LIB_PATH='/Users/evil/.espressif/tools/xtensa-esp32-elf/esp-2021r1-8.4.0/xtensa-esp32-elf/lib/gcc/xtensa-esp32-elf/8.4.0/'
-# CC = CC_PREFIX+'gcc'
-# AR = CC_PREFIX+'ar'
-# LD = CC_PREFIX+'ld'
-# AS = CC_PREFIX+'as'
-# OBJCOPY = CC_PREFIX+'objcopy'
-# RANLIB = CC_PREFIX+'ranlib'
+CC_PATH='~/.espressif/tools/xtensa-esp32-elf/esp-2021r1-8.4.0/xtensa-esp32-elf/bin/'
+CC_PREFIX=CC_PATH+'xtensa-esp32-elf-'
+CC_LIB_PATH=''
+CC = CC_PREFIX+'gcc'
+AR = CC_PREFIX+'ar'
+LD = CC_PREFIX+'ld'
+AS = CC_PREFIX+'as'
+OBJCOPY = CC_PREFIX+'objcopy'
+RANLIB = CC_PREFIX+'ranlib'
+CFLAGS = '-fstack-protector '
+LINKFLAGS = ' -nostartfiles -e _start  -g '
+
+# SINGLE_KERNEL= True #单个文件 kernel.elf
+
+default_apps = False

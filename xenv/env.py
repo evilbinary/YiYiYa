@@ -180,7 +180,7 @@ elif arch_type == 'arm':
 
 elif arch_type=='xtensa':
     env['APP']=False
-    env['LINKLD']='xlinker/link-'+platform+'.ld'
+    env['LINKLD']='link-'+platform+'.ld'
     pass
 
 

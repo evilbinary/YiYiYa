@@ -8,6 +8,14 @@ import os
 
 Import('env')               
 
+linkflags=' $LDFLAGS -nostdlib -nostartfiles -T boot/xtensa/link.ld'
+cflags= '$CFLAGS -fno-stack-protector  '
+include=[
+    '.',
+    'include',
+    '../../duck',
+    '../../duck/platform/'+env['PLATFORM']
+]
 
 env.GenerateKernelSize('config.h',['../../duck/init/kernel'])
 
@@ -23,9 +31,23 @@ source = [
 if env.get('MYLIB'):
     source.append(env.get('MYLIB'))
 
-env.Program(target ='init.elf', source=source,
-    CFLAGS='$CFLAGS -I. -Iinclude',
-    LINKFLAGS= '-nostdlib -nostartfiles -T boot/xtensa/link.ld'
-    )
+if env.get('SINGLE_KERNEL'):
+    boot_source=[
+        'boot.s'
+    ]
+    source=[
+        'init.c',
+        'esp32.c',
+    ]
+    env.Object('boot.o',boot_source,ASFLAGS='$ASFLAGS')
+    env.Object('init.o',source,ASFLAGS='$ASFLAGS $CFLAGS',CPPPATH=include,
+        CFLAGS=cflags,
+        LINKFLAGS= linkflags)
+else:
+    # env.GenerateKernelSize('config.h',['../../duck/init/kernel'])
+    env.Program(target ='init.elf', source = source,
+        CPPPATH=include,
+        CFLAGS=cflags,
+        LINKFLAGS= linkflags)
 
-env.Objcopy('init.bin','init.elf',OBJCOPYFLAGS='-O binary -S --strip-debug')
+    env.Objcopy('init.bin','init.elf',OBJCOPYFLAGS='-O binary -S --strip-debug')
