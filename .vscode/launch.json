@@ -658,6 +658,8 @@
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
             "program": "${workspaceRoot}/boot/riscv/init.elf",
+            // "program": "${workspaceRoot}/duck/init/kernel.elf",
+
             "cwd": "${workspaceRoot}",
             "args": [],
             "sourceFileMap": {

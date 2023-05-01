@@ -2,6 +2,16 @@
 
 linux下开发环境比较简单，以ubuntu举例。
 
+### 安装gcc
+
+```bash
+#arm 版本的gcc
+apt install arm-none-eabi-gcc
+# i386版本的gcc
+apt-get install libc6-dev:i386 gcc:i386
+```
+
+
 ### 安装scons
 
 ```bash
