@@ -47,9 +47,14 @@ else:
     linkflags='-nostdlib -nostartfiles -T boot/arm/link-'+env['PLATFORM']+'.ld'
     pass
 
-if env['PLATFORM']=='stm32f4xx':
-    env.Object('boot.o',boot_source,ASFLAGS='')
-    env.Object('init.o',source,ASFLAGS='', CFLAGS=cflags,LINKFLAGS= linkflags)
+if env.get('SINGLE_KERNEL'):
+    source=[ 
+    'init.c',
+    ]
+    env.Object('boot.o',boot_source,ASFLAGS='$ASFLAGS')
+    env.Object('init.o',source,ASFLAGS='$ASFLAGS $CFLAGS',CPPPATH=include,
+        CFLAGS=cflags,
+        LINKFLAGS= linkflags)
 else:
     env.GenerateKernelSize('config.h',['../../duck/init/kernel'])
     env.Object('boot.o',boot_source,ASFLAGS='')

@@ -15,7 +15,7 @@
 .type  boot_reset_handler, %function
 _start:
 boot_reset_handler:  
-    ldr   sp, =_estack
+    ldr   sp, =_stack_svc
     cpsid i
     bl init_boot
     
@@ -38,7 +38,7 @@ boot_systick_handler:
     b boot_halt
 
 .section  .isr_vector,"a",%progbits
-  .word  _estack
+  .word  _stack_svc
   .word  boot_reset_handler
   .word  boot_nmi_handler
   .word  boot_hardfault_handler

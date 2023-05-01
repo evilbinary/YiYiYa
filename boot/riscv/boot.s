@@ -10,7 +10,8 @@ la sp,_stack_svc
 la t0, _stack_irq
 csrw  sscratch, t0
 mv  gp, zero
-li   t0, 0x40000
+
+li   t0, 0x40100
 csrs sstatus,t0
 
 csrw satp, zero

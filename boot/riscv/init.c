@@ -207,12 +207,20 @@ void init_memory() {
   // ptr++;
   // count++;
 #ifdef SBI
-  ptr->base = 0x80100000;
+  ptr->base = 0x80220000;
   ptr->length = 0x1000000 * 4;  // 16M*4
   ptr->type = 1;
   boot_info->total_memory += ptr->length;
   ptr++;
   count++;
+
+  ptr->type = 2;
+  ptr->base = (u32)boot_info->kernel_base;
+  ptr->length = (u32)boot_info->kernel_size;
+  boot_info->total_memory += ptr->length;
+  ptr++;
+  count++;
+
 #else
   ptr->base = 0x80000000;
   ptr->length = 0x1000000 * 4;  // 16M*4
@@ -444,7 +452,7 @@ extern int __start, __end;
 void get_segment() {
   int num = boot_data.segments_number++;
   boot_data.segments[num].start = &__start;
-  boot_data.segments[num].size = &__end - &__start;
+  boot_data.segments[num].size = &__end - &__start ;
   boot_data.segments[num].type = 1;
 }
 #endif

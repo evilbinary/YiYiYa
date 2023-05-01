@@ -7,8 +7,8 @@
 
 #include "gpio.h"
 
-boot_info_t* boot_info = NULL;
-boot_info_t boot_data;
+static boot_info_t* boot_info = NULL;
+static boot_info_t boot_data;
 int cpu_id = 0;
 
 void io_write32(uint port, u32 data) { *(u32*)port = data; }
@@ -18,8 +18,6 @@ u32 io_read32(uint port) {
   data = *(u32*)port;
   return data;
 }
-
-void cls() {}
 
 #if defined(V3S) || defined(CUBIEBOARD2)
 void init_uart() {
@@ -68,14 +66,14 @@ void init_uart() {
   io_write32(addr + 0x0c, val);
 }
 
-void uart_send(unsigned int c) {
+void uart_send_ch(unsigned int c) {
   u32 addr = 0x01c28000;
   while ((io_read32(addr + 0x7c) & (0x1 << 1)) == 0)
     ;
   io_write32(addr + 0x00, c);
 }
 
-char uart_getc() {
+char uart_get_ch() {
   char r;
   /* wait until something is in the buffer */
   do {
@@ -118,13 +116,13 @@ void init_uart() {
   *UART0_CR = 0x301;        // enable Tx, Rx, FIFO
 }
 
-void uart_send(unsigned int c) {
+void uart_send_ch(unsigned int c) {
   while (io_read32(UART0_FR) & 0x20) {
   }
   io_write32(UART0_DR, c);
 }
 
-char uart_getc() {
+char uart_get_ch() {
   unsigned int c;
   while (io_read32(UART0_FR) & 0x10) {
   }
@@ -135,13 +133,13 @@ char uart_getc() {
 #elif defined(STM32F4XX)
 void init_uart() {}
 
-void uart_send(unsigned int c) {
+void uart_send_ch(unsigned int c) {
   // u32 addr = 0x01c28000;
   // while((io_read32(addr + 0x7c) & (0x1 << 1)) == 0);
   // io_write32(addr + 0x00, c);
 }
 
-char uart_getc() {
+char uart_get_ch() {
   // char r;
   // /* wait until something is in the buffer */
   // do{asm volatile("nop");}while(*UART0_FR&0x10);
@@ -154,22 +152,22 @@ char uart_getc() {
 #elif defined(RK3128)
 void init_uart() {}
 
-void uart_send(unsigned int c) {
+void uart_send_ch(unsigned int c) {
   while (((io_read32(0x20000000 + 0x60014)) & 0x20) == 0)
     ;
   io_write32(0x20000000 + 0x60000, c);
 }
 
-char uart_getc() {
+char uart_get_ch() {
   if ((io_read32(0x20000000 + 0x60014) & 0x01) == 0) return 0;
   return io_read32(0x20000000 + 0x60000);
 }
 
 #endif
 
-void print_string(const unsigned char* str) {
+static void print_string(const unsigned char* str) {
   while (*str) {
-    uart_send(*str);
+    uart_send_ch(*str);
     ++str;
   }
 }
@@ -340,7 +338,6 @@ void init_boot() {
   init_uart();
 
   init_boot_info();
-  cls();
   putc('b');
   putc('o');
   putc('o');
@@ -375,7 +372,6 @@ void init_boot() {
 }
 
 void init_apu_boot() {
-  cls();
   printf("boot apu info addr %x\n\r", boot_info);
   start_apu_kernel();
   for (;;)
@@ -398,7 +394,7 @@ void* memmove32(void* s1, const void* s2, u32 n) {
   }
 }
 
-void load_elf(Elf32_Ehdr* elf_header) {
+static void load_elf(Elf32_Ehdr* elf_header) {
   // printf("e_phnum:%d\n\r", elf_header->e_phnum);
   u16* elf = elf_header;
   Elf32_Phdr* phdr = (elf + elf_header->e_phoff / 2);
