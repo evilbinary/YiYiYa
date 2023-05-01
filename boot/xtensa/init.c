@@ -5,9 +5,10 @@
  ********************************************************************/
 #include "init.h"
 #include "gpio.h"
+#include "esp32.h"
 
-boot_info_t* boot_info = NULL;
-boot_info_t boot_data;
+static boot_info_t* boot_info = NULL;
+static boot_info_t boot_data;
 
 typedef int (*entry)(int, char**, char**);
 typedef void (*rom_write_char_uart_fn)(char c);
@@ -26,7 +27,7 @@ volatile unsigned char* const UART0_PTR = (unsigned char*)0x0101f1000;
 
 rom_printf_fn printf = 0x40007d54;
 rom_spiflash_read_fn disk_read_lba = 0x40062ed8;
-rom_write_char_uart_fn send = 0x40007cf8;
+rom_write_char_uart_fn esp_send = 0x40007cf8;
 rom_cache_flash_mmu_set_fn cache_flash_mmu_set= 0x400095e0;
 rom_cache_read_enable_fn cache_read_enable= 0x40009a84;
 rom_cache_flush_fn cache_flush=0x40009a14;
@@ -46,14 +47,12 @@ u32 io_read32(uint port) {
   return data;
 }
 
-void cls() {}
-
 void init_uart() {
   u32 addr;
   u32 val;
 }
 
-void uart_send(u8 c) { send(c); }
+void uart_send_ch(u8 c) { esp_send(c); }
 
 char uart_getc() {
   // char r;
@@ -65,16 +64,16 @@ char uart_getc() {
   // return r=='\r'?'\n':r;
 }
 
-void print_string(const unsigned char* str) {
+static void print_string(const unsigned char* str) {
   while (*str) {
-    uart_send(*str);
+    uart_send_ch(*str);
     ++str;
   }
 }
 
 void getch() { uart_getc(); }
 
-void print_char(char s) { uart_send(s); }
+static void print_char(char s) { uart_send_ch(s); }
 
 void display(const char* string) { print_string(string); }
 
@@ -169,7 +168,6 @@ void init_boot() {
   display("hello duck\n");
   init_boot_info();
   display("init boot info end\n");
-  cls();
 
   printf("boot info addr %x\n\r", boot_info);
 
@@ -200,7 +198,7 @@ void init_boot() {
 
 #define read16(addr) ((*(u32*)addr) & 0xff)
 
-void load_elf(Elf32_Ehdr* elf_header) {
+static void load_elf(Elf32_Ehdr* elf_header) {
   u32 e_phnum = read16(&elf_header->e_phnum);
   printf("e_phnum:%d\n", e_phnum);
   u32 elf = KERNEL_FLASH_ADDR;

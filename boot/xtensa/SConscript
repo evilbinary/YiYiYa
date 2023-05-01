@@ -17,9 +17,7 @@ include=[
     '../../duck/platform/'+env['PLATFORM']
 ]
 
-env.GenerateKernelSize('config.h',['../../duck/init/kernel'])
 
-env.Object('boot', ['boot.s'],ASFLAGS='')
 
 source = [
     'boot.o',
@@ -37,14 +35,13 @@ if env.get('SINGLE_KERNEL'):
     ]
     source=[
         'init.c',
-        'esp32.c',
     ]
     env.Object('boot.o',boot_source,ASFLAGS='$ASFLAGS')
     env.Object('init.o',source,ASFLAGS='$ASFLAGS $CFLAGS',CPPPATH=include,
         CFLAGS=cflags,
         LINKFLAGS= linkflags)
 else:
-    # env.GenerateKernelSize('config.h',['../../duck/init/kernel'])
+    env.GenerateKernelSize('config.h',['../../duck/init/kernel'])
     env.Program(target ='init.elf', source = source,
         CPPPATH=include,
         CFLAGS=cflags,

@@ -228,6 +228,6 @@ RANLIB = CC_PREFIX+'ranlib'
 CFLAGS = '-fstack-protector '
 LINKFLAGS = ' -nostartfiles -e _start  -g '
 
-# SINGLE_KERNEL= True #单个文件 kernel.elf
+SINGLE_KERNEL= True #单个文件 kernel.elf
 
 default_apps = False
