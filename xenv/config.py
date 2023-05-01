@@ -107,11 +107,10 @@ LD = CC_PREFIX+'ld'
 AS = CC_PREFIX+'as'
 OBJCOPY = CC_PREFIX+'objcopy'
 RANLIB = CC_PREFIX+'ranlib'
-CFLAGS = '-fstack-protector -nostdlib -nostdinc  -fno-builtin' #-fstack-protector -mapcs-frame mov ip, sp 特权模式下 -fstack-protector   -fstack-protector-all  -DMALLOC_TRACE -fno-omit-frame-pointer
+CFLAGS = '-DSTM32F401xC -fstack-protector -nostdlib -nostdinc  -fno-builtin' #-fstack-protector -mapcs-frame -fstack-protector   -fstack-protector-all  -DMALLOC_TRACE -fno-omit-frame-pointer -DSTM32F401xC -DSTM32F429xx
 LDFLAGS=' -nostdlib '
 LINKLD = 'link-'+platform+'.ld'+ ' -Wl,-Map=kernel.map ' # -Map=kernel.map 
 SINGLE_KERNEL= True #单个文件 kernel.elf
-
 
 default_apps = False
 
