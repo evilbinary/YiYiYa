@@ -34,7 +34,7 @@ OBJCOPY = 'objcopy'
 CFLAGS = ''
 ARFLAGS = 'rc'
 OBJCOPYFLAGS = ' -S -g'
-LINKFLAGS = '-nostdlib -nostartfiles -e start  -g '
+LINKFLAGS = '-nostdlib -nostartfiles -e _start  -g '
 LINKLD = 'link-'+platform+'.ld'+ '' # -Map=kernel.map 
 SINGLE_KERNEL = False
 ASFLAGS=''
@@ -107,10 +107,11 @@ LD = CC_PREFIX+'ld'
 AS = CC_PREFIX+'as'
 OBJCOPY = CC_PREFIX+'objcopy'
 RANLIB = CC_PREFIX+'ranlib'
-CFLAGS = '-fstack-protector ' #-fstack-protector -mapcs-frame mov ip, sp 特权模式下 -fstack-protector   -fstack-protector-all  -DMALLOC_TRACE -fno-omit-frame-pointer
-LDFLAGS=' '
-LINKLD = 'link-'+platform+'.ld'+ '' # -Map=kernel.map 
+CFLAGS = '-fstack-protector -nostdlib -nostdinc  -fno-builtin' #-fstack-protector -mapcs-frame mov ip, sp 特权模式下 -fstack-protector   -fstack-protector-all  -DMALLOC_TRACE -fno-omit-frame-pointer
+LDFLAGS=' -nostdlib '
+LINKLD = 'link-'+platform+'.ld'+ ' -Wl,-Map=kernel.map ' # -Map=kernel.map 
 SINGLE_KERNEL= True #单个文件 kernel.elf
+
 
 default_apps = False
 

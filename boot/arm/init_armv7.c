@@ -8,8 +8,8 @@ extern int _estack;
 extern int _sidata;
 extern int __bss_start__,__bss_end__;
 
-boot_info_t *_boot_info = NULL;
-boot_info_t _boot_data;
+static boot_info_t *_boot_info = NULL;
+static boot_info_t _boot_data;
 
 void init_memory() {
   // read memory info

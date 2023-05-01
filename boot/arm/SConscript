@@ -48,9 +48,6 @@ else:
     pass
 
 if env.get('SINGLE_KERNEL'):
-    source=[ 
-    'init.c',
-    ]
     env.Object('boot.o',boot_source,ASFLAGS='$ASFLAGS')
     env.Object('init.o',source,ASFLAGS='$ASFLAGS $CFLAGS',CPPPATH=include,
         CFLAGS=cflags,
