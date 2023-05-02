@@ -229,15 +229,28 @@ elif env.get('run')=='stm32f4xx':
   
 
 elif env.get('run')=='esp32':
-  env.Command('esp32', 
-    [ '../boot/xtensa/init.elf',
-      '../duck/init/kernel'
-    ],
-    ['esptool.py --chip esp32 elf2image --flash_mode="dio" --flash_freq "40m" --flash_size "4MB" -o boot/xtensa/init.bin  ${SOURCES[0]}',
-    # 'esptool.py --chip esp32 elf2image --flash_mode="dio" --flash_freq "40m" --flash_size "4MB" -o init/kernel.bin  ${SOURCES[1]}',
-    'esptool.py --chip esp32 --port /dev/tty.wchusbserial14120 --baud 460800 --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 40m --flash_size detect 0x1000 boot/xtensa/init.bin 0x10000 duck/init/kernel',
-    'idf_monitor.py -p /dev/tty.wchusbserial14120 -b 115200 --toolchain-prefix xtensa-esp32-elf- --target esp32 --revision 0  duck/init/kernel.elf'   #boot/xtensa/init.elf
-  ])
+  if env.get('SINGLE_KERNEL'):
+    env.Command('esp32', 
+      [ 
+        '../duck/init/kernel.elf',
+        '../duck/init/kernel.bin'
+      ],
+      [
+      'esptool.py --chip esp32 elf2image --flash_mode="dio" --flash_freq "40m" --flash_size "4MB" -o duck/init/kernel.bin  ${SOURCES[0]}',
+      'esptool.py --chip esp32 --port /dev/tty.wchusbserial14140 --baud 460800 --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 40m --flash_size detect 0x1000 duck/init/kernel.bin',
+      'idf_monitor.py -p /dev/tty.wchusbserial14140 -b 115200 --toolchain-prefix xtensa-esp32-elf- --target esp32 --revision 0  duck/init/kernel.elf'   #boot/xtensa/init.elf
+    ])
+  else:
+    env.Command('esp32', 
+      [ '../boot/xtensa/init.elf',
+        '../duck/init/kernel.elf',
+        '../duck/init/kernel.bin'
+      ],
+      ['esptool.py --chip esp32 elf2image --flash_mode="dio" --flash_freq "40m" --flash_size "4MB" -o boot/xtensa/init.bin  ${SOURCES[0]}',
+      'esptool.py --chip esp32 elf2image --flash_mode="dio" --flash_freq "40m" --flash_size "4MB" -o duck/init/kernel.bin  ${SOURCES[1]}',
+      'esptool.py --chip esp32 --port /dev/tty.wchusbserial14140 --baud 460800 --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 40m --flash_size detect 0x1000 boot/xtensa/init.bin 0x10000 duck/init/kernel.bin',
+      'idf_monitor.py -p /dev/tty.wchusbserial14140 -b 115200 --toolchain-prefix xtensa-esp32-elf- --target esp32 --revision 0  duck/init/kernel.elf'   #boot/xtensa/init.elf
+    ])
   
 elif env.get('run')=='dmulator':
   print('run start')

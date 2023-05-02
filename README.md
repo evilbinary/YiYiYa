@@ -7,9 +7,17 @@ https://github.com/evilbinary/YiYiYa
 
 ### 编译
 
-提前安装 scons、qemu [开发环境文档](https://github.com/evilbinary/YiYiYa/blob/main/docs/develop/%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83.md)
 
-编译
+1、编译工具安装
+
+提前安装 scons、qemu [开发环境文档](https://github.com/evilbinary/YiYiYa/tree/main/docs/install)
+
+
+2、编译平台配置
+
+配置编译目标平台 [xenv/config.py配置](https://github.com/evilbinary/YiYiYa/blob/main/docs/develop/%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83.md)
+
+3、运行编译命令
 
 ```
 scons

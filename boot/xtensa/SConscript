@@ -22,7 +22,6 @@ include=[
 source = [
     'boot.o',
     'init.c',
-    'esp32.c',
     'config.h'
     ]
 
@@ -36,6 +35,7 @@ if env.get('SINGLE_KERNEL'):
     source=[
         'init.c',
     ]
+    cflags+= ' -DSINGLE_KERNEL '
     env.Object('boot.o',boot_source,ASFLAGS='$ASFLAGS')
     env.Object('init.o',source,ASFLAGS='$ASFLAGS $CFLAGS',CPPPATH=include,
         CFLAGS=cflags,
