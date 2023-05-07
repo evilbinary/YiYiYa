@@ -43,6 +43,8 @@ run_qemu_cmd=''
 debug_qemu_cmd=''
 
 
+boot_loader_path='~/dev/c/esp/esp-idf/examples/custom_bootloader/bootloader_override/build/'
+
 if env.get('ARCHTYPE')=='x86':
   if env.get('ARCH')=='x86-duck':
     run_qemu_cmd='boot/x86-duck/init.elf'
@@ -68,8 +70,8 @@ elif env.get('ARCHTYPE') =='arm':
     # run_qemu_cmd =run_qemu_cmd+' -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor'
     debug_qemu_cmd = run_qemu_cmd +' -S -s'
 elif env.get('ARCHTYPE')=='xtensa':
-  run_qemu_cmd='~/dev/c/esp/qemu/build/qemu-system-xtensa -nographic -M esp32 -drive file=image/flash_image.bin,if=mtd,format=raw -s -serial stdio -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor  -D ./qemu.log -drive if=sd,id=sd0,format=raw,file=image/disk.img -d in_asm -d cpu_reset -d in_asm,int,mmu' #-d in_asm -d cpu_reset -d in_asm,int,mmu
-  debug_qemu_cmd = run_qemu_cmd +' -S -s'
+  run_qemu_cmd='~/dev/qemu-esp32/build/qemu-system-xtensa -nographic -M esp32 -drive file=image/duck.img,if=mtd,format=raw -s -serial stdio -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor  -D ./qemu.log -drive if=sd,id=sd0,format=raw,file=image/disk.img -d in_asm -d cpu_reset -d in_asm,int,mmu' #-d in_asm -d cpu_reset -d in_asm,int,mmu
+  debug_qemu_cmd = run_qemu_cmd +' -S '
 elif env.get('ARCHTYPE')=='general':
   run_qemu_cmd ='duck/init/kernel.elf'
   debug_qemu_cmd = 'lldb '+run_qemu_cmd
@@ -85,6 +87,7 @@ else:
   print('no support run')
 
 def build_duck_image():
+  print('build duck image')
   if env.get('ARCHTYPE')=='x86':
     env.Command('duck.img', 
       [
@@ -132,15 +135,26 @@ def build_duck_image():
           'dd if=${SOURCES[1]} bs=512 count=%s seek=12  conv=notrunc of=$TARGET'%(env.get('KERNEL_SIZE'))
       ])
   elif env.get('ARCHTYPE')=='xtensa':
-    env.Command('esp32', 
-    [ '../boot/xtensa/init.elf',
-      '../duck/init/kernel'
-    ],
-    [
-      'source ~/dev/c/esp/esp-idf/export.sh && esptool.py --chip esp32 elf2image --flash_mode="dio" --flash_freq "40m" --flash_size "4MB" -o boot/xtensa/init.bin  ${SOURCES[0]}',
-    # 'esptool.py --chip esp32 elf2image --flash_mode="dio" --flash_freq "40m" --flash_size "4MB" -o duck/init/kernel.bin  ${SOURCES[1]}',
-    'source ~/dev/c/esp/esp-idf/export.sh && esptool.py --chip esp32 merge_bin --fill-flash-size 4MB -o image/flash_image.bin 0x1000 boot/xtensa/init.bin 0x10000 duck/init/kernel',
-  ])
+    if env.get('SINGLE_KERNEL'):
+      env.Command('esp32', 
+      [ 
+        '../duck/init/kernel.elf',
+        '../duck/init/kernel.bin'
+      ],
+      [
+      'source ~/dev/c/esp/esp-idf/export.sh && esptool.py --chip esp32 elf2image --flash_mode="dio" --flash_freq "40m" --flash_size "4MB" -o duck/init/kernel.bin  ${SOURCES[0]}',
+      'source ~/dev/c/esp/esp-idf/export.sh && esptool.py --chip esp32 merge_bin --fill-flash-size 4MB -o image/duck.img 0x1000 %s/bootloader/bootloader.bin 0x8000 %s/partition_table/partition-table.bin 0x10000 duck/init/kernel.bin'%(boot_loader_path,boot_loader_path),
+      ])
+    else:
+      env.Command('esp32', 
+      [ '../boot/xtensa/init.elf',
+        '../duck/init/kernel'
+      ],
+      [
+        'source ~/dev/c/esp/esp-idf/export.sh && esptool.py --chip esp32 elf2image --flash_mode="dio" --flash_freq "40m" --flash_size "4MB" -o boot/xtensa/init.bin  ${SOURCES[0]}',
+      # 'esptool.py --chip esp32 elf2image --flash_mode="dio" --flash_freq "40m" --flash_size "4MB" -o duck/init/kernel.bin  ${SOURCES[1]}',
+      'source ~/dev/c/esp/esp-idf/export.sh && esptool.py --chip esp32 merge_bin --fill-flash-size 4MB -o image/flash_image.bin 0x1000 boot/xtensa/init.bin 0x10000 duck/init/kernel',
+      ])
   elif env.get('ARCHTYPE')=='riscv':
     env.Command('duck.img', 
         [
@@ -237,7 +251,7 @@ elif env.get('run')=='esp32':
       ],
       [
       'esptool.py --chip esp32 elf2image --flash_mode="dio" --flash_freq "40m" --flash_size "4MB" -o duck/init/kernel.bin  ${SOURCES[0]}',
-      'esptool.py --chip esp32 --port /dev/tty.wchusbserial14140 --baud 460800 --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 40m --flash_size detect 0x1000 duck/init/kernel.bin',
+      'esptool.py --chip esp32 --port /dev/tty.wchusbserial14140 --baud 460800 --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 40m --flash_size detect 0x1000 %s/bootloader/bootloader.bin 0x8000 %s/partition_table/partition-table.bin 0x10000 duck/init/kernel.bin'%(boot_loader_path,boot_loader_path),
       'idf_monitor.py -p /dev/tty.wchusbserial14140 -b 115200 --toolchain-prefix xtensa-esp32-elf- --target esp32 --revision 0  duck/init/kernel.elf'   #boot/xtensa/init.elf
     ])
   else:

@@ -225,8 +225,8 @@ LD = CC_PREFIX+'ld'
 AS = CC_PREFIX+'as'
 OBJCOPY = CC_PREFIX+'objcopy'
 RANLIB = CC_PREFIX+'ranlib'
-CFLAGS = '-fstack-protector '
+CFLAGS = '-fstack-protector -DMALLOC_TRACE '
 LINKFLAGS = ' -nostartfiles -e _start  -g '
-SINGLE_KERNEL= False
+SINGLE_KERNEL= True
 
 default_apps = False

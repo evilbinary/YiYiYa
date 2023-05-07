@@ -1442,7 +1442,7 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            "program": "${workspaceRoot}/init/kernel",
+            "program": "${workspaceRoot}/duck/init/kernel.elf",
             // "program": "${workspaceRoot}/app/hello/hello",
             // "program": "${workspaceRoot}/app/gui/gui",
             // "program": "${workspaceRoot}/app/file/file",
@@ -1463,7 +1463,7 @@
 			],
             // "targetArchitecture": "xtensa-esp32",
             "MIMode": "gdb",
-            "miDebuggerPath": "/Users/evil/.espressif/tools/xtensa-esp32-elf/esp-2021r1-8.4.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-gdb",
+            "miDebuggerPath": "/Users/evil/.espressif/tools/xtensa-esp-elf-gdb/12.1_20221002/xtensa-esp-elf-gdb/bin/xtensa-esp32-elf-gdb",
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
                 // {
