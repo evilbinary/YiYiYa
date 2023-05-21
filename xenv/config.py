@@ -131,7 +131,7 @@ LDFLAGS=' '
 LINKLD = 'link.ld'+ ' -Xlinker -Map=kernel.map ' # 
 
 default_libc = 'libmusl'
-default_apps = False
+default_apps = True
 
 
 # osx x86-64 for demulator 配置实例
