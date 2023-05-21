@@ -10,4 +10,4 @@ halt:
 
 .data
 stack: .space 256
-stack_top:
+_stack_top:

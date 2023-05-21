@@ -4,8 +4,10 @@
  * 邮箱: rootdebug@163.com
  ********************************************************************/
 #include "init.h"
-
+#ifdef SINGLE_KERNEL
+#else
 #include "esp32.h"
+#endif
 #include "gpio.h"
 
 static boot_info_t* boot_info = NULL;
@@ -105,7 +107,7 @@ void init_memory() {
   memory_info_t* ptr = boot_info->memory;
   boot_info->total_memory = 0;
 
-  ptr->base = 0x3FFF0000;
+  ptr->base = &_data_end ;
   ptr->length = 0x100000;  // 16M
   ptr->type = 1;
   boot_info->total_memory += ptr->length;
@@ -157,7 +159,12 @@ void* memmove32(void* s1, const void* s2, u32 n) {
 }
 
 void init_boot() {
+
+#ifdef SINGLE_KERNEL
+
+#else
   bootloader_init();
+#endif
 
   memset(&_bss_start, 0, (&_bss_end - &_bss_start) * sizeof(_bss_start));
 
@@ -375,12 +382,6 @@ void* load_kernel() {
 
 // start kernel
 void start_kernel() {
-  cache_read_disable(0);
-  cache_flush(0);
-
-  for (int i = 0; i < DPORT_FLASH_MMU_TABLE_SIZE; i++) {
-    DPORT_PRO_FLASH_MMU_TABLE[i] = DPORT_FLASH_MMU_TABLE_INVALID_VAL;
-  }
 
 #ifdef SINGLE_KERNEL
   // get_segment();
@@ -388,6 +389,12 @@ void start_kernel() {
   entry start = kstart;
   printf("single kernerl entry %x\n", start);
 #else
+  cache_read_disable(0);
+  cache_flush(0);
+
+  for (int i = 0; i < DPORT_FLASH_MMU_TABLE_SIZE; i++) {
+    DPORT_PRO_FLASH_MMU_TABLE[i] = DPORT_FLASH_MMU_TABLE_INVALID_VAL;
+  }
   boot_info->kernel_entry = load_kernel();
   entry start = boot_info->kernel_entry;
   printf("kernel entry %x\n", boot_info->kernel_entry);

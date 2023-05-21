@@ -225,8 +225,9 @@ LD = CC_PREFIX+'ld'
 AS = CC_PREFIX+'as'
 OBJCOPY = CC_PREFIX+'objcopy'
 RANLIB = CC_PREFIX+'ranlib'
-CFLAGS = '-fstack-protector -DMALLOC_TRACE '
+CFLAGS = '-fstack-protector -ffunction-sections '#-DMALLOC_TRACE  -mtext-section-literals 
 LINKFLAGS = ' -nostartfiles -e _start  -g '
+ASFLAGS ='-Iduck/arch/lx6 -I. -Iarch/lx6 '
 SINGLE_KERNEL= True
 
 default_apps = False
