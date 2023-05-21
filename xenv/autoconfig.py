@@ -21,8 +21,8 @@ def parms(target, source, env):
     if 'AutoConfigParams' in env.Dictionary().keys():
         params = env['AutoConfigParams']
         if not isinstance(params, list):
-            print('AutoConfigParams must be a sequence')
-            Exit(1)
+            print('AutoConfigParams must be a sequence',params)
+            #Exit(1)
     targetfile = 'config.h'
     if 'AutoConfigTarget' in env.Dictionary().keys():
         targetfile = env['AutoConfigTarget']

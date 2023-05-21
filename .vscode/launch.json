@@ -19,7 +19,7 @@
             },
             "targetArchitecture": "x86",
             "MIMode": "gdb",
-            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerPath": "/usr/local/Cellar/gdb/13.1/bin/gdb",
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
                 // {
@@ -54,7 +54,7 @@
             },
             "targetArchitecture": "x86",
             "MIMode": "gdb",
-            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerPath": "/usr/local/Cellar/gdb/13.1/bin/gdb",
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
                 // {
@@ -89,7 +89,7 @@
             },
             "targetArchitecture": "x86",
             "MIMode": "gdb",
-            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerPath": "/usr/local/Cellar/gdb/13.1/bin/gdb",
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
                 // {
@@ -125,7 +125,7 @@
             },
             "targetArchitecture": "x86",
             "MIMode": "gdb",
-            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerPath": "/usr/local/Cellar/gdb/13.1/bin/gdb",
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
                 // {
@@ -161,7 +161,7 @@
             },
             "targetArchitecture": "x86",
             "MIMode": "gdb",
-            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerPath": "/usr/local/Cellar/gdb/13.1/bin/gdb",
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
                 // {
@@ -231,7 +231,7 @@
             },
             "targetArchitecture": "x86",
             "MIMode": "gdb",
-            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerPath": "/usr/local/Cellar/gdb/13.1/bin/gdb",
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
                 // {
@@ -301,7 +301,7 @@
             },
             "targetArchitecture": "x86",
             "MIMode": "gdb",
-            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerPath": "/usr/local/Cellar/gdb/13.1/bin/gdb",
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
                 // {
@@ -337,7 +337,7 @@
             },
             "targetArchitecture": "x86",
             "MIMode": "gdb",
-            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerPath": "/usr/local/Cellar/gdb/13.1/bin/gdb",
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
                 // {
@@ -372,7 +372,7 @@
             },
             "targetArchitecture": "x86",
             "MIMode": "gdb",
-            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerPath": "/usr/local/Cellar/gdb/13.1/bin/gdb",
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
                 // {
@@ -408,7 +408,7 @@
             },
             "targetArchitecture": "x86",
             "MIMode": "gdb",
-            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerPath": "/usr/local/Cellar/gdb/13.1/bin/gdb",
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
                 // {
@@ -444,7 +444,7 @@
             },
             "targetArchitecture": "x86",
             "MIMode": "gdb",
-            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerPath": "/usr/local/Cellar/gdb/13.1/bin/gdb",
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
                 // {
@@ -480,7 +480,7 @@
             },
             "targetArchitecture": "x86",
             "MIMode": "gdb",
-            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerPath": "/usr/local/Cellar/gdb/13.1/bin/gdb",
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
                 // {
@@ -516,7 +516,7 @@
             },
             "targetArchitecture": "x86",
             "MIMode": "gdb",
-            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerPath": "/usr/local/Cellar/gdb/13.1/bin/gdb",
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
                 // {
@@ -558,7 +558,7 @@
             },
             "targetArchitecture": "x86",
             "MIMode": "gdb",
-            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerPath": "/usr/local/Cellar/gdb/13.1/bin/gdb",
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
                 // {
@@ -594,7 +594,7 @@
             },
             "targetArchitecture": "x86",
             "MIMode": "gdb",
-            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerPath": "/usr/local/Cellar/gdb/13.1/bin/gdb",
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
                 // {
@@ -627,7 +627,7 @@
             },
             "targetArchitecture": "x86",
             "MIMode": "gdb",
-            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerPath": "/usr/local/Cellar/gdb/13.1/bin/gdb",
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
                 // {
@@ -705,7 +705,7 @@
             },
             "targetArchitecture": "arm",
             "MIMode": "gdb",
-            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerPath": "/usr/local/Cellar/gdb/13.1/bin/gdb",
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
                 // {
@@ -746,7 +746,7 @@
             // },
             "targetArchitecture": "arm",
             "MIMode": "gdb",
-            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerPath": "/usr/local/Cellar/gdb/13.1/bin/gdb",
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
                 // {
@@ -785,7 +785,7 @@
             // },
             "targetArchitecture": "arm",
             "MIMode": "gdb",
-            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerPath": "/usr/local/Cellar/gdb/13.1/bin/gdb",
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
                 // {
@@ -820,7 +820,7 @@
             // },
             "targetArchitecture": "arm",
             "MIMode": "gdb",
-            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerPath": "/usr/local/Cellar/gdb/13.1/bin/gdb",
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
                 // {
@@ -853,7 +853,7 @@
             // },
             "targetArchitecture": "arm",
             "MIMode": "gdb",
-            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerPath": "/usr/local/Cellar/gdb/13.1/bin/gdb",
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
                 // {
@@ -893,7 +893,7 @@
             // },
             "targetArchitecture": "arm",
             "MIMode": "gdb",
-            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerPath": "/usr/local/Cellar/gdb/13.1/bin/gdb",
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
                 // {
@@ -932,7 +932,7 @@
             // },
             "targetArchitecture": "arm",
             "MIMode": "gdb",
-            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerPath": "/usr/local/Cellar/gdb/13.1/bin/gdb",
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
                 // {
@@ -971,7 +971,7 @@
             // },
             "targetArchitecture": "arm",
             "MIMode": "gdb",
-            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerPath": "/usr/local/Cellar/gdb/13.1/bin/gdb",
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
                 // {
@@ -1010,7 +1010,7 @@
             // },
             "targetArchitecture": "arm",
             "MIMode": "gdb",
-            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerPath": "/usr/local/Cellar/gdb/13.1/bin/gdb",
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
                 // {
@@ -1050,7 +1050,7 @@
             // },
             "targetArchitecture": "arm",
             "MIMode": "gdb",
-            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerPath": "/usr/local/Cellar/gdb/13.1/bin/gdb",
             // "miDebuggerPath": "C:\\Program Files (x86)\\GNU Arm Embedded Toolchain\\10 2021.10\\bin\\arm-none-eabi-gdb.exe",
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
@@ -1214,7 +1214,7 @@
             // },
             // "targetArchitecture": "arm",
             "MIMode": "gdb",
-            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerPath": "/usr/local/Cellar/gdb/13.1/bin/gdb",
             // "miDebuggerPath": "C:\\Program Files (x86)\\GNU Arm Embedded Toolchain\\10 2021.10\\bin\\arm-none-eabi-gdb.exe",
             // "miDebuggerPath": "D:\\Program Files\\gcc-arm-none-eabi-9\\bin\\arm-none-eabi-gdb.exe",
             "miDebuggerArgs": "",
@@ -1342,7 +1342,7 @@
             // "targetArchitecture": "arm",
             "MIMode": "gdb",
            
-            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerPath": "/usr/local/Cellar/gdb/13.1/bin/gdb",
             // "miDebuggerPath": "C:\\Program Files (x86)\\GNU Arm Embedded Toolchain\\10 2021.10\\bin\\arm-none-eabi-gdb.exe",
             // "miDebuggerPath": "D:\\Program Files\\gcc-arm-none-eabi-9\\bin\\arm-none-eabi-gdb.exe",
             "miDebuggerArgs": "",
@@ -1400,7 +1400,7 @@
             },
             "targetArchitecture": "arm",
             "MIMode": "gdb",
-            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerPath": "/usr/local/Cellar/gdb/13.1/bin/gdb",
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
                 // {
@@ -1499,7 +1499,7 @@
             },
             "targetArchitecture": "x86",
             "MIMode": "gdb",
-            "miDebuggerPath": "/opt/local/bin/ggdb",
+            "miDebuggerPath": "/usr/local/Cellar/gdb/13.1/bin/gdb",
             "miDebuggerArgs": "",
             "customLaunchSetupCommands": [
                 // {
