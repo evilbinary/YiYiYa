@@ -34,20 +34,20 @@ boot_source= ['boot_'+env['ARCH']+'.s']
 # if env.get('MYLIB'):
 #     source.append(env.get('MYLIB'))
 
+linkflags='-nostdlib -nostartfiles -T boot/arm/link-'+env['PLATFORM']+'.ld'
 
-if env['PLATFORM']=='stm32f4xx':
-    linkflags='-nostdlib -nostartfiles -T boot/arm/link-stm32f4xx.ld'
-    source=['init_armv7.c']
-    boot_source=['boot_armv7.s',]
-    # cflags+=' -DNO_KSTART '
 
-elif env['PLATFORM']=='raspi2':
-    linkflags='-nostdlib -nostartfiles -T boot/arm/link-raspi2.ld'
-else:
-    linkflags='-nostdlib -nostartfiles -T boot/arm/link-'+env['PLATFORM']+'.ld'
-    pass
 
 if env.get('SINGLE_KERNEL'):
+    if env['PLATFORM']=='stm32f4xx':
+        linkflags='-nostdlib -nostartfiles -T boot/arm/link-stm32f4xx.ld'
+        source=['init_armv7.c']
+        boot_source=['boot_armv7.s',]
+        # cflags+=' -DNO_KSTART '
+        pass
+    else:
+        source=['init.c']
+
     env.Object('boot.o',boot_source,ASFLAGS='$ASFLAGS')
     env.Object('init.o',source,ASFLAGS='$ASFLAGS $CFLAGS',CPPPATH=include,
         CFLAGS=cflags,

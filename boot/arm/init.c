@@ -20,7 +20,7 @@ u32 io_read32(uint port) {
 }
 
 #if defined(V3S) || defined(CUBIEBOARD2)
-void init_uart() {
+void uart_init() {
   u32 addr;
   u32 val;
   /* Config GPIOB8 and GPIOB9 to txd0 and rxd0 */
@@ -84,9 +84,24 @@ char uart_get_ch() {
   /* convert carrige return to newline */
   return r == '\r' ? '\n' : r;
 }
+#elif defined(ORANGEPI_PC)
+void uart_init() {
+
+}
+
+void uart_send_ch(unsigned int c) {
+  while ((io_read32(UART0_DR) & 0x20) == 0)
+    ;
+  io_write32(SUNXI_UART0_BASE, c);
+}
+
+char uart_get_ch() {
+  while (( io_read32(UART0_DR) & 0x01) == 0);
+    return(io_read32(SUNXI_UART0_BASE));
+}
 
 #elif defined(RASPI2)
-void init_uart() {
+void uart_init() {
   register unsigned int r;
 
   /* initialize UART */
@@ -131,7 +146,7 @@ char uart_get_ch() {
 }
 
 #elif defined(STM32F4XX)
-void init_uart() {}
+void uart_init() {}
 
 void uart_send_ch(unsigned int c) {
   // u32 addr = 0x01c28000;
@@ -150,7 +165,7 @@ char uart_get_ch() {
 }
 
 #elif defined(RK3128)
-void init_uart() {}
+void uart_init() {}
 
 void uart_send_ch(unsigned int c) {
   while (((io_read32(0x20000000 + 0x60014)) & 0x20) == 0)
@@ -301,6 +316,13 @@ void init_memory() {
   boot_info->total_memory += ptr->length;
   ptr++;
   count++;
+#elif defined(ORANGEPI_PC)
+  ptr->base = 0x40000000;
+  ptr->length = 0x10000000 * 4;  // 256m*4
+  ptr->type = 1;
+  boot_info->total_memory += ptr->length;
+  ptr++;
+  count++;
 #else
   //
   ptr->type = 1;
@@ -335,7 +357,7 @@ void init_cpu() {
 void read_kernel() {}
 
 void init_boot() {
-  init_uart();
+  uart_init();
 
   init_boot_info();
   putc('b');
@@ -511,13 +533,30 @@ void* load_kernel() {
   }
 }
 
+#ifdef SINGLE_KERNEL
+extern int __bss_start__, __bss_end__;
+extern int __start, __end;
+
+void get_segment() {
+  int num = boot_data.segments_number++;
+  boot_data.segments[num].start = &__start;
+  boot_data.segments[num].size = &__end - &__start ;
+  boot_data.segments[num].type = 1;
+}
+#endif
+
 // start kernel
 void start_kernel() {
+  #ifdef SINGLE_KERNEL
+  get_segment();
+  extern void kstart(int argc, char* argv[], char** envp);
+  entry start = kstart;
+#else
   boot_info->kernel_entry = load_kernel();
   entry start = boot_info->kernel_entry;
   printf("kernel entry %x\n\r", boot_info->kernel_entry);
   // print_hex(boot_info->kernel_entry);
-
+#endif
   int argc = 0;
   char** argv = 0;
   char* envp[10];
