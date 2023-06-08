@@ -18,6 +18,9 @@ brew 方式安装如下：
 ```bash
 #arm 版本的gcc
 brew install --cask gcc-arm-embedded
+#或者
+brew tap armmbed/homebrew-formulae
+brew install armmbed/formulae/arm-none-eabi-gcc
 # i386版本的gcc
 brew install i386-elf-binutils
 # riscv版本

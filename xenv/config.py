@@ -9,7 +9,7 @@ default_libc = 'libmusl'  # libmusl libc libnewlib
 
 # board select platform,选择你要编译的平台
 #riscv-virt dmulator i386-pc v3s raspi2 esp32 stm32f4xx raspi3 rk3128 rk3288 cubieboard2 dummy rk3288 orangepi-pc
-platform = 'i386-pc'
+platform = 'v3s'
 
 # 是否要构建应用
 default_apps = True
@@ -59,20 +59,20 @@ LDFLAGS=''
 
 # osx arm 配置实例
 
-# CC_PATH = ''
-# CC_PREFIX = 'arm-none-eabi-'
-# CC_LIB_PATH = '/opt/local/lib/gcc/arm-none-eabi/9.2.0/'
-# CC = CC_PREFIX+'gcc'
-# AR = CC_PREFIX+'ar'
-# LD = CC_PREFIX+'ld'
-# AS = CC_PREFIX+'as'
-# OBJCOPY = CC_PREFIX+'objcopy'
-# RANLIB = CC_PREFIX+'ranlib'
-# CFLAGS = '-fstack-protector ' #-fstack-protector -mapcs-frame mov ip, sp 特权模式下 -fstack-protector   -fstack-protector-all  -DMALLOC_TRACE -fno-omit-frame-pointer
-# LDFLAGS=' '
-# LINKLD = 'link-'+platform+'.ld'+ '' # -Map=kernel.map 
-
-# default_apps = False
+CC_PATH = ''
+CC_PREFIX = 'arm-none-eabi-'
+CC_LIB_PATH = '/opt/local/lib/gcc/arm-none-eabi/8.3.0/' #/opt/local/lib/gcc/arm-none-eabi/9.2.0/
+CC = CC_PREFIX+'gcc'
+AR = CC_PREFIX+'ar'
+LD = CC_PREFIX+'ld'
+AS = CC_PREFIX+'as'
+OBJCOPY = CC_PREFIX+'objcopy'
+RANLIB = CC_PREFIX+'ranlib'
+CFLAGS = '-fstack-protector' #-fstack-protector -mapcs-frame mov ip, sp 特权模式下 -fstack-protector   -fstack-protector-all  -DMALLOC_TRACE -fno-omit-frame-pointer
+LDFLAGS=' '
+LINKLD = 'link-'+platform+'.ld'+ '' # -Map=kernel.map 
+SINGLE_KERNEL = False
+default_apps = True
 
 
 # osx riscv 配置实例
@@ -117,21 +117,21 @@ LDFLAGS=''
 
 # osx i668 配置实例
 
-CC_PREFIX='i686-elf-'
-CC='i686-elf-gcc'
-CXX = 'i686-elf-gcc'
-CC_LIB_PATH ='/usr/local/opt/i686-elf-gcc/lib/gcc/i686-elf/13.1.0/' #port install lib path /opt/local/lib/gcc/i686-elf/9.2.0/
-AR='i686-elf-ar'
-LD='i686-elf-ld'
-AS='i686-elf-as'
-OBJCOPY='i686-elf-objcopy'
-RANLIB='i686-elf-ranlib'
-CFLAGS='-march=i686 ' #-DMALLOC_TRACE -fsanitize=leak  -fsanitize=address -lasan -fno-omit-frame-pointer
-LDFLAGS=' '
-LINKLD = 'link.ld'+ ' -Xlinker -Map=kernel.map ' # 
+# CC_PREFIX='i686-elf-'
+# CC='i686-elf-gcc'
+# CXX = 'i686-elf-gcc'
+# CC_LIB_PATH ='/usr/local/opt/i686-elf-gcc/lib/gcc/i686-elf/13.1.0/' #port install lib path /opt/local/lib/gcc/i686-elf/9.2.0/
+# AR='i686-elf-ar'
+# LD='i686-elf-ld'
+# AS='i686-elf-as'
+# OBJCOPY='i686-elf-objcopy'
+# RANLIB='i686-elf-ranlib'
+# CFLAGS='-march=i686 ' #-DMALLOC_TRACE -fsanitize=leak  -fsanitize=address -lasan -fno-omit-frame-pointer
+# LDFLAGS=' '
+# LINKLD = 'link.ld'+ ' -Xlinker -Map=kernel.map ' # 
 
-default_libc = 'libmusl'
-default_apps = True
+# default_libc = 'libmusl'
+# default_apps = True
 
 
 # osx x86-64 for demulator 配置实例

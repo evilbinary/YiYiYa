@@ -169,14 +169,16 @@ elif arch_type == 'arm':
     #env['CFLAGS']= env['CFLAGS']+ ' -fno-omit-fram e-pointer -mapcs -mno-sched-prolog ' #for debug backtrace
     if platform=='raspi2': 
         env['CFLAGS']= env['CFLAGS']+ ' -nostdlib -nostdinc --specs=nosys.specs -mcpu=cortex-a7  -mtune=cortex-a7 -mfpu=vfpv4 -mfloat-abi=softfp '
+        env['LINKFLAGS'] += ' -mcpu=cortex-a7  -mtune=cortex-a7 -mfpu=vfpv4 -mfloat-abi=softfp '
         pass
     elif platform =='stm32f4xx':
         env['CFLAGS']= env['CFLAGS']+ ' -specs=nosys.specs -mcpu=cortex-m4 -nolibc -nostdlib -nostdinc -fno-builtin -DUSE_HAL_DRIVER   -mthumb -mthumb-interwork  -mfloat-abi=soft -mfpu=vfpv4-d16 '# -DSTM32F401xC  -Wl,--gc-sections -fdata-sections -ffunction-sections    -mfpu=fpv4-sp-d16  -mcpu=cortex-m4  -ffreestanding -nostdlib  -mfloat-abi=hard -mfpu=fpv4-sp-d16   # -mfloat-abi=hard -mfloat-abi=softfp  -mfloat-abi=softfp
         arch='armv7e-m'
     else:
         env['USER']=' -Tapp/xlinker/user-'+platform+'.ld'
-        env['CFLAGS']= env['CFLAGS']+ ' -mcpu=cortex-a7  -mtune=cortex-a7 -mfloat-abi=hard   -mfpu=vfpv4 '#-mfpu=vfpv4  -mfloat-abi=softfp
+        env['CFLAGS']= env['CFLAGS']+ ' -mcpu=cortex-a7  -mtune=cortex-a7 -mfloat-abi=softfp   -mfpu=vfpv4 '#-mfpu=vfpv4  -mfloat-abi=softfp
     #env['CFLAGS']= ' -march='+arch
+        env['LINKFLAGS'] += ' -mcpu=cortex-a7  -mtune=cortex-a7 -mfloat-abi=softfp   -mfpu=vfpv4'
 
 elif arch_type=='xtensa':
     env['APP']=False

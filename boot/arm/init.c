@@ -323,6 +323,13 @@ void init_memory() {
   boot_info->total_memory += ptr->length;
   ptr++;
   count++;
+#elif defined(RASPI2)
+  ptr->base = 0x00000000;
+  ptr->length = 0x10000000 * 4;  // 256m*4
+  ptr->type = 1;
+  boot_info->total_memory += ptr->length;
+  ptr++;
+  count++;
 #else
   //
   ptr->type = 1;

@@ -53,7 +53,7 @@ if env.get('SINGLE_KERNEL'):
         CFLAGS=cflags,
         LINKFLAGS= linkflags)
 else:
-    env.GenerateKernelSize('config.h',['../../duck/init/kernel'])
+    #env.GenerateKernelSize('config.h',['../../duck/init/kernel'])
     env.Object('boot.o',boot_source,ASFLAGS='')
     env.Program(target ='init.elf', source = source,
         CPPPATH=include,
