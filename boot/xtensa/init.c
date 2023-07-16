@@ -412,7 +412,7 @@ void start_kernel() {
           (DPORT_APP_CACHE_MASK_IROM0 & 0) | DPORT_APP_CACHE_MASK_DROM0 |
           DPORT_APP_CACHE_MASK_DRAM1);
 
-  cache_read_enable(0);
+  cache_read_enable(1);
 
   int argc = 0;
   u32** argv = 0;
