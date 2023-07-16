@@ -9,7 +9,7 @@ default_libc = 'libmusl'  # libmusl libc libnewlib
 
 # board select platform,选择你要编译的平台
 #riscv-virt dmulator i386-pc v3s raspi2 esp32 stm32f4xx raspi3 rk3128 rk3288 cubieboard2 dummy rk3288 orangepi-pc
-platform = 'v3s'
+platform = 'raspi2'
 
 # 是否要构建应用
 default_apps = True
@@ -63,6 +63,7 @@ CC_PATH = ''
 CC_PREFIX = 'arm-none-eabi-'
 CC_LIB_PATH = '/opt/local/lib/gcc/arm-none-eabi/8.3.0/' #/opt/local/lib/gcc/arm-none-eabi/9.2.0/
 CC = CC_PREFIX+'gcc'
+CXX = CC_PREFIX+'g++'
 AR = CC_PREFIX+'ar'
 LD = CC_PREFIX+'ld'
 AS = CC_PREFIX+'as'
@@ -119,7 +120,7 @@ default_apps = True
 
 # CC_PREFIX='i686-elf-'
 # CC='i686-elf-gcc'
-# CXX = 'i686-elf-gcc'
+# CXX = 'i686-elf-g++'
 # CC_LIB_PATH ='/usr/local/opt/i686-elf-gcc/lib/gcc/i686-elf/13.1.0/' #port install lib path /opt/local/lib/gcc/i686-elf/9.2.0/
 # AR='i686-elf-ar'
 # LD='i686-elf-ld'

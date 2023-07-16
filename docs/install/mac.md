@@ -21,8 +21,14 @@ brew install --cask gcc-arm-embedded
 #或者
 brew tap armmbed/homebrew-formulae
 brew install armmbed/formulae/arm-none-eabi-gcc
+
 # i386版本的gcc
 brew install i386-elf-binutils
+#或者
+brew tap nativeos/i386-elf-toolchain
+brew install nativeos/i386-elf-toolchain/i386-elf-binutils
+brew install nativeos/i386-elf-toolchain/i386-elf-gcc
+
 # riscv版本
 brew install riscv-gnu-toolchain
 ```
