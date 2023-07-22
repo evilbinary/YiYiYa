@@ -11,14 +11,20 @@ default_libc = 'libmusl'  # libmusl libc libnewlib
 #riscv-virt dmulator i386-pc v3s raspi2 esp32 stm32f4xx raspi3 rk3128 rk3288 cubieboard2 dummy rk3288 orangepi-pc
 platform = 'raspi2'
 
-# 是否要构建应用
-default_apps = True
+# 构建应用
+default_apps = [
+                'cmd','gui','hello', 'test','unitest',
+                'microui', 'etk',  'lvgl', 'track',
+                 'sdl2', 'infones', 'launcher', 'mgba', 
+                 'lua', 'scheme', 'quickjs', 'gnuboy',
+                 'watch','gmenu2x','monogui',
+                #  'sdlmine',
+                 'sdl',
+                 ]
 
 #构建的module
 modules=['posix','loader','musl','ipc',] #'musl','gaga','ipc','pty','log','debug','ewok'
 
-#构建的应用
-apps=['cmd','etk','lua']
 
 # gcc path,这里是默认的gcc配置，使用的时候可以启用一下面配置实例注释
 CC_PREFIX = ''
@@ -75,7 +81,7 @@ CFLAGS = '-fstack-protector' #-fstack-protector -mapcs-frame mov ip, sp 特权�
 LDFLAGS=' '
 LINKLD = 'link-'+platform+'.ld'+ '' # -Map=kernel.map 
 SINGLE_KERNEL = False
-default_apps = False
+# default_apps = False
 
 
 # osx riscv 配置实例
