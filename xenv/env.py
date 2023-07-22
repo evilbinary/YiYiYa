@@ -7,6 +7,7 @@
 import os
 import platform 
 import sys
+import datetime
 from SCons.Environment import *
 from SCons.Builder  import *
 
@@ -127,6 +128,9 @@ env = Environment(
         MODULES=modules,
         SINGLE_KERNEL= SINGLE_KERNEL,
         )
+
+gcc_version = env.Detect(CC)
+print("scons version: %s compiler: %s date: %s"%(SCons.__version__,gcc_version,datetime.datetime.now()))
 
 autogen.generate(env)
 autoconfig.generate(env)
