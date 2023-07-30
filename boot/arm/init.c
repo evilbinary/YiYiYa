@@ -100,7 +100,7 @@ char uart_get_ch() {
     return(io_read32(SUNXI_UART0_BASE));
 }
 
-#elif defined(RASPI2)
+#elif defined(RASPI2) ||defined(RASPI3)
 void uart_init() {
   register unsigned int r;
 

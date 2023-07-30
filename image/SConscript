@@ -69,6 +69,11 @@ elif env.get('ARCHTYPE') =='arm':
   elif env.get('PLATFORM') in ['orangepi-pc','cubieboard2'] :
     run_qemu_cmd='qemu-system-arm -name YiYiYa -M orangepi-pc -rtc base=localtime -kernel %s  -serial stdio   -D ./qemu.log -drive if=sd,id=sd0,format=raw,file=image/disk.img -d in_asm,int,mmu,cpu_reset,guest_errors,strace'%(kernel_image) #-d in_asm -d cpu_reset -d in_asm,int,mmu,cpu_reset
     debug_qemu_cmd =run_qemu_cmd+' -S -s -monitor tcp:127.0.0.1:55555,server,nowait'
+  elif env.get('PLATFORM') in ['raspi3'] :
+    run_qemu_cmd='qemu-system-aarch64 -name YiYiYa -M raspi3b  -rtc base=localtime -kernel %s  -serial stdio   -D ./qemu.log -drive if=sd,id=sd0,format=raw,file=image/disk.img '%(kernel_image) #-d in_asm -d cpu_reset -d in_asm,int,mmu
+    # run_qemu_cmd =run_qemu_cmd+' -monitor tcp:127.0.0.1:55555,server,nowait'
+    # run_qemu_cmd =run_qemu_cmd+' -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor'
+    debug_qemu_cmd = run_qemu_cmd +' -S -s'
   else:
     run_qemu_cmd='qemu-system-arm -name YiYiYa -M raspi2b  -rtc base=localtime -kernel %s  -serial stdio   -D ./qemu.log -drive if=sd,id=sd0,format=raw,file=image/disk.img '%(kernel_image) #-d in_asm -d cpu_reset -d in_asm,int,mmu
     # run_qemu_cmd =run_qemu_cmd+' -monitor tcp:127.0.0.1:55555,server,nowait'

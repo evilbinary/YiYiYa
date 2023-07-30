@@ -9,7 +9,7 @@ default_libc = 'libmusl'  # libmusl libc libnewlib
 
 # board select platform,选择你要编译的平台
 #riscv-virt dmulator i386-pc v3s raspi2 esp32 stm32f4xx raspi3 rk3128 rk3288 cubieboard2 dummy rk3288 orangepi-pc
-platform = 'raspi2'
+platform = 'raspi3'
 
 # 构建应用
 default_apps = [

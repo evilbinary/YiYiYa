@@ -53,7 +53,7 @@ support_arch_cflags = {
     'armv7': '',
     'armv7e-m': '-mthumb -mthumb-interwork  -mfloat-abi=soft -mfpu=vfpv4-d16 -mcpu=cortex-m4 ',
     'armv7-a': '-mcpu=cortex-a7 -mtune=cortex-a7 -mfpu=vfpv4 -mfloat-abi=softfp',
-    'armv8-a': ''
+    'armv8-a': ' -mfpu=vfpv4 -mfloat-abi=softfp',
 }
 
 
@@ -62,11 +62,12 @@ support_arch_linkflags = {
     'armv7': '',
     'armv7e-m': '-mthumb -mthumb-interwork  -mfloat-abi=soft -mfpu=vfpv4-d16 -mcpu=cortex-m4 ',
     'armv7-a': '-mcpu=cortex-a7 -mtune=cortex-a7 -mfpu=vfpv4 -mfloat-abi=softfp',
+    'armv8-a':'',
 }
 
 support_platform_cflags = {
     'raspi2': '-nostdlib -nostdinc --specs=nosys.specs',
-    'raspi3': '',
+    'raspi3': '-mcpu=cortex-a53 -mtune=cortex-a53',
     'stm32f4xx': '-specs=nosys.specs -nolibc -nostdlib -nostdinc -fno-builtin -DUSE_HAL_DRIVER'
 
 }
