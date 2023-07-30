@@ -875,7 +875,40 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            "program": "${workspaceRoot}/app/test/test-file",
+            "program": "${workspaceRoot}/app/test/test-dl",
+            "cwd": "${workspaceRoot}",
+            "args": [],
+            "sourceFileMap": {
+                "<source-path>": "<target-path>"
+            },
+            // "logging": {
+            //     "engineLogging": true
+            // },
+            "targetArchitecture": "arm",
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/local/Cellar/gdb/13.1/bin/gdb",
+            "miDebuggerArgs": "",
+            "customLaunchSetupCommands": [
+                // {
+                //     "text": "target remote localhost:1234",
+                //     "description": "Connect to QEMU remote debugger"
+                // }
+            ],
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+            ],
+            "preLaunchTask": "Build and run"
+        },
+        {
+            "name": "service arm with GDB",
+            "type": "cppdbg",
+            "request": "launch",
+            "miDebuggerServerAddress": "localhost:1234",
+            "program": "${workspaceRoot}/foot/service/serviceb",
             "cwd": "${workspaceRoot}",
             "args": [],
             "sourceFileMap": {

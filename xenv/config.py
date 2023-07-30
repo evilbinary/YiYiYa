@@ -23,14 +23,13 @@ default_apps = [
                  ]
 
 #构建的module
-modules=['posix','loader','musl','ipc',] #'musl','gaga','ipc','pty','log','debug','ewok'
+modules=['posix','loader','musl','ipc','gaga','log','pty'] #'musl','gaga','ipc','pty','log','debug','ewok'
 
 
 # gcc path,这里是默认的gcc配置，使用的时候可以启用一下面配置实例注释
 CC_PREFIX = ''
 CC_PATH = ''
 CC_LIB_PATH = ''
-
 CC = 'gcc'
 LD = 'ld'
 AR = 'ar'
@@ -81,7 +80,7 @@ CFLAGS = '-fstack-protector' #-fstack-protector -mapcs-frame mov ip, sp 特权�
 LDFLAGS=' '
 LINKLD = 'link-'+platform+'.ld'+ '' # -Map=kernel.map 
 SINGLE_KERNEL = False
-# default_apps = False
+default_apps = False
 
 
 # osx riscv 配置实例

@@ -7,3 +7,6 @@
 [submodule "app"]
 	path = app
 	url = https://github.com/evilbinary/app.git
+[submodule "foot"]
+	path = foot
+	url = https://github.com/evilbinary/foot.git
