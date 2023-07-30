@@ -62,7 +62,7 @@ support_arch_linkflags = {
     'armv7': '',
     'armv7e-m': '-mthumb -mthumb-interwork  -mfloat-abi=soft -mfpu=vfpv4-d16 -mcpu=cortex-m4 ',
     'armv7-a': '-mcpu=cortex-a7 -mtune=cortex-a7 -mfpu=vfpv4 -mfloat-abi=softfp',
-    'armv8-a':'',
+    'armv8-a':'-mcpu=cortex-a53 -mtune=cortex-a53',
 }
 
 support_platform_cflags = {
@@ -144,7 +144,7 @@ env = Environment(
     CFLAGS='%s %s %s %s' % (CFLAGS, common_cflags, support_arch_cflags.get(arch),support_platform_cflags.get(platform)),
     #PATH= os.environ['PATH'],
     LIBPATH=lib_path,
-    LINKFLAGS=LINKFLAGS,
+    LINKFLAGS='%s %s'%(LINKFLAGS,support_arch_linkflags.get(arch) ),
     OBJCOPYFLAGS=OBJCOPYFLAGS,
     ARCH=arch,
     PLATFORM=platform,

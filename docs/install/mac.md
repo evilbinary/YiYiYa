@@ -22,6 +22,12 @@ brew install --cask gcc-arm-embedded
 brew tap armmbed/homebrew-formulae
 brew install armmbed/formulae/arm-none-eabi-gcc
 
+#aarch64 安装
+brew install --cask gcc-aarch64-embedded
+#或者
+brew install aarch64-elf-gcc
+
+
 # i386版本的gcc
 brew install i386-elf-binutils
 #或者
