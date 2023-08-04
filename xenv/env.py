@@ -95,7 +95,10 @@ arch = support_platform[platform]
 arch_type = get_arch(arch)
 archs = support_archs[arch_type]
 
-common_cflags = '-DDUCK -D%s -D%s -I. -I./include -Ilibs/include -g -nostdlib -nostdinc -fPIC -fno-builtin -std=c99 -std=gnu99 -w -D%s' % (
+common_cflags = '-DDUCK -D%s -D%s -g -nostdlib -nostdinc -fPIC -fno-builtin -std=c99 -std=gnu99 -w -D%s' % (
+    arch_type.upper(), macro_fmt(arch), macro_fmt(platform))
+
+common_cxxflags = '-DDUCK -D%s -D%s -g  -fPIC -w -D%s' % (
     arch_type.upper(), macro_fmt(arch), macro_fmt(platform))
 
 lib_path = ['.', '../arch/', '../modules', '../libs/']
@@ -142,6 +145,7 @@ env = Environment(
     ARFLAGS=ARFLAGS,
     LDFLAGS=LDFLAGS,
     CFLAGS='%s %s %s %s' % (CFLAGS, common_cflags, support_arch_cflags.get(arch),support_platform_cflags.get(platform)),
+    CXXFLAGS='%s %s %s' % (CXXFLAGS, common_cxxflags, support_arch_cflags.get(arch),),
     #PATH= os.environ['PATH'],
     LIBPATH=lib_path,
     LINKFLAGS='%s %s'%(LINKFLAGS,support_arch_linkflags.get(arch) ),
@@ -237,7 +241,7 @@ def add_libc(e):
             '#/eggs/libmusl/include',
             '#/eggs/libmusl/obj/include/',
             '#/eggs/libmusl/arch/generic/',
-            '#/eggs/ibmusl/arch/generic/bits'
+            '#/eggs/libmusl/arch/generic/bits'
         ]
         e['LIBC'] = ['libm.a', 'libmusl.a']
         e['LINKFLAGS'] += '  eggs/libmusl/lib/crt1.o '

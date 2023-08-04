@@ -20,6 +20,7 @@ default_apps = [
                  'watch','gmenu2x','monogui',
                 #  'sdlmine',
                  'sdl',
+                 'xtrack',
                  ]
 
 #构建的module
@@ -46,6 +47,7 @@ LINKLD = 'link-'+platform+'.ld'+ '' # -Map=kernel.map
 SINGLE_KERNEL = False
 ASFLAGS=''
 LDFLAGS=''
+CXXFLAGS=''
 
 # ******************************************************************** #
 
@@ -62,7 +64,7 @@ LDFLAGS=''
 
 # LINKLD='-Map=kernel.map -T xlinker/link-dmulator.ld'
 
-# default_apps=False
+# default_apps=[]
 
 # osx arm 配置实例
 
@@ -80,7 +82,24 @@ CFLAGS = '-fstack-protector' #-fstack-protector -mapcs-frame mov ip, sp 特权�
 LDFLAGS=' '
 LINKLD = 'link-'+platform+'.ld'+ '' # -Map=kernel.map 
 SINGLE_KERNEL = False
-default_apps = False
+
+# # osx aarch64 配置实例
+
+# CC_PATH = ''
+# CC_PREFIX = 'aarch64-none-elf-'
+# CC_LIB_PATH = '' #/opt/local/lib/gcc/arm-none-eabi/9.2.0/
+# CC = CC_PREFIX+'gcc'
+# CXX = CC_PREFIX+'g++'
+# AR = CC_PREFIX+'ar'
+# LD = CC_PREFIX+'ld'
+# AS = CC_PREFIX+'as'
+# OBJCOPY = CC_PREFIX+'objcopy'
+# RANLIB = CC_PREFIX+'ranlib'
+# CFLAGS = '-fstack-protector' #-fstack-protector -mapcs-frame mov ip, sp 特权模式下 -fstack-protector   -fstack-protector-all  -DMALLOC_TRACE -fno-omit-frame-pointer
+# LDFLAGS=' '
+# LINKLD = 'link-'+platform+'.ld'+ '' # -Map=kernel.map 
+# SINGLE_KERNEL = False
+# default_apps = []
 
 
 # osx riscv 配置实例
@@ -102,7 +121,7 @@ default_apps = False
 # ASFLAGS= ' -march=rv32imaczicsr -mabi=ilp32 '
 # SINGLE_KERNEL= True
 
-# default_apps = False
+# default_apps = []
 
 # osx armv7 配置实例
 
@@ -120,7 +139,7 @@ default_apps = False
 # LINKLD = 'link-'+platform+'.ld'+ ' -Wl,-Map=kernel.map ' # -Map=kernel.map 
 # SINGLE_KERNEL= True #单个文件 kernel.elf
 
-# default_apps = False
+# default_apps = []
 
 
 # osx i668 配置实例
@@ -158,7 +177,7 @@ default_apps = False
 # LINKLD = '' # link.ld'+ ' -Xlinker -Map=kernel.map 
 
 # default_libc = 'libmusl'
-# default_apps = False
+# default_apps = []
 
 # clang
 # CC_PREFIX=''
@@ -177,7 +196,7 @@ default_apps = False
 # LINKFLAGS = '-e start  -g '
 
 # default_libc = 'libmusl'
-# default_apps = False
+# default_apps = []
 
 
 
@@ -238,4 +257,4 @@ default_apps = False
 # ASFLAGS ='-Iduck/arch/lx6 -I. -Iarch/lx6 '
 # SINGLE_KERNEL= True
 
-# default_apps = False
+# default_apps = []

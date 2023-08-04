@@ -731,6 +731,44 @@
             "preLaunchTask": "Build and run"
         },
         {
+            "name": "init arm64 with GDB",
+            "type": "cppdbg",
+            "request": "launch",
+            "miDebuggerServerAddress": "localhost:1234",
+            "program": "${workspaceRoot}/boot/arm/init.elf",
+            "cwd": "${workspaceRoot}",
+            "args": [],
+            "sourceFileMap": {
+                "<source-path>": "<target-path>"
+            },
+            "targetArchitecture": "arm64",
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/local/bin/aarch64-none-elf-gdb",
+            "miDebuggerArgs": "",
+            "customLaunchSetupCommands": [
+                // {
+                //     "text": "target remote localhost:1234",
+                //     "description": "Connect to QEMU remote debugger"
+                // }
+            ],
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                // {
+                //     "text": "set architecture i386:intel ",
+                //     "description": "set architecture i386"
+                // },
+                // {
+                //     "text": "file ${workspaceRoot}/boot/x86/init",
+                //     "description": "file on setup."
+                // },
+            ],
+            "preLaunchTask": "Build and run"
+        },
+        {
             "name": "gnuboy arm with GDB",
             "type": "cppdbg",
             "request": "launch",
@@ -764,11 +802,11 @@
             "preLaunchTask": "Build and run"
         },
         {
-            "name": "track arm with GDB",
+            "name": "xtrack arm with GDB",
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            "program": "${workspaceRoot}/app/track/track",
+            "program": "${workspaceRoot}/app/xtrack/xtrack",
             // "program": "${workspaceRoot}/app/hello/hello",
             // "program": "${workspaceRoot}/app/gui/gui",
             // "program": "${workspaceRoot}/app/file/file",
