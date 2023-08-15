@@ -5,11 +5,11 @@
 
 _start:
     // save CPSR.
-    mrs r0, cpsr
+    mrs x0, nzcv
 
-    mrc p15, #0, r4, c0, c0, #5
-    and r4, r4, #3
-    cmp r4, #0
+    mrs x1, mpidr_el1
+    and   x1, x1, #3    
+    cmp x1, #0
     bne apu_entry //is other core
 
     //main core init 

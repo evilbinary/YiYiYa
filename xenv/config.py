@@ -83,6 +83,8 @@ LDFLAGS=' '
 LINKLD = 'link-'+platform+'.ld'+ '' # -Map=kernel.map 
 SINGLE_KERNEL = False
 
+# default_apps=[]
+
 # # osx aarch64 配置实例
 
 # CC_PATH = ''
