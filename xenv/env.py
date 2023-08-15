@@ -129,6 +129,9 @@ elif arch_type == 'xtensa':
     CC_PATH = '~/.espressif/tools/xtensa-esp32-elf/esp-2021r1-8.4.0/xtensa-esp32-elf/bin/'
 
 
+if support_platform_cflags.get(platform)==None:
+    support_platform_cflags[platform]=''
+
 env = Environment(
     ENV=os.environ,
     APP=default_apps,
