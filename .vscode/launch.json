@@ -847,7 +847,7 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            "program": "${workspaceRoot}/app/cmd/ls",
+            "program": "${workspaceRoot}/app/cmd/shell",
             "cwd": "${workspaceRoot}",
             "args": [],
             "sourceFileMap": {
