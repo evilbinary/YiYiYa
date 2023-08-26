@@ -190,51 +190,49 @@ library.generate(env)
 if ARGUMENTS.get('FUTURE'):
     print("The FUTURE option is not supported yet!")
     Exit(2)
-# if plt == 'Linux':
-#     if arch == 'x86':
-#         env['LINKFLAGS'] = env['LINKFLAGS']+' -m32'
-#     env['CFLAGS'] = env['CFLAGS']+' -no-pie -fno-pic '
-#     if CC_LIB_PATH:
-#         env['MYLIB'] = 'libgcc.a'
-#         env['CFLAGS'] = env['CFLAGS']+' -Llibgcc.a '
-#     pass
-# elif plt == 'Windows':
-#     if arch == 'x86':
-#         # -ffreestanding -nostdlib
-#         env['CFLAGS'] = env['CFLAGS'] + \
-#             ' -fno-stack-protector -mno-stack-arg-probe '
-#     env['USER'] = '--entry main -Tapp/xlinker/user.ld   '
-#     env['MYLIB'] = 'libgcc.a'
-#     env['PROGSUFFIX'] = ''
-# elif plt == 'Darwin':
-#     if CC_LIB_PATH:
-#         env['MYLIB'] = 'libgcc.a'
 
-# if env.get('DEFAULT_LIBC') == 'libmusl':
-#     env['CFLAGS'] += ' -DLIBC_POSIX '
+if plt == 'Linux':
+    if arch == 'x86':
+        env['LINKFLAGS'] = env['LINKFLAGS']+' -m32'
+    env['CFLAGS'] = env['CFLAGS']+' -no-pie -fno-pic '
+    if CC_LIB_PATH:
+        env['MYLIB'] = 'libgcc.a'
+        env['CFLAGS'] = env['CFLAGS']+' -Llibgcc.a '
+    pass
+elif plt == 'Windows':
+    if arch == 'x86':
+        # -ffreestanding -nostdlib
+        env['CFLAGS'] = env['CFLAGS'] + \
+            ' -fno-stack-protector -mno-stack-arg-probe '
+    env['USER'] = '--entry main -Tapp/xlinker/user.ld   '
+    env['MYLIB'] = 'libgcc.a'
+    env['PROGSUFFIX'] = ''
+elif plt == 'Darwin':
+    if CC_LIB_PATH:
+        env['MYLIB'] = 'libgcc.a'
 
-# if env.get('SINGLE_KERNEL'):
-#     env['CFLAGS'] += ' -DSINGLE_KERNEL '
+if env.get('SINGLE_KERNEL'):
+    env['CFLAGS'] += ' -DSINGLE_KERNEL '
 
-# if arch_type == 'x86':
-#     if platform == 'x86_duck':
-#         env['CFLAGS'] += ' -m32 -march=native '
-#     else:
-#         env['CFLAGS'] += ' -march=i486 '
-#     pass
-# elif arch_type == 'arm':
-#     env['USER'] = ' -Tapp/xlinker/user-arm.ld '
-#     if platform == 'raspi2':
-#         pass
-#     elif platform == 'stm32f4xx':
-#         pass
-#     else:
-#         env['USER'] = ' -Tapp/xlinker/user-'+platform+'.ld'
+if arch_type == 'x86':
+    if platform == 'x86_duck':
+        env['CFLAGS'] += ' -m32 -march=native '
+    else:
+        env['CFLAGS'] += ' -march=i486 '
+    pass
+elif arch_type == 'arm':
+    env['USER'] = ' -Tapp/xlinker/user-arm.ld '
+    if platform == 'raspi2':
+        pass
+    elif platform == 'stm32f4xx':
+        pass
+    else:
+        env['USER'] = ' -Tapp/xlinker/user-'+platform+'.ld'
 
-# elif arch_type == 'xtensa':
-#     env['APP'] = False
-#     env['LINKLD'] = 'link-'+platform+'.ld'
-#     pass
+elif arch_type == 'xtensa':
+    env['APP'] = False
+    env['LINKLD'] = 'link-'+platform+'.ld'
+    pass
 
 # program check
 

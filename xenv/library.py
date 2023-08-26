@@ -115,12 +115,13 @@ def use_libc(e):
                 '#eggs/libmusl/arch/generic/',
                 '#eggs/libmusl/arch/generic/bits'
             ],
-            ['-DDUCK',
+            ['-DDUCK -DDLIBC_POSIX',
              ' -D__LIB_MUSL__ -Wl,-dynamic-linker,/lib/ld-musl-%s.so ' % (
                  arch)
              ],
-            ['eggs/libmusl/lib/crt1.o ']
-        )
+            ['eggs/libmusl/lib/crt1.o ',
+              e['USER']
+            ])
 
         if e['ARCHTYPE'] == 'x86':
             e.AddInclude(
