@@ -253,15 +253,14 @@ check(env,[
     CC
 ])
 
-
-if env.get('MODULES'):
-    for module in env.get('MODULES'):
-        env.Append(CLAGS=' -D'+module.upper()+'_MODULE ')
-
-
 bootEnv = env.Clone()
 appEnv = env.Clone()
 cliEnv = env.Clone()
+
+if env.get('MODULES'):
+    for module in env.get('MODULES'):
+        env.Append(CFLAGS=' -D'+module.upper()+'_MODULE ')
+
 
 cliEnv.UseLibc()
 
