@@ -21,7 +21,7 @@ plt = platform.system()
 
 from xenv.config import *
 
-import autoconfig,make,autogen,library
+import autoconfig,make,autogen,library,progress
 
 support_archs = {
     'arm': ['armv5', 'armv6', 'armv7', 'armv7e-m', 'armv7-a', 'armv8-a'],
@@ -250,6 +250,9 @@ check(env,[
     'dd',
     CC
 ])
+
+# if GetOption("progress"):
+progress.progress_settings(env, 5)
 
 bootEnv = env.Clone()
 appEnv = env.Clone()
