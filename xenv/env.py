@@ -21,7 +21,7 @@ plt = platform.system()
 
 from xenv.config import *
 
-import autoconfig,make,autogen
+import autoconfig,make,autogen,library
 
 support_archs = {
     'arm': ['armv5', 'armv6', 'armv7', 'armv7e-m', 'armv7-a', 'armv8-a'],
@@ -52,8 +52,8 @@ support_arch_cflags = {
     'x86': '',
     'armv7': '',
     'armv7e-m': '-mthumb -mthumb-interwork  -mfloat-abi=soft -mfpu=vfpv4-d16 -mcpu=cortex-m4 ',
-    'armv7-a': '-mcpu=cortex-a7 -mtune=cortex-a7 -mfpu=vfpv4 -mfloat-abi=softfp',
-    'armv8-a': ' -mfpu=vfpv4 -mfloat-abi=softfp',
+    'armv7-a': '-mcpu=cortex-a7 -mtune=cortex-a7 -mfpu=vfpv4 -mfloat-abi=softfp ',
+    'armv8-a': ' -mfpu=vfpv4 -mfloat-abi=softfp ',
 }
 
 
@@ -61,7 +61,7 @@ support_arch_linkflags = {
     'x86': '',
     'armv7': '',
     'armv7e-m': '-mthumb -mthumb-interwork  -mfloat-abi=soft -mfpu=vfpv4-d16 -mcpu=cortex-m4 ',
-    'armv7-a': '-mcpu=cortex-a7 -mtune=cortex-a7 -mfpu=vfpv4 -mfloat-abi=softfp',
+    'armv7-a': '-mcpu=cortex-a7 -mtune=cortex-a7 -mfpu=vfpv4 -mfloat-abi=softfp ',
     'armv8-a':'-mcpu=cortex-a53 -mtune=cortex-a53',
 }
 
@@ -101,7 +101,7 @@ common_cflags = '-DDUCK -D%s -D%s -nostdlib -nostdinc -fPIC -fno-builtin -std=c9
 common_cxxflags = '-DDUCK -D%s -D%s  -fPIC -w -D%s' % (
     arch_type.upper(), macro_fmt(arch), macro_fmt(platform))
 
-lib_path = ['.', '../arch/', '../modules', '../libs/']
+lib_path = ['.']
 
 
 print('welcome to yiyiya os build')
@@ -132,6 +132,13 @@ elif arch_type == 'xtensa':
 if support_platform_cflags.get(platform)==None:
     support_platform_cflags[platform]=''
 
+# VariantDir('build', 'src', duplicate=False)
+
+CFLAGS +=' '+common_cflags
+CFLAGS +=' '+support_arch_cflags.get(arch)
+CFLAGS +=' '+support_platform_cflags.get(platform)
+CFLAGS +=' '
+
 env = Environment(
     ENV=os.environ,
     APP=default_apps,
@@ -147,7 +154,7 @@ env = Environment(
     ASFLAGS=ASFLAGS,
     ARFLAGS=ARFLAGS,
     LDFLAGS=LDFLAGS,
-    CFLAGS='%s %s %s %s' % (CFLAGS, common_cflags, support_arch_cflags.get(arch),support_platform_cflags.get(platform)),
+    CFLAGS=CFLAGS,
     CXXFLAGS='%s %s ' % (CXXFLAGS, common_cxxflags,),
     #PATH= os.environ['PATH'],
     LIBPATH=lib_path,
@@ -177,125 +184,94 @@ print("scons version: %s compiler: %s date: %s" %
 autogen.generate(env)
 autoconfig.generate(env)
 make.generate(env)
+library.generate(env)
 
-if plt == 'Linux':
-    if arch == 'x86':
-        env['LINKFLAGS'] = env['LINKFLAGS']+' -m32'
-    env['CFLAGS'] = env['CFLAGS']+' -no-pie -fno-pic '
-    if CC_LIB_PATH:
-        env['MYLIB'] = 'libgcc.a'
-        env['CFLAGS'] = env['CFLAGS']+' -Llibgcc.a '
-    pass
-elif plt == 'Windows':
-    if arch == 'x86':
-        # -ffreestanding -nostdlib
-        env['CFLAGS'] = env['CFLAGS'] + \
-            ' -fno-stack-protector -mno-stack-arg-probe '
-    env['USER'] = '--entry main -Tapp/xlinker/user.ld   '
-    env['MYLIB'] = 'libgcc.a'
-    env['PROGSUFFIX'] = ''
-elif plt == 'Darwin':
-    if CC_LIB_PATH:
-        env['MYLIB'] = 'libgcc.a'
 
-if env.get('DEFAULT_LIBC') == 'libmusl':
-    env['CFLAGS'] += ' -DLIBC_POSIX '
+if ARGUMENTS.get('FUTURE'):
+    print("The FUTURE option is not supported yet!")
+    Exit(2)
+# if plt == 'Linux':
+#     if arch == 'x86':
+#         env['LINKFLAGS'] = env['LINKFLAGS']+' -m32'
+#     env['CFLAGS'] = env['CFLAGS']+' -no-pie -fno-pic '
+#     if CC_LIB_PATH:
+#         env['MYLIB'] = 'libgcc.a'
+#         env['CFLAGS'] = env['CFLAGS']+' -Llibgcc.a '
+#     pass
+# elif plt == 'Windows':
+#     if arch == 'x86':
+#         # -ffreestanding -nostdlib
+#         env['CFLAGS'] = env['CFLAGS'] + \
+#             ' -fno-stack-protector -mno-stack-arg-probe '
+#     env['USER'] = '--entry main -Tapp/xlinker/user.ld   '
+#     env['MYLIB'] = 'libgcc.a'
+#     env['PROGSUFFIX'] = ''
+# elif plt == 'Darwin':
+#     if CC_LIB_PATH:
+#         env['MYLIB'] = 'libgcc.a'
 
-if env.get('SINGLE_KERNEL'):
-    env['CFLAGS'] += ' -DSINGLE_KERNEL '
+# if env.get('DEFAULT_LIBC') == 'libmusl':
+#     env['CFLAGS'] += ' -DLIBC_POSIX '
 
-if arch_type == 'x86':
-    if platform == 'x86_duck':
-        env['CFLAGS'] += ' -m32 -march=native '
-    else:
-        env['CFLAGS'] += ' -march=i486 '
-    pass
-elif arch_type == 'arm':
-    env['USER'] = ' -Tapp/xlinker/user-arm.ld '
-    if platform == 'raspi2':
-        pass
-    elif platform == 'stm32f4xx':
-        pass
-    else:
-        env['USER'] = ' -Tapp/xlinker/user-'+platform+'.ld'
+# if env.get('SINGLE_KERNEL'):
+#     env['CFLAGS'] += ' -DSINGLE_KERNEL '
 
-elif arch_type == 'xtensa':
-    env['APP'] = False
-    env['LINKLD'] = 'link-'+platform+'.ld'
-    pass
+# if arch_type == 'x86':
+#     if platform == 'x86_duck':
+#         env['CFLAGS'] += ' -m32 -march=native '
+#     else:
+#         env['CFLAGS'] += ' -march=i486 '
+#     pass
+# elif arch_type == 'arm':
+#     env['USER'] = ' -Tapp/xlinker/user-arm.ld '
+#     if platform == 'raspi2':
+#         pass
+#     elif platform == 'stm32f4xx':
+#         pass
+#     else:
+#         env['USER'] = ' -Tapp/xlinker/user-'+platform+'.ld'
+
+# elif arch_type == 'xtensa':
+#     env['APP'] = False
+#     env['LINKLD'] = 'link-'+platform+'.ld'
+#     pass
+
+# program check
+
+def check(env,tools=[]):
+    conf = Configure(env)
+    for tool in tools:
+        if not conf.CheckProg(tool):
+            print(tools+' is missing,please install')
+            Exit(1)
+    env = conf.Finish()
+
+check(env,[
+    'qemu-img',
+    'mkfs.vfat',
+    'dd',
+    CC
+])
 
 
 if env.get('MODULES'):
     for module in env.get('MODULES'):
-        env['CFLAGS'] = env['CFLAGS']+' -D'+module.upper()+'_MODULE '
-
-
-def add_libc(e):
-    if e.get('HAS_LIBC'):
-        return
-    e['HAS_LIBC'] = True
-    if e.get('DEFAULT_LIBC') == 'libmusl':
-        # -static
-        e['CFLAGS'] += ' -D__LIB_MUSL__ -Wl,-dynamic-linker,/lib/ld-musl-%s.so.1 ' % (
-            arch)
-        e['LIBPATH'] += ['#/eggs/libmusl/lib/']
-        e['CPPPATH'] += [
-            '#/eggs/libmusl',
-            '#/eggs/libmusl/include',
-            '#/eggs/libmusl/obj/include/',
-            '#/eggs/libmusl/arch/generic/',
-            '#/eggs/libmusl/arch/generic/bits'
-        ]
-        e['LIBC'] = ['libm.a', 'libmusl.a']
-        e['LINKFLAGS'] += '  eggs/libmusl/lib/crt1.o '
-
-        if e['ARCHTYPE'] == 'x86':
-            e['CPPPATH'] += [
-                '#/eggs/libmusl/arch/i386/',
-                '#/eggs/libmusl/arch/i386/bits']
-        elif e['ARCHTYPE'] == 'arm':
-            e['CPPPATH'] += [
-                '#/eggs/libmusl/arch/arm/',
-                '#/eggs/libmusl/arch/arm/bits']
-        else:
-            print('no support libmusl type %s' % (arch))
-    elif e.get('DEFAULT_LIBC') == 'libnewlib':
-        e['CFLAGS'] += ' -D__LIB_NEWLIB__ -D_LIBC  -static '
-        e['LIBPATH'] += ['#/eggs/libnewlib/lib/']
-        e['USER'] = '--entry main -Tapp/xlinker/cygmon.ld   '
-        e['CPPPATH'] += [
-            '#/eggs/libnewlib',
-            '#/eggs/include/c',
-            '#/eggs/include/',
-        ]
-        e['LIBC'] = ['libm.a', 'libc.a', 'libcygmon.a']
-
-        if e['ARCHTYPE'] == 'x86':
-            e['CPPPATH'] += [
-                '#/eggs/libnewlib/lib/i386-elf/include',
-                '#/eggs/libnewlib/lib/i386-elf/lib',
-            ]
-            e['LIBPATH'] += ['#/eggs/libnewlib/lib/i386-elf/lib', ]
-        elif e['ARCHTYPE'] == 'arm':
-            e['CPPPATH'] += [
-                '#/eggs/libnewlib/lib/arm-eabi/include', ]
-        else:
-            print('no support libmusl type %s' % (e['ARCHTYPE']))
-    else:
-        e['LIBPATH'] += ['../../eggs/libc/']
-        e['CPPPATH'] += [
-            '#/eggs/include/c',
-            '#/eggs/include/',
-            '.'
-        ]
-        e['CFLAGS'] += '  -DLIBYC '
-        e['LINKFLAGS'] += '  eggs/libc/crt/crt.o '
-        e['LIBC'] = ['libc.a']
+        env.Append(CLAGS=' -D'+module.upper()+'_MODULE ')
 
 
 bootEnv = env.Clone()
 appEnv = env.Clone()
+cliEnv = env.Clone()
 
+cliEnv.UseLibc()
+
+appEnv.UseLibApp()
+
+cppEnv = env.Clone()
+cppEnv.UseLibCxx()
+
+Export('cppEnv')
 Export('bootEnv')
 Export('appEnv')
+Export('cliEnv')
 Export('env')

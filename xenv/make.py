@@ -36,8 +36,8 @@ def parms(target, source, env):
         make_cmd = env.subst(env['MAKE'])
 
     make_env = None
-    if env['CROSS_BUILD']:
-        make_env = env['CROSS_ENV']
+    if env.get('CROSS_BUILD'):
+        make_env = env.get('CROSS_ENV')
     if 'MakeEnv' in env:
         if make_env == None:
             make_env = {}
@@ -62,7 +62,7 @@ def parms(target, source, env):
 
     return (make_path, make_env, make_targets, make_cmd, make_jobs, make_opts)
 
-def message(target, source, env):
+def message(target, source, env,execution=None):
     """Return a pretty Make message"""
 
     (make_path,
@@ -72,7 +72,12 @@ def message(target, source, env):
      make_jobs,
      make_opts) = parms(target, source, env)
 
-    myenv = env.Clone()
+    
+    myenv =env
+    try:
+        myenv= env.Clone()
+    except Exception:
+        pass
     # Want to use MakeTargets in the MAKECOMSTR, but make it pretty first.
     if 'MakeTargets' in myenv:
         myenv['MakeTargets'] += ' '
@@ -98,7 +103,6 @@ def message(target, source, env):
 
 def builder(target, source, env):
     """Run make in a directory."""
-
     (make_path,
      make_env,
      make_targets,

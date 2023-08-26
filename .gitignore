@@ -69,3 +69,4 @@ image/disk.img
 
 **.pyc
 **/**/**.pyc
+**/*.pyc
