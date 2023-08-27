@@ -77,7 +77,7 @@ def add_cflags(env, cflags=[]):
     if isinstance(cflags,str):
         cflags=[cflags]
     for cflag in cflags:
-        env.Append(CFLAGS=cflag+' ')
+        env.Append(CFLAGS=' '+cflag+' ')
 
 
 def add_cxxflags(env, cxxflags=[]):
@@ -86,6 +86,12 @@ def add_cxxflags(env, cxxflags=[]):
     for cflag in cxxflags:
         env.Append(CXXFLAGS=' '+cflag.replace('#/','')+' ')
 
+
+def add_linkflags(env,linkflags=[]):
+    if isinstance(linkflags,str):
+        linkflags=[linkflags]
+    for linkflag in linkflags:
+        env.Append(LINKFLAGS=' '+linkflag)
 
 def check_exist(e, name):
     if not e.get('ALL_LIBS'):
@@ -116,11 +122,10 @@ def use_libc(e):
                 '#eggs/libmusl/arch/generic/bits'
             ],
             ['-DDUCK -DDLIBC_POSIX',
-             ' -D__LIB_MUSL__ -Wl,-dynamic-linker,/lib/ld-musl-%s.so ' % (
-                 arch)
+             ' -D__LIB_MUSL__ ',
+            #  '-Wl,-dynamic-linker,/lib/ld-musl-%s.so ' % (arch)
              ],
             ['eggs/libmusl/lib/crt1.o ',
-              e['USER']
             ])
 
         if e['ARCHTYPE'] == 'x86':
@@ -147,7 +152,7 @@ def use_libc(e):
 
         ], ['-D__LIB_NEWLIB__ -D_LIBC  -static'])
 
-        e['USER'] = '--entry main -Tapp/xlinker/cygmon.ld   '
+        e['USERLD'] = '--entry main -Tapp/xlinker/cygmon.ld   '
         if e['ARCHTYPE'] == 'x86':
             e.AddInclude([
                 '#/eggs/libnewlib/lib/i386-elf/include',
@@ -240,6 +245,7 @@ def use_libapp(env):
         '#/eggs/libuuid',
     ]
     env.AddPath(app_lib)
+    env.AddLinkFlags(env['USERLD'])
 
 def generate(env, **kwargs):
     env.AddMethod(add_include, "AddInclude")
@@ -252,6 +258,8 @@ def generate(env, **kwargs):
     env.AddMethod(add_cxxflags, "AddCxxFlags")
     env.AddMethod(add_cflags, "AddCflags")
     env.AddMethod(add_cflags, "AddCFlags")
+    env.AddMethod(add_linkflags, "AddLinkFlags")
+
     
     env.AddMethod(add_path, "AddPath")
     env.AddMethod(use_libapp, "UseLibApp")

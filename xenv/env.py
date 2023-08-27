@@ -180,7 +180,7 @@ env = Environment(
     MYLIB=None,
     LIBC=libc,
     LIBCFLAGS=libcflags,
-    USER=' -Tapp/xlinker/user.ld',
+    USERLD=' -Tapp/xlinker/user.ld',
     ARCHS=archs,
     ARCHTYPE=arch_type,
     CPPPATH=[],
@@ -214,7 +214,7 @@ elif plt == 'Windows':
         # -ffreestanding -nostdlib
         env['CFLAGS'] = env['CFLAGS'] + \
             ' -fno-stack-protector -mno-stack-arg-probe '
-    env['USER'] = '--entry main -Tapp/xlinker/user.ld   '
+    env['USERLD'] = '--entry main -Tapp/xlinker/user.ld   '
     env['MYLIB'] = 'libgcc.a'
     env['PROGSUFFIX'] = ''
 elif plt == 'Darwin':
@@ -231,13 +231,13 @@ if arch_type == 'x86':
         env['CFLAGS'] += ' -march=i486 '
     pass
 elif arch_type == 'arm':
-    env['USER'] = ' -Tapp/xlinker/user-arm.ld '
+    env['USERLD'] = ' -Tapp/xlinker/user-arm.ld '
     if platform == 'raspi2':
         pass
     elif platform == 'stm32f4xx':
         pass
     else:
-        env['USER'] = ' -Tapp/xlinker/user-'+platform+'.ld'
+        env['USERLD'] = ' -Tapp/xlinker/user-'+platform+'.ld'
 
 elif arch_type == 'xtensa':
     env['APP'] = False
@@ -266,15 +266,20 @@ progress.progress_settings(env, 5)
 bootEnv = env.Clone()
 appEnv = env.Clone()
 cliEnv = env.Clone()
+libEnv = env.Clone()
 
 if env.get('MODULES'):
     for module in env.get('MODULES'):
         env.Append(CFLAGS=' -D'+module.upper()+'_MODULE ')
 
+libEnv.UseLibc()
+libEnv.UseLibApp()
 
 cliEnv.UseLibc()
+cliEnv.AddLinkFlags(cliEnv['USERLD'])
 
 appEnv.UseLibApp()
+
 
 cppEnv = env.Clone()
 cppEnv.UseLibCxx()
@@ -282,5 +287,6 @@ cppEnv.UseLibCxx()
 Export('cppEnv')
 Export('bootEnv')
 Export('appEnv')
+Export('libEnv')
 Export('cliEnv')
 Export('env')
