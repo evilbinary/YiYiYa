@@ -66,7 +66,7 @@ support_arch_linkflags = {
 }
 
 support_platform_cflags = {
-    'raspi2': '-nostdlib -nostdinc --specs=nosys.specs',
+    'raspi2': '-nostdlib -nostdinc ',#--specs=nosys.specs
     'raspi3': '-mcpu=cortex-a53 -mtune=cortex-a53',
     'stm32f4xx': '-specs=nosys.specs -nolibc -nostdlib -nostdinc -fno-builtin -DUSE_HAL_DRIVER'
 
