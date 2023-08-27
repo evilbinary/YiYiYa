@@ -20,13 +20,13 @@ https://github.com/evilbinary/YiYiYa
 3、运行编译命令
 
 ```
-scons
+scons platform=raspi2 -j8
 ```
 
 ### 运行
 
 ```
-scons --run=qemu
+scons platform=raspi2 run=qemu
 ```
 
 

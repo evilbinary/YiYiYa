@@ -17,11 +17,15 @@ default_apps = [
                 'microui', 'etk',  'lvgl', 'track',
                  'sdl2', 'infones', 'launcher', 'mgba', 
                  'lua', 'scheme', 'quickjs', 'gnuboy',
-                 'watch','gmenu2x','monogui',
+                 'watch',
                 #  'sdlmine',
                  'sdl',
-                 'xtrack',
                  ]
+# c++ 应用 输入才编译
+cpp_apps =[
+    'xtrack','gmenu2x',
+    'monogui','testcpp'
+]
 
 #构建的module
 modules=['posix','loader','musl','ipc','gaga','log','pty'] #'musl','gaga','ipc','pty','log','debug','ewok'

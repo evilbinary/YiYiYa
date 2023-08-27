@@ -39,6 +39,12 @@ env.AppendENVPath('PATH', ['/Volumes/android/u-boot/scripts/dtc/','/Volumes/andr
 env.KernelSize(['size'],['../duck/init/kernel'])
 
 
+if ARGUMENTS.get('build'):
+  env['build']=ARGUMENTS.get('build')
+if ARGUMENTS.get('run'):
+  env['run']=ARGUMENTS.get('run')
+
+
 run_qemu_cmd=''
 debug_qemu_cmd=''
 

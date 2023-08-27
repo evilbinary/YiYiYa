@@ -91,7 +91,20 @@ def macro_fmt(a):
     return a.upper().replace('-', '_')
 
 
-arch = support_platform[platform]
+if ARGUMENTS.get('cpp', 0):
+    default_apps+=cpp_apps
+else:
+    cpp_apps=[]
+
+if ARGUMENTS.get('platform'):
+    platform=ARGUMENTS.get('platform')
+    
+
+arch = support_platform.get(platform)
+if not arch:
+    print('please select right platform')
+    exit(-1)
+    
 arch_type = get_arch(arch)
 archs = support_archs[arch_type]
 
@@ -142,6 +155,7 @@ CFLAGS +=' '
 env = Environment(
     ENV=os.environ,
     APP=default_apps,
+    CPP_APP= cpp_apps,
     CC_PREFIX=CC_PREFIX,
     CC=CC,
     LD=LD,
@@ -186,10 +200,6 @@ autoconfig.generate(env)
 make.generate(env)
 library.generate(env)
 
-
-if ARGUMENTS.get('FUTURE'):
-    print("The FUTURE option is not supported yet!")
-    Exit(2)
 
 if plt == 'Linux':
     if arch == 'x86':
@@ -251,7 +261,6 @@ check(env,[
     CC
 ])
 
-# if GetOption("progress"):
 progress.progress_settings(env, 5)
 
 bootEnv = env.Clone()
