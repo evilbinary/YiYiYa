@@ -29,5 +29,12 @@ run:
 com:
 	minicom -D /dev/tty.usbserial 
 
+
+push:
+	cd app && git push
+	cd eggs && git push
+	cd duck && git push
+	cd foot && git push
+
 clean:
 	scons -c
