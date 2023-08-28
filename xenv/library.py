@@ -123,6 +123,7 @@ def use_libc(e):
             ],
             ['-DDUCK -DDLIBC_POSIX',
              ' -D__LIB_MUSL__ ',
+             '-static',
             #  '-Wl,-dynamic-linker,/lib/ld-musl-%s.so ' % (arch)
              ],
             ['eggs/libmusl/lib/crt1.o ',
