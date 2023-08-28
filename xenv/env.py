@@ -285,9 +285,14 @@ appEnv.AddLinkFlags(appEnv['USERLD'])
 cppEnv = env.Clone()
 cppEnv.UseLibCxx()
 
+cppCliEnv=cppEnv.Clone()
+cppCliEnv.AddLinkFlags(cppCliEnv['USERLD'])
+
+
 Export('cppEnv')
 Export('bootEnv')
 Export('appEnv')
 Export('libEnv')
 Export('cliEnv')
+Export('cppCliEnv')
 Export('env')
