@@ -6,6 +6,7 @@ lib:
 
 raspi2: lib
 	scons platform=raspi2 -j8
+	scons run=q
 
 v3s: lib
 	scons platform=v3s -j8 
