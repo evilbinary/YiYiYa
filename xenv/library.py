@@ -127,6 +127,7 @@ def use_libc(e):
             #  '-Wl,-dynamic-linker,/lib/ld-musl-%s.so ' % (arch)
              ],
             ['eggs/libmusl/lib/crt1.o ',
+            '-static '
             ])
 
         if e['ARCHTYPE'] == 'x86':

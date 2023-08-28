@@ -21,5 +21,8 @@ img:
 	qemu-img create  image/disk.img 512m
 	mkfs.vfat image/disk.img 
 
+run:
+	scons run=q
+
 clean:
 	scons -c
