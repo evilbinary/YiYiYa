@@ -279,6 +279,7 @@ cliEnv.UseLibc()
 cliEnv.AddLinkFlags(cliEnv['USERLD'])
 
 appEnv.UseLibApp()
+appEnv.AddLinkFlags(appEnv['USERLD'])
 
 
 cppEnv = env.Clone()

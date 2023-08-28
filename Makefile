@@ -25,5 +25,9 @@ img:
 run:
 	scons run=q
 
+
+com:
+	minicom -D /dev/tty.usbserial 
+
 clean:
 	scons -c

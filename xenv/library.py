@@ -123,7 +123,6 @@ def use_libc(e):
             ],
             ['-DDUCK -DDLIBC_POSIX',
              ' -D__LIB_MUSL__ ',
-             '-static',
             #  '-Wl,-dynamic-linker,/lib/ld-musl-%s.so ' % (arch)
              ],
             ['eggs/libmusl/lib/crt1.o ',
@@ -195,10 +194,9 @@ def use_libcxx(e):
             '#/eggs/libcxxabi/include'
         ],
         ['-DDUCK',
-         ' -D__LIB_MUSL__ -Wl,-dynamic-linker,/lib/ld-musl-%s.so.1 ' % (
-             arch)
+        #  ' -D__LIB_MUSL__ -Wl,-dynamic-linker,/lib/ld-musl-%s.so.1 ' % (arch)
          ],
-        ['  ']
+        ['-static ']
     )
     e.AddCxxFlags([' -g -fno-use-cxa-atexit -fno-threadsafe-statics',
                    ' -D_LIBCPP_HAS_NO_THREADS',
@@ -247,7 +245,6 @@ def use_libapp(env):
         '#/eggs/libuuid',
     ]
     env.AddPath(app_lib)
-    env.AddLinkFlags(env['USERLD'])
 
 def generate(env, **kwargs):
     env.AddMethod(add_include, "AddInclude")
