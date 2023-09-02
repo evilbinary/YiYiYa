@@ -36,7 +36,7 @@ env = env.Clone(
   )
 # export PATH=$PATH:/Volumes/android/u-boot/scripts/dtc/:/Volumes/android/u-boot/tools/
 env.AppendENVPath('PATH', ['/Volumes/android/u-boot/scripts/dtc/','/Volumes/android/u-boot/tools/'])
-env.KernelSize(['size'],['../duck/init/kernel'])
+env.KernelSize(['size'],['../duck/init/kernel.elf'])
 
 
 if ARGUMENTS.get('build'):
@@ -113,7 +113,7 @@ def build_duck_image():
         'dd if=/dev/zero bs=512 count=2880 conv=notrunc of=$TARGET',
         'dd if=${SOURCES[0]} bs=512 count=1 conv=notrunc of=$TARGET',
         'dd if=${SOURCES[1]} bs=512 count=11 seek=1  conv=notrunc of=$TARGET',
-        'dd if=${SOURCES[2]} bs=512 count=%s seek=12  conv=notrunc of=$TARGET'%(env.get('KERNEL_SIZE'))
+        'dd if=${SOURCES[2]} bs=512 count=%s seek=12  conv=notrunc of=$TARGET'%(env.get('KERNEL_BLOCK_SIZE'))
     ])
   elif env.get('ARCHTYPE') =='arm':
       if env.get('PLATFORM')=='v3s':
@@ -146,7 +146,7 @@ def build_duck_image():
         [
           'dd if=/dev/zero bs=512 count=2880 conv=notrunc of=$TARGET',
           'dd if=${SOURCES[0]} bs=512 count=11 seek=0 conv=notrunc of=$TARGET',
-          'dd if=${SOURCES[1]} bs=512 count=%s seek=12  conv=notrunc of=$TARGET'%(env.get('KERNEL_SIZE'))
+          'dd if=${SOURCES[1]} bs=512 count=%s seek=12  conv=notrunc of=$TARGET'%(env.get('KERNEL_BLOCK_SIZE'))
       ])
   elif env.get('ARCHTYPE')=='xtensa':
     if env.get('SINGLE_KERNEL'):
@@ -179,7 +179,7 @@ def build_duck_image():
         [
           'dd if=/dev/zero bs=512 count=2880 conv=notrunc of=$TARGET',
           'dd if=${SOURCES[0]} bs=512 count=11 seek=0 conv=notrunc of=$TARGET',
-          'dd if=${SOURCES[1]} bs=512 count=%s seek=12  conv=notrunc of=$TARGET'%(env.get('KERNEL_SIZE'))
+          'dd if=${SOURCES[1]} bs=512 count=%s seek=12  conv=notrunc of=$TARGET'%(env.get('KERNEL_BLOCK_SIZE'))
       ])
   else:
     print('not support build duck image')

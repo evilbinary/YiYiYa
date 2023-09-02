@@ -82,7 +82,7 @@ LD = CC_PREFIX+'ld'
 AS = CC_PREFIX+'as'
 OBJCOPY = CC_PREFIX+'objcopy'
 RANLIB = CC_PREFIX+'ranlib'
-CFLAGS = '-fstack-protector -g' #-fstack-protector -mapcs-frame mov ip, sp 特权模式下 -fstack-protector   -fstack-protector-all  -DMALLOC_TRACE -fno-omit-frame-pointer
+CFLAGS = '-fstack-protector -g -DBACKTRACE' #-fstack-protector -mapcs-frame mov ip, sp 特权模式下 -fstack-protector   -fstack-protector-all  -DMALLOC_TRACE -fno-omit-frame-pointer
 LDFLAGS=' '
 LINKLD = 'link-'+platform+'.ld'+ '' # -Map=kernel.map 
 SINGLE_KERNEL = False
