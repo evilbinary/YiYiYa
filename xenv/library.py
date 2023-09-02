@@ -15,33 +15,33 @@ def use_library(env, libs=[], cpppath=[], cflags=[], linkflags=[]):
     """
     add use dependency lib in env
     """
-    lib_list=[]
+    lib_list = []
     for lib in libs:
-        p=lib.split('/')
-        lib_path= ''
-        lib_name = p[-1].replace('.a','')
-        lib_origin_name=p[-1]
+        p = lib.split('/')
+        lib_path = ''
+        lib_name = p[-1].replace('.a', '')
+        lib_origin_name = p[-1]
 
         if lib_name[:3] != "lib":
             lib_name = 'lib'+lib_name
-        if len(p)>1:
-            lib_path= '/'.join(p[:-1])
-            lib_path+='/'
+        if len(p) > 1:
+            lib_path = '/'.join(p[:-1])
+            lib_path += '/'
 
         # if check_exist(env, lib_name):
         #     continue
 
         # print('---->', env, lib)
         # search path
-        env.Append(CPPPATH=['#eggs/' +lib_path+ lib_name,
-                            '#eggs/' +lib_path+ lib_name+'/include'
+        env.Append(CPPPATH=['#eggs/' + lib_path + lib_name,
+                            '#eggs/' + lib_path + lib_name+'/include'
                             ])
         # search lib path
         env.Prepend(LIBPATH=['#eggs/'+lib_path + lib_name,
-                            '#eggs/'+lib_path + lib_name+'/lib'
-                            ])
+                             '#eggs/'+lib_path + lib_name+'/lib'
+                             ])
         lib_list.append(lib_origin_name)
-    
+
     # add to link
     env.PrependUnique(LIBS=lib_list)
 
@@ -74,24 +74,25 @@ def add_libpath(env, libpath=[]):
 
 
 def add_cflags(env, cflags=[]):
-    if isinstance(cflags,str):
-        cflags=[cflags]
+    if isinstance(cflags, str):
+        cflags = [cflags]
     for cflag in cflags:
         env.Append(CFLAGS=' '+cflag+' ')
 
 
 def add_cxxflags(env, cxxflags=[]):
-    if isinstance(cxxflags,str):
-        cxxflags=[cxxflags]
+    if isinstance(cxxflags, str):
+        cxxflags = [cxxflags]
     for cflag in cxxflags:
-        env.Append(CXXFLAGS=' '+cflag.replace('#/','')+' ')
+        env.Append(CXXFLAGS=' '+cflag.replace('#/', '')+' ')
 
 
-def add_linkflags(env,linkflags=[]):
-    if isinstance(linkflags,str):
-        linkflags=[linkflags]
+def add_linkflags(env, linkflags=[]):
+    if isinstance(linkflags, str):
+        linkflags = [linkflags]
     for linkflag in linkflags:
         env.Append(LINKFLAGS=' '+linkflag)
+
 
 def check_exist(e, name):
     if not e.get('ALL_LIBS'):
@@ -123,11 +124,11 @@ def use_libc(e):
             ],
             ['-DDUCK -DDLIBC_POSIX',
              ' -D__LIB_MUSL__ ',
-            #  '-Wl,-dynamic-linker,/lib/ld-musl-%s.so ' % (arch)
+             #  '-Wl,-dynamic-linker,/lib/ld-musl-%s.so ' % (arch)
              ],
             ['eggs/libmusl/lib/crt1.o ',
-            '-static '
-            ])
+             '-static '
+             ])
 
         if e['ARCHTYPE'] == 'x86':
             e.AddInclude(
@@ -194,19 +195,20 @@ def use_libcxx(e):
             '#/eggs/libcxxabi/include'
         ],
         ['-DDUCK',
-        #  ' -D__LIB_MUSL__ -Wl,-dynamic-linker,/lib/ld-musl-%s.so.1 ' % (arch)
+         #  ' -D__LIB_MUSL__ -Wl,-dynamic-linker,/lib/ld-musl-%s.so.1 ' % (arch)
          ],
-        ['-static ']
+        ['-static']  # 
     )
-    e.AddCxxFlags([' -g -fno-use-cxa-atexit -fno-threadsafe-statics',
-                   ' -D_LIBCPP_HAS_NO_THREADS',
-                   '-D_LIBCPP_HAS_NO_MONOTONIC_CLOCK',
-                   '-D_LIBCPP_HAS_MUSL_LIBC',
-                   '-D_LIBCPP_HAS_NO_LIBRARY_ALIGNED_ALLOCATION',
-                   '-D_LIBCPP_BUILDING_LIBRARY',
-                   '-D_POSIX_C_SOURCE -D_LIBCXXABI_HAS_NO_THREADS -D_GNU_SOURCE  ',
-                   '-D_LIBCPP_AVAILABILITY_FILESYSTEM'
-                   ])
+    e.AddCxxFlags([
+        '-fno-use-cxa-atexit -fno-threadsafe-statics',
+        ' -D_LIBCPP_HAS_NO_THREADS',
+        '-D_LIBCPP_HAS_NO_MONOTONIC_CLOCK',
+        '-D_LIBCPP_HAS_MUSL_LIBC',
+        '-D_LIBCPP_HAS_NO_LIBRARY_ALIGNED_ALLOCATION',
+        '-D_LIBCPP_BUILDING_LIBRARY',
+        '-D_POSIX_C_SOURCE -D_LIBCXXABI_HAS_NO_THREADS -D_GNU_SOURCE  ',
+        '-D_LIBCPP_AVAILABILITY_FILESYSTEM'
+    ])
 
 
 def use_libgcc(env):
@@ -222,7 +224,7 @@ def use_libapp(env):
     env.UseLibrary(['gui', 'jpeg', 'zlib', 'png',
                    'etk', 'cmocka', 'lz4', 'uuid'])
 
-    app_lib=[
+    app_lib = [
         '#/eggs/',
         '.',
         '../libs/include/',
@@ -246,6 +248,7 @@ def use_libapp(env):
     ]
     env.AddPath(app_lib)
 
+
 def generate(env, **kwargs):
     env.AddMethod(add_include, "AddInclude")
     env.AddMethod(use_library, "UseLibrary")
@@ -259,7 +262,6 @@ def generate(env, **kwargs):
     env.AddMethod(add_cflags, "AddCFlags")
     env.AddMethod(add_linkflags, "AddLinkFlags")
 
-    
     env.AddMethod(add_path, "AddPath")
     env.AddMethod(use_libapp, "UseLibApp")
     env.AddMethod(use_libgcc, "useLibGcc")

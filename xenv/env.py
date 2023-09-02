@@ -108,10 +108,10 @@ if not arch:
 arch_type = get_arch(arch)
 archs = support_archs[arch_type]
 
-common_cflags = '-DDUCK -D%s -D%s -nostdlib -nostdinc -fPIC -fno-builtin -std=c99 -std=gnu99 -w -D%s' % (
+common_cflags = '-DDUCK -D%s -D%s -nostdlib -nostdinc -fno-builtin -std=c99 -std=gnu99 -w -D%s' % (
     arch_type.upper(), macro_fmt(arch), macro_fmt(platform))
 
-common_cxxflags = '-DDUCK -D%s -D%s  -fPIC -w -D%s' % (
+common_cxxflags = '-DDUCK -D%s -D%s  -w -D%s' % (
     arch_type.upper(), macro_fmt(arch), macro_fmt(platform))
 
 lib_path = ['.']
