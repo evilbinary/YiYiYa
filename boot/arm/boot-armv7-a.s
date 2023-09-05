@@ -92,7 +92,7 @@ apu_entry:
 
     bl init_apu_boot
 halt:
-    wfi
+    //wfi
     b halt
 
 .data
