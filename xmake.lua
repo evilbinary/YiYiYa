@@ -73,16 +73,14 @@ end
 
 
 
-
 --c++ 应用 输入才编译
 set_config("cpp-apps",false)
 
 -- apply debug and release modes
-add_rules("mode.debug", "mode.release")
+add_rules("mode.debug", "mode.release","arch")
 
 includes("image/xmake.lua")
 includes("boot/xmake.lua")
 includes("duck/xmake.lua")
-
 -- includes("eggs/xmake.lua")
 -- includes("app/xmake.lua")

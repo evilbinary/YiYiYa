@@ -1,62 +1,6 @@
-
-support_archs = {
-    arm = {'armv5', 'armv6', 'armv7', 'armv7e-m', 'armv7-a', 'armv8-a'},
-    x86 = {'x86', 'x86-64', 'x86-duck'},
-    xtensa = {'lx6'},
-    riscv = {'riscv'},
-    dummy = {'dummy'},
-    general = {'general'}
-}
-
-support_platform = {
-    stm32f4xx = 'armv7e-m',
-    ['i386-pc'] = 'x86',
-    raspi2 = 'armv7-a',
-    esp32 = 'lx6',
-    v3s = 'armv7-a',
-    raspi3 = 'armv8-a',
-    rk3128 = 'armv7-a',
-    cubieboard2 = 'armv7-a',
-    dmulator = 'general',
-    dummy = 'dummy',
-    rk3288 = 'armv7-a',
-    ['orangepi-pc'] = 'armv7-a',
-    ['riscv-virt'] = 'riscv'
-}
-
-support_arch_cflags = {
-    x86= '',
-    armv7= '',
-    ['armv7e-m']= '-mthumb -mthumb-interwork  -mfloat-abi=soft -mfpu=vfpv4-d16 -mcpu=cortex-m4 ',
-    ['armv7-a']= '-mcpu=cortex-a7 -mtune=cortex-a7 -mfpu=vfpv4 -mfloat-abi=softfp ',
-    ['armv8-a']= ' -mfpu=vfpv4 -mfloat-abi=softfp '
-}
-
-
-support_arch_linkflags = {
-    x86= '',
-    armv7= '',
-    ['armv7e-m']= '-mthumb -mthumb-interwork  -mfloat-abi=soft -mfpu=vfpv4-d16 -mcpu=cortex-m4 ',
-    ['armv7-a']= '-mcpu=cortex-a7 -mtune=cortex-a7 -mfpu=vfpv4 -mfloat-abi=softfp ',
-    ['armv8-a']='-mcpu=cortex-a53 -mtune=cortex-a53'
-}
-
-support_platform_cflags = {
-    ['raspi2']= '-nostdlib -nostdinc ',-- --specs=nosys.specs
-    ['raspi3']= '-mcpu=cortex-a53 -mtune=cortex-a53',
-    ['stm32f4xx']= '-specs=nosys.specs -nolibc -nostdlib -nostdinc -fno-builtin -DUSE_HAL_DRIVER'
-
-}
-
-function get_arch(arch)
-    local archs = {}
-    for k, v in pairs(support_archs) do
-        for i = 1, #v do
-            archs[v[i]] = k
-        end
-    end
-    return archs[arch]
-end
+includes(
+    "support.lua"
+)
 
 function append(array, ...)
     local arg = {...}
@@ -88,7 +32,7 @@ def_arch_type=''
 
 if plat and plat ~='' then
     arch =support_platform[plat]
-    arch_type =get_arch(arch)
+    arch_type =get_arch_type(arch)
     archs= support_archs[arch_type]
 
     if arch then
@@ -98,9 +42,58 @@ if plat and plat ~='' then
         set_config("arch_type", arch_type )
         set_config("def_arch",def_arch)
         set_config("def_arch_type",def_arch_type)
+        set('arch',arch)
     end
 end
 
+
+rule("arch")
+    before_run(function (target)
+        import("support")
+        import("core.project.config")
+        import('core.base.global')
+
+        arch=target:arch()
+        plat=target:plat()
+        arch_type= support.get_arch_type(arch)
+
+        global.set("arch",arch)
+        global.set("arch_type",arch_type)
+        global.set("plat",plat)
+
+        config.set("arch",arch)
+        config.set("arch_type",arch_type)
+        config.set("plat",plat)
+
+        target:set("arch_type", arch_type)
+        target:set("arch", arch)
+        target:set("plat", plat)
+    end)
+    on_load(function (target)
+        import("support")
+        import("core.project.config")
+        import('core.base.global')
+
+        arch=target:arch()
+        plat=target:plat()
+        arch_type= support.get_arch_type(arch)
+
+        support.set('arch',arch)
+
+        global.set("arch",arch)
+        global.set("arch_type",arch_type)
+        global.set("plat",plat)
+
+        config.set("arch",arch)
+        config.set("arch_type",arch_type)
+        config.set("plat",plat)
+
+        target:set("arch_type", arch_type)
+        target:set("arch", arch)
+        target:set("plat", plat)
+        
+        
+    end)
 
 rule("objcopy-file")
     after_build(function (target)
@@ -156,7 +149,7 @@ rule("kernel-gen")
         
         arch_type =config.get('arch_type')
         if arch_type=='' then
-            arch_type = target:values('arch_type')
+            arch_type = target:get('arch_type')
         end
         
          -- 生成头文件内容
@@ -199,7 +192,7 @@ rule("make-image")
 
         arch_type =config.get('arch_type')
         if arch_type=='' then
-            arch_type = target:values('arch_type')
+            arch_type = target:get('arch_type')
         end
 
         if arch_type=='x86' then
@@ -225,3 +218,28 @@ rule("make-image")
         
 
     end)
+
+rule_end()
+
+
+local rootfs_dir =  os.scriptdir().."/app/resource/"
+
+function install_dir(path)
+    before_build(function (target)
+        if not os.exists(rootfs_dir..path) then
+            os.run("mkdir -p %s", rootfs_dir..path)
+        end
+        if os.exists(target:scriptdir().."") then
+            os.cp(target:scriptdir().."", rootfs_dir..path)
+        end
+    end)
+
+
+    after_link(function (target)
+        os.cp(target:targetfile(), rootfs_dir..path)
+    end)
+
+    after_clean(function(target)
+        os.rm(rootfs_dir..path.."/"..target:name())
+    end)
+end
