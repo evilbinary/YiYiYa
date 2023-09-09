@@ -70,3 +70,5 @@ image/disk.img
 **.pyc
 **/**/**.pyc
 **/*.pyc
+
+build/**

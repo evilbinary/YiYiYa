@@ -24,21 +24,22 @@ target("duck.fit")
         'kernel.elf'
     )
     add_files(
+        '$(buildir)/$(plat)/$(arch)/$(mode)/kernel-$(plat).its',
         "$(buildir)/$(plat)/$(arch)/$(mode)/boot-init.bin",
         "$(buildir)/$(plat)/$(arch)/$(mode)/kernel"
     )
+    set_configdir("$(buildir)/$(plat)/$(arch)/$(mode)")
+    set_configvar("BOOT", "boot-init.bin" )
+    set_configvar("KERNEL", "kernel" )
+    add_configfiles('kernel-$(plat).its')
+
 
     on_build(function (target)
         local targetfile = target:targetfile()
         local sourcefiles = target:sourcefiles()
         arch_type= target:get('arch_type')
 
-        if arch_type=='x86' then 
-            os.exec('mkimage -f kernel.its '..targetfile)
-
-        elseif arch_type=='arm' then
-            os.exec('mkimage -f kernel-$(plat).its '..targetfile)
-        end
+        os.exec('mkimage -f '..sourcefiles[1]..' '..targetfile)
     end)
 
 
@@ -70,7 +71,7 @@ target("uImage.img")
 
 
 --run
-function run_qemu(plat,mode) 
+function run_qemu(plat,mode,debug) 
     on_run(function (target)
         import('core.base.global')
         
@@ -144,16 +145,29 @@ function run_qemu(plat,mode)
             print('no support run')
         end
 
-        cprint('${green}run qemu ${clear} %s',run_qemu_cmd)
-        os.exec(run_qemu_cmd)
+        if debug then 
+            cprint('${green}run qemu debug ${clear} %s',debug_qemu_cmd)
+            os.exec(debug_qemu_cmd)
+        else
+            cprint('${green}run qemu ${clear} %s',run_qemu_cmd)
+            os.exec(run_qemu_cmd)
+        end
 
     -- print('qmeu=>',os.arch() ,plat )
     end)
     on_build(function (target) 
-        print('build nothing, just use xmake run qemu')
 
     end)
 end
+
+target("debug")
+    
+    add_deps("duck.img","disk.img")
+
+    add_rules("arch")
+
+
+    run_qemu('raspi2',get_config('mode'),true)
 
 target("qemu")
     

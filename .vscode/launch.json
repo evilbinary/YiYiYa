@@ -1565,7 +1565,7 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            "program": "${workspaceRoot}/duck/init/kernel.elf",
+            "program": "${workspaceRoot}/build/raspi2/armv7-a/debug/kernel.elf",
             // "program": "${workspaceRoot}/app/launcher/launcher",
 
             // "program": "${workspaceRoot}/app/hello/hello",
