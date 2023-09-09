@@ -136,7 +136,7 @@ rule("kernel-gen")
 
         local inputfile =''
 
-        print("target " .. target:name())
+        print("kernel gen target " .. target:name())
         for _, file in ipairs(sourcefiles) do
             print('file->',file)
             inputfile=file
@@ -148,7 +148,7 @@ rule("kernel-gen")
         local file_size = os.filesize(inputfile)
         
 
-        local kernel_size=  math.ceil((1023+ file_size)/1024.0)*1024
+        local kernel_size=  math.ceil((1023+ file_size)/1024)*1024
         local block_size = math.ceil(kernel_size/1024)
 
         print('kernel size: ',file_size,' size: ',kernel_size,'block size: ',block_size)

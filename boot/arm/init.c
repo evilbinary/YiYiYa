@@ -269,7 +269,7 @@ void init_boot_info() {
   boot_info->version = BOOT_VERSION;
   boot_info->kernel_origin_base = KERNEL_ORIGIN_BASE;
   boot_info->kernel_base = KERNEL_BASE;
-  boot_info->kernel_size = KERNEL_BLOCK_SIZE * READ_BLOCK_SIZE * 2;
+  boot_info->kernel_size = KERNEL_SIZE*2;
   boot_info->tss_number = MAX_CPU;
   boot_info->second_boot_entry = SECOND_BOOT_ENTRY;
   boot_info->segments_number = 0;
