@@ -29,6 +29,9 @@ elseif is_plat("raspi3") then
 
 end
 
+--默认libc
+default_libc = 'libmusl'  -- libmusl libc libnewlib
+
 --应用
 apps = {              
     'cmd','gui','hello', 'test','unitest',
@@ -70,7 +73,6 @@ if plat then
     add_cflags(arch_cflags,plat_cflags)
 
 end
-
 
 
 --c++ 应用 输入才编译

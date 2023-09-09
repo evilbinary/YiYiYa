@@ -52,10 +52,13 @@ rule("arch")
         import("support")
         import("core.project.config")
         import('core.base.global')
+        import("show")
 
         arch=target:arch()
         plat=target:plat()
         arch_type= support.get_arch_type(arch)
+
+        archs= support.get_archs(arch_type)
 
         global.set("arch",arch)
         global.set("arch_type",arch_type)
@@ -68,6 +71,14 @@ rule("arch")
         target:set("arch_type", arch_type)
         target:set("arch", arch)
         target:set("plat", plat)
+
+
+        show.show_logo(logo, {seed = 580})
+
+        cprint('${magenta}welcome to yiyiya os build${clear}')
+        cprint('${blink}Copyright (C) 2021-present evilbinary evilbinary.org')
+        cprint('your select platform: '..plat..'${clear} arch: '..arch..' build env: '..os.host() )
+        
     end)
     on_load(function (target)
         import("support")
@@ -108,12 +119,12 @@ rule("kernel-objcopy")
         local inputfile = target:targetfile()
         local outputfile = string.gsub(inputfile, "%.elf$", "")
         objcopy = target:tool("objcopy")
-        os.execv(objcopy,{"-O", "binary",inputfile, outputfile})
-        os.runv(objcopy, {"-O", "binary", "--only-keep-debug", inputfile, outputfile..".dbg"})
-        os.runv(objcopy, {"-O", "binary", "-S", inputfile, outputfile..".bin"})
+        os.execv(objcopy,{"-S",inputfile, outputfile})
+        os.execv(objcopy, {"-O", "binary", "--only-keep-debug", inputfile, outputfile..".dbg"})
+        os.execv(objcopy, {"-O", "binary", "-S", inputfile, outputfile..".bin"})
         
     end)
-   
+
 
 rule("kernel-gen")
     set_extensions("",".elf")
@@ -184,7 +195,13 @@ rule("make-image")
         local sourcefiles = target:sourcefiles()
         local objectfiles = target:objectfiles()
         
-        print('make image '.. targetfile..' ')
+        local file_size = os.filesize(targetfile)
+
+        local kernel_size=  math.ceil((1023+ file_size)/1024.0)*1024
+        local block_size = math.ceil(kernel_size/1024)
+ 
+        print('make image '.. targetfile..' '..block_size)
+
 
         for _, file in ipairs(sourcefiles) do
             print('-->'..file)
@@ -202,14 +219,14 @@ rule("make-image")
                 os.exec('dd if=/dev/zero bs=512 count=2880 conv=notrunc of='..targetfile)
                 os.exec('tools/mksunxi/mksunxiboot '..sourcefiles[1]..' boot/arm/init-spl.bin')
                 os.exec('dd if=boot/arm/init-spl.bin bs=512 count=11 seek=0 conv=notrunc of='..targetfile)
-                os.exec('dd if=${SOURCES[1]} bs=512 count=11 seek=12 conv=notrunc of='..targetfile)
+                os.exec('dd if=${SOURCES[1]} bs=512 count='..block_size..' seek=12 conv=notrunc of='..targetfile)
             elseif plat=='stm32f4xx' then
 
             else
                 os.exec('dd if=/dev/zero bs=512 count=2880 conv=notrunc of='..targetfile)
 
                 os.exec('dd if='..sourcefiles[1]..' bs=512 count=11 seek=0 conv=notrunc of='..targetfile)
-                os.exec('dd if='..sourcefiles[2]..' bs=512 count=11 seek=12 conv=notrunc of='..targetfile)
+                os.exec('dd if='..sourcefiles[2]..' bs=512 count='..block_size..' seek=12 conv=notrunc of='..targetfile)
                 print('make image finished ')
             end
         end

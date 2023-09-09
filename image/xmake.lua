@@ -119,13 +119,13 @@ function run_qemu(plat,mode)
                 -- run_qemu_cmd =run_qemu_cmd..' -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor'
                 debug_qemu_cmd = run_qemu_cmd ..' -S -s'
             else
-                run_qemu_cmd='qemu-system-arm -name YiYiYa -M raspi2b  -rtc base=localtime -kernel '..kernel_image..'  -serial stdio   -D ./qemu.log -drive if=sd,id=sd0,format=raw,file='..disk_img..' '--#-d in_asm -d cpu_reset -d in_asm,int,mmu
+                run_qemu_cmd='qemu-system-arm -name YiYiYa -M raspi2b  -rtc base=localtime -kernel '..kernel_image..'  -serial stdio   -D ./qemu.log -drive if=sd,id=sd0,format=raw,file='..disk_img..' -d cpu_reset -d in_asm,int,mmu'--#-d in_asm -d cpu_reset -d in_asm,int,mmu
                 --# run_qemu_cmd =run_qemu_cmd..' -monitor tcp:127.0.0.1:55555,server,nowait'
                 --# run_qemu_cmd =run_qemu_cmd..' -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor'
                 debug_qemu_cmd = run_qemu_cmd ..' -S -s'
             end
         elseif arch_type=='xtensa' then
-            run_qemu_cmd='~/dev/qemu-esp32/build/qemu-system-xtensa -nographic -M esp32 -drive file=image/duck.img,if=mtd,format=raw -s -serial stdio -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor  -D ./qemu.log -drive if=sd,id=sd0,format=raw,file='..disk_img..' -d in_asm -d cpu_reset -d in_asm,int,mmu' ---d in_asm -d cpu_reset -d in_asm,int,mmu
+            run_qemu_cmd='~/dev/qemu-esp32/build/qemu-system-xtensa -nographic -M esp32 -drive file='..disk_img..',if=mtd,format=raw -s -serial stdio -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor  -D ./qemu.log -drive if=sd,id=sd0,format=raw,file='..disk_img..' -d in_asm -d cpu_reset -d in_asm,int,mmu' ---d in_asm -d cpu_reset -d in_asm,int,mmu
             debug_qemu_cmd = run_qemu_cmd ..' -S '
 
         elseif arch_type=='general' then
@@ -144,21 +144,25 @@ function run_qemu(plat,mode)
             print('no support run')
         end
 
-        cprint('${green}run qemu %s',run_qemu_cmd)
-        os.run(run_qemu_cmd)
+        cprint('${green}run qemu ${clear} %s',run_qemu_cmd)
+        os.exec(run_qemu_cmd)
 
     -- print('qmeu=>',os.arch() ,plat )
+    end)
+    on_build(function (target) 
+        print('build nothing, just use xmake run qemu')
+
     end)
 end
 
 target("qemu")
-        
+    
     add_deps("duck.img","disk.img")
 
     add_rules("arch")
 
 
-    run_qemu('raspi2',"release")
+    run_qemu('raspi2',get_config('mode'))
 
 
 target("raspi2")
@@ -166,7 +170,7 @@ target("raspi2")
     add_deps("duck.img","disk.img")
 
     add_rules("arch")
-    run_qemu('raspi2',"release")
+    run_qemu('raspi2',get_config('mode'))
 
 
 
