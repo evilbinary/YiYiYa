@@ -287,11 +287,19 @@ function set_type(type)
     if default_libc=='musl' then
         -- add_files(os.projectdir()..'/eggs/libmusl/lib/crt1.o')
 
+        
         add_cflags(
             '-DDUCK -DDLIBC_POSIX',
              ' -D__LIB_MUSL__ ',
              '-static',
              '-nostdlib'
+            )
+        add_cxxflags(
+            '-DDUCK -DDLIBC_POSIX',
+                ' -D__LIB_MUSL__ ',
+                '-static',
+                '-nostdlib',
+                ' -nostdinc'
             )
         add_ldflags(
             '-static'

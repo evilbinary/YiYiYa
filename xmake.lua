@@ -73,6 +73,7 @@ if plat then
     arch_cflags=get_arch_cflags(arch)
     plat_cflags=get_platform_cflags(plat)
     add_cflags(arch_cflags,plat_cflags)
+    add_cxxflags(arch_cflags)
     set_config('cflags',arch_cflags,plat_cflags)
 end
 
