@@ -35,6 +35,7 @@ push:
 	cd eggs && git push
 	cd duck && git push
 	cd foot && git push
+	git push
 
 clean:
 	rm -rf build
