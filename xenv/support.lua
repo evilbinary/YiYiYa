@@ -20,7 +20,8 @@ support_platform = {
     dummy = 'dummy',
     rk3288 = 'armv7-a',
     ['orangepi-pc'] = 'armv7-a',
-    ['riscv-virt'] = 'riscv'
+    ['riscv-virt'] = 'riscv',
+    android ='armv7-a'
 }
 
 support_arch_cflags = {
@@ -43,8 +44,8 @@ support_arch_linkflags = {
 support_platform_cflags = {
     ['raspi2']= '-nostdlib -nostdinc ',-- --specs=nosys.specs
     ['raspi3']= '-mcpu=cortex-a53 -mtune=cortex-a53',
-    ['stm32f4xx']= '-specs=nosys.specs -nolibc -nostdlib -nostdinc -fno-builtin -DUSE_HAL_DRIVER'
-
+    ['stm32f4xx']= '-specs=nosys.specs -nolibc -nostdlib -nostdinc -fno-builtin -DUSE_HAL_DRIVER',
+    ['android'] = ''
 }
 
 support_config= {

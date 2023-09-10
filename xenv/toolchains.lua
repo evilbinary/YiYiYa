@@ -13,10 +13,19 @@ toolchain("arm-none-eabi")
     set_toolset("strip", "arm-none-eabi-strip")
     set_toolset("as", "arm-none-eabi-gcc")
     set_toolset("objcopy", "arm-none-eabi-objcopy")
+    set_toolset("sh",    "arm-none-eabi-gcc")
 
     arch_cflags=support_arch_cflags[arch]
     plat_cflags=support_platform_cflags[plat]
     add_cflags(arch_cflags,plat_cflags)
+
+    -- on_load(function (toolchain)
+    --     local tool = toolchain:config("arm-none-eabi") or "arm-none-eabi"
+    --     toolchain:set("toolset", "cc",    tool .. "-cc")
+    --     toolchain:set("toolset", "cxx",   tool .. "-c++")
+    --     toolchain:set("toolset", "ld",    tool .. "-c++")
+    --     toolchain:set("toolset", "sh",    tool .. "-c++")
+    -- end)
 
 toolchain_end()
 

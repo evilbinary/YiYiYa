@@ -16,7 +16,8 @@ set_config("arch_type","")
 set_policy("check.auto_ignore_flags", false)
 
 
-
+add_platformdirs("./xenv/platform")
+add_moduledirs('./xenv/module')
 
 --构建应用
 set_config("apps", false )
@@ -26,11 +27,12 @@ if is_plat("raspi2") then
 
 elseif is_plat("raspi3") then
     set_toolchains("arm-none-eabi")
-
+else 
+    set_toolchains("arm-none-eabi")
 end
 
 --默认libc
-default_libc = 'libmusl'  -- libmusl libc libnewlib
+default_libc = 'musl'  -- musl c newlib
 
 --应用
 apps = {              
@@ -84,5 +86,5 @@ add_rules("mode.debug", "mode.release","arch")
 includes("image/xmake.lua")
 includes("boot/xmake.lua")
 includes("duck/xmake.lua")
--- includes("eggs/xmake.lua")
--- includes("app/xmake.lua")
+includes("eggs/xmake.lua")
+includes("app/xmake.lua")

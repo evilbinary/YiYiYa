@@ -72,8 +72,11 @@ target("uImage.img")
 
 --run
 function run_qemu(plat,mode,debug) 
+
     on_run(function (target)
         import('core.base.global')
+
+
         
         local script_dir = path.directory(os.scriptdir())
         local env_dir = path.join(script_dir,"xenv/")
@@ -85,6 +88,16 @@ function run_qemu(plat,mode,debug)
         kernel_image="build/"..plat.."/"..arch.."/"..mode.."/duck.img"
         disk_img="image/disk.img"
         
+        if is_host('mac') then
+            os.exec('hdiutil attach '..disk_img)
+            os.cp('app/resource/*', '/Volumes/disk/')
+            os.exec('hdiutil eject /Volumes/disk')
+        elseif is_host('linux') then
+            os.exec('mcopy -nmov  -i image/disk.img app/resource/* ::')
+        else
+            os.exec('mcopy.exe -nmov  -i image/disk.img app/resource/* ::')
+        end
+
         run_qemu_cmd=''
         debug_qemu_cmd=''
   
@@ -120,7 +133,7 @@ function run_qemu(plat,mode,debug)
                 -- run_qemu_cmd =run_qemu_cmd..' -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor'
                 debug_qemu_cmd = run_qemu_cmd ..' -S -s'
             else
-                run_qemu_cmd='qemu-system-arm -name YiYiYa -M raspi2b  -rtc base=localtime -kernel '..kernel_image..'  -serial stdio   -D ./qemu.log -drive if=sd,id=sd0,format=raw,file='..disk_img..' -d cpu_reset -d in_asm,int,mmu'--#-d in_asm -d cpu_reset -d in_asm,int,mmu
+                run_qemu_cmd='qemu-system-arm -name YiYiYa -M raspi2b  -rtc base=localtime -kernel '..kernel_image..'  -serial stdio   -D ./qemu.log -drive if=sd,id=sd0,format=raw,file='..disk_img..' '--#-d in_asm -d cpu_reset -d in_asm,int,mmu
                 --# run_qemu_cmd =run_qemu_cmd..' -monitor tcp:127.0.0.1:55555,server,nowait'
                 --# run_qemu_cmd =run_qemu_cmd..' -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor'
                 debug_qemu_cmd = run_qemu_cmd ..' -S -s'
@@ -163,6 +176,7 @@ end
 target("debug")
     
     add_deps("duck.img","disk.img")
+ 
 
     add_rules("arch")
 
@@ -172,6 +186,7 @@ target("debug")
 target("qemu")
     
     add_deps("duck.img","disk.img")
+
 
     add_rules("arch")
 
@@ -192,13 +207,12 @@ target("disk.img")
 
     on_build(function (target)
         os.exec('qemu-img create image/disk.img 256m')
-        os.exec('mkfs.vfat image/disk.img')
+        os.exec('mkfs.vfat -n disk image/disk.img')
     end)
 
     on_run(function (target)
         print('make disk.img')
-
         os.exec('qemu-img create image/disk.img 256m')
-        os.exec('mkfs.vfat image/disk.img')
+        os.exec('mkfs.vfat -n disk image/disk.img')
     end)
 

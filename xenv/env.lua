@@ -239,24 +239,57 @@ rule("make-image")
 rule_end()
 
 
-local rootfs_dir =  os.scriptdir().."/app/resource/"
+local root_res_dir =  os.projectdir().."/app/resource/"
 
 function install_dir(path)
     before_build(function (target)
-        if not os.exists(rootfs_dir..path) then
-            os.run("mkdir -p %s", rootfs_dir..path)
+        if not os.exists(root_res_dir..path) then
+            os.run("mkdir -p %s", root_res_dir..path)
         end
-        if os.exists(target:scriptdir().."") then
-            os.cp(target:scriptdir().."", rootfs_dir..path)
-        end
+        -- if os.exists(target:scriptdir().."") then
+        --     os.cp(target:scriptdir().."", rootfs_dir..path)
+        -- end
     end)
 
 
     after_link(function (target)
-        os.cp(target:targetfile(), rootfs_dir..path)
+        os.cp(target:targetfile(), root_res_dir..path)
     end)
 
     after_clean(function(target)
-        os.rm(rootfs_dir..path.."/"..target:name())
+        os.rm(root_res_dir..path.."/"..target:name())
     end)
+end
+
+function set_type(type)
+    if type == "lib" then
+        set_kind("static")
+    elseif type == "app" then
+        set_kind("binary")
+        install_dir("app")
+    elseif type == "cli" then
+        set_kind("binary")
+        install_dir("bin")
+    else
+        print('not support')
+    end
+
+    if default_libc=='musl' then
+        add_cflags(
+            '-DDUCK -DDLIBC_POSIX',
+             ' -D__LIB_MUSL__ '
+            )
+    end
+
+    add_packages(default_libc)
+
+    on_config(function (target)
+        if type=='cli' or type=='app' then
+            target:add('ldflags','-Tapp/xlinker/user-'.. target:plat()..'.ld', {force=true})
+        end
+
+    end)
+
+    on_run(function (target)end)
+
 end
