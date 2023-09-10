@@ -103,7 +103,16 @@ rule("arch")
         target:set("arch", arch)
         target:set("plat", plat)
         
-        
+        import('core.base.global')
+        import("lib.detect.find_library")
+
+        local library = find_library("gcc", 
+            {"/opt/local/lib/gcc/arm-none-eabi/*/"},
+            {kind = "static"}
+        )
+        -- print('libgcc',library.linkdir)
+        target:add('linkdirs',library.linkdir)
+
     end)
 
 rule("objcopy-file")
@@ -274,16 +283,40 @@ function set_type(type)
         print('not support')
     end
 
+
     if default_libc=='musl' then
+        -- add_files(os.projectdir()..'/eggs/libmusl/lib/crt1.o')
+
         add_cflags(
             '-DDUCK -DDLIBC_POSIX',
-             ' -D__LIB_MUSL__ '
+             ' -D__LIB_MUSL__ ',
+             '-static',
+             '-nostdlib'
             )
+        add_ldflags(
+            '-static'
+        )
+
     end
+
 
     add_packages(default_libc)
 
     on_config(function (target)
+        import('core.base.global')
+        import("lib.detect.find_library")
+
+        local library = find_library("gcc", 
+            {"/opt/local/lib/gcc/arm-none-eabi/*/","/usr/lib/gcc/*/"},
+            {kind = "static"}
+        )
+ 
+        -- print('libgcc',library.linkdir)
+        target:add("ldflags",{
+            '-L'..library.linkdir,
+            "-lgcc"
+        })
+
         if type=='cli' or type=='app' then
             target:add('ldflags','-Tapp/xlinker/user-'.. target:plat()..'.ld', {force=true})
         end

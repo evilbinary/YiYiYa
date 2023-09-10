@@ -20,18 +20,14 @@ https://github.com/evilbinary/YiYiYa
 3、运行编译命令
 
 ```
-make raspi2
-```
-
-或者
-```
-scons platform=raspi2 -j8
+xmake f -m debug
+xmake -v
 ```
 
 ### 运行
 
 ```
-scons platform=raspi2 run=qemu
+xmake run qemu
 ```
 
 

@@ -57,13 +57,7 @@ modules={
     --'musl','gaga','ipc','pty','log','debug','ewok'
 }
 
---cflags 
 
-for index, value in ipairs(modules) do
-    mod=string.upper(value)..'_MODULE '
-    add_defines(mod)
-    -- add_ldflags(mod)
-end
 
 if plat then
     add_defines(string.upper(plat))
