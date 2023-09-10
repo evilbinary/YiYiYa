@@ -56,20 +56,27 @@ modules={
     'posix','loader','musl','ipc','gaga','log','pty' 
     --'musl','gaga','ipc','pty','log','debug','ewok'
 }
+if not plat then 
 
+return 
 
+end
 
 if plat then
+    -- print('plat',plat,'--->',get_config('plat'))
+    arch=get_arch(plat)
+
     add_defines(string.upper(plat))
     add_defines(def_arch)
     add_defines(def_arch_type)
     
-    arch_cflags=support_arch_cflags[arch]
-    plat_cflags=support_platform_cflags[plat]
+    arch_cflags=get_arch_cflags(arch)
+    plat_cflags=get_platform_cflags(plat)
     add_cflags(arch_cflags,plat_cflags)
-
+    set_config('cflags',arch_cflags,plat_cflags)
 end
 
+-- print('get cflags ',get_config('cflags'))
 
 --c++ 应用 输入才编译
 set_config("cpp-apps",false)

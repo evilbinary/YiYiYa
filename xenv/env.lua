@@ -31,9 +31,9 @@ def_arch = ''
 def_arch_type=''
 
 if plat and plat ~='' then
-    arch =support_platform[plat]
+    arch =get_arch(plat)
     arch_type =get_arch_type(arch)
-    archs= support_archs[arch_type]
+    archs= get_archs(arch_type)
 
     if arch then
         def_arch=string.upper(string.gsub(arch, "-", "_"))
@@ -66,7 +66,7 @@ rule("arch")
 
         config.set("arch",arch)
         config.set("arch_type",arch_type)
-        config.set("plat",plat)
+        -- config.set("plat",plat)
 
         target:set("arch_type", arch_type)
         target:set("arch", arch)
@@ -97,7 +97,7 @@ rule("arch")
 
         config.set("arch",arch)
         config.set("arch_type",arch_type)
-        config.set("plat",plat)
+        -- config.set("plat",plat)
 
         target:set("arch_type", arch_type)
         target:set("arch", arch)

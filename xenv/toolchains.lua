@@ -15,8 +15,8 @@ toolchain("arm-none-eabi")
     set_toolset("objcopy", "arm-none-eabi-objcopy")
     set_toolset("sh",    "arm-none-eabi-gcc")
 
-    arch_cflags=support_arch_cflags[arch]
-    plat_cflags=support_platform_cflags[plat]
+    arch_cflags=get_arch_cflags(arch)
+    plat_cflags=get_platform_cflags(plat)
     add_cflags(arch_cflags,plat_cflags)
 
     -- on_load(function (toolchain)

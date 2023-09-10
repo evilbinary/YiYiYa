@@ -1,4 +1,4 @@
-support_archs = {
+local support_archs = {
     arm = {'armv5', 'armv6', 'armv7', 'armv7e-m', 'armv7-a', 'armv8-a'},
     x86 = {'x86', 'x86-64', 'x86-duck'},
     xtensa = {'lx6'},
@@ -7,7 +7,7 @@ support_archs = {
     general = {'general'}
 }
 
-support_platform = {
+local support_platform = {
     stm32f4xx = 'armv7e-m',
     ['i386-pc'] = 'x86',
     raspi2 = 'armv7-a',
@@ -24,7 +24,7 @@ support_platform = {
     android ='armv7-a'
 }
 
-support_arch_cflags = {
+local support_arch_cflags = {
     x86= '',
     armv7= '',
     ['armv7e-m']= '-mthumb -mthumb-interwork  -mfloat-abi=soft -mfpu=vfpv4-d16 -mcpu=cortex-m4 ',
@@ -33,7 +33,7 @@ support_arch_cflags = {
 }
 
 
-support_arch_linkflags = {
+local support_arch_linkflags = {
     x86= '',
     armv7= '',
     ['armv7e-m']= '-mthumb -mthumb-interwork  -mfloat-abi=soft -mfpu=vfpv4-d16 -mcpu=cortex-m4 ',
@@ -41,16 +41,28 @@ support_arch_linkflags = {
     ['armv8-a']='-mcpu=cortex-a53 -mtune=cortex-a53'
 }
 
-support_platform_cflags = {
+local support_platform_cflags = {
     ['raspi2']= '-nostdlib -nostdinc ',-- --specs=nosys.specs
     ['raspi3']= '-mcpu=cortex-a53 -mtune=cortex-a53',
     ['stm32f4xx']= '-specs=nosys.specs -nolibc -nostdlib -nostdinc -fno-builtin -DUSE_HAL_DRIVER',
     ['android'] = ''
 }
 
-support_config= {
+local support_config= {
     arch=''
 }
+
+function dump_table(table, indent)
+    indent = indent or ""
+    for key, value in pairs(table) do
+        if type(value) == "table" then
+            print(indent .. key .. ":")
+            dumpTable(value, indent .. "  ")
+        else
+            print(indent .. key .. ": " .. tostring(value))
+        end
+    end
+end
 
 function get_arch_type(arch)
     local archs = {}
@@ -62,14 +74,24 @@ function get_arch_type(arch)
     return archs[arch]
 end
 
-function get_arch(plat)
-    return support_platform[plat]
+function get_arch(p)
+    return support_platform[p]
 end
 
 
 function get_archs(arch_type)
     return support_archs[arch_type]
 end
+
+function get_arch_cflags(key)
+    return support_arch_cflags[key]
+end 
+
+function get_platform_cflags(key)
+    return support_platform_cflags[key]
+end 
+
+
 
 
 function set(key,val)

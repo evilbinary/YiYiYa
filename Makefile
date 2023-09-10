@@ -1,29 +1,29 @@
 all: raspi2
 
-lib:
-	scons eggs/libmusl/ -j8
-	scons eggs/libffmpeg -j8
 
-raspi2: lib
-	scons platform=raspi2 -j8
-	scons run=q
+raspi2:
+	xmake f -m debug -p raspi2 -v
+	xmake
 
-v3s: lib
-	scons platform=v3s -j8 
-	scons run=q
+v3s:
+	make f -m debug -p v3s -v
+	xmake
 
 
-i386-pc: lib
-	scons platform=i386-pc -j8
-	scons run=q
+i386-pc:
+	xmake f -m debug -p i386-pc -v
+	xmake
 
 
 img:
 	qemu-img create  image/disk.img 512m
 	mkfs.vfat image/disk.img 
 
-run:
-	scons run=q
+qemu:
+	xmake build qemu
+
+run:qemu
+	xmake run qemu
 
 
 com:
@@ -37,4 +37,4 @@ push:
 	cd foot && git push
 
 clean:
-	scons -c
+	rm -rf build
