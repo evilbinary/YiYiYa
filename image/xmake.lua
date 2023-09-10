@@ -16,6 +16,8 @@ target("duck.img")
 
 
 
+rule("its")
+    set_extensions(".bin", ".its","")
 
 target("duck.fit")
 
@@ -23,11 +25,18 @@ target("duck.fit")
         'boot-init.elf',
         'kernel.elf'
     )
+    add_rules("its")
+
+    add_files('$(buildir)/$(plat)/$(arch)/$(mode)/kernel-$(plat).its',
+        {rules = "its"})
+
     add_files(
-        '$(buildir)/$(plat)/$(arch)/$(mode)/kernel-$(plat).its',
         "$(buildir)/$(plat)/$(arch)/$(mode)/boot-init.bin",
-        "$(buildir)/$(plat)/$(arch)/$(mode)/kernel"
+        {rules = "its"}
     )
+
+    add_files("$(buildir)/$(plat)/$(arch)/$(mode)/kernel",{rules = "its"})
+
     set_configdir("$(buildir)/$(plat)/$(arch)/$(mode)")
     set_configvar("BOOT", "boot-init.bin" )
     set_configvar("KERNEL", "kernel" )
@@ -50,9 +59,11 @@ target("uImage.img")
         'boot-init.elf',
         'kernel.elf'
     )
+    add_rules("its")
     add_files(
         "$(buildir)/$(plat)/$(arch)/$(mode)/boot-init.bin",
         "$(buildir)/$(plat)/$(arch)/$(mode)/kernel"
+        ,{rules = "its"}
     )
 
     on_build(function (target)
