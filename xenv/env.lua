@@ -107,7 +107,9 @@ rule("arch")
         import("lib.detect.find_library")
 
         local library = find_library("gcc", 
-            {"/opt/local/lib/gcc/arm-none-eabi/*/"},
+            {"/opt/local/lib/gcc/arm-none-eabi/*/",
+            "/usr/lib/gcc/arm-none-eabi/*/"    
+        },
             {kind = "static"}
         )
         -- print('libgcc',library.linkdir)
@@ -315,7 +317,8 @@ function set_type(type)
         import("lib.detect.find_library")
 
         local library = find_library("gcc", 
-            {"/opt/local/lib/gcc/arm-none-eabi/*/","/usr/lib/gcc/*/"},
+            {"/opt/local/lib/gcc/arm-none-eabi/*/","/usr/lib/gcc/*/",
+            "/usr/lib/gcc/arm-none-eabi/*/"},
             {kind = "static"}
         )
  
