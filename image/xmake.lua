@@ -104,7 +104,7 @@ function run_qemu(plat,mode,debug)
             os.cp('app/resource/*', '/Volumes/disk/')
             os.exec('hdiutil eject /Volumes/disk')
         elseif is_host('linux') then
-            os.exec('mcopy -nmov  -i image/disk.img app/resource/* ::')
+            os.exec('mcopy -nmov  -i image/disk.img app/resource/ ::')
         else
             os.exec('mcopy.exe -nmov  -i image/disk.img app/resource/* ::')
         end
