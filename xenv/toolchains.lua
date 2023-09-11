@@ -14,6 +14,7 @@ toolchain("arm-none-eabi")
     set_toolset("as", "arm-none-eabi-gcc")
     set_toolset("objcopy", "arm-none-eabi-objcopy")
     set_toolset("sh",    "arm-none-eabi-gcc")
+    set_toolset("ranlib","arm-none-eabi-ranlib")
 
     arch_cflags=get_arch_cflags(arch)
     plat_cflags=get_platform_cflags(plat)
@@ -41,6 +42,8 @@ toolchain("riscv64-unknown-elf")
     set_toolset("strip", "riscv64-unknown-elf-strip")
     set_toolset("as", "riscv64-unknown-elf-gcc")
     set_toolset("objcopy", "riscv64-unknown-elf-objcopy")
+    set_toolset("ranlib", "riscv64-unknown-elf-ranlib")
+
 toolchain_end()
 
 
@@ -56,6 +59,8 @@ toolchain("i386-elf")
     set_toolset("strip", "i386-elf-strip")
     set_toolset("as", "i386-elf-gcc")
     set_toolset("objcopy", "i386-elf-objcopy")
+    set_toolset("ranlib", "i386-elf-ranlib")
+
 toolchain_end()
 
 toolchain("i686-elf")
@@ -70,5 +75,7 @@ toolchain("i686-elf")
     set_toolset("strip", "i686-elf-strip")
     set_toolset("as", "i686-elf-gcc")
     set_toolset("objcopy", "i686-elf-objcopy")
+    set_toolset("ranlib", "i686-elf-ranlib")
+
 toolchain_end()
 
