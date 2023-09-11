@@ -294,19 +294,19 @@ function set_type(type)
             '-DDUCK -DDLIBC_POSIX',
              ' -D__LIB_MUSL__ ',
              '-static',
-             '-nostdlib'
+             '-nostdlib',
+             '-nostdinc'
             )
         add_cxxflags(
             '-DDUCK -DDLIBC_POSIX',
                 ' -D__LIB_MUSL__ ',
                 '-static',
                 '-nostdlib',
-                ' -nostdinc'
+                '-nostdinc'
             )
         add_ldflags(
             '-static'
         )
-
     end
 
 
