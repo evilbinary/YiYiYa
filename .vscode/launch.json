@@ -913,7 +913,7 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            "program": "${workspaceRoot}/app/test/test-free",
+            "program": "${workspaceRoot}/build/raspi2/armv7-a/debug/test-sound",
             "cwd": "${workspaceRoot}",
             "args": [],
             "sourceFileMap": {

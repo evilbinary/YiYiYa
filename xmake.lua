@@ -80,7 +80,10 @@ end
 -- print('get cflags ',get_config('cflags'))
 
 --c++ 应用 输入才编译
-set_config("cpp-apps",false)
+if not get_config("cpp") then
+    cpp_apps={}
+end
+
 
 -- apply debug and release modes
 add_rules("mode.debug", "mode.release","arch")

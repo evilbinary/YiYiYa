@@ -19,10 +19,13 @@ img:
 	qemu-img create  image/disk.img 512m
 	mkfs.vfat image/disk.img 
 
-qemu:
+duck.img:
+	xmake build duck.img
+
+qemu: 
 	xmake build qemu
 
-run:qemu
+run: duck.img
 	xmake run qemu
 
 
@@ -36,6 +39,9 @@ push:
 	cd duck && git push
 	cd foot && git push
 	git push
+
+pull:
+	git submodule update --init --recursive
 
 clean:
 	rm -rf build
