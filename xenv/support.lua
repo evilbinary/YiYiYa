@@ -27,25 +27,29 @@ local support_platform = {
 local support_arch_cflags = {
     x86= '',
     armv7= '',
-    ['armv7e-m']= '-mthumb -mthumb-interwork  -mfloat-abi=soft -mfpu=vfpv4-d16 -mcpu=cortex-m4 ',
-    ['armv7-a']= '-mcpu=cortex-a7 -mtune=cortex-a7 -mfpu=vfpv4 -mfloat-abi=softfp ',
-    ['armv8-a']= ' -mfpu=vfpv4 -mfloat-abi=softfp '
+    ['armv7e-m']= {'-mthumb', '-mthumb-interwork',  '-mfloat-abi=soft', '-mfpu=vfpv4-d16', '-mcpu=cortex-m4'},
+    ['armv7-a']= {'-mcpu=cortex-a7',
+                '-mtune=cortex-a7',
+                '-mfpu=vfpv4',
+                '-mfloat-abi=softfp'
+            },
+    ['armv8-a']= {'-mfpu=vfpv4', '-mfloat-abi=softfp'}
 }
 
 
 local support_arch_linkflags = {
     x86= '',
     armv7= '',
-    ['armv7e-m']= '-mthumb -mthumb-interwork  -mfloat-abi=soft -mfpu=vfpv4-d16 -mcpu=cortex-m4 ',
-    ['armv7-a']= '-mcpu=cortex-a7 -mtune=cortex-a7 -mfpu=vfpv4 -mfloat-abi=softfp ',
-    ['armv8-a']='-mcpu=cortex-a53 -mtune=cortex-a53'
+    ['armv7e-m']= {'-mthumb', '-mthumb-interwork',  '-mfloat-abi=soft', '-mfpu=vfpv4-d16', '-mcpu=cortex-m4'},
+    ['armv7-a']= {'-mcpu=cortex-a7','-mtune=cortex-a7','-mfpu=vfpv4','-mfloat-abi=softfp'},
+    ['armv8-a']={'-mcpu=cortex-a53', '-mtune=cortex-a53'}
 }
 
 local support_platform_cflags = {
-    ['raspi2']= '-nostdlib -nostdinc ',-- --specs=nosys.specs
-    ['raspi3']= '-mcpu=cortex-a53 -mtune=cortex-a53',
-    ['stm32f4xx']= '-specs=nosys.specs -nolibc -nostdlib -nostdinc -fno-builtin -DUSE_HAL_DRIVER',
-    ['android'] = ''
+    ['raspi2']= {'-nostdlib','-nostdinc'},-- --specs=nosys.specs
+    ['raspi3']= {'-mcpu=cortex-a53','-mtune=cortex-a53'},
+    ['stm32f4xx']= {'-specs=nosys.specs', '-nolibc', '-nostdlib', '-nostdinc' ,'-fno-builtin', '-DUSE_HAL_DRIVER'},
+    ['android'] = {}
 }
 
 local support_config= {
