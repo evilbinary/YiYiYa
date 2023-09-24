@@ -72,3 +72,5 @@ image/disk.img
 **/*.pyc
 
 build/**
+
+**/__pycache__

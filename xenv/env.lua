@@ -272,6 +272,10 @@ function install_dir(path)
     end)
 end
 
+if default_libc=='musl' then
+    add_packages(default_libc)
+end
+
 function set_type(type)
     if type == "lib" then
         set_kind("static")
