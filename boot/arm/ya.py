@@ -22,8 +22,6 @@ else:
         '../../duck/platform/{plat}'
     )
 
-    print('os script dir',os.scriptdir())
-
 
     add_ldflags("-T"+path.join(os.scriptdir(), "../arm/link-{plat}.ld"), force = true)
 

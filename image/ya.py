@@ -219,12 +219,12 @@ run_qemu('raspi2',get_config('mode'))
 
 target("disk.img")
 
-def build(target):
-    os.exec('qemu-img create image/disk.img 512m')
-    os.exec('mkfs.vfat -n disk image/disk.img')
-    pass
+# def build(target):
+#     os.exec('qemu-img create image/disk.img 512m')
+#     os.exec('mkfs.vfat -n disk image/disk.img')
+#     pass
 
-on_build(build)
+# on_build(build)
 
 def run(target):
     print('make disk.img')

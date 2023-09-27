@@ -84,30 +84,30 @@ set_config('modules',modules)
 
 
 # #c++ 应用 输入才编译
-# option("cpp-apps")
-# set_default(false)
-# set_showmenu(true)
-# set_description("Enable cpp support")
-# option_end()
+option("cpp-apps")
+set_default(false)
+set_showmenu(true)
+set_description("Enable cpp support")
+option_end()
 
-# #wayland 应用 输入才编译
-# option("wayland")
-# set_default(false)
-# set_showmenu(true)
-# set_description("Enable wayland support")
-# option_end()
+#wayland 应用 输入才编译
+option("wayland")
+set_default(false)
+set_showmenu(true)
+set_description("Enable wayland support")
+option_end()
 
-# option("app")
-# set_default(true)
-# set_showmenu(true)
-# set_description("Enable app build")
-# option_end()
+option("app")
+set_default(true)
+set_showmenu(true)
+set_description("Enable app build")
+option_end()
 
-# option("tests")
-# set_default(false)
-# set_showmenu(true)
-# set_description("Enable tests build")
-# option_end()
+option("tests")
+set_default(false)
+set_showmenu(true)
+set_description("Enable tests build")
+option_end()
 
 arch=get_arch()
 
