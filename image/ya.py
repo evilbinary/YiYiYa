@@ -89,13 +89,12 @@ on_build(build)
 
 
 #run
-def run_qemu(plat,mode,debug=False):
+def run_qemu(plat,debug=False):
 
     def run(target):
-        # import('core.base.global')
+        mode=get_config('mode')
 
-
-        
+        # import('core.base.global')        
         script_dir = path.directory(os.scriptdir())
         env_dir = path.join(script_dir,"xenv/")
         # import('support', { rootdir = env_dir })
@@ -196,7 +195,7 @@ target("debug")
 
 add_deps("duck.img","disk.img")
 add_rules("arch")
-run_qemu('raspi2',get_config('mode'),True)
+run_qemu('raspi2',True)
 
 
 
@@ -204,7 +203,7 @@ target("qemu")
 
 add_deps("duck.img","disk.img")
 add_rules("arch")
-run_qemu('raspi2',get_config('mode'))
+run_qemu('raspi2')
 
 
 
@@ -213,7 +212,7 @@ target("raspi2")
 
 add_deps("duck.img","disk.img")
 add_rules("arch")
-run_qemu('raspi2',get_config('mode'))
+run_qemu('raspi2')
 
 
 

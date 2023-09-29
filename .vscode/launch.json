@@ -24,7 +24,7 @@
             "stopOnEntry": false,
             "python": "python3.11",
             "program": "${file}",
-            "args": ["-m","debug"],
+            "args": ["-m","debug","-r","qemu"],
             "cwd": "${workspaceRoot}",
             "env": {"PYTHONPATH":"${workspaceRoot}"},
             // "envFile": "${workspaceRoot}/.env"

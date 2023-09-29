@@ -93,7 +93,7 @@ def build (target):
     kernel_size=  math.ceil((1023+ file_size)/1024.0)*1024
     block_size = math.ceil(kernel_size/1024)
 
-    print('make image {} {}'.format( targetfile,block_size))
+    print('make image {} block size {}'.format( targetfile,block_size))
 
 
     for file in sourcefiles:
@@ -110,14 +110,14 @@ def build (target):
             os.exec('dd if=/dev/zero bs=512 count=2880 conv=notrunc of='+targetfile)
             os.exec('tools/mksunxi/mksunxiboot '+sourcefiles[0]+' boot/arm/init-spl.bin')
             os.exec('dd if=boot/arm/init-spl.bin bs=512 count=11 seek=0 conv=notrunc of='+targetfile)
-            os.exec('dd if=${SOURCES[1]} bs=512 count='+block_size+' seek=12 conv=notrunc of='+targetfile)
+            os.exec('dd if=${SOURCES[1]} bs=512 count='+str(block_size)+' seek=12 conv=notrunc of='+targetfile)
         elif plat=='stm32f4xx' :
             pass
         else:
             os.exec('dd if=/dev/zero bs=512 count=2880 conv=notrunc of='+targetfile)
 
             os.exec('dd if='+sourcefiles[0]+' bs=512 count=11 seek=0 conv=notrunc of='+targetfile)
-            os.exec('dd if='+sourcefiles[1]+' bs=512 count='+block_size+' seek=12 conv=notrunc of='+targetfile)
+            os.exec('dd if='+sourcefiles[1]+' bs=512 count='+str(block_size)+' seek=12 conv=notrunc of='+targetfile)
             print('make image finished ')
 
 on_build(build)
