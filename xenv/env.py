@@ -281,7 +281,6 @@ def set_type(type):
             kind = "static"
         )
  
-        print('libgcc',library)
         if library:
             target.add("ldflags",[
                 '-L'+library.linkdir,

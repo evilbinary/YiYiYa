@@ -18,13 +18,13 @@
             // "envFile": "${workspaceRoot}/.env"
         },
         {
-            "name": "python build all",
+            "name": "python build debug",
             "type": "python",
             "request": "launch",
             "stopOnEntry": false,
             "python": "python3.11",
             "program": "${file}",
-            "args": [],
+            "args": ["-m","debug"],
             "cwd": "${workspaceRoot}",
             "env": {"PYTHONPATH":"${workspaceRoot}"},
             // "envFile": "${workspaceRoot}/.env"
