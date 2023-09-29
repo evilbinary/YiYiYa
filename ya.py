@@ -134,7 +134,10 @@ add_cflags(arch_cflags)
 add_cflags(plat_cflags)
 
 add_cxxflags(arch_cflags)
+
 set_config('cflags',arch_cflags,plat_cflags)
+set_config('cpp_apps',cpp_apps)
+set_config('apps',apps)
 
 
 #apply debug and release modes
@@ -144,5 +147,6 @@ includes('./boot/ya.py')
 includes('./duck/ya.py')
 add_subs('./image/ya.py')
 add_subs('./eggs/ya.py')
+add_subs('./app/ya.py')
 
 process()

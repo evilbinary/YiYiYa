@@ -4,6 +4,7 @@
 # * 作者. evilbinary on 01/01/20
 # * 邮箱. rootdebug@163.com
 # ********************************************************************
+from ymake.detect import find_library
 
 rule("objcopy-file")
 
@@ -213,3 +214,82 @@ after_build(build)
 
 
 # rule_end()
+
+root_res_dir =  os.projectdir()+"/app/resource/"
+
+def install_dir(path):
+
+    def build(target):
+        if not os.exists(root_res_dir+path):
+            os.run("mkdir -p %s", root_res_dir+path)
+        # if os.exists(target:scriptdir()+"") then
+        #     os.cp(target:scriptdir()+"", rootfs_dir+path)
+    before_build(build)
+
+    def link(target):
+        os.cp(target.targetfile(), root_res_dir+path)
+
+    after_link(link)
+
+    def clean(target):
+        os.rm(root_res_dir+path+"/"+target.name())
+
+    after_clean(clean)
+
+
+def set_type(type):
+    if type == "lib":
+        set_kind("static")
+    elif type == "app":
+        set_kind("binary")
+        install_dir("app")
+    elif type == "cli":
+        set_kind("binary")
+        install_dir("bin")
+    else:
+        print('not support')
+
+    default_libc=get_config('default_libc')
+    if default_libc=='musl':
+        # add_files(os.projectdir()+'/eggs/libmusl/lib/crt1.o')
+        add_cflags(
+            '-DDUCK -DDLIBC_POSIX',
+             ' -D__LIB_MUSL__ ',
+             '-static',
+             '-nostdlib',
+             '-nostdinc'
+            )
+        add_cxxflags(
+            '-DDUCK -DDLIBC_POSIX',
+                ' -D__LIB_MUSL__ ',
+                '-static',
+                '-nostdlib',
+                '-nostdinc'
+            )
+        add_ldflags(
+            '-static'
+        )
+
+
+    add_packages(default_libc)
+
+    def config (target):
+
+        library = find_library("gcc", 
+            ["/opt/local/lib/gcc/arm-none-eabi/*/","/usr/lib/gcc/*/",
+            "/usr/lib/gcc/arm-none-eabi/*/"],
+            kind = "static"
+        )
+ 
+        print('libgcc',library)
+        if library:
+            target.add("ldflags",[
+                '-L'+library.linkdir,
+                "-l"+library.link
+            ])
+        if type=='cli' or type=='app':
+            target.add('ldflags','-Tapp/xlinker/user-'+ target.plat()+'.ld', force=true)
+
+    on_config(config)
+
+add_buildin('set_type',set_type)

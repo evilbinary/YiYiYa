@@ -18,6 +18,18 @@
             // "envFile": "${workspaceRoot}/.env"
         },
         {
+            "name": "python build all",
+            "type": "python",
+            "request": "launch",
+            "stopOnEntry": false,
+            "python": "python3.11",
+            "program": "${file}",
+            "args": [],
+            "cwd": "${workspaceRoot}",
+            "env": {"PYTHONPATH":"${workspaceRoot}"},
+            // "envFile": "${workspaceRoot}/.env"
+        },
+        {
             "name": "python build",
             "type": "python",
             "request": "launch",
