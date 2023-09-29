@@ -81,7 +81,7 @@ modules=[
 ]
 
 set_config('modules',modules)
-
+set_config('default_libc',default_libc)
 
 # #c++ 应用 输入才编译
 option("cpp-apps")
@@ -143,6 +143,6 @@ add_rules("mode.debug", "mode.release","arch")
 includes('./boot/ya.py')
 includes('./duck/ya.py')
 add_subs('./image/ya.py')
-
+add_subs('./eggs/ya.py')
 
 process()
