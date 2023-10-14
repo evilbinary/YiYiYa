@@ -18,13 +18,25 @@
             // "envFile": "${workspaceRoot}/.env"
         },
         {
-            "name": "python build debug",
+            "name": "python build run debug",
             "type": "python",
             "request": "launch",
             "stopOnEntry": false,
             "python": "python3.11",
-            "program": "${file}",
+            "program": "/usr/local/bin/ya",
             "args": ["-m","debug","-r","qemu"],
+            "cwd": "${workspaceRoot}",
+            "env": {"PYTHONPATH":"${workspaceRoot}"},
+            // "envFile": "${workspaceRoot}/.env"
+        },
+        {
+            "name": "python build kernel",
+            "type": "python",
+            "request": "launch",
+            "stopOnEntry": false,
+            "python": "python3.11",
+            "program": "/usr/local/bin/ya",
+            "args": ["-m","debug","-b","kernel.elf","-v","D"],
             "cwd": "${workspaceRoot}",
             "env": {"PYTHONPATH":"${workspaceRoot}"},
             // "envFile": "${workspaceRoot}/.env"
@@ -733,7 +745,8 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            "program": "${workspaceRoot}/boot/arm/init.elf",
+            // "program": "${workspaceRoot}/boot/arm/init.elf",
+            "program": "${workspaceRoot}/build/raspi2/armv7-a/debug/boot-init.elf",
             "cwd": "${workspaceRoot}",
             "args": [],
             "sourceFileMap": {
@@ -755,14 +768,20 @@
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
                 },
+                 {
+                    "text": "file ${workspaceRoot}/build/raspi2/armv7-a/debug/boot-init.elf",
+                    "description": "file on setup."
+                },
+                {
+                    "description": "break start",
+                    "text": "b init_boot",
+                    "ignoreFailures": false
+                },
                 // {
                 //     "text": "set architecture i386:intel ",
                 //     "description": "set architecture i386"
                 // },
-                // {
-                //     "text": "file ${workspaceRoot}/boot/x86/init",
-                //     "description": "file on setup."
-                // },
+               
             ],
             "preLaunchTask": "Build and run"
         },

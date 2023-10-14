@@ -10,12 +10,8 @@ module_path=['..',
     '../../',
     '../../..',
     'xenv',
-    '/Users/evil/dev/c/YiYiYa/xenv/',
-    '/Users/evil/dev/c/ymake/']
-
+   ]
 sys.path.extend(module_path)
-
-from ymake.yaya import *
 import xenv.support as support
 
 project("YiYiYa",
@@ -148,5 +144,3 @@ includes('./duck/ya.py')
 add_subs('./image/ya.py')
 add_subs('./eggs/ya.py')
 add_subs('./app/ya.py')
-
-process()

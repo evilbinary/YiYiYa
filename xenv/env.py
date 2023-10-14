@@ -4,7 +4,7 @@
 # * 作者. evilbinary on 01/01/20
 # * 邮箱. rootdebug@163.com
 # ********************************************************************
-from ymake.detect import find_library
+from detect import find_library
 
 rule("objcopy-file")
 
@@ -81,7 +81,7 @@ rule("make-image")
 
 set_extensions("",".bin")
 
-def build (target):
+def build(target):
     # import("core.project.config")
 
     targetfile = target.targetfile()
@@ -206,7 +206,7 @@ def build (target):
     outputfile = string.gsub(inputfile, "\.elf$", "")
     objcopy = target.tool("objcopy")
     os.execv(objcopy,["-S",inputfile, outputfile])
-    os.execv(objcopy, ["-O", "binary", "--only-keep-debug", inputfile, outputfile+".dbg"])
+    os.execv(objcopy, ["--only-keep-debug", inputfile, outputfile+".dbg"])
     os.execv(objcopy, ["-O", "binary", "-S", inputfile, outputfile+".bin"])
     
 after_build(build)
