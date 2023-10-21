@@ -105,6 +105,12 @@ set_showmenu(true)
 set_description("Enable tests build")
 option_end()
 
+# option("single-kernel")
+# set_default(false)
+# set_showmenu(true)
+# set_description("Enable kernel one file build")
+# option_end()
+
 arch=get_arch()
 
 

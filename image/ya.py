@@ -118,9 +118,8 @@ def run_qemu(plat,debug=False):
         run_qemu_cmd=''
         debug_qemu_cmd=''
   
-
-        if target.get('SINGLE_KERNEL') :
-            kernel_image= 'duck/init/kernel.elf'
+        if has_config('single-kernel') :
+            kernel_image= "build/"+plat+"/"+arch+"/"+mode+"/kernel.elf"
 
         if arch_type=='x86' :
             if target.get('arch')=='x86-duck' :
@@ -164,7 +163,7 @@ def run_qemu(plat,debug=False):
 
         elif arch_type=='riscv' :
             bios='none'
-            if target.get('SINGLE_KERNEL') :
+            if has_config('single-kernel') :
                 bios='default'
             
 

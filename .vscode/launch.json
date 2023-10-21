@@ -748,11 +748,12 @@
             // "program": "${workspaceRoot}/boot/arm/init.elf",
             "program": "${workspaceRoot}/build/raspi2/armv7-a/debug/boot-init.elf",
             "cwd": "${workspaceRoot}",
+            "stopAtEntry": true,
             "args": [],
             "sourceFileMap": {
                 "<source-path>": "<target-path>"
             },
-            "targetArchitecture": "arm",
+            // "targetArchitecture": "arm",
             "MIMode": "gdb",
             "miDebuggerPath": "/usr/local/Cellar/gdb/13.1/bin/gdb",
             "miDebuggerArgs": "",
@@ -773,10 +774,21 @@
                     "description": "file on setup."
                 },
                 {
-                    "description": "break start",
+                    "description": "break _start",
                     "text": "b init_boot",
                     "ignoreFailures": false
                 },
+                { "text": "break init_boot", "ignoreFailures": true },
+				{ "text": "set print pretty on", "ignoreFailures": true },
+				{ "text": "set print object on", "ignoreFailures": true },
+				{ "text": "set print static-members on", "ignoreFailures": true },
+				{ "text": "set print vtbl on", "ignoreFailures": true },
+				{ "text": "set print demangle on", "ignoreFailures": true },
+				{ "text": "set demangle-style gnu-v3", "ignoreFailures": true },
+				{ "text": "set print sevenbit-strings off", "ignoreFailures": true },
+				{ "text": "set detach-on-fork off", "ignoreFailures": false },
+				{ "text": "set schedule-multiple on", "ignoreFailures": false },
+				{ "text": "set follow-fork-mode child", "ignoreFailures": false }
                 // {
                 //     "text": "set architecture i386:intel ",
                 //     "description": "set architecture i386"
@@ -1672,10 +1684,10 @@
                 //     "text": "break _start",
                 //     "description": "Break on exception handler."
                 // },
-                // {
-                //     "text": "break start",
-                //     "description": "Break on exception handler."
-                // },
+                {
+                    "text": "break start",
+                    "description": "Break on exception handler."
+                },
             ],
             "preLaunchTask": "Build and run"
         },

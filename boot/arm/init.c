@@ -180,7 +180,7 @@ char uart_get_ch() {
 
 #endif
 
-static void print_string(const unsigned char* str) {
+static void print_string(const unsigned char* str) {  
   while (*str) {
     uart_send_ch(*str);
     ++str;
@@ -393,7 +393,6 @@ void init_boot() {
   init_cpu();
 
   print_string("start kernel\n\r");
-
   start_kernel();
 
   for (;;)
@@ -407,11 +406,6 @@ void init_apu_boot() {
     ;
 }
 
-void* memset(void* s, int c, size_t n) {
-  int i;
-  for (i = 0; i < n; i++) ((char*)s)[i] = c;
-  return s;
-}
 
 void* memmove32(void* s1, const void* s2, u32 n) {
   u32 *dest, *src;
@@ -434,6 +428,7 @@ static void load_elf(Elf32_Ehdr* elf_header) {
     switch (phdr[i].p_type) {
       case PT_NULL: {
         char* vaddr = phdr[i].p_vaddr;
+        memset(vaddr,0,phdr[i].p_memsz);
         // printf(" %s %x %x %x %s %x %x \r\n", "NULL", phdr[i].p_offset,
         //        phdr[i].p_vaddr, phdr[i].p_paddr, "", phdr[i].p_filesz,
         //        phdr[i].p_memsz);
@@ -549,6 +544,12 @@ void get_segment() {
   boot_data.segments[num].start = &__start;
   boot_data.segments[num].size = &__end - &__start ;
   boot_data.segments[num].type = 1;
+}
+#else
+void* memset(void* s, int c, size_t n) {
+  int i;
+  for (i = 0; i < n; i++) ((char*)s)[i] = c;
+  return s;
 }
 #endif
 

@@ -4,7 +4,7 @@
 # * 作者: evilbinary on 01/01/20
 # * 邮箱: rootdebug@163.com
 # ********************************************************************
-if get_config('SINGLE_KERNEL'): 
+if get_config('single-kernel'): 
         set_kind("object")
 
 else:

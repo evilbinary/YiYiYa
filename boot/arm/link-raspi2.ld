@@ -5,7 +5,7 @@ __stack_size = 0x200;
 
 SECTIONS
 {
-    . = 0x8000;
+    . = 0x10000; /*0x10000 for qemu 0x8000 for real hardware*/
     .text : { KEEP(*(.text.boot)) *(.text .text.* .gnu.linkonce.t*) }
     .data : {*(.data)}
     .bss : {*(.bss)}
