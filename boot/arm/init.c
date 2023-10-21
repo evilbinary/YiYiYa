@@ -428,7 +428,7 @@ static void load_elf(Elf32_Ehdr* elf_header) {
     switch (phdr[i].p_type) {
       case PT_NULL: {
         char* vaddr = phdr[i].p_vaddr;
-        memset(vaddr,0,phdr[i].p_memsz);
+        // memset(vaddr,0,phdr[i].p_memsz);
         // printf(" %s %x %x %x %s %x %x \r\n", "NULL", phdr[i].p_offset,
         //        phdr[i].p_vaddr, phdr[i].p_paddr, "", phdr[i].p_filesz,
         //        phdr[i].p_memsz);
