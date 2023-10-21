@@ -43,34 +43,34 @@ def build (target):
     kernel_size=  math.ceil((1023+ file_size)/1024)*1024
     block_size = math.ceil(kernel_size/1024)
 
-    print('kernel size. ',file_size,' size. ',kernel_size,'block size. ',block_size)
+    print('file size ',file_size,'kernel size ',kernel_size,'block size ',block_size)
 
 
     target.set('KERNEL_SIZE',kernel_size)
     target.set('KERNEL_BLOCK_SIZE',block_size)
 
 
-    arch_type =config.get('arch_type')
-    if arch_type=='':
+    arch_type =get_arch_type()
+    if not arch_type:
         arch_type = target.get('arch_type')
 
 
-        ## 生成头文件内容
-        content = "#ifndef BOOT_"+string.upper(arch_type) +"_CONFIG_H\n"
-        content= content + "#define BOOT_"+string.upper(arch_type)  +"_CONFIG_H\n"
-        content= content + "#define KERNEL_BLOCK_SIZE "+ block_size+"\n"
-        content= content + "#define KERNEL_SIZE "+kernel_size+"\n"
-        content= content + "#endif"
+    ## 生成头文件内容
+    content = "#ifndef BOOT_"+string.upper(arch_type) +"_CONFIG_H\n"
+    content= content + "#define BOOT_"+string.upper(arch_type)  +"_CONFIG_H\n"
+    content= content + "#define KERNEL_BLOCK_SIZE "+ str(block_size)+"\n"
+    content= content + "#define KERNEL_SIZE "+str(kernel_size)+"\n"
+    content= content + "#endif"
 
 
-        script_dir = path.directory(os.scriptdir())
-        header_file = path.join(script_dir,"boot/"+arch_type+"/", "config.h")
+    script_dir = path.directory(os.scriptdir())
+    header_file = path.join(script_dir,"boot/"+str(arch_type)+"/")+ "/config.h"
 
-        file = io.open(header_file, "w")
-        file.write(content)
-        file.close()
+    file = io.open(header_file, "w")
+    file.write(content)
+    file.close()
 
-        print("generated header file success. " + header_file)
+    print("generated header file success. " + header_file)
 
 after_build( build)
 
@@ -87,13 +87,13 @@ def build(target):
     targetfile = target.targetfile()
     sourcefiles = target.sourcefiles()
     objectfiles = target.objectfiles()
-    
+
     file_size = os.filesize(sourcefiles[1])
 
     kernel_size=  math.ceil((1023+ file_size)/1024.0)*1024
     block_size = math.ceil(kernel_size/1024)
 
-    print('make image {} block size {}'.format( targetfile,block_size))
+    print('make image {} kernel size {} block size {}'.format( targetfile,kernel_size,block_size))
 
 
     for file in sourcefiles:
