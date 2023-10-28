@@ -5,7 +5,6 @@
 # * 邮箱: rootdebug@163.com
 # ********************************************************************
 target("duck.img")
-
 add_deps(
     'boot-init.elf',
     'kernel.elf'
@@ -148,7 +147,7 @@ def run_qemu(plat,debug=False):
                 # run_qemu_cmd =run_qemu_cmd+' -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor'
                 debug_qemu_cmd = run_qemu_cmd +' -S -s'
             else:
-                run_qemu_cmd='qemu-system-arm -name YiYiYa -M raspi2b  -rtc base=localtime -kernel '+kernel_image+'  -serial stdio   -D ./qemu.log -drive if=sd,id=sd0,format=raw,file='+disk_img+' -d in_asm -d cpu_reset -d in_asm,int,mmu'##-d in_asm -d cpu_reset -d in_asm,int,mmu
+                run_qemu_cmd='qemu-system-arm -name YiYiYa -M raspi2b  -rtc base=localtime -kernel '+kernel_image+'  -serial stdio   -D ./qemu.log -drive if=sd,id=sd0,format=raw,file='+disk_img+' '##-d in_asm -d cpu_reset -d in_asm,int,mmu
                 ## run_qemu_cmd =run_qemu_cmd+' -monitor tcp:127.0.0.1:55555,server,nowait'
                 ## run_qemu_cmd =run_qemu_cmd+' -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor'
                 debug_qemu_cmd = run_qemu_cmd +' -S -s'
