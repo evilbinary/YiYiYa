@@ -106,8 +106,8 @@ def run_qemu(plat,debug=False):
         
         if is_host('mac'):
             os.exec('hdiutil attach '+disk_img)
-            os.cp('app/resource/*', '/Volumes/disk/')
-            os.exec('hdiutil eject /Volumes/disk')
+            os.cp('app/resource/*', '/Volumes/YIYIYA/')
+            os.exec('hdiutil eject /Volumes/YIYIYA')
         elif is_host('linux') :
             os.exec('bash -c \'mcopy -nmov  -i image/disk.img app/resource/* ::\'')
         else:
@@ -224,7 +224,7 @@ target("disk.img")
 def run(target):
     print('make disk.img')
     os.exec('qemu-img create image/disk.img 512m')
-    os.exec('mkfs.vfat -n disk image/disk.img')
+    os.exec('mkfs.vfat -n YIYIYA image/disk.img')
 
 on_run(run)
 
