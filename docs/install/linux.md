@@ -12,11 +12,11 @@ apt-get install libc6-dev:i386 gcc:i386
 ```
 
 
-### 安装scons
+### 安装yymake
 
 ```bash
 
-apt install scons
+apt install yymake
 
 ```
 
@@ -32,9 +32,9 @@ apt install qemu
 
 ```bash
 #清理
-scons -c
+rm -rf build
 #编译
-scons -j8
+ya -m debug -j8
 #运行
-scons --run=q
+ya -m debug -r qemu
 ```

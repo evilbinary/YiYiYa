@@ -42,12 +42,13 @@ def build (target):
 
     kernel_size=  math.ceil((1023+ file_size)/1024)*1024
     block_size = math.ceil(kernel_size/1024)
+    block_512_size = math.ceil(kernel_size/512)
 
     print('file size ',file_size,'kernel size ',kernel_size,'block size ',block_size)
 
 
     target.set('KERNEL_SIZE',kernel_size)
-    target.set('KERNEL_BLOCK_SIZE',block_size)
+    target.set('KERNEL_BLOCK_SIZE',block_512_size)
 
 
     arch_type =get_arch_type()
@@ -58,7 +59,7 @@ def build (target):
     ## 生成头文件内容
     content = "#ifndef BOOT_"+string.upper(arch_type) +"_CONFIG_H\n"
     content= content + "#define BOOT_"+string.upper(arch_type)  +"_CONFIG_H\n"
-    content= content + "#define KERNEL_BLOCK_SIZE "+ str(block_size)+"\n"
+    content= content + "#define KERNEL_BLOCK_SIZE "+ str(block_512_size)+"\n"
     content= content + "#define KERNEL_SIZE "+str(kernel_size)+"\n"
     content= content + "#endif"
 

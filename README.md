@@ -10,7 +10,7 @@ https://github.com/evilbinary/YiYiYa
 
 1、编译工具安装
 
-提前安装 scons、qemu [开发环境文档](https://github.com/evilbinary/YiYiYa/tree/main/docs/install)
+提前安装 yymake、qemu [开发环境文档](https://github.com/evilbinary/YiYiYa/tree/main/docs/install)
 
 
 2、编译平台配置
@@ -20,14 +20,13 @@ https://github.com/evilbinary/YiYiYa
 3、运行编译命令
 
 ```
-xmake f -m debug
-xmake -v
+ya -m debug
 ```
 
 ### 运行
 
 ```
-xmake run qemu
+ya -m debug -r qemu
 ```
 
 

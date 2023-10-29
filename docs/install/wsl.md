@@ -22,14 +22,15 @@ apt install qemu
 ```
 
 
-### 安装scons
+### 安装yymake
 
 在打开的wsl的ubuntu20.01 tls版本下输入
+
 ```bash
-
-apt install scons gcc
-
+apt install gcc
+pip install yymake
 ```
+
 
 
 ### 安装x11
@@ -56,10 +57,9 @@ export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}'):0
 
 ```bash
 #清理
-scons -c
+rm -rf build
 #编译
-scons -j8
+ya -m debug -j8
 #运行
-scons --run=q
+ya -m debug -r qemu
 ```
-

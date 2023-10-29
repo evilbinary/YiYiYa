@@ -39,10 +39,10 @@ brew install nativeos/i386-elf-toolchain/i386-elf-gcc
 brew install riscv-gnu-toolchain
 ```
 
-### 安装scons
+### 安装yymake
 
 ```bash
-pip install scons
+pip install yymake
 ```
 
 ### 安装qemu
@@ -64,9 +64,9 @@ brew install qemu
 
 ```bash
 #清理
-scons -c
+rm -rf build
 #编译
-scons -j8
+ya -m debug -j8
 #运行
-scons --run=q
+ya -m debug -r qemu
 ```

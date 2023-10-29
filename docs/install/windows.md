@@ -12,7 +12,7 @@ windows 安装比较麻烦，需要的步骤比较多，需要有点耐心。有
 
 如果搞不清楚可以参考这个 [win 10安装python（详细讲解）](https://zhuanlan.zhihu.com/p/122435116)
 
-3、打开power shell 输入`pip install scons`
+3、打开power shell 输入`pip install yymake`
 
 
 ### 安装gcc
@@ -55,9 +55,9 @@ checking whether we are cross compiling...
 
 ```bash
 #清理
-scons -c
+rm -rf build
 #编译
-scons -j8
+ya -m debug -j8
 #运行
-scons --run=q
+ya -m debug -r qemu
 ```

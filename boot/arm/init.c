@@ -428,7 +428,7 @@ static void load_elf(Elf32_Ehdr* elf_header) {
     switch (phdr[i].p_type) {
       case PT_NULL: {
         char* vaddr = phdr[i].p_vaddr;
-        // memset(vaddr,0,phdr[i].p_memsz);
+        memset(vaddr,0,phdr[i].p_memsz);
         // printf(" %s %x %x %x %s %x %x \r\n", "NULL", phdr[i].p_offset,
         //        phdr[i].p_vaddr, phdr[i].p_paddr, "", phdr[i].p_filesz,
         //        phdr[i].p_memsz);
@@ -474,27 +474,29 @@ static void load_elf(Elf32_Ehdr* elf_header) {
   for (int i = 0; i < elf_header->e_shnum; i++) {
     if (SHT_NOBITS == shdr[i].sh_type) {
       char* vaddr = shdr[i].sh_addr;
-      memset(vaddr, 0, shdr[i].sh_size);
+      // memset(vaddr, 0, shdr[i].sh_size);
 
       // int num = boot_data.segments_number++;
       // boot_data.segments[num].start = vaddr;
-      // boot_data.segments[num].size = phdr[i].p_memsz;
+      // boot_data.segments[num].size = shdr[i].sh_size;
       // boot_data.segments[num].type = 1;
 
       // map_alignment(page,vaddr,buf,shdr[i].sh_size);
     } else if (entry != shdr[i].sh_addr && SHT_PROGBITS == shdr[i].sh_type &&
                shdr[i].sh_flags & SHF_ALLOC && shdr[i].sh_flags) {
-      char* start = shdr[i].sh_offset;
+      char* start = elf + shdr[i].sh_offset/2;
       char* vaddr = shdr[i].sh_addr;
       printf("load shdr start:%x vaddr:%x size:%x \n\r", start, vaddr,
              shdr[i].sh_size);
       u32* phstart = (u32)elf + shdr[i].sh_offset;
-      memset(vaddr, 0, shdr->sh_size);
-      memmove32(phstart, vaddr, shdr[i].sh_size);
+      // memset(vaddr, 0, shdr[i].sh_size);
+      memmove32(vaddr, start, shdr[i].sh_size);
+
+      // memmove32(phstart, vaddr, shdr[i].sh_size);
 
       // int num = boot_data.segments_number++;
       // boot_data.segments[num].start = vaddr;
-      // boot_data.segments[num].size = phdr[i].p_memsz;
+      // boot_data.segments[num].size = shdr[i].sh_size;
       // boot_data.segments[num].type = 1;
     }
   }
