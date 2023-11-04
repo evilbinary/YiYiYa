@@ -26,7 +26,9 @@ includes(
     "xenv/env.py"
 )
 
-plat="raspi2"
+plat=get_plat()
+if not plat:
+    plat="raspi2"
 
 set_defaultplat(plat)
 set_toolchain('arm-none-eabi')

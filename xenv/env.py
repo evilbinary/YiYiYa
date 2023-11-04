@@ -276,21 +276,29 @@ def set_type(type):
     add_packages(default_libc)
 
     def config (target):
-
-        library = find_library("gcc", 
-            ["/opt/local/lib/gcc/arm-none-eabi/*/","/usr/lib/gcc/*/",
-            "/usr/lib/gcc/arm-none-eabi/*/"],
-            kind = "static"
-        )
- 
-        if library:
-            target.add("ldflags",[
-                '-L'+library.linkdir,
-                "-l"+library.link
-            ])
         if type=='cli' or type=='app':
             target.add('ldflags','-Tapp/xlinker/user-'+ target.plat()+'.ld', force=true)
 
     on_config(config)
 
 add_buildin('set_type',set_type)
+
+
+
+target("gcc")
+set_kind('lib')
+def config (target):
+
+    library = find_library("gcc", 
+                ["/opt/local/lib/gcc/arm-none-eabi/*/","/usr/lib/gcc/*/",
+                "/usr/lib/gcc/arm-none-eabi/*/"],
+                kind = "static"
+            )
+    if library:
+        target.add("ldflags",[
+            '-L'+library.linkdir,
+            "-l"+library.link
+        ])
+        target.add("includedir",library.linkdir)
+
+on_config(config)
