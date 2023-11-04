@@ -78,6 +78,12 @@ modules=[
     #'musl','gaga','ipc','pty','log','debug','ewok'
 ]
 
+#构建foot
+foot=[
+    'driver','service'
+]
+set_config('foot',foot)
+
 set_config('modules',modules)
 set_config('default_libc',default_libc)
 
@@ -152,3 +158,4 @@ includes('./duck/ya.py')
 add_subs('./image/ya.py')
 add_subs('./eggs/ya.py')
 add_subs('./app/ya.py')
+add_subs('./foot/ya.py')
