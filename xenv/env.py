@@ -300,5 +300,7 @@ def config (target):
             "-l"+library.link
         ])
         target.add("includedir",library.linkdir)
+    else:
+        print('not found gcc lib')
 
 on_config(config)

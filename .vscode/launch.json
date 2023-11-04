@@ -42,6 +42,18 @@
             // "envFile": "${workspaceRoot}/.env"
         },
         {
+            "name": "python build ls",
+            "type": "python",
+            "request": "launch",
+            "stopOnEntry": false,
+            "python": "python3.11",
+            "program": "/usr/local/bin/ya",
+            "args": ["-m","debug","-b","scheme","-v","D","-j","1"],
+            "cwd": "${workspaceRoot}",
+            "env": {"PYTHONPATH":"${workspaceRoot}"},
+            // "envFile": "${workspaceRoot}/.env"
+        },
+        {
             "name": "python build kernel",
             "type": "python",
             "request": "launch",
