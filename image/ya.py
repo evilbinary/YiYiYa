@@ -109,7 +109,7 @@ def run_qemu(plat,debug=False):
             os.cp('app/resource/*', '/Volumes/YIYIYA/')
             os.exec('hdiutil eject /Volumes/YIYIYA')
         elif is_host('linux') :
-            os.exec('bash -c \'mcopy -nmov  -i image/disk.img app/resource/* ::\'')
+            os.shell('mcopy -nmov  -i image/disk.img app/resource/* ::')
         else:
             os.exec('mcopy.exe -nmov  -i image/disk.img app/resource/* ::')
         
