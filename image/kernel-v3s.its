@@ -11,7 +11,7 @@
 	images {
 		setup {
 			description = "YiYiYa init";
-			data = /incbin/("../boot/arm/init.bin");
+			data = /incbin/("${BOOT}");
 			type = "kernel";
 			arch = "arm";
 			os = "linux";
@@ -24,7 +24,7 @@
 		};
 		kernel {
 			description = "YiYiYa kernel";
-			data = /incbin/("../duck/init/kernel.elf");
+			data = /incbin/("${KERNEL}");
 			type = "ramdisk";
 			arch = "arm";
 			os = "linux";

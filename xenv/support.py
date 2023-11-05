@@ -48,7 +48,14 @@ support_platform_cflags ={
     'raspi2': ['-nostdlib','-nostdinc'],# #specs=nosys.specs
     'raspi3': ['-mcpu=cortex-a53','-mtune=cortex-a53'],
     'stm32f4xx': ['-specs=nosys.specs', '-nolibc', '-nostdlib', '-nostdinc' ,'-fno-builtin', '-DUSE_HAL_DRIVER'],
-    'android' : []
+    'android' : [],
+    'v3s':['-nostdlib','-nostdinc'],
+    'orangepi-pc':['-nostdlib','-nostdinc'],
+    'rk3128': ['-nostdlib','-nostdinc'],
+    'i386-pc': ['-nostdlib','-nostdinc'],
+    'cubieboard2': ['-nostdlib','-nostdinc'],
+    'dmulator':[],
+    'dummy':[],
 }
 
 
@@ -61,17 +68,17 @@ def get_arch_type(arch):
 
 
 def get_arch(p):
-    return support_platform[p]
+    return support_platform.get(p)
 
 def get_archs(arch_type):
-    return support_archs[arch_type]
+    return support_archs.get(arch_type)
 
 
 def get_arch_cflags(key):
-    return support_arch_cflags[key]
+    return support_arch_cflags.get(key)
  
 
 def get_platform_cflags(plat):
-    return support_platform_cflags[plat]
+    return support_platform_cflags.get(plat)
  
 

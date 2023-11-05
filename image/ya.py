@@ -202,8 +202,6 @@ add_rules("arch")
 run_qemu('raspi2')
 
 
-
-
 target("raspi2")
 
 add_deps("duck.img","disk.img")
@@ -228,3 +226,24 @@ def run(target):
 
 on_run(run)
 
+
+#v3s 运行
+
+target("v3s")
+add_deps("duck.fit")
+
+def run(target):
+    targetfile = target.targetfile()
+    sourcefiles = target.sourcefiles()
+    arch=target.get_arch()
+    arch_type= target.get_arch_type()
+    mode =target.get_config('mode')
+    plat=target.plat()
+
+    duck_fit="build/"+plat+"/"+arch+"/"+mode+"/duck.img"
+
+    print('run v3s fel ',duck_fit)
+
+    os.shell('~/dev/c/sunxi-tools/sunxi-fel version uboot ~/dev/c/u-boot-v3s/u-boot-sunxi-with-spl.bin  write 0x41000000 '+duck_fit)
+
+on_run(run)
