@@ -39,6 +39,11 @@ brew install nativeos/i386-elf-toolchain/i386-elf-gcc
 brew install riscv-gnu-toolchain
 ```
 
+```bash
+#  安装工具
+brew install mtools u-boot-tools dosfstools
+```
+
 ### 安装yymake
 
 ```bash

@@ -19,6 +19,9 @@ wsl.exe --set-version Ubuntu-20.04 2
 
 ```bash
 apt install qemu
+
+#  安装工具
+sudo apt install mtools u-boot-tools dosfstools
 ```
 
 
