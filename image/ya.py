@@ -240,7 +240,7 @@ def run(target):
     mode =target.get_config('mode')
     plat=target.plat()
 
-    duck_fit="build/"+plat+"/"+arch+"/"+mode+"/duck.img"
+    duck_fit="build/"+plat+"/"+arch+"/"+mode+"/duck.fit"
 
     print('run v3s fel ',duck_fit)
 
