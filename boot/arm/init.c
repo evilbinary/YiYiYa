@@ -474,7 +474,7 @@ static void load_elf(Elf32_Ehdr* elf_header) {
   for (int i = 0; i < elf_header->e_shnum; i++) {
     if (SHT_NOBITS == shdr[i].sh_type) {
       char* vaddr = shdr[i].sh_addr;
-      // memset(vaddr, 0, shdr[i].sh_size);
+      memset(vaddr, 0, shdr[i].sh_size);
 
       // int num = boot_data.segments_number++;
       // boot_data.segments[num].start = vaddr;
