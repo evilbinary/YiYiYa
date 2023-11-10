@@ -74,8 +74,21 @@ wayland_apps={
 
 #构建的module
 modules=[
-    'posix','loader','musl','ipc','gaga','log','pty' 
-    #'musl','gaga','ipc','pty','log','debug','ewok'
+    'devfs',
+    'serial',
+    'i2c',
+    'spi',
+    'loader',
+    'posix',
+    'test',
+    'fat',
+    'gpu',
+    'mouse',
+    'sdhci',
+    'rtc',
+    'gpio',
+    'debug', 'log','pty','ipc','gaga','musl',
+    #'ewok'
 ]
 
 #构建foot

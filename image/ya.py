@@ -242,7 +242,7 @@ def run(target):
 
     duck_fit="build/"+plat+"/"+arch+"/"+mode+"/duck.fit"
 
-    print('run v3s fel ',duck_fit)
+    print('run v3s fel',duck_fit)
 
     os.shell('~/dev/c/sunxi-tools/sunxi-fel version uboot ~/dev/c/u-boot-v3s/u-boot-sunxi-with-spl.bin  write 0x41000000 '+duck_fit)
 
