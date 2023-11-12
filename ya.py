@@ -87,7 +87,12 @@ modules=[
     'sdhci',
     'rtc',
     'gpio',
-    'debug', 'log','pty','ipc','gaga','musl',
+    'log','pty',
+    'ipc',
+    'musl',
+    'gaga',
+    # 'debug',
+    # 'fatfs',
     #'ewok'
 ]
 

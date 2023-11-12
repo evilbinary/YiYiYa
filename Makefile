@@ -2,31 +2,27 @@ all: raspi2
 
 
 raspi2:
-	xmake f -m debug -p raspi2 -v
-	xmake
+	ya -m debug -r qemu
 
 v3s:
-	make f -m debug -p v3s -v
-	xmake
+	ya -m debug -r v3s -p v3s
 
 
 i386-pc:
-	xmake f -m debug -p i386-pc -v
-	xmake
-
+	ya -m debug -r qemu -p i386-pc
 
 img:
 	qemu-img create  image/disk.img 512m
-	mkfs.vfat image/disk.img 
+	mkfs.vfat -n YIYIYA image/disk.img 
 
 duck.img:
-	xmake build duck.img
+	ya -m debug -b duck.img
 
 qemu: 
-	xmake build qemu
+	ya -m debug -b qemu
 
 run: duck.img
-	xmake run qemu
+	ya -m debug -r qemu
 
 
 com:

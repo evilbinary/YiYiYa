@@ -7,7 +7,8 @@
 target("duck.img")
 add_deps(
     'boot-init.elf',
-    'kernel.elf'
+    'kernel.elf',
+    'kernel'
 )
 
 add_files(

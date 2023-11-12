@@ -938,7 +938,7 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            "program": "${workspaceRoot}/build/raspi2/armv7-a/debug/shell",
+            "program": "${workspaceRoot}/build/raspi2/armv7-a/debug/ls",
             "cwd": "${workspaceRoot}",
             "args": [],
             "sourceFileMap": {
@@ -1217,7 +1217,7 @@
             "miDebuggerServerAddress": "localhost:1234",
             // "program": "${workspaceRoot}/app/hello/hello",
             // "program": "${workspaceRoot}/app/hello/hello",
-            "program": "${workspaceRoot}/app/etk/etk",
+            "program": "${workspaceRoot}/build/raspi2/armv7-a/debug/etk",
             // "program": "${workspaceRoot}/app/file/file",
             // "program": "${workspaceRoot}/app/microui/microui",
 
