@@ -163,6 +163,23 @@ char uart_get_ch() {
   // /* convert carrige return to newline */
   // return r=='\r'?'\n':r;
 }
+#elif defined(MIYOO)
+
+
+void uart_init() {}
+
+void uart_send_ch(unsigned int c) {
+  while (!(UART_REG8(UART_LSR) & UART_LSR_THRE));
+    UART_REG8(UART_TX) = c;
+}
+
+char uart_get_ch() {
+  char c;
+  while(!(UART_REG8(UART_LSR) & UART_LSR_DR));
+  c=(char) ( UART_REG8(UART_TX) & 0xff);
+  return c;
+}
+
 
 #elif defined(RK3128)
 void uart_init() {}
