@@ -20,7 +20,8 @@ support_platform = {
     'dummy': 'dummy',
     'rk3288': 'armv7-a',
     'orangepi-pc': 'armv7-a',
-    'riscv-virt': 'riscv'
+    'riscv-virt': 'riscv',
+    'miyoo': 'armv7-a',
 }
 
 support_arch_cflags ={
@@ -56,6 +57,7 @@ support_platform_cflags ={
     'cubieboard2': ['-nostdlib','-nostdinc'],
     'dmulator':[],
     'dummy':[],
+    'miyoo':['-nostdlib','-nostdinc']
 }
 
 
