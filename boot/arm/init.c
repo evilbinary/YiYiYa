@@ -11,9 +11,9 @@ static boot_info_t* boot_info = NULL;
 static boot_info_t boot_data;
 int cpu_id = 0;
 
-void io_write32(uint port, u32 data) { *(u32*)port = data; }
+static void io_write32(uint port, u32 data) { *(u32*)port = data; }
 
-u32 io_read32(uint port) {
+static u32 io_read32(uint port) {
   u32 data;
   data = *(u32*)port;
   return data;

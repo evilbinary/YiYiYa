@@ -4,26 +4,8 @@
 # * 作者: evilbinary on 01/01/20
 # * 邮箱: rootdebug@163.com
 # ********************************************************************
-target("duck.img")
-add_deps(
-    'boot-init.elf',
-    'kernel.elf',
-    'kernel'
-)
-
-add_files(
-    "{buildir}/boot-init.bin",
-    "{buildir}/kernel"
-)
-
-add_rules("make-image")
-    
-
 rule("its")
 set_extensions(".bin", ".its","")
-
-
-
 
 target("duck.fit")
 
@@ -57,20 +39,50 @@ def build(target):
 
 on_build(build)
 
+if has_config('single-kernel'): 
+    target("duck.fit")
+    target("duck.img")
+else:
+
+    target("duck.img")
+    add_deps(
+        'boot-init.elf',
+        'kernel.elf',
+        'kernel'
+    )
+
+    add_files(
+        "{buildir}/boot-init.bin",
+        "{buildir}/kernel"
+    )
+
+    add_rules("make-image")
+        
+
 
 
 target("uImage.img")
 
-add_deps(
-    'boot-init.elf',
-    'kernel.elf'
-)
-add_rules("its")
-add_files(
-    "{buildir}/boot-init.bin",
-    "{buildir}/kernel"
-    ,rules = "its"
-)
+if has_config('single-kernel'): 
+    add_deps(
+        'kernel.elf'
+    )
+    add_rules("its")
+    add_files(
+        "{buildir}/kernel"
+        ,rules = "its"
+    )
+else:
+    add_deps(
+        'boot-init.elf',
+        'kernel.elf'
+    )
+    add_rules("its")
+    add_files(
+        "{buildir}/boot-init.bin",
+        "{buildir}/kernel"
+        ,rules = "its"
+    )
 
 
 def build(target):
