@@ -32,7 +32,6 @@ void init_memory();
 void init_kernel();
 
 typedef int (*entry)(int, char**, char**);
-#define getch() uart_get_ch()
-#define putc(s)  uart_send_ch(s)
+
 
 #endif

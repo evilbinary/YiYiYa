@@ -85,9 +85,7 @@ char uart_get_ch() {
   return r == '\r' ? '\n' : r;
 }
 #elif defined(ORANGEPI_PC)
-void uart_init() {
-
-}
+void uart_init() {}
 
 void uart_send_ch(unsigned int c) {
   while ((io_read32(UART0_DR) & 0x20) == 0)
@@ -96,11 +94,12 @@ void uart_send_ch(unsigned int c) {
 }
 
 char uart_get_ch() {
-  while (( io_read32(UART0_DR) & 0x01) == 0);
-    return(io_read32(SUNXI_UART0_BASE));
+  while ((io_read32(UART0_DR) & 0x01) == 0)
+    ;
+  return (io_read32(SUNXI_UART0_BASE));
 }
 
-#elif defined(RASPI2) ||defined(RASPI3)
+#elif defined(RASPI2) || defined(RASPI3)
 void uart_init() {
   register unsigned int r;
 
@@ -165,21 +164,23 @@ char uart_get_ch() {
 }
 #elif defined(MIYOO)
 
-
 void uart_init() {}
 
 void uart_send_ch(unsigned int c) {
-  while (!(UART_REG8(UART_LSR) & UART_LSR_THRE));
-    UART_REG8(UART_TX) = c;
+  while (!(UART_REG8(UART_LSR) & UART_LSR_THRE))
+    ;
+  UART_REG8(UART_TX) = c;
+  while (!(UART_REG8(UART_LSR) & UART_LSR_THRE))
+    ;
 }
 
 char uart_get_ch() {
   char c;
-  while(!(UART_REG8(UART_LSR) & UART_LSR_DR));
-  c=(char) ( UART_REG8(UART_TX) & 0xff);
+  while (!(UART_REG8(UART_LSR) & UART_LSR_DR))
+    ;
+  c = (char)(UART_REG8(UART_TX) & 0xff);
   return c;
 }
-
 
 #elif defined(RK3128)
 void uart_init() {}
@@ -197,7 +198,7 @@ char uart_get_ch() {
 
 #endif
 
-static void print_string(const unsigned char* str) {  
+static void print_string(const unsigned char* str) {
   while (*str) {
     uart_send_ch(*str);
     ++str;
@@ -249,7 +250,7 @@ void printf(const char* format, ...) {
 
   while ((c = *format++) != 0) {
     if (c != '%')
-      putc(c);
+      uart_send_ch(c);
     else {
       char* p;
 
@@ -268,11 +269,11 @@ void printf(const char* format, ...) {
           if (!p) p = "(null)";
 
         string:
-          while (*p) putc(*p++);
+          while (*p) uart_send_ch(*p++);
           break;
 
         default:
-          putc(*((int*)arg++));
+          uart_send_ch(*((int*)arg++));
           break;
       }
     }
@@ -286,7 +287,7 @@ void init_boot_info() {
   boot_info->version = BOOT_VERSION;
   boot_info->kernel_origin_base = KERNEL_ORIGIN_BASE;
   boot_info->kernel_base = KERNEL_BASE;
-  boot_info->kernel_size = KERNEL_SIZE*2;
+  boot_info->kernel_size = KERNEL_SIZE * 2;
   boot_info->tss_number = MAX_CPU;
   boot_info->second_boot_entry = SECOND_BOOT_ENTRY;
   boot_info->segments_number = 0;
@@ -347,6 +348,13 @@ void init_memory() {
   boot_info->total_memory += ptr->length;
   ptr++;
   count++;
+#elif defined(MIYOO)
+  ptr->base = 0x20000000;
+  ptr->length = 0x8000000;  // 128
+  ptr->type = 1;
+  boot_info->total_memory += ptr->length;
+  ptr++;
+  count++;
 #else
   //
   ptr->type = 1;
@@ -384,12 +392,12 @@ void init_boot() {
   uart_init();
 
   init_boot_info();
-  putc('b');
-  putc('o');
-  putc('o');
-  putc('t');
-  putc('\n');
-  putc('\r');
+  uart_send_ch('b');
+  uart_send_ch('o');
+  uart_send_ch('o');
+  uart_send_ch('t');
+  uart_send_ch('\n');
+  uart_send_ch('\r');
   printf("boot info addr %x\n\r", boot_info);
 
   print_string("init display\n\r");
@@ -423,7 +431,6 @@ void init_apu_boot() {
     ;
 }
 
-
 void* memmove32(void* s1, const void* s2, u32 n) {
   u32 *dest, *src;
   int i;
@@ -445,7 +452,7 @@ static void load_elf(Elf32_Ehdr* elf_header) {
     switch (phdr[i].p_type) {
       case PT_NULL: {
         char* vaddr = phdr[i].p_vaddr;
-        memset(vaddr,0,phdr[i].p_memsz);
+        memset(vaddr, 0, phdr[i].p_memsz);
         // printf(" %s %x %x %x %s %x %x \r\n", "NULL", phdr[i].p_offset,
         //        phdr[i].p_vaddr, phdr[i].p_paddr, "", phdr[i].p_filesz,
         //        phdr[i].p_memsz);
@@ -459,20 +466,20 @@ static void load_elf(Elf32_Ehdr* elf_header) {
         char* start = elf + phdr[i].p_offset / 2;
         char* vaddr = phdr[i].p_vaddr;
         // if ((phdr[i].p_flags & PF_X) == PF_X) {
-          // printf(" %s %x %x %x %s %x %x \r\n", "LOAD", phdr[i].p_offset,
-          //        phdr[i].p_vaddr, phdr[i].p_paddr, "", phdr[i].p_filesz,
-          //        phdr[i].p_memsz);
+        // printf(" %s %x %x %x %s %x %x \r\n", "LOAD", phdr[i].p_offset,
+        //        phdr[i].p_vaddr, phdr[i].p_paddr, "", phdr[i].p_filesz,
+        //        phdr[i].p_memsz);
 
-          entry = vaddr;
-          printf("load start:%x vaddr:%x size:%x \n\r", start, vaddr,
-                 phdr[i].p_filesz);
-          memmove32(vaddr, start, phdr[i].p_memsz);
-          printf("move end\n\r");
+        entry = vaddr;
+        printf("load start:%x vaddr:%x size:%x \n\r", start, vaddr,
+               phdr[i].p_filesz);
+        memmove32(vaddr, start, phdr[i].p_memsz);
+        printf("move end\n\r");
 
-          int num = boot_data.segments_number++;
-          boot_data.segments[num].start = vaddr;
-          boot_data.segments[num].size = phdr[i].p_memsz;
-          boot_data.segments[num].type = 1;
+        int num = boot_data.segments_number++;
+        boot_data.segments[num].start = vaddr;
+        boot_data.segments[num].size = phdr[i].p_memsz;
+        boot_data.segments[num].type = 1;
         // } else {
         //   int num = boot_data.segments_number++;
         //   boot_data.segments[num].start = vaddr;
@@ -501,7 +508,7 @@ static void load_elf(Elf32_Ehdr* elf_header) {
       // map_alignment(page,vaddr,buf,shdr[i].sh_size);
     } else if (entry != shdr[i].sh_addr && SHT_PROGBITS == shdr[i].sh_type &&
                shdr[i].sh_flags & SHF_ALLOC && shdr[i].sh_flags) {
-      char* start = elf + shdr[i].sh_offset/2;
+      char* start = elf + shdr[i].sh_offset / 2;
       char* vaddr = shdr[i].sh_addr;
       printf("load shdr start:%x vaddr:%x size:%x \n\r", start, vaddr,
              shdr[i].sh_size);
@@ -555,14 +562,21 @@ void* load_kernel() {
 }
 
 #ifdef SINGLE_KERNEL
-extern int __bss_start__, __bss_end__;
+extern int __bss_start, __bss_end;
 extern int __start, __end;
 
-void get_segment() {
+void init_segment() {
   int num = boot_data.segments_number++;
   boot_data.segments[num].start = &__start;
-  boot_data.segments[num].size = &__end - &__start ;
+  boot_data.segments[num].size = &__end - &__start;
   boot_data.segments[num].type = 1;
+
+  // init bss
+  unsigned* dst = NULL;
+  unsigned* src = NULL;
+  for (dst = &__bss_start; dst < &__bss_end; dst++) {
+    *dst = 0;
+  }
 }
 #else
 void* memset(void* s, int c, size_t n) {
@@ -574,10 +588,12 @@ void* memset(void* s, int c, size_t n) {
 
 // start kernel
 void start_kernel() {
-  #ifdef SINGLE_KERNEL
-  get_segment();
+#ifdef SINGLE_KERNEL
+  init_segment();
   extern void kstart(int argc, char* argv[], char** envp);
   entry start = kstart;
+  boot_info->kernel_entry = start;
+  printf("kernel entry %x\n\r", boot_info->kernel_entry);
 #else
   boot_info->kernel_entry = load_kernel();
   entry start = boot_info->kernel_entry;
