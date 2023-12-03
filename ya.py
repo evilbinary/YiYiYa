@@ -43,8 +43,14 @@ set_arch_type(arch_type)
 
 
 #构建应用
-if is_plat("raspi2","raspi3"):
+if arch_type=='arm':
     set_toolchains("arm-none-eabi")
+elif arch_type=='x86':
+    set_toolchains("i386-elf")
+elif arch_type=='riscv':
+    set_toolchains("riscv64-unknown-elf")
+elif arch_type in ['dummy','general'] :
+    set_toolchains("gcc")
 else:
     set_toolchains("arm-none-eabi")
 
