@@ -53,7 +53,7 @@ else:
 
     add_files(
         "{buildir}/boot-init.bin",
-        "{buildir}/kernel"
+        "{buildir}/kernel",
     )
 
     add_rules("make-image")
