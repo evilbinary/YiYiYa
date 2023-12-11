@@ -11,7 +11,9 @@
 
 #define KERNEL_MOVE 
 #define READ_BLOCK_SIZE 512
+
 #define KERNEL_BASE 0x100000
+
 #ifdef V3S
 #define KERNEL_ORIGIN_BASE 0x40000000
 #elif defined(CUBIEBOARD2)
@@ -19,6 +21,8 @@
 #else
 #define KERNEL_ORIGIN_BASE 0x10000+512*12
 #endif
+
+
 #define PDT_BASE 0x9000
 #define BOOT_VERSION 0x01
 

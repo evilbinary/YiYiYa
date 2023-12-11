@@ -19,6 +19,36 @@ static u32 io_read32(uint port) {
   return data;
 }
 
+#ifdef SINGLE_KERNEL
+extern unsigned int __bss_start, __bss_end;
+extern unsigned int __start, __end;
+
+void init_segment() {
+  int num = boot_data.segments_number++;
+  boot_data.segments[num].start = (unsigned int) &__start;
+  boot_data.segments[num].size = (unsigned int)&__end - (unsigned int)&__start;
+  boot_data.segments[num].type = 1;
+
+  boot_info->kernel_base = (unsigned int) &__start;
+}
+
+void init_bss(){
+  // init bss
+  unsigned* dst = NULL;
+  unsigned* src = NULL;
+  for (dst = &__bss_start; dst < &__bss_end; dst++) {
+    *dst = 0;
+  }
+}
+#else
+void* memset(void* s, int c, size_t n) {
+  int i;
+  for (i = 0; i < n; i++) ((char*)s)[i] = c;
+  return s;
+}
+#endif
+
+
 #if defined(V3S) || defined(CUBIEBOARD2)
 void uart_init() {
   u32 addr;
@@ -389,6 +419,10 @@ void init_cpu() {
 void read_kernel() {}
 
 void init_boot() {
+  #ifdef SINGLE_KERNEL
+  init_bss();
+  #endif
+
   uart_init();
 
   init_boot_info();
@@ -561,30 +595,6 @@ void* load_kernel() {
   }
 }
 
-#ifdef SINGLE_KERNEL
-extern int __bss_start, __bss_end;
-extern int __start, __end;
-
-void init_segment() {
-  int num = boot_data.segments_number++;
-  boot_data.segments[num].start = &__start;
-  boot_data.segments[num].size = &__end - &__start;
-  boot_data.segments[num].type = 1;
-
-  // init bss
-  unsigned* dst = NULL;
-  unsigned* src = NULL;
-  for (dst = &__bss_start; dst < &__bss_end; dst++) {
-    *dst = 0;
-  }
-}
-#else
-void* memset(void* s, int c, size_t n) {
-  int i;
-  for (i = 0; i < n; i++) ((char*)s)[i] = c;
-  return s;
-}
-#endif
 
 // start kernel
 void start_kernel() {
