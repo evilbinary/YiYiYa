@@ -170,7 +170,7 @@ add_cflags(plat_cflags)
 add_cxxflags(arch_cflags)
 
 set_config('cflags',arch_cflags,plat_cflags)
-set_config('cpp_apps',cpp_apps)
+set_config('cpp-apps',cpp_apps)
 set_config('apps',apps)
 
 

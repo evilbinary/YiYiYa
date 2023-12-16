@@ -24,7 +24,7 @@
             "stopOnEntry": false,
             "python": "python3.11",
             "program": "/usr/local/bin/ya",
-            "args": ["-m","debug"],
+            "args": ["-m","debug","-p","miyoo", "--single-kernel"],
             "cwd": "${workspaceRoot}",
             "env": {"PYTHONPATH":"${workspaceRoot}"},
             // "envFile": "${workspaceRoot}/.env"
