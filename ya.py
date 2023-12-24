@@ -97,6 +97,7 @@ modules=[
     'ipc',
     'musl',
     'gaga',
+    'debug',
     # 'debug',
     # 'fatfs',
     #'ewok'
