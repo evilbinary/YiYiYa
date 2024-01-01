@@ -98,6 +98,7 @@ modules=[
     'musl',
     'gaga',
     'debug',
+    'keyboard'
     # 'debug',
     # 'fatfs',
     #'ewok'
