@@ -164,10 +164,12 @@ add_defines(def_arch_type)
 
 arch_cflags=support.get_arch_cflags(arch)
 plat_cflags=support.get_platform_cflags(plat)
-
+arch_ldflags=support.get_arch_linkflags(arch)
 
 add_cflags(arch_cflags)
 add_cflags(plat_cflags)
+
+add_ldflags(arch_ldflags)
 
 add_cxxflags(arch_cflags)
 

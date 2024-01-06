@@ -128,11 +128,8 @@ on_build(build)
 rule("arch")
 
 def build (target):
-    # import("support")
-    # import("core.project.config")
-
     import globa,show
-
+    
     arch=target.arch()
     plat=target.plat()
     arch_type= support.get_arch_type(arch)
@@ -162,42 +159,40 @@ before_run(build)
 
 
 def load (target):
-    # import("support")
-    # import("core.project.config")
-    # import('core.base.global')
     import globa
+    import xenv.support as support    
 
     arch=target.arch()
     plat=target.plat()
     arch_type= support.get_arch_type(arch)
 
-    support.set('arch',arch)
-
-    globa.set("arch",arch)
-    globa.set("arch_type",arch_type)
-    globa.set("plat",plat)
-
-    config.set("arch",arch)
-    config.set("arch_type",arch_type)
-    ##config.set("plat",plat)
-
     target.set("arch_type", arch_type)
     target.set("arch", arch)
     target.set("plat", plat)
-    
-    # import('core.base.global')
-    # import("lib.detect.find_library")
 
     library = find_library("gcc", 
         {"/opt/local/lib/gcc/arm-none-eabi/*/",
         "/usr/lib/gcc/arm-none-eabi/*/"    
     },
-        {kind : "static"}
+        kind= "static"
     )
-    # print('libgcc',library.linkdir)
     target.add('linkdirs',library.linkdir)
+    if library:
+        # print('target=>',target.get('name'))
+        # print('libgcc==>',library)
+        
+        target.add("ldflags",[
+            '-L'+library.linkdir,
+            "-l"+library.link
+        ],after=True)
 
-on_load(load)
+        print('ldflags=>',target.get('ldflags') )
+        # target.add("ldflags",[
+        #     '-L'+library.linkdir+'/'+library.filename
+        # ])
+        target.add("includedir",library.linkdir)
+
+# before_build(load)
 
 
 

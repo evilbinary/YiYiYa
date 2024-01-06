@@ -22,27 +22,34 @@ support_platform = {
     'orangepi-pc': 'armv7-a',
     'riscv-virt': 'riscv',
     'miyoo': 'armv7-a',
+    'versatilepb': 'armv5',
+    'f1c100s': 'armv5',
 }
 
 support_arch_cflags ={
-    'x86': '',
-    'armv7': '',
+    'x86': [],
+    'armv5':['-march=armv5te','-mcpu=arm926ej-s','-mfloat-abi=soft'],
+    'armv7': [],
     'armv7e-m': ['-mthumb', '-mthumb-interwork',  '-mfloat-abi=soft', '-mfpu=vfpv4-d16', '-mcpu=cortex-m4'],
     'armv7-a': ['-mcpu=cortex-a7',
                 '-mtune=cortex-a7',
                 '-mfpu=vfpv4',
                 '-mfloat-abi=softfp'
             ],
-    'armv8-a': ['-mfpu=vfpv4', '-mfloat-abi=softfp']
+    'armv8-a': ['-mcpu=cortex-a53', '-mtune=cortex-a53','-mfpu=vfpv4', '-mfloat-abi=softfp'],
+    'dummy':[],
 }
 
 
 support_arch_linkflags ={
-    'x86': '',
-    'armv7': '',
-    'armv7e-m': ['-mthumb', '-mthumb-interwork',  '-mfloat-abi=soft', '-mfpu=vfpv4-d16', '-mcpu=cortex-m4'],
-    'armv7-a': ['-mcpu=cortex-a7','-mtune=cortex-a7','-mfpu=vfpv4','-mfloat-abi=softfp'],
-    'armv8-a': ['-mcpu=cortex-a53', '-mtune=cortex-a53']
+    'x86': [],
+    # 'armv5':['-mcpu=arm926ej-s','-mfloat-abi=soft','-mfpu=vfp'],
+    'armv5': [],
+    'armv7': [],
+    'armv7e-m': [],
+    'armv7-a': [],
+    'armv8-a': [],
+    'dummpy': []
 }
 
 support_platform_cflags ={
@@ -56,8 +63,10 @@ support_platform_cflags ={
     'i386-pc': ['-nostdlib','-nostdinc'],
     'cubieboard2': ['-nostdlib','-nostdinc'],
     'dmulator':[],
-    'dummy':[],
-    'miyoo':['-nostdlib','-nostdinc']
+    'dummy':['-nostdlib','-nostdinc','-Wno-error,-Wimplicit-function-declaration'],
+    'miyoo':['-nostdlib','-nostdinc'],
+    'versatilepb': ['-nostdlib','-nostdinc'],
+    'f1c100s': []
 }
 
 
@@ -83,4 +92,7 @@ def get_arch_cflags(key):
 def get_platform_cflags(plat):
     return support_platform_cflags.get(plat)
  
+
+def get_arch_linkflags(key):
+    return support_arch_linkflags.get(key)
 
