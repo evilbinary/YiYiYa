@@ -174,6 +174,19 @@ char uart_get_ch() {
   return c;
 }
 
+#elif defined(VERSATILEPB)
+void uart_init() {}
+
+void uart_send_ch(unsigned int c) {
+ 
+}
+
+char uart_get_ch() {
+  
+  return 0;
+}
+
+
 #elif defined(STM32F4XX)
 void uart_init() {}
 

@@ -28,7 +28,7 @@ support_platform = {
 
 support_arch_cflags ={
     'x86': [],
-    'armv5':['-march=armv5te','-mcpu=arm926ej-s','-mfloat-abi=soft'],
+    'armv5':['-march=armv5te','-mfloat-abi=soft','-fno-threadsafe-statics'],
     'armv7': [],
     'armv7e-m': ['-mthumb', '-mthumb-interwork',  '-mfloat-abi=soft', '-mfpu=vfpv4-d16', '-mcpu=cortex-m4'],
     'armv7-a': ['-mcpu=cortex-a7',

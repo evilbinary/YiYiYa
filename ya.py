@@ -68,6 +68,9 @@ apps = [
     'sdl',
 ]
 
+if arch in ['armv5']:
+    apps=['cmd','gui','hello']
+
 # cpp应用
 cpp_apps=[
     'xtrack','gmenu2x',

@@ -150,16 +150,22 @@ def run_qemu(plat,debug=False):
                 run_qemu_cmd='qemu-system-gnuarmeclipse -name YiYiYa #verbose #verbose #board STM32F429I-Discovery #mcu STM32F429ZITx   -rtc base=localtime -kernel duck/init/kernel.elf  -serial stdio  -D ./qemu.log -d unimp,guest_errors #semihosting-config enable -d in_asm,int,mmu,cpu_reset' #-d in_asm -d cpu_reset -d in_asm,int,mmu -d   -drive if=sd,id=sd0,format=raw,file='+disk_img+' #-d in_asm -d cpu_reset -d in_asm,int,mmu
                 debug_qemu_cmd = run_qemu_cmd+ ' -S -s'
 
-            elif string.find(target.get('plat') , 'orangepi-pc,cubieboard2') :
+            elif string.find(target.plat() , 'orangepi-pc,cubieboard2') :
                 run_qemu_cmd = 'qemu-system-arm -name YiYiYa -M orangepi-pc -rtc base=localtime -kernel '+kernel_image+'  -serial stdio   -D ./qemu.log -drive if=sd,id=sd0,format=raw,file='+disk_img+' -d in_asm,int,mmu,cpu_reset,guest_errors,strace'##-d in_asm -d cpu_reset -d in_asm,int,mmu,cpu_reset
                 debug_qemu_cmd =run_qemu_cmd+' -S -s -monitor tcp:127.0.0.1:55555,server,nowait'
 
-            elif string.find(target.get('plat'), 'raspi3' ) :
+            elif string.find(target.plat(), 'raspi3' ) :
                 run_qemu_cmd='qemu-system-aarch64 -name YiYiYa -M raspi3b  -rtc base=localtime -kernel '+kernel_image+'  -serial stdio   -D ./qemu.log -drive if=sd,id=sd0,format=raw,file='+disk_img+' ' # -d in_asm -d cpu_reset -d in_asm,int,mmu
                 #run_qemu_cmd =run_qemu_cmd+' -monitor tcp:127.0.0.1:55555,server,nowait'
                 # run_qemu_cmd =run_qemu_cmd+' -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor'
                 debug_qemu_cmd = run_qemu_cmd +' -S -s'
+            elif target.plat() in ['versatilepb']:
+                run_qemu_cmd='qemu-system-arm -name YiYiYa -M versatilepb  -rtc base=localtime -kernel '+kernel_image+'  -serial stdio   -D ./qemu.log -drive if=sd,id=sd0,format=raw,file='+disk_img+' '##-d in_asm -d cpu_reset -d in_asm,int,mmu
+                ## run_qemu_cmd =run_qemu_cmd+' -monitor tcp:127.0.0.1:55555,server,nowait'
+                ## run_qemu_cmd =run_qemu_cmd+' -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor'
+                debug_qemu_cmd = run_qemu_cmd +' -S -s'
             else:
+                print('-->', target.plat())
                 run_qemu_cmd='qemu-system-arm -name YiYiYa -M raspi2b  -rtc base=localtime -kernel '+kernel_image+'  -serial stdio   -D ./qemu.log -drive if=sd,id=sd0,format=raw,file='+disk_img+' '##-d in_asm -d cpu_reset -d in_asm,int,mmu
                 ## run_qemu_cmd =run_qemu_cmd+' -monitor tcp:127.0.0.1:55555,server,nowait'
                 ## run_qemu_cmd =run_qemu_cmd+' -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor'
@@ -204,7 +210,13 @@ target("debug")
 
 add_deps("duck.img","disk.img")
 add_rules("arch")
-run_qemu('raspi2',True)
+
+plat=get_plat()
+if not plat:
+    plat='raspi2'
+
+
+run_qemu(plat,True)
 
 
 
@@ -212,7 +224,12 @@ target("qemu")
 
 add_deps("duck.img","disk.img")
 add_rules("arch")
-run_qemu('raspi2')
+
+plat=get_plat()
+if not plat:
+    plat='raspi2'
+
+run_qemu(plat)
 
 
 target("raspi2")
