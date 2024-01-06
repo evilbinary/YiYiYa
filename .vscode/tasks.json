@@ -66,6 +66,30 @@
             ]
         },
         {
+            "label": "Build versatilepb and run",
+            "dependsOrder":"sequence",
+            "dependsOn": [
+                "Run versatilepb QEMU",
+            ]
+        },
+        {
+            "label": "Run versatilepb QEMU",
+            "type": "shell",
+            "isBackground": true,
+            "command": "ya -m debug -p versatilepb  --single-kernel -r debug",
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(run qemu)",
+                    "line": 1,
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "^(run qemu)",
+                    "endsPattern": "^(run qemu)"
+                }
+            }
+        },
+        {
             "label": "Build vmdk",
             "type": "shell",
             "command": "qemu-img convert -O vmdk image/disk.img image/disk.vmdk",
