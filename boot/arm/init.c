@@ -25,14 +25,14 @@ extern unsigned int __start, __end;
 
 void init_segment() {
   int num = boot_data.segments_number++;
-  boot_data.segments[num].start = (unsigned int) &__start;
+  boot_data.segments[num].start = (unsigned int)&__start;
   boot_data.segments[num].size = (unsigned int)&__end - (unsigned int)&__start;
   boot_data.segments[num].type = 1;
 
-  boot_info->kernel_base = (unsigned int) &__start;
+  boot_info->kernel_base = (unsigned int)&__start;
 }
 
-void init_bss(){
+void init_bss() {
   // init bss
   unsigned* dst = NULL;
   unsigned* src = NULL;
@@ -47,7 +47,6 @@ void* memset(void* s, int c, size_t n) {
   return s;
 }
 #endif
-
 
 #if defined(V3S) || defined(CUBIEBOARD2)
 void uart_init() {
@@ -175,17 +174,15 @@ char uart_get_ch() {
 }
 
 #elif defined(VERSATILEPB)
-void uart_init() {}
+void uart_init() { io_write32(UART0 + UART_INT_ENABLE, UART_RECEIVE); }
 
 void uart_send_ch(unsigned int c) {
- 
+  while (io_read32(UART0+UART_FLAGS) & UART_TRANSMIT)
+    ;
+  io_write32(UART0 + UART_DATA, c);
 }
 
-char uart_get_ch() {
-  
-  return 0;
-}
-
+char uart_get_ch() { return 0; }
 
 #elif defined(STM32F4XX)
 void uart_init() {}
@@ -432,9 +429,9 @@ void init_cpu() {
 void read_kernel() {}
 
 void init_boot() {
-  #ifdef SINGLE_KERNEL
+#ifdef SINGLE_KERNEL
   init_bss();
-  #endif
+#endif
 
   uart_init();
 
@@ -607,7 +604,6 @@ void* load_kernel() {
     return elf;
   }
 }
-
 
 // start kernel
 void start_kernel() {

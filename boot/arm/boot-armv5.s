@@ -10,7 +10,7 @@ _start:
     mrc p15, #0, r4, c0, c0, #5
     and r4, r4, #3
     cmp r4, #0
-    bne apu_entry //is other core
+    //bne apu_entry //is other core
 
     //main core init 
     ldr sp, = _estack
