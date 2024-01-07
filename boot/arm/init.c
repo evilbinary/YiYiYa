@@ -396,8 +396,8 @@ void init_memory() {
   ptr++;
   count++;
 #elif defined(VERSATILEPB)
-  ptr->base = 0;
-  ptr->length = 0x8000000;  // 128
+  ptr->base = 0x00010000;
+  ptr->length = 0x10000000 * 4;  // 128
   ptr->type = 1;
   boot_info->total_memory += ptr->length;
   ptr++;
