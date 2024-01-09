@@ -24,6 +24,7 @@ support_platform = {
     'miyoo': 'armv7-a',
     'versatilepb': 'armv5',
     'f1c100s': 'armv5',
+    't113-s3': 'armv7-a',
 }
 
 support_arch_cflags ={
@@ -66,7 +67,8 @@ support_platform_cflags ={
     'dummy':['-nostdlib','-nostdinc','-Wno-error,-Wimplicit-function-declaration'],
     'miyoo':['-nostdlib','-nostdinc'],
     'versatilepb': ['-nostdlib','-nostdinc'],
-    'f1c100s': []
+    'f1c100s': [],
+    't113-s3': []
 }
 
 
