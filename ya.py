@@ -151,7 +151,8 @@ option_end()
 arch=get_arch()
 
 
-add_defines(plat.upper())
+
+add_defines(plat.replace("-", "_").upper())
 
 
 arch=get_arch()

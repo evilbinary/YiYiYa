@@ -177,12 +177,27 @@ char uart_get_ch() {
 void uart_init() { io_write32(UART0 + UART_INT_ENABLE, UART_RECEIVE); }
 
 void uart_send_ch(unsigned int c) {
-  while (io_read32(UART0+UART_FLAGS) & UART_TRANSMIT)
+  while (io_read32(UART0 + UART_FLAGS) & UART_TRANSMIT)
     ;
   io_write32(UART0 + UART_DATA, c);
 }
 
 char uart_get_ch() { return 0; }
+
+#elif defined(T113_S3)
+void uart_init() {}
+
+void uart_send_ch(unsigned int c) {
+  while ((io_read32(UART0_BASE + UART_USR) & UART_TRANSMIT) == 0)
+    ;
+  io_write32(UART0_BASE, c);
+}
+
+char uart_get_ch() {
+  while ((io_read32(UART0_BASE+ UART_LSR) & UART_RECEIVE) == 0)
+    ;
+  return (io_read32(UART0_BASE));
+}
 
 #elif defined(STM32F4XX)
 void uart_init() {}
@@ -390,6 +405,13 @@ void init_memory() {
   count++;
 #elif defined(MIYOO)
   ptr->base = 0x20000000;
+  ptr->length = 0x8000000;  // 128
+  ptr->type = 1;
+  boot_info->total_memory += ptr->length;
+  ptr++;
+  count++;
+#elif defined(T113_S3)
+  ptr->base = 0x40000000;
   ptr->length = 0x8000000;  // 128
   ptr->type = 1;
   boot_info->total_memory += ptr->length;

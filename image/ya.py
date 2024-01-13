@@ -69,7 +69,7 @@ if has_config('single-kernel'):
     )
     add_rules("its")
     add_files(
-        "{buildir}/kernel"
+        "{buildir}/kernel.bin"
         ,rules = "its"
     )
 else:
@@ -80,7 +80,7 @@ else:
     add_rules("its")
     add_files(
         "{buildir}/boot-init.bin",
-        "{buildir}/kernel"
+        "{buildir}/kernel.bin"
         ,rules = "its"
     )
 
@@ -95,7 +95,8 @@ def build(target):
     if arch_type=='x86': 
         os.exec('mkimage -n YiYiYa -A x86 -O u-boot -T kernel -C none -a 0x30008000 -e 0x30008000 -d '+sourcefiles[0]+' '+targetfile)
     elif arch_type=='arm':
-        os.exec('mkimage -n YiYiYa -A arm -O u-boot -T kernel -C none -a 0x41000000 -e 0x1000000 -d '+sourcefiles[0]+' '+targetfile)
+        cmd='mkimage -n YiYiYa -A arm -O u-boot -T kernel -C none -a 0x42000000 -e 0x42000000 -d '+sourcefiles[0]+' '+targetfile
+        os.exec(cmd)
 
 on_build(build)
 
@@ -272,8 +273,36 @@ def run(target):
 
     duck_fit="build/"+plat+"/"+arch+"/"+mode+"/duck.fit"
 
-    print('run v3s fel',duck_fit)
+    print('run '+plat+' fel',duck_fit)
 
     os.shell('~/dev/c/sunxi-tools/sunxi-fel version uboot ~/dev/c/u-boot-v3s/u-boot-sunxi-with-spl.bin  write 0x41000000 '+duck_fit)
+
+on_run(run)
+
+
+#t113-s3 运行
+target("t113-s3")
+# add_deps("duck.fit")
+add_deps("uImage.img")
+
+def run(target):
+    targetfile = target.targetfile()
+    sourcefiles = target.sourcefiles()
+    arch=target.get_arch()
+    arch_type= target.get_arch_type()
+    mode =target.get_config('mode')
+    plat=target.plat()
+
+    duck_fit="build/"+plat+"/"+arch+"/"+mode+"/duck.fit"
+    duck_kernel="build/"+plat+"/"+arch+"/"+mode+"/kernel.elf"
+    duck_img="build/"+plat+"/"+arch+"/"+mode+"/uImage.img"
+
+
+
+
+    print('run '+plat+' fel',duck_img)
+
+    # os.shell('~/dev/c/sunxi-tools/sunxi-fel version uboot ~/dev/c/uboots/u-boot-sunxi-with-spl.bin  write 0x41000000 '+duck_fit)
+    os.shell('~/dev/c/sunxi-tools/sunxi-fel version uboot ~/dev/c/uboots/u-boot-sunxi-with-spl.bin  write 0x41000000 '+duck_img)
 
 on_run(run)
