@@ -68,7 +68,7 @@ support_platform_cflags ={
     'miyoo':['-nostdlib','-nostdinc'],
     'versatilepb': ['-nostdlib','-nostdinc'],
     'f1c100s': [],
-    't113-s3': []
+    't113-s3': ['-nostdlib','-nostdinc']
 }
 
 
