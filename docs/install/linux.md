@@ -20,7 +20,7 @@ sudo apt install mtools u-boot-tools dosfstools
 
 ```bash
 
-apt install yymake
+pip install yymake
 
 ```
 

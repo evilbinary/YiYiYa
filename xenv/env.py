@@ -248,6 +248,7 @@ def set_type(type):
 
     default_libc=get_config('default_libc')
     if default_libc=='musl':
+        add_deps('gcc')
         # add_files(os.projectdir()+'/eggs/libmusl/lib/crt1.o')
         add_cflags(
             '-DDUCK -DDLIBC_POSIX',
@@ -289,12 +290,14 @@ def config (target):
                 "/usr/lib/gcc/arm-none-eabi/*/"],
                 kind = "static"
             )
+    print('found gcc lib',library)
     if library:
         target.add("ldflags",[
             '-L'+library.linkdir,
             "-l"+library.link
         ])
         target.add("includedir",library.linkdir)
+        
     else:
         print('not found gcc lib')
 
