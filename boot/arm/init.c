@@ -606,6 +606,7 @@ void print_hex(u32* addr) {
   printf("\n\r");
 }
 
+
 void* load_kernel() {
 #ifdef KERNEL_MOVE
   u32* elf = boot_info->kernel_origin_base;

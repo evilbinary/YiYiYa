@@ -18,6 +18,8 @@
 #define KERNEL_ORIGIN_BASE 0x40000000
 #elif defined(CUBIEBOARD2)
 #define KERNEL_ORIGIN_BASE 0x40000000
+#elif defined(RASPI2)
+#define KERNEL_ORIGIN_BASE 0
 #else
 #define KERNEL_ORIGIN_BASE 0x10000+512*12
 #endif

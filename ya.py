@@ -144,7 +144,10 @@ set_description("Enable tests build")
 option_end()
 
 option("single-kernel")
-set_default(false)
+if arch_type=='x86':
+    set_default(false)
+else:
+    set_default(true)
 set_showmenu(true)
 set_description("Enable kernel one file build")
 option_end()
