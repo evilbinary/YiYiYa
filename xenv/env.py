@@ -290,14 +290,13 @@ def config (target):
                 "/usr/lib/gcc/arm-none-eabi/*/"],
                 kind = "static"
             )
-    print('found gcc lib',library)
+    # print('found gcc lib',library)
     if library:
         target.add("ldflags",[
             '-L'+library.linkdir,
             "-l"+library.link
         ])
         target.add("includedir",library.linkdir)
-        
     else:
         print('not found gcc lib')
 

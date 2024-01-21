@@ -6,9 +6,8 @@
 # ********************************************************************
 
 if has_config('single-kernel'): 
-    set_kind("object")
-
     target("boot-init.elf")
+    set_kind("object")
     pass
 else:
     target("boot-init.elf")

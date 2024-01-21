@@ -78,6 +78,32 @@
             // "envFile": "${workspaceRoot}/.env"
         },
         {
+            "name": "python build app",
+            "type": "python",
+            "request": "launch",
+            "stopOnEntry": false,
+            "python": "python3.11",
+            "program": "/usr/local/bin/ya",
+            "args": ["-m","debug","-b","gui","-v","D","-p","raspi2","-j","1"],
+            "cwd": "${workspaceRoot}",
+            "env": {"PYTHONPATH":"${workspaceRoot}"},
+            "justMyCode": false 
+            // "envFile": "${workspaceRoot}/.env"
+        },
+        {
+            "name": "python build single all",
+            "type": "python",
+            "request": "launch",
+            "stopOnEntry": false,
+            "python": "python3.11",
+            "program": "/usr/local/bin/ya",
+            "args": ["-m","debug","-v","D","-p","raspi2","-j","1","--single-kernel"],
+            "cwd": "${workspaceRoot}",
+            "env": {"PYTHONPATH":"${workspaceRoot}"},
+            "justMyCode": false 
+            // "envFile": "${workspaceRoot}/.env"
+        }, 
+        {
             "name": "python build",
             "type": "python",
             "request": "launch",
