@@ -74,7 +74,8 @@ if arch in ['armv5']:
 # cpp应用
 cpp_apps=[
     'xtrack','gmenu2x',
-    'monogui','testcpp'
+    'monogui','testcpp',
+    'commander'
 ]
 
 wayland_apps={
