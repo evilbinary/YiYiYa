@@ -66,6 +66,7 @@ apps = [
     'watch',
     #'sdlmine',
     'sdl',
+    'doom'
 ]
 
 if arch in ['armv5']:

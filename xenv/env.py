@@ -214,22 +214,34 @@ after_build(build)
 
 root_res_dir =  os.projectdir()+"/app/resource/"
 
-def install_dir(path):
+def install_dir(path,target_name=False):
+    install_path=root_res_dir+path
+    
 
     def build(target):
-        if not os.exists(root_res_dir+path):
-            os.run("mkdir -p %s", root_res_dir+path)
-        # if os.exists(target:scriptdir()+"") then
-        #     os.cp(target:scriptdir()+"", rootfs_dir+path)
+        app_path=install_path
+        if target_name:
+            app_path+='/'+target.get('name')
+        if not os.exists(app_path):            
+            os.shell('mkdir',['-p',app_path])
+
     before_build(build)
 
     def link(target):
-        os.cp(target.targetfile(), root_res_dir+path)
+        app_path=install_path
+
+        if target_name:
+            app_path+='/'+target.get('name')+'/'
+        os.cp(target.targetfile(), app_path)
 
     after_link(link)
 
     def clean(target):
-        os.rm(root_res_dir+path+"/"+target.name())
+        app_path=install_path
+
+        if target_name:
+            app_path+='/'+target.get('name')
+        os.rm(app_path+"/"+target.name())
 
     after_clean(clean)
 
@@ -239,7 +251,7 @@ def set_type(type):
         set_kind("static")
     elif type == "app":
         set_kind("binary")
-        install_dir("app")
+        install_dir("app",True)
     elif type == "cli":
         set_kind("binary")
         install_dir("bin")
