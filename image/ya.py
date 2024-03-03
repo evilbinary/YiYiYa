@@ -161,13 +161,13 @@ def run_qemu(plat,debug=False):
                 # run_qemu_cmd =run_qemu_cmd+' -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor'
                 debug_qemu_cmd = run_qemu_cmd +' -S -s'
             elif target.plat() in ['versatilepb']:
-                run_qemu_cmd='qemu-system-arm -name YiYiYa -M versatilepb  -rtc base=localtime -kernel '+kernel_image+'  -serial stdio   -D ./qemu.log -drive if=sd,id=sd0,format=raw,file='+disk_img+' -d in_asm -d cpu_reset -d in_asm,int,mmu'##-d in_asm -d cpu_reset -d in_asm,int,mmu
+                run_qemu_cmd='qemu-system-arm -name YiYiYa -M versatilepb -cpu arm1176 -rtc base=localtime -kernel '+kernel_image+'  -serial stdio   -D ./qemu.log -drive if=sd,id=sd0,format=raw,file='+disk_img+' '##-d in_asm -d cpu_reset -d in_asm,int,mmu
                 ## run_qemu_cmd =run_qemu_cmd+' -monitor tcp:127.0.0.1:55555,server,nowait'
                 ## run_qemu_cmd =run_qemu_cmd+' -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor'
                 debug_qemu_cmd = run_qemu_cmd +' -S -s'
             else:
                 print('-->', target.plat())
-                run_qemu_cmd='qemu-system-arm -name YiYiYa -M raspi2b  -rtc base=localtime -kernel '+kernel_image+'  -serial stdio   -D ./qemu.log -drive if=sd,id=sd0,format=raw,file='+disk_img+' '##-d in_asm -d cpu_reset -d in_asm,int,mmu
+                run_qemu_cmd='qemu-system-arm -name YiYiYa -M raspi2b  -rtc base=localtime -kernel '+kernel_image+'  -serial stdio   -D ./qemu.log -drive if=sd,id=sd0,format=raw,file='+disk_img+' -device usb-mouse -device usb-kbd '##-d in_asm -d cpu_reset -d in_asm,int,mmu
                 ## run_qemu_cmd =run_qemu_cmd+' -monitor tcp:127.0.0.1:55555,server,nowait'
                 ## run_qemu_cmd =run_qemu_cmd+' -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor'
                 debug_qemu_cmd = run_qemu_cmd +' -S -s'
@@ -261,7 +261,8 @@ on_run(run)
 #v3s 运行
 
 target("v3s")
-add_deps("duck.fit")
+# add_deps("duck.fit")
+add_deps("uImage.img")
 
 def run(target):
     targetfile = target.targetfile()
@@ -272,10 +273,15 @@ def run(target):
     plat=target.plat()
 
     duck_fit="build/"+plat+"/"+arch+"/"+mode+"/duck.fit"
+    duck_img="build/"+plat+"/"+arch+"/"+mode+"/uImage.img"
+    duck_kernel="build/"+plat+"/"+arch+"/"+mode+"/kernel"
 
-    print('run '+plat+' fel',duck_fit)
+    print('run '+plat+' fel',duck_kernel)
 
-    os.shell('~/dev/c/sunxi-tools/sunxi-fel version uboot ~/dev/c/u-boot-v3s/u-boot-sunxi-with-spl.bin  write 0x41000000 '+duck_fit)
+    os.shell('~/dev/c/sunxi-tools/sunxi-fel version uboot ~/dev/c/u-boot-v3s/u-boot-sunxi-with-spl.bin  write 0x41000000 '+duck_kernel)
+    # os.shell('~/dev/c/sunxi-tools/sunxi-fel version uboot ~/dev/c/u-boot-v3s/u-boot-sunxi-with-spl.bin  write 0x41000000 '+duck_fit)
+    # os.shell('~/dev/c/sunxi-tools/sunxi-fel version uboot ~/dev/c/u-boot-v3s/u-boot-sunxi-with-spl.bin  write 0x41000000 '+duck_img)
+
 
 on_run(run)
 
@@ -294,15 +300,14 @@ def run(target):
     plat=target.plat()
 
     duck_fit="build/"+plat+"/"+arch+"/"+mode+"/duck.fit"
-    duck_kernel="build/"+plat+"/"+arch+"/"+mode+"/kernel.elf"
+    duck_kernel="build/"+plat+"/"+arch+"/"+mode+"/kernel"
     duck_img="build/"+plat+"/"+arch+"/"+mode+"/uImage.img"
 
 
+    print('run '+plat+' fel',duck_kernel)
 
-
-    print('run '+plat+' fel',duck_img)
-
-    # os.shell('~/dev/c/sunxi-tools/sunxi-fel version uboot ~/dev/c/uboots/u-boot-sunxi-with-spl.bin  write 0x41000000 '+duck_fit)
     os.shell('~/dev/c/sunxi-tools/sunxi-fel version uboot ~/dev/c/uboots/u-boot-sunxi-with-spl.bin  write 0x41000000 '+duck_img)
+    # os.shell('~/dev/c/sunxi-tools/sunxi-fel version uboot ~/dev/c/uboots/u-boot-sunxi-with-spl.bin  write 0x41000000 '+duck_fit)
+    # os.shell('~/dev/c/sunxi-tools/sunxi-fel version uboot ~/dev/c/uboots/u-boot-sunxi-with-spl.bin  write 0x41000000 '+duck_kernel)
 
 on_run(run)

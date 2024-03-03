@@ -1076,7 +1076,7 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            "program": "${workspaceRoot}/foot/driver/tinyusb/tinyusb",
+            "program": "${workspaceRoot}/build/raspi2/armv7-a/debug/tinyusb",
             "cwd": "${workspaceRoot}",
             "args": [],
             "sourceFileMap": {
@@ -1105,11 +1105,44 @@
             "preLaunchTask": "Build and run"
         },
         {
-            "name": "service arm with GDB",
+            "name": "csudusb arm with GDB",
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            "program": "${workspaceRoot}/foot/service/serviceb",
+            "program": "${workspaceRoot}/build/raspi2/armv7-a/debug/usbd",
+            "cwd": "${workspaceRoot}",
+            "args": [],
+            "sourceFileMap": {
+                "<source-path>": "<target-path>"
+            },
+            // "logging": {
+            //     "engineLogging": true
+            // },
+            "targetArchitecture": "arm",
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/local/Cellar/gdb/13.1/bin/gdb",
+            "miDebuggerArgs": "",
+            "customLaunchSetupCommands": [
+                // {
+                //     "text": "target remote localhost:1234",
+                //     "description": "Connect to QEMU remote debugger"
+                // }
+            ],
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+            ],
+            "preLaunchTask": "Build and run"
+        },
+        {
+            "name": "systemd arm with GDB",
+            "type": "cppdbg",
+            "request": "launch",
+            "miDebuggerServerAddress": "localhost:1234",
+            "program": "${workspaceRoot}/build/raspi2/armv7-a/debug/systemd",
             "cwd": "${workspaceRoot}",
             "args": [],
             "sourceFileMap": {
