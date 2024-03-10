@@ -109,6 +109,9 @@ modules=[
     #'ewok'
 ]
 
+if plat=='t113-s3':
+    modules+=['lcd']
+
 #构建foot
 foot=[
     'driver','service'
