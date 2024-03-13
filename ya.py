@@ -98,19 +98,20 @@ modules=[
     'sdhci',
     'rtc',
     'gpio',
-    'log','pty',
+    'pty',
     'ipc',
     'musl',
     'gaga',
     'debug',
-    'keyboard'
+    'keyboard',
+    'log',
     # 'debug',
     # 'fatfs',
     #'ewok'
 ]
 
-if plat=='t113-s3':
-    modules+=['lcd']
+# if plat=='t113-s3':
+#     modules+=['lcd']
 
 #构建foot
 foot=[
