@@ -117,15 +117,15 @@ char uart_get_ch() {
 void uart_init() {}
 
 void uart_send_ch(unsigned int c) {
-  while ((io_read32(UART0_DR) & 0x20) == 0)
+  while ((io_read32(UART0_BASE + UART_USR) & UART_TRANSMIT) == 0)
     ;
-  io_write32(SUNXI_UART0_BASE, c);
+  io_write32(UART0_BASE, c);
 }
 
 char uart_get_ch() {
-  while ((io_read32(UART0_DR) & 0x01) == 0)
+  while ((io_read32(UART0_BASE+ UART_LSR) & UART_RECEIVE) == 0)
     ;
-  return (io_read32(SUNXI_UART0_BASE));
+  return (io_read32(UART0_BASE));
 }
 
 #elif defined(RASPI2) || defined(RASPI3)

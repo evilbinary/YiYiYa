@@ -110,8 +110,8 @@ modules=[
     #'ewok'
 ]
 
-# if plat=='t113-s3':
-#     modules+=['lcd']
+if plat=='t113-s3':
+    modules+=['lcd']
 
 #构建foot
 foot=[
