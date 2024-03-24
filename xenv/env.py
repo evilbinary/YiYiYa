@@ -279,7 +279,25 @@ def set_type(type):
         add_ldflags(
             '-static'
         )
-
+    elif default_libc=='newlib':
+        add_deps('gcc')
+        add_cflags(
+            '-DDUCK -DDLIBC_POSIX',
+             ' -D__LIB_NEWLIB__ ',
+             '-static',
+             '-nostdlib',
+             '-nostdinc'
+            )
+        add_cxxflags(
+            '-DDUCK -DDLIBC_POSIX',
+                ' -D__LIB_NEWLIB__ ',
+                '-static',
+                '-nostdlib',
+                '-nostdinc'
+            )
+        add_ldflags(
+            '-static'
+        )
 
     add_packages(default_libc)
 
