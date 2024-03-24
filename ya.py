@@ -70,7 +70,12 @@ apps = [
 ]
 
 if arch in ['armv5']:
-    apps=['cmd','gui','hello']
+    apps=['cmd','gui','hello','test','unitest',
+        'microui', 'etk',  'lvgl', 'track',
+        'sdl2', 'infones', 'launcher', #'mgba', 
+        'lua',  'quickjs', 'gnuboy',
+        'watch',
+    ]
 
 # cpp应用
 cpp_apps=[
