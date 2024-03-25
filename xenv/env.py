@@ -298,6 +298,28 @@ def set_type(type):
         add_ldflags(
             '-static'
         )
+    elif default_libc=='c':
+        add_deps('gcc')
+        
+        add_cflags(
+            '-DDUCK -DDLIBC_POSIX',
+             ' -D__LIB_C__ ',
+             '-static',
+             '-nostdlib',
+             '-nostdinc',
+            )
+        add_cxxflags(
+            '-DDUCK -DDLIBC_POSIX',
+                ' -D__LIB_C__ ',
+                '-static',
+                '-nostdlib',
+                '-nostdinc'
+            )
+        add_ldflags(
+            '-static'
+        )
+        
+        add_ldflags('-L'+get_build_obj_dir()+'/eggs/libc/crt/')
 
     add_packages(default_libc)
 
