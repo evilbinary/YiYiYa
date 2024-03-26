@@ -16,7 +16,7 @@ else:
 
     add_files(
         'boot-{arch}.s',
-        'init.c'
+        'init-{arch}.c'
     )
     add_includedirs(
         '.',

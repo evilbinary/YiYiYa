@@ -110,12 +110,13 @@ modules=[
     'debug',
     'keyboard',
     'log',
+    'hello',
     # 'debug',
     # 'fatfs',
     #'ewok'
 ]
 
-if plat=='t113-s3':
+if plat in['t113-s3','stm32f4xx']:
     modules+=['lcd']
 
 #构建foot

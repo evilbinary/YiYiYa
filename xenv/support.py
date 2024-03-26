@@ -8,7 +8,8 @@ support_archs = {
 }
 
 support_platform = {
-    'stm32f4xx': 'armv7e-m',
+    'stm32f4xx': 'armv7',
+    'stm32f401': 'armv7',
     'i386-pc': 'x86',
     'raspi2': 'armv7-a',
     'esp32': 'lx6',
@@ -30,8 +31,7 @@ support_platform = {
 support_arch_cflags ={
     'x86': [],
     'armv5':['-march=armv5te','-mfloat-abi=soft'], #, '-mthumb-interwork', '-mcpu=arm926ej-s','-mtune=arm926ej-s','-marm',
-    'armv7': [],
-    'armv7e-m': ['-mthumb', '-mthumb-interwork',  '-mfloat-abi=soft', '-mfpu=vfpv4-d16', '-mcpu=cortex-m4'],
+    'armv7': ['-mthumb', '-mthumb-interwork',  '-mfloat-abi=soft', '-mfpu=vfpv4-d16', '-mcpu=cortex-m4',],
     'armv7-a': ['-mcpu=cortex-a7',
                 '-mtune=cortex-a7',
                 '-mfpu=vfpv4',
@@ -47,7 +47,6 @@ support_arch_linkflags ={
     # 'armv5':['-mcpu=arm926ej-s','-mfloat-abi=soft','-mfpu=vfp'],
     'armv5': [],
     'armv7': [],
-    'armv7e-m': [],
     'armv7-a': [],
     'armv8-a': [],
     'dummpy': []
@@ -56,7 +55,7 @@ support_arch_linkflags ={
 support_platform_cflags ={
     'raspi2': ['-nostdlib','-nostdinc'],# #specs=nosys.specs
     'raspi3': ['-mcpu=cortex-a53','-mtune=cortex-a53'],
-    'stm32f4xx': ['-specs=nosys.specs', '-nolibc', '-nostdlib', '-nostdinc' ,'-fno-builtin', '-DUSE_HAL_DRIVER'],
+    'stm32f4xx': ['-specs=nosys.specs',  '-nostdlib', '-nostdinc' ,'-fno-builtin', '-DUSE_HAL_DRIVER','-DSTM32F401xC'],#'-nolibc',
     'android' : [],
     'v3s':['-nostdlib','-nostdinc'],
     'orangepi-pc':['-nostdlib','-nostdinc'],
