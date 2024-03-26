@@ -148,7 +148,7 @@ def run_qemu(plat,debug=False):
         elif arch_type =='arm' :
 
             if target.get('arch') =='armv7' :
-                run_qemu_cmd='qemu-system-gnuarmeclipse -name YiYiYa #verbose #verbose #board STM32F429I-Discovery #mcu STM32F429ZITx   -rtc base=localtime -kernel duck/init/kernel.elf  -serial stdio  -D ./qemu.log -d unimp,guest_errors #semihosting-config enable -d in_asm,int,mmu,cpu_reset' #-d in_asm -d cpu_reset -d in_asm,int,mmu -d   -drive if=sd,id=sd0,format=raw,file='+disk_img+' #-d in_asm -d cpu_reset -d in_asm,int,mmu
+                run_qemu_cmd='qemu-system-gnuarmeclipse -name YiYiYa -verbose -board STM32F429I-Discovery -mcu STM32F429ZITx   -rtc base=localtime -kernel '+kernel_image+'  -serial stdio  -D ./qemu.log -d unimp,guest_errors -semihosting-config enable -d in_asm,int,mmu,cpu_reset' #-d in_asm -d cpu_reset -d in_asm,int,mmu -d   -drive if=sd,id=sd0,format=raw,file='+disk_img+' #-d in_asm -d cpu_reset -d in_asm,int,mmu
                 debug_qemu_cmd = run_qemu_cmd+ ' -S -s'
 
             elif string.find(target.plat() , 'orangepi-pc,cubieboard2') :
