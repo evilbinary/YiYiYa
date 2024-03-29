@@ -76,6 +76,12 @@ if arch in ['armv5']:
         'lua',  'quickjs', 'gnuboy',
         'watch',
     ]
+elif arch in ['riscv']:
+    apps=[
+        'cmd','gui','hello','test','unitest',
+        'microui', 'etk',  'lvgl', 'track',
+        'sdl2', 'infones', 'launcher', #'mgba',
+    ]
 
 # cpp应用
 cpp_apps=[

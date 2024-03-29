@@ -39,7 +39,10 @@ support_arch_cflags ={
             ],
     'armv8-a': ['-mcpu=cortex-a53', '-mtune=cortex-a53','-mfpu=vfpv4', '-mfloat-abi=softfp'],
     'dummy':[],
-    'riscv':[]
+    'riscv':['-fstack-protector',
+            '-nostdlib', '-nostdinc',
+            '-fno-builtin', '-mcmodel=medany',  
+            '-march=rv32imaczicsr','-mabi=ilp32' ]#
 }
 
 
@@ -51,7 +54,7 @@ support_arch_linkflags ={
     'armv7-a': [],
     'armv8-a': [],
     'dummpy': [],
-    'riscv':[]
+    'riscv':['-melf32lriscv','-nostdlib',] #'-m elf32lriscv' '-march=rv32imaczicsr', '-mabi=ilp32','-mcmodel=medany'
 }
 
 support_platform_cflags ={
@@ -70,7 +73,7 @@ support_platform_cflags ={
     'versatilepb': ['-nostdlib','-nostdinc'],
     'f1c100s': [],
     't113-s3': ['-nostdlib','-nostdinc'],
-    'riscv-virt':[]
+    'riscv-virt':[]#-g -Wall
 }
 
 
