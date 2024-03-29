@@ -39,6 +39,7 @@ support_arch_cflags ={
             ],
     'armv8-a': ['-mcpu=cortex-a53', '-mtune=cortex-a53','-mfpu=vfpv4', '-mfloat-abi=softfp'],
     'dummy':[],
+    'riscv':[]
 }
 
 
@@ -49,7 +50,8 @@ support_arch_linkflags ={
     'armv7': [],
     'armv7-a': [],
     'armv8-a': [],
-    'dummpy': []
+    'dummpy': [],
+    'riscv':[]
 }
 
 support_platform_cflags ={
@@ -67,7 +69,8 @@ support_platform_cflags ={
     'miyoo':['-nostdlib','-nostdinc'],
     'versatilepb': ['-nostdlib','-nostdinc'],
     'f1c100s': [],
-    't113-s3': ['-nostdlib','-nostdinc']
+    't113-s3': ['-nostdlib','-nostdinc'],
+    'riscv-virt':[]
 }
 
 
