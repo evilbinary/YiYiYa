@@ -336,12 +336,25 @@ add_buildin('set_type',set_type)
 target("gcc")
 set_kind('lib')
 def config (target):
-
-    library = find_library("gcc", 
-                ["/opt/local/lib/gcc/arm-none-eabi/*/","/usr/lib/gcc/*/",
-                "/usr/lib/gcc/arm-none-eabi/*/"],
-                kind = "static"
-            )
+    arch=target.arch()
+    library=None
+    if arch in['arm']:
+        library = find_library("gcc", 
+                    ["/usr/lib/gcc/arm-none-eabi/*/",
+                    "/opt/local/lib/gcc/arm-none-eabi/*/",
+                    "/usr/lib/gcc/*/",
+                    ],
+                    kind = "static"
+                )
+    elif arch in ['riscv']:
+        library = find_library("gcc", 
+            ["/usr/local/lib/gcc/riscv64-unknown-elf/*/",
+            "/usr/lib/gcc/riscv64-unknown-elf/*/",
+            "/opt/local/lib/gcc/riscv64-unknown-elf/*/",
+            "/usr/lib/gcc/*/",
+            ],
+            kind = "static"
+        )
     # print('found gcc lib',library)
     if library:
         target.add("ldflags",[
