@@ -315,11 +315,11 @@ void init_apu_boot() {
     ;
 }
 
-void* memset(void* s, int c, size_t n) {
-  int i;
-  for (i = 0; i < n; i++) ((char*)s)[i] = c;
-  return s;
-}
+// void* memset(void* s, int c, size_t n) {
+//   int i;
+//   for (i = 0; i < n; i++) ((char*)s)[i] = c;
+//   return s;
+// }
 
 void* memmove32(void* s1, const void* s2, u32 n) {
   u32 *dest, *src;

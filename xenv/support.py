@@ -42,7 +42,7 @@ support_arch_cflags ={
     'riscv':['-fstack-protector',
             '-nostdlib', '-nostdinc',
             '-fno-builtin', '-mcmodel=medany',  
-            '-march=rv32imaczicsr','-mabi=ilp32' ]#
+            '-march=rv32imaczicsr','-mabi=ilp32','-DSBI' ]#
 }
 
 
