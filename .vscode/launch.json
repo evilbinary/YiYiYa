@@ -1763,7 +1763,7 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            "program": "${workspaceRoot}/duck/init/kernel.elf",
+            "program": "${workspaceRoot}/build/riscv-virt/riscv/debug/kernel.elf",
             // "program": "${workspaceRoot}/app/launcher/launcher",
 
             // "program": "${workspaceRoot}/app/hello/hello",
@@ -1820,7 +1820,7 @@
                 //     "description": "Break on exception handler."
                 // },
             ],
-            "preLaunchTask": "Build and run"
+            "preLaunchTask": "Build riscv-virt and run"
         },
 
 

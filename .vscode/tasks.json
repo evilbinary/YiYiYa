@@ -66,6 +66,31 @@
             ]
         },
         {
+            "label": "Build riscv-virt and run",
+            "dependsOrder":"sequence",
+            "dependsOn": [
+                "Run riscv-virt QEMU",
+            ]
+        },
+        {
+            "label": "Run riscv-virt QEMU",
+            "type": "shell",
+            "isBackground": true,
+            "command": "ya -m debug -p riscv-virt -b kernel.elf --single-kernel -r debug",
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(run qemu)",
+                    "line": 1,
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "^(run qemu)",
+                    "endsPattern": "^(run qemu)"
+                }
+            }
+        },
+
+        {
             "label": "Build versatilepb and run",
             "dependsOrder":"sequence",
             "dependsOn": [
