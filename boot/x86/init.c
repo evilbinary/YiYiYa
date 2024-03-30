@@ -444,13 +444,11 @@ void* memmove32(void* s1, const void* s2, u32 n) {
   }
 }
 
-#ifdef SINGLE_KERNEL
 void* memset(void* s, int c, size_t n) {
   int i;
   for (i = 0; i < n; i++) ((char*)s)[i] = c;
   return s;
 }
-#endif
 
 void load_elf(Elf32_Ehdr* elf_header) {
   // printf("e_phnum:%d\n\r", elf_header->e_phnum);
@@ -598,7 +596,7 @@ void start_kernel() {
   asm volatile("movl %0, %%es" : : "r"(GDT_ENTRY_32BIT_DS * GDT_SIZE));
   asm volatile("movl %0, %%gs" : : "r"(GDT_ENTRY_32BIT_DS * GDT_SIZE));
   asm volatile("movl %0, %%fs" : : "r"(GDT_ENTRY_32BIT_FS * GDT_SIZE));
-  // print_string("load kernel\n\r");
+  print_string("load kernel\n\r");
   boot_info->kernel_entry = load_kernel();
   entry start = boot_info->kernel_entry;
   int argc = 0;

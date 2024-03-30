@@ -15,8 +15,7 @@ else:
     add_deps('boot-config')
 
     add_files(
-        'boot-{arch}.s',
-        'init.c'
+        'boot-{arch}.s'
     )
     add_includedirs(
         '.',
