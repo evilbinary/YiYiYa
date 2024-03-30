@@ -339,17 +339,18 @@ add_buildin('set_type',set_type)
 target("gcc")
 set_kind('lib')
 def config (target):
-    arch=target.arch()
+    arch_type=target.arch_type()
     library=None
-    if arch in['arm']:
+    if arch_type in['arm']:
         library = find_library("gcc", 
-                    ["/usr/lib/gcc/arm-none-eabi/*/",
-                    "/opt/local/lib/gcc/arm-none-eabi/*/",
-                    "/usr/lib/gcc/*/",
+                    [
+                        "/opt/local/lib/gcc/arm-none-eabi/*/",
+                        "/usr/lib/gcc/arm-none-eabi/*/",
+                        "/usr/lib/gcc/*/",
                     ],
                     kind = "static"
                 )
-    elif arch in ['riscv']:
+    elif arch_type in ['riscv']:
         library = find_library("gcc", 
             ["/usr/local/lib/gcc/riscv64-unknown-elf/*/",
             "/usr/lib/gcc/riscv64-unknown-elf/*/",
