@@ -122,5 +122,6 @@
     "sdl_config.h": "c",
     "fixed_dsp.h": "c"
   },
-  "git.ignoreLimitWarning": true
+  "git.ignoreLimitWarning": true,
+  "mesonbuild.selectRootDir": false
 }

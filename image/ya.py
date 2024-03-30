@@ -43,7 +43,6 @@ if has_config('single-kernel'):
     target("duck.fit")
     target("duck.img")
 else:
-
     target("duck.img")
     add_deps(
         'boot-init.elf',
@@ -139,10 +138,10 @@ def run_qemu(plat,debug=False):
                 run_qemu_cmd='boot/x86-duck/init.elf'
                 debug_qemu_cmd='ggdb '+ run_qemu_cmd
             else:
-                run_qemu_cmd='qemu-system-i386 -smp 1,sockets=1 -m 512M -name YiYiYa -rtc base=localtime,clock=host -boot a  -fda $SOURCE -serial stdio -D ./qemu.log  -drive id=disk,file='+disk_img+',format=raw,if=none -device ahci,id=ahci -device ide-hd,drive=disk,bus=ahci.0 -device sb16 -net nic,model=e1000 ' # -d in_asm -d cpu_reset -d in_asm,int,mmu -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor 
+                run_qemu_cmd='qemu-system-i386 -smp 1,sockets=1 -m 512M -name YiYiYa -rtc base=localtime,clock=host -boot a  -fda '+kernel_image+' -serial stdio -D ./qemu.log  -drive id=disk,file='+disk_img+',format=raw,if=none -device ahci,id=ahci -device ide-hd,drive=disk,bus=ahci.0 -device sb16 -net nic,model=e1000 ' # -d in_asm -d cpu_reset -d in_asm,int,mmu -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor 
                 run_qemu_cmd =run_qemu_cmd+' -monitor tcp:127.0.0.1:55555,server,nowait'
                 
-                debug_qemu_cmd = 'qemu-system-i386 -smp 2,sockets=1 -m 512M  -name YiYiYa -rtc base=localtime -boot a -S -s -fda $SOURCE -serial stdio  -D ./qemu.log  -drive id=disk,file='+disk_img+',format=raw,if=none -device ahci,id=ahci -device ide-hd,drive=disk,bus=ahci.0 -device sb16  -net nic,model=e1000 '  #-d in_asm -d cpu_reset -d in_asm,int,mmu
+                debug_qemu_cmd = 'qemu-system-i386 -smp 2,sockets=1 -m 512M  -name YiYiYa -rtc base=localtime -boot a -S -s -fda '+kernel_image+' -serial stdio  -D ./qemu.log  -drive id=disk,file='+disk_img+',format=raw,if=none -device ahci,id=ahci -device ide-hd,drive=disk,bus=ahci.0 -device sb16  -net nic,model=e1000 '  #-d in_asm -d cpu_reset -d in_asm,int,mmu
                 debug_qemu_cmd =debug_qemu_cmd+' -monitor tcp:127.0.0.1:55555,server,nowait'
             
         elif arch_type =='arm' :
@@ -186,7 +185,7 @@ def run_qemu(plat,debug=False):
                 bios='default'
             
 
-            run_qemu_cmd='qemu-system-riscv32 -smp 1 -name YiYiYa -M virt -bios '+bios+' -rtc base=localtime -kernel '+kernel_image+' -drive id=disk,file='+disk_img+' -serial stdio -D ./qemu.log   ' #-serial stdio -d in_asm -d cpu_reset -d in_asm,int,mmu
+            run_qemu_cmd='qemu-system-riscv32 -machine virt -cpu rv32 -smp 1 -name YiYiYa -M virt -bios '+bios+' -rtc base=localtime -kernel '+kernel_image+' -drive id=disk,file='+disk_img+' -serial stdio -D ./qemu.log  -d in_asm,int,mmu ' #-serial stdio -d in_asm -d cpu_reset -d in_asm,int,mmu
             debug_qemu_cmd =run_qemu_cmd+' -S -s -monitor tcp:127.0.0.1:55555,server,nowait'
         else:
             print('no support run')

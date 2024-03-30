@@ -104,8 +104,11 @@ def build(target):
     plat =target.get('plat')
     arch_type = target.get('arch_type')
     
-
     if arch_type=='x86' :
+        os.exec('dd if=/dev/zero bs=512 count=2880 conv=notrunc of='+targetfile)
+        os.exec('dd if='+sourcefiles[1]+' bs=512 count=11 seek=0 conv=notrunc of='+targetfile)
+        os.exec('dd if='+sourcefiles[0]+' bs=512 count='+str(block_512_size)+' seek=12 conv=notrunc of='+targetfile)
+        print('make image finished ')
         pass
     elif arch_type=='arm':
         if plat=='v3s' :

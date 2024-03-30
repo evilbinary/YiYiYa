@@ -117,6 +117,7 @@ modules=[
     'keyboard',
     'log',
     'hello',
+    'sound'
     # 'debug',
     # 'fatfs',
     #'ewok'
@@ -124,6 +125,8 @@ modules=[
 
 if plat in['t113-s3','stm32f4xx']:
     modules+=['lcd']
+elif arch in['x86']:
+    modules+=['ahci','pci','vga']
 
 #构建foot
 foot=[

@@ -444,11 +444,13 @@ void* memmove32(void* s1, const void* s2, u32 n) {
   }
 }
 
+#ifdef SINGLE_KERNEL
 void* memset(void* s, int c, size_t n) {
   int i;
   for (i = 0; i < n; i++) ((char*)s)[i] = c;
   return s;
 }
+#endif
 
 void load_elf(Elf32_Ehdr* elf_header) {
   // printf("e_phnum:%d\n\r", elf_header->e_phnum);
