@@ -89,13 +89,18 @@ def build(target):
     sourcefiles = target.sourcefiles()
 
     arch_type= target.get('arch_type')
+    plat= target.get('plat')
 
     print('build uimage '+arch_type+' '+targetfile)
     if arch_type=='x86': 
         os.exec('mkimage -n YiYiYa -A x86 -O u-boot -T kernel -C none -a 0x30008000 -e 0x30008000 -d '+sourcefiles[0]+' '+targetfile)
     elif arch_type=='arm':
-        cmd='mkimage -n YiYiYa -A arm -O u-boot -T kernel -C none -a 0x42000000 -e 0x42000000 -d '+sourcefiles[0]+' '+targetfile
-        os.exec(cmd)
+        if plat in ['f1c200s','f1c100s']:
+            cmd='mkimage -n YiYiYa -A arm -O u-boot -T kernel -C none -a 0x82000000 -e 0x82000000 -d '+sourcefiles[0]+' '+targetfile
+            os.exec(cmd)
+        else:
+            cmd='mkimage -n YiYiYa -A arm -O u-boot -T kernel -C none -a 0x42000000 -e 0x42000000 -d '+sourcefiles[0]+' '+targetfile
+            os.exec(cmd)
 
 on_build(build)
 
@@ -279,7 +284,7 @@ def run(target):
 
     # os.shell('~/dev/c/sunxi-tools/sunxi-fel version uboot ~/dev/c/u-boot-v3s/u-boot-sunxi-with-spl.bin  write 0x41000000 '+duck_kernel)
     # os.shell('~/dev/c/sunxi-tools/sunxi-fel version uboot ~/dev/c/u-boot-v3s/u-boot-sunxi-with-spl.bin  write 0x41000000 '+duck_fit)
-    os.shell('~/dev/c/sunxi-tools/sunxi-fel version uboot ~/dev/c/u-boot-v3s/u-boot-sunxi-with-spl.bin  write 0x41000000 '+duck_img)
+    os.shell('~/dev/c/sunxi-tools/sunxi-fel -p version uboot ~/dev/c/u-boot-v3s/u-boot-sunxi-with-spl.bin  write 0x41000000 '+duck_img)
 
 
 on_run(run)
@@ -305,7 +310,7 @@ def run(target):
 
     print('run '+plat+' fel',duck_kernel)
 
-    os.shell('~/dev/c/sunxi-tools/sunxi-fel version uboot ~/dev/c/uboots/t113-s3/u-boot-sunxi-with-spl.bin  write 0x41000000 '+duck_img)
+    os.shell('~/dev/c/sunxi-tools/sunxi-fel -p version uboot ~/dev/c/uboots/t113-s3/u-boot-sunxi-with-spl.bin  write 0x41000000 '+duck_img)
     # os.shell('~/dev/c/sunxi-tools/sunxi-fel version uboot ~/dev/c/uboots/u-boot-sunxi-with-spl.bin  write 0x41000000 '+duck_fit)
     # os.shell('~/dev/c/sunxi-tools/sunxi-fel version uboot ~/dev/c/uboots/u-boot-sunxi-with-spl.bin  write 0x41000000 '+duck_kernel)
 
@@ -332,8 +337,8 @@ def run(target):
 
     print('run '+plat+' fel',duck_kernel)
 
-    # os.shell('~/dev/c/sunxi-tools/sunxi-fel version uboot ~/dev/c/uboots/f1c200s/u-boot-sunxi-with-spl.bin  write 0x41000000 '+duck_img)
-    # os.shell('~/dev/c/sunxi-tools/sunxi-fel version uboot ~/dev/c/uboots/f1c200s/u-boot-sunxi-with-spl.bin  write 0x41000000 '+duck_fit)
-    os.shell('~/dev/c/sunxi-tools/sunxi-fel version uboot ~/dev/c/uboots/f1c200s/u-boot-sunxi-with-spl.bin  write 0x41000000 '+duck_kernel)
+    os.shell('~/dev/c/sunxi-tools/sunxi-fel -p version uboot ~/dev/c/uboots/f1c200s/u-boot-sunxi-with-spl.bin  write 0x81000000 '+duck_img)
+    # os.shell('~/dev/c/sunxi-tools/sunxi-fel -p version uboot ~/dev/c/uboots/f1c200s/u-boot-sunxi-with-spl.bin  write 0x81000000 '+duck_fit)
+    # os.shell('~/dev/c/sunxi-tools/sunxi-fel -p version  uboot ~/dev/c/uboots/f1c200s/u-boot-sunxi-with-spl.bin  write 0x81000000 '+duck_kernel)
 
 on_run(run)

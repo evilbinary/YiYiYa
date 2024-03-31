@@ -3,9 +3,8 @@
  * 作者: evilbinary on 01/01/20
  * 邮箱: rootdebug@163.com
  ********************************************************************/
-#include "init.h"
-
 #include "gpio.h"
+#include "init.h"
 
 static boot_info_t* boot_info = NULL;
 static boot_info_t boot_data;
@@ -48,156 +47,28 @@ void* memset(void* s, int c, size_t n) {
 }
 #endif
 
-#if defined(V3S) || defined(CUBIEBOARD2) 
-void uart_init() {
-  u32 addr;
-  u32 val;
-  /* Config GPIOB8 and GPIOB9 to txd0 and rxd0 */
-  addr = 0x01c20824 + 0x04;
-  val = io_read32(addr);
-  val &= ~(0xf << ((8 & 0x7) << 2));
-  val |= ((0x3 & 0x7) << ((8 & 0x7) << 2));
-  io_write32(addr, val);
-
-  val = io_read32(addr);
-  val &= ~(0xf << ((9 & 0x7) << 2));
-  val |= ((0x3 & 0x7) << ((9 & 0x7) << 2));
-  io_write32(addr, val);
-
-  /* Open the clock gate for uart0 */
-  addr = 0x01c2006c;
-  val = io_read32(addr);
-  val |= 1 << 16;
-  io_write32(addr, val);
-
-  /* Deassert uart0 reset */
-  addr = 0x01c202d8;
-  val = io_read32(addr);
-  val |= 1 << 16;
-  io_write32(addr, val);
-
-  /* Config uart0 to 115200-8-1-0 */
-  addr = 0x01c28000;
-  io_write32(addr + 0x04, 0x0);
-  io_write32(addr + 0x08, 0xf7);
-  io_write32(addr + 0x10, 0x0);
-  val = io_read32(addr + 0x0c);
-  val |= (1 << 7);
-  io_write32(addr + 0x0c, val);
-  io_write32(addr + 0x00, 0xd & 0xff);
-  io_write32(addr + 0x04, (0xd >> 8) & 0xff);
-  val = io_read32(addr + 0x0c);
-  val &= ~(1 << 7);
-  io_write32(addr + 0x0c, val);
-  val = io_read32(addr + 0x0c);
-  val &= ~0x1f;
-  val |= (0x3 << 0) | (0 << 2) | (0x0 << 3);
-  io_write32(addr + 0x0c, val);
-}
-
-void uart_send_ch(unsigned int c) {
-  u32 addr = 0x01c28000;
-  while ((io_read32(addr + 0x7c) & (0x1 << 1)) == 0)
-    ;
-  io_write32(addr + 0x00, c);
-}
-
-char uart_get_ch() {
-  char r;
-  /* wait until something is in the buffer */
-  do {
-    asm volatile("nop");
-  } while (*UART0_FR & 0x10);
-  /* read it and return */
-  r = (char)(*UART0_DR);
-  /* convert carrige return to newline */
-  return r == '\r' ? '\n' : r;
-}
-#elif defined(ORANGEPI_PC) ||defined(F1C200S)
+#if defined(F1C200S) || defined(F1C100S)
 void uart_init() {}
 
 void uart_send_ch(unsigned int c) {
-  while ((io_read32(UART0_BASE + UART_USR) & UART_TRANSMIT) == 0)
-    ;
-  io_write32(UART0_BASE, c);
+  while ((io_read32(UART1_BASE + UART_USR) & UART_TRANSMIT) == 0);
+  io_write32(UART1_BASE, c);
 }
 
 char uart_get_ch() {
-  while ((io_read32(UART0_BASE+ UART_LSR) & UART_RECEIVE) == 0)
-    ;
-  return (io_read32(UART0_BASE));
-}
-
-#elif defined(RASPI2) || defined(RASPI3)
-void uart_init() {
-  register unsigned int r;
-
-  /* initialize UART */
-  *UART0_CR = 0;  // turn off UART0
-
-  /* map UART0 to GPIO pins */
-  r = *GPFSEL1;
-  r &= ~((7 << 12) | (7 << 15));  // gpio14, gpio15
-  r |= (4 << 12) | (4 << 15);     // alt0
-  *GPFSEL1 = r;
-  *GPPUD = 0;  // enable pins 14 and 15
-  r = 150;
-  while (r--) {
-    asm volatile("nop");
-  }
-  *GPPUDCLK0 = (1 << 14) | (1 << 15);
-  r = 150;
-  while (r--) {
-    asm volatile("nop");
-  }
-  *GPPUDCLK0 = 0;  // flush GPIO setup
-
-  *UART0_ICR = 0x7FF;  // clear interrupts
-  *UART0_IBRD = 2;     // 115200 baud
-  *UART0_FBRD = 0xB;
-  *UART0_LCRH = 0b11 << 5;  // 8n1
-  *UART0_CR = 0x301;        // enable Tx, Rx, FIFO
-}
-
-void uart_send_ch(unsigned int c) {
-  while (io_read32(UART0_FR) & 0x20) {
-  }
-  io_write32(UART0_DR, c);
-}
-
-char uart_get_ch() {
-  unsigned int c;
-  while (io_read32(UART0_FR) & 0x10) {
-  }
-  c = io_read32(UART0_DR);
-  return c;
+  while ((io_read32(UART1_BASE + UART_LSR) & UART_RECEIVE) == 0);
+  return (io_read32(UART1_BASE));
 }
 
 #elif defined(VERSATILEPB)
 void uart_init() { io_write32(UART0 + UART_INT_ENABLE, UART_RECEIVE); }
 
 void uart_send_ch(unsigned int c) {
-  while (io_read32(UART0 + UART_FLAGS) & UART_TRANSMIT)
-    ;
+  while (io_read32(UART0 + UART_FLAGS) & UART_TRANSMIT);
   io_write32(UART0 + UART_DATA, c);
 }
 
 char uart_get_ch() { return 0; }
-
-#elif defined(T113_S3)
-void uart_init() {}
-
-void uart_send_ch(unsigned int c) {
-  while ((io_read32(UART0_BASE + UART_USR) & UART_TRANSMIT) == 0)
-    ;
-  io_write32(UART0_BASE, c);
-}
-
-char uart_get_ch() {
-  while ((io_read32(UART0_BASE+ UART_LSR) & UART_RECEIVE) == 0)
-    ;
-  return (io_read32(UART0_BASE));
-}
 
 #elif defined(STM32F4XX)
 void uart_init() {}
@@ -216,39 +87,6 @@ char uart_get_ch() {
   // r=(char)(*UART0_DR);
   // /* convert carrige return to newline */
   // return r=='\r'?'\n':r;
-}
-#elif defined(MIYOO)
-
-void uart_init() {}
-
-void uart_send_ch(unsigned int c) {
-  while (!(UART_REG8(UART_LSR) & UART_LSR_THRE))
-    ;
-  UART_REG8(UART_TX) = c;
-  while (!(UART_REG8(UART_LSR) & UART_LSR_THRE))
-    ;
-}
-
-char uart_get_ch() {
-  char c;
-  while (!(UART_REG8(UART_LSR) & UART_LSR_DR))
-    ;
-  c = (char)(UART_REG8(UART_TX) & 0xff);
-  return c;
-}
-
-#elif defined(RK3128)
-void uart_init() {}
-
-void uart_send_ch(unsigned int c) {
-  while (((io_read32(0x20000000 + 0x60014)) & 0x20) == 0)
-    ;
-  io_write32(0x20000000 + 0x60000, c);
-}
-
-char uart_get_ch() {
-  if ((io_read32(0x20000000 + 0x60014) & 0x01) == 0) return 0;
-  return io_read32(0x20000000 + 0x60000);
 }
 
 #endif
@@ -369,54 +207,14 @@ void init_memory() {
   int count = 0;
   memory_info_t* ptr = boot_info->memory;
   boot_info->total_memory = 0;
-#ifdef V3S
-  // ptr->base=0x00000;
-  // ptr->length=0xEFFF;
-  // ptr->type=1;
-  // boot_info->total_memory += ptr->length;
-  // ptr++;
-  // count++;
-  ptr->base = 0x40000000;
+#ifdef F1C200S
+  ptr->base = 0x80000000;
   ptr->length = 0x1000000 * 4;  // 16M*4
   ptr->type = 1;
   boot_info->total_memory += ptr->length;
   ptr++;
   count++;
-#elif defined(CUBIEBOARD2)
-  ptr->base = 0x40000000;
-  ptr->length = 0x10000000 * 4;  // 256m*4
-  ptr->type = 1;
-  boot_info->total_memory += ptr->length;
-  ptr++;
-  count++;
-#elif defined(ORANGEPI_PC)
-  ptr->base = 0x40000000;
-  ptr->length = 0x10000000 * 4;  // 256m*4
-  ptr->type = 1;
-  boot_info->total_memory += ptr->length;
-  ptr++;
-  count++;
-#elif defined(RASPI2)
-  ptr->base = 0x00000000;
-  ptr->length = 0x10000000 * 4;  // 256m*4
-  ptr->type = 1;
-  boot_info->total_memory += ptr->length;
-  ptr++;
-  count++;
-#elif defined(MIYOO)
-  ptr->base = 0x20000000;
-  ptr->length = 0x8000000;  // 128
-  ptr->type = 1;
-  boot_info->total_memory += ptr->length;
-  ptr++;
-  count++;
-#elif defined(T113_S3)
-  ptr->base = 0x40000000;
-  ptr->length = 0x8000000;  // 128
-  ptr->type = 1;
-  boot_info->total_memory += ptr->length;
-  ptr++;
-  count++;
+
 #elif defined(VERSATILEPB)
   ptr->base = 0x00010000;
   ptr->length = 0x10000000 * 4;  // 128
@@ -493,15 +291,13 @@ void init_boot() {
   print_string("start kernel\n\r");
   start_kernel();
 
-  for (;;)
-    ;
+  for (;;);
 }
 
 void init_apu_boot() {
   printf("boot apu info addr %x\n\r", boot_info);
   start_apu_kernel();
-  for (;;)
-    ;
+  for (;;);
 }
 
 void* memmove32(void* s1, const void* s2, u32 n) {
@@ -606,7 +402,6 @@ void print_hex(u32* addr) {
   printf("\n\r");
 }
 
-
 void* load_kernel() {
 #ifdef KERNEL_MOVE
   u32* elf = boot_info->kernel_origin_base;
@@ -642,12 +437,15 @@ void start_kernel() {
   extern void kstart(int argc, char* argv[], char** envp);
   entry start = kstart;
   boot_info->kernel_entry = start;
-  printf("kernel entry %x\n\r", boot_info->kernel_entry);
+  printf("kernel entry single %x\n\r", boot_info->kernel_entry);
+  // print_hex(boot_info->kernel_entry);
+
 #else
   boot_info->kernel_entry = load_kernel();
   entry start = boot_info->kernel_entry;
   printf("kernel entry %x\n\r", boot_info->kernel_entry);
   // print_hex(boot_info->kernel_entry);
+
 #endif
   int argc = 0;
   char** argv = 0;
