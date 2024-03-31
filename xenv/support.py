@@ -72,8 +72,8 @@ support_platform_cflags ={
     'dummy':['-nostdlib','-nostdinc','-Wno-error,-Wimplicit-function-declaration'],
     'miyoo':['-nostdlib','-nostdinc'],
     'versatilepb': ['-nostdlib','-nostdinc'],
-    'f1c100s': [],
-    'f1c200s': [],
+    'f1c100s': ['-nostdlib','-nostdinc'],
+    'f1c200s': ['-nostdlib','-nostdinc'],
     't113-s3': ['-nostdlib','-nostdinc'],
     'riscv-virt':[]#-g -Wall
 }
