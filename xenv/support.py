@@ -26,6 +26,7 @@ support_platform = {
     'versatilepb': 'armv5',
     'f1c100s': 'armv5',
     't113-s3': 'armv7-a',
+    'f1c200s': 'armv5',
 }
 
 support_arch_cflags ={
@@ -72,6 +73,7 @@ support_platform_cflags ={
     'miyoo':['-nostdlib','-nostdinc'],
     'versatilepb': ['-nostdlib','-nostdinc'],
     'f1c100s': [],
+    'f1c200s': [],
     't113-s3': ['-nostdlib','-nostdinc'],
     'riscv-virt':[]#-g -Wall
 }

@@ -172,17 +172,22 @@ set_showmenu(true)
 set_description("Enable kernel one file build")
 option_end()
 
-arch=get_arch()
-
-
 
 add_defines(plat.replace("-", "_").upper())
 
 
 arch=get_arch()
+if not arch:
+    print('not found arch, please config',plat,'arch in support.py')
+    exit(-1)
 def_arch=arch.replace("-", "_").upper()
 
 arch_type=get_arch_type()
+
+if not arch_type:
+    print('not found arch_type, please config',plat,'arch in support.py')
+    exit(-1)
+
 def_arch_type=arch_type.replace( "-", "_").upper()
 
 add_defines(def_arch)
@@ -193,6 +198,10 @@ add_defines(def_arch_type)
 arch_cflags=support.get_arch_cflags(arch)
 plat_cflags=support.get_platform_cflags(plat)
 arch_ldflags=support.get_arch_linkflags(arch)
+
+if not arch_cflags:
+    print('not found plat_cflags, please config',plat,'arch in support.py')
+    exit(-1)
 
 add_cflags(arch_cflags)
 add_cflags(plat_cflags)

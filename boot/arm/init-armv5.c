@@ -48,7 +48,7 @@ void* memset(void* s, int c, size_t n) {
 }
 #endif
 
-#if defined(V3S) || defined(CUBIEBOARD2)
+#if defined(V3S) || defined(CUBIEBOARD2) 
 void uart_init() {
   u32 addr;
   u32 val;
@@ -113,7 +113,7 @@ char uart_get_ch() {
   /* convert carrige return to newline */
   return r == '\r' ? '\n' : r;
 }
-#elif defined(ORANGEPI_PC)
+#elif defined(ORANGEPI_PC) ||defined(F1C200S)
 void uart_init() {}
 
 void uart_send_ch(unsigned int c) {

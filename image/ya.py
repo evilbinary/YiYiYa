@@ -138,7 +138,7 @@ def run_qemu(plat,debug=False):
                 run_qemu_cmd='boot/x86-duck/init.elf'
                 debug_qemu_cmd='ggdb '+ run_qemu_cmd
             else:
-                run_qemu_cmd='qemu-system-i386 -smp 1,sockets=1 -m 512M -name YiYiYa -rtc base=localtime,clock=host -boot a  -fda '+kernel_image+' -serial stdio -D ./qemu.log  -drive id=disk,file='+disk_img+',format=raw,if=none -device ahci,id=ahci -device ide-hd,drive=disk,bus=ahci.0 -device sb16 -net nic,model=e1000 ' # -d in_asm -d cpu_reset -d in_asm,int,mmu -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor 
+                run_qemu_cmd='qemu-system-i386 -smp 1,sockets=1 -m 512M -name YiYiYa -rtc base=localtime,clock=host -boot a  -fda '+kernel_image+' -serial stdio -D ./qemu.log  -drive id=disk,file='+disk_img+',format=raw,if=none -device ahci,id=ahci -device ide-hd,drive=disk,bus=ahci.0 -device sb16 -net nic,model=e1000 -d in_asm,int,mmu' # -d in_asm -d cpu_reset -d in_asm,int,mmu -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor 
                 run_qemu_cmd =run_qemu_cmd+' -monitor tcp:127.0.0.1:55555,server,nowait'
                 
                 debug_qemu_cmd = 'qemu-system-i386 -smp 2,sockets=1 -m 512M  -name YiYiYa -rtc base=localtime -boot a -S -s -fda '+kernel_image+' -serial stdio  -D ./qemu.log  -drive id=disk,file='+disk_img+',format=raw,if=none -device ahci,id=ahci -device ide-hd,drive=disk,bus=ahci.0 -device sb16  -net nic,model=e1000 '  #-d in_asm -d cpu_reset -d in_asm,int,mmu
@@ -305,8 +305,35 @@ def run(target):
 
     print('run '+plat+' fel',duck_kernel)
 
-    os.shell('~/dev/c/sunxi-tools/sunxi-fel version uboot ~/dev/c/uboots/u-boot-sunxi-with-spl.bin  write 0x41000000 '+duck_img)
+    os.shell('~/dev/c/sunxi-tools/sunxi-fel version uboot ~/dev/c/uboots/t113-s3/u-boot-sunxi-with-spl.bin  write 0x41000000 '+duck_img)
     # os.shell('~/dev/c/sunxi-tools/sunxi-fel version uboot ~/dev/c/uboots/u-boot-sunxi-with-spl.bin  write 0x41000000 '+duck_fit)
     # os.shell('~/dev/c/sunxi-tools/sunxi-fel version uboot ~/dev/c/uboots/u-boot-sunxi-with-spl.bin  write 0x41000000 '+duck_kernel)
+
+on_run(run)
+
+
+#f1c200s 运行
+target("f1c200s")
+# add_deps("duck.fit")
+add_deps("uImage.img")
+
+def run(target):
+    targetfile = target.targetfile()
+    sourcefiles = target.sourcefiles()
+    arch=target.get_arch()
+    arch_type= target.get_arch_type()
+    mode =target.get_config('mode')
+    plat=target.plat()
+
+    duck_fit="build/"+plat+"/"+arch+"/"+mode+"/duck.fit"
+    duck_kernel="build/"+plat+"/"+arch+"/"+mode+"/kernel.elf"
+    duck_img="build/"+plat+"/"+arch+"/"+mode+"/uImage.img"
+
+
+    print('run '+plat+' fel',duck_kernel)
+
+    # os.shell('~/dev/c/sunxi-tools/sunxi-fel version uboot ~/dev/c/uboots/f1c200s/u-boot-sunxi-with-spl.bin  write 0x41000000 '+duck_img)
+    # os.shell('~/dev/c/sunxi-tools/sunxi-fel version uboot ~/dev/c/uboots/f1c200s/u-boot-sunxi-with-spl.bin  write 0x41000000 '+duck_fit)
+    os.shell('~/dev/c/sunxi-tools/sunxi-fel version uboot ~/dev/c/uboots/f1c200s/u-boot-sunxi-with-spl.bin  write 0x41000000 '+duck_kernel)
 
 on_run(run)
