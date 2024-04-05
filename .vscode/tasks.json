@@ -89,6 +89,30 @@
                 }
             }
         },
+        {
+            "label": "Build dmulator and run",
+            "dependsOrder":"sequence",
+            "dependsOn": [
+                "Run dmulator QEMU",
+            ]
+        },
+        {
+            "label": "Run dmulator QEMU",
+            "type": "shell",
+            "isBackground": true,
+            "command": "ya -m debug -p dmulator -b kernel.elf",
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(run qemu)",
+                    "line": 1,
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "^(run qemu)",
+                    "endsPattern": "^(run qemu)"
+                }
+            }
+        },
 
         {
             "label": "Build versatilepb and run",

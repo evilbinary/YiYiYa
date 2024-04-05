@@ -1890,6 +1890,58 @@
             "preLaunchTask": "Build versatilepb and run"
         },
         {
+            "name": "kernel dmulator with GDB",
+            "type": "cppdbg",
+            "request": "launch",
+            // "miDebuggerServerAddress": "localhost:1234",
+            "program": "${workspaceRoot}/build/dmulator/general/debug/kernel.elf",
+           
+            "cwd": "${workspaceRoot}",
+            "args": [],
+            "sourceFileMap": {
+                "<source-path>": "<target-path>"
+            },
+            "MIMode": "gdb",
+           
+            "miDebuggerPath": "gdb",
+            "miDebuggerArgs": "",
+            "customLaunchSetupCommands": [
+                // {
+                //     "text": "target remote localhost:1234",
+                //     "description": "Connect to QEMU remote debugger"
+                // }
+            ],
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                // {
+                //     "text": "set architecture i386:intel ",
+                //     "description": "set architecture i386"
+                // },
+                // {
+                //     "text": "target remote :1234",
+                //     "description": "connect the port"
+                // },
+                // {
+                //     "text": "file ./boot/x86/setup.bin",
+                //     "description": "file on setup."
+                // },
+                // {
+                //     "text": "break _start",
+                //     "description": "Break on exception handler."
+                // },
+                {
+                    "text": "break start",
+                    "description": "Break on exception handler."
+                },
+            ],
+            "preLaunchTask": "Build dmulator and run"
+        },
+       
+        {
             "name": "kernel arm with GDB",
             "type": "cppdbg",
             "request": "launch",
