@@ -34,7 +34,7 @@ push:
 	cd eggs && git push
 	cd duck && git push
 	cd foot && git push
-	git 
+	git push
 	
 pullm:
 	cd app &&git checkout main && git pull
