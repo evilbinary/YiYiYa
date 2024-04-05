@@ -57,7 +57,7 @@ support_arch_linkflags ={
     'armv8-a': [],
     'dummy': [],
     'riscv':['-melf32lriscv','-nostdlib',], #'-m elf32lriscv' '-march=rv32imaczicsr', '-mabi=ilp32','-mcmodel=medany'
-    'general':['-lSystem', '-e _main']
+    'general':[]
 }
 
 support_platform_cflags ={
@@ -70,7 +70,7 @@ support_platform_cflags ={
     'rk3128': ['-nostdlib','-nostdinc'],
     'i386-pc': ['-nostdlib','-nostdinc'],
     'cubieboard2': ['-nostdlib','-nostdinc'],
-    'dmulator':['-Wno-error=implicit-function-declaration'],
+    'dmulator':['-m32','-Wno-error=implicit-function-declaration'],
     'dummy':['-nostdlib','-nostdinc','-Wno-error,-Wimplicit-function-declaration'],
     'miyoo':['-nostdlib','-nostdinc'],
     'versatilepb': ['-nostdlib','-nostdinc'],
