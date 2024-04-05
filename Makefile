@@ -34,8 +34,14 @@ push:
 	cd eggs && git push
 	cd duck && git push
 	cd foot && git push
-	git push
-
+	git 
+	
+pullm:
+	cd app &&git checkout main && git pull
+	cd eggs &&git checkout main && git pull
+	cd duck &&git checkout main && git pull
+	cd foot &&git checkout main && git pull
+	git pull
 pull:
 	git submodule update --init --recursive
 
