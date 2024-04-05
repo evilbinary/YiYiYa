@@ -347,6 +347,7 @@ def config (target):
                         "/opt/local/lib/gcc/arm-none-eabi/*/",
                         "/usr/lib/gcc/arm-none-eabi/*/",
                         "/usr/lib/gcc/*/",
+                        "/usr/local/lib/gcc/*/"
                     ],
                     kind = "static"
                 )

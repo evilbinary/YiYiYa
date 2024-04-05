@@ -43,7 +43,8 @@ support_arch_cflags ={
     'riscv':['-fstack-protector',
             '-nostdlib', '-nostdinc',
             '-fno-builtin', '-mcmodel=medany',  
-            '-march=rv32imaczicsr','-mabi=ilp32','-DSBI' ]#
+            '-march=rv32imaczicsr','-mabi=ilp32','-DSBI' ],#
+    'general':[]
 }
 
 
@@ -54,8 +55,9 @@ support_arch_linkflags ={
     'armv7': [],
     'armv7-a': [],
     'armv8-a': [],
-    'dummpy': [],
-    'riscv':['-melf32lriscv','-nostdlib',] #'-m elf32lriscv' '-march=rv32imaczicsr', '-mabi=ilp32','-mcmodel=medany'
+    'dummy': [],
+    'riscv':['-melf32lriscv','-nostdlib',], #'-m elf32lriscv' '-march=rv32imaczicsr', '-mabi=ilp32','-mcmodel=medany'
+    'general':['-lSystem', '-e _main']
 }
 
 support_platform_cflags ={
@@ -68,14 +70,14 @@ support_platform_cflags ={
     'rk3128': ['-nostdlib','-nostdinc'],
     'i386-pc': ['-nostdlib','-nostdinc'],
     'cubieboard2': ['-nostdlib','-nostdinc'],
-    'dmulator':[],
+    'dmulator':['-m32','-Wno-error=implicit-function-declaration'],
     'dummy':['-nostdlib','-nostdinc','-Wno-error,-Wimplicit-function-declaration'],
     'miyoo':['-nostdlib','-nostdinc'],
     'versatilepb': ['-nostdlib','-nostdinc'],
     'f1c100s': ['-nostdlib','-nostdinc'],
     'f1c200s': ['-nostdlib','-nostdinc'],
     't113-s3': ['-nostdlib','-nostdinc'],
-    'riscv-virt':[]#-g -Wall
+    'riscv-virt':[],#-g -Wall
 }
 
 
