@@ -70,7 +70,7 @@ support_platform_cflags ={
     'rk3128': ['-nostdlib','-nostdinc'],
     'i386-pc': ['-nostdlib','-nostdinc'],
     'cubieboard2': ['-nostdlib','-nostdinc'],
-    'dmulator':['-m32','-Wno-error=implicit-function-declaration'],
+    'dmulator':['-Wno-error=implicit-function-declaration'],
     'dummy':['-nostdlib','-nostdinc','-Wno-error,-Wimplicit-function-declaration'],
     'miyoo':['-nostdlib','-nostdinc'],
     'versatilepb': ['-nostdlib','-nostdinc'],
