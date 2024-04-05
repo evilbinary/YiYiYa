@@ -1,5 +1,8 @@
+import sys
+
 support_archs = {
-    'arm': ['armv5', 'armv6', 'armv7', 'armv7e-m', 'armv7-a', 'armv8-a'],
+    'arm': ['armv5', 'armv6', 'armv7', 'armv7e-m', 'armv7-a'],
+    'arm64': ['armv8-a'],
     'x86': ['x86', 'x86_64', 'x86-duck'],
     'xtensa':  ['lx6'],
     'riscv': ['riscv'],
@@ -38,7 +41,7 @@ support_arch_cflags ={
                 '-mfpu=vfpv4',
                 '-mfloat-abi=softfp'
             ],
-    'armv8-a': ['-mcpu=cortex-a53', '-mtune=cortex-a53','-mfpu=vfpv4', '-mfloat-abi=softfp'],
+    'armv8-a': ['-mcpu=cortex-a53', '-mtune=cortex-a53',],#'-mfpu=vfpv4', '-mfloat-abi=softfp'
     'dummy':[],
     'riscv':['-fstack-protector',
             '-nostdlib', '-nostdinc',
@@ -47,6 +50,10 @@ support_arch_cflags ={
     'general':[]
 }
 
+general_link = []
+
+if sys.platform=='linux':
+    general_link=['-m32']
 
 support_arch_linkflags ={
     'x86': [],
@@ -57,7 +64,7 @@ support_arch_linkflags ={
     'armv8-a': [],
     'dummy': [],
     'riscv':['-melf32lriscv','-nostdlib',], #'-m elf32lriscv' '-march=rv32imaczicsr', '-mabi=ilp32','-mcmodel=medany'
-    'general':[]
+    'general': general_link
 }
 
 support_platform_cflags ={

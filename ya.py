@@ -50,6 +50,8 @@ elif arch_type=='riscv':
     set_toolchains("riscv64-unknown-elf")
 elif arch_type in ['dummy','general'] :
     set_toolchains("gcc")
+elif arch_type =='arm64':
+    set_toolchains('aarch64-none-elf')
 else:
     set_toolchains("arm-none-eabi")
 
@@ -74,6 +76,7 @@ if arch in ['armv5']:
         'sdl2', 'infones', 'launcher', #'mgba', 
         'lua',  'quickjs', 'gnuboy',
         'watch',
+        'sdl'
     ]
 elif arch in ['riscv']:
     apps=[
