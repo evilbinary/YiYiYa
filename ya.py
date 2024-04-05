@@ -41,7 +41,6 @@ arch_type=support.get_arch_type(arch)
 set_arch(arch)
 set_arch_type(arch_type)
 
-
 #构建应用
 if arch_type=='arm':
     set_toolchains("arm-none-eabi")

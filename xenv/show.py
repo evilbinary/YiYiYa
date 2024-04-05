@@ -1,7 +1,3 @@
-# local cli       = import("core.base.cli")
-# local tty       = import("core.base.tty")
-# local colors    = import("core.base.colors")
-# local text      = import("core.base.text")
 ##show logo
 def show_logo(logo, opt):
 
