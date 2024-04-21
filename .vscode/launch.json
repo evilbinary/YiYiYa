@@ -1055,7 +1055,7 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            "program": "${workspaceRoot}/build/raspi2/armv7-a/debug/test-sound",
+            "program": "${workspaceRoot}/build/raspi2/armv7-a/debug/date",
             "cwd": "${workspaceRoot}",
             "args": [],
             "sourceFileMap": {
@@ -1427,7 +1427,7 @@
             // "program": "${workspaceRoot}/app/hello/hello",
             // "program": "${workspaceRoot}/app/sdl2/showimage",
             // "program": "${workspaceRoot}/app/sdl/testwm",
-            "program": "${workspaceRoot}/build/raspi2/armv7-a/debug/testwm",
+            "program": "${workspaceRoot}/build/raspi2/armv7-a/debug/testwave",
             // "program": "${workspaceRoot}/app/file/file",
             // "program": "${workspaceRoot}/app/microui/microui",
 

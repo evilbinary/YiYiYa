@@ -119,7 +119,8 @@ modules=[
     'keyboard',
     'log',
     'hello',
-    'sound'
+    'sound',
+    'dma'
     # 'debug',
     # 'fatfs',
     #'ewok'
