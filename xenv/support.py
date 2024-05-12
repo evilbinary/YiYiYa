@@ -68,7 +68,7 @@ support_arch_linkflags ={
 }
 
 support_platform_cflags ={
-    'raspi2': ['-nostdlib','-nostdinc'],# #specs=nosys.specs
+    'raspi2': ['-nostdlib','-nostdinc','-mapcs-frame','-DBACKTRACE'],# #specs=nosys.specs
     'raspi3': ['-mcpu=cortex-a53','-mtune=cortex-a53'],
     'stm32f4xx': ['-specs=nosys.specs',  '-nostdlib', '-nostdinc' ,'-fno-builtin', '-DUSE_HAL_DRIVER','-DSTM32F401xC'],#'-nolibc',
     'android' : [],
@@ -83,7 +83,7 @@ support_platform_cflags ={
     'versatilepb': ['-nostdlib','-nostdinc'],
     'f1c100s': ['-nostdlib','-nostdinc'],
     'f1c200s': ['-nostdlib','-nostdinc'],
-    't113-s3': ['-nostdlib','-nostdinc'],
+    't113-s3': ['-nostdlib','-nostdinc','-mapcs-frame'],
     'riscv-virt':[],#-g -Wall
 }
 

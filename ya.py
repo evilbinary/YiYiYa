@@ -67,7 +67,8 @@ apps = [
     'watch',
     #'sdlmine',
     'sdl',
-    'doom'
+    'doom',
+    'doom2',
 ]
 
 if arch in ['armv5']:
@@ -105,7 +106,6 @@ modules=[
     'loader',
     'posix',
     'test',
-    'fat',
     'gpu',
     'mouse',
     'sdhci',
@@ -120,9 +120,11 @@ modules=[
     'log',
     'hello',
     'sound',
-    'dma'
+    'dma',
+    # 'fat',
+    'fatfs',
+    'ipc',
     # 'debug',
-    # 'fatfs',
     #'ewok'
 ]
 
