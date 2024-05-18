@@ -1055,7 +1055,7 @@
             "type": "cppdbg",
             "request": "launch",
             "miDebuggerServerAddress": "localhost:1234",
-            "program": "${workspaceRoot}/build/raspi2/armv7-a/debug/loopwave",
+            "program": "${workspaceRoot}/build/raspi2/armv7-a/debug/test-time",
             "cwd": "${workspaceRoot}",
             "args": [],
             "sourceFileMap": {

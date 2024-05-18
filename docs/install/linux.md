@@ -8,7 +8,7 @@ linux下开发环境比较简单，以ubuntu举例。
 #arm 版本的gcc
 sudo apt-get install gcc-arm-none-eabi
 # i386版本的gcc
-apt-get install libc6-dev:i386 gcc:i386
+apt-get install libc6-dev:i386 gcc:i386 gcc-multilib
 
 #  安装工具
 sudo apt install mtools u-boot-tools dosfstools
