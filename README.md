@@ -83,6 +83,7 @@ https://github.com/evilbinary/YiYiYa
 
 捐赠人 | 金额¥| 日期
 ---|---|---
+[BiscuitOS](https://github.com/BiscuitOS)     | 200 | 2024-04-26
 [xiekeyi98](https://github.com/xiekeyi98)    | 9.9 | 2022-03-25
 [hulang1024](https://github.com/hulang1024)    | 12 | 2022-02-11
 **焱    | 0.01 | 2022-02-11
