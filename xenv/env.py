@@ -249,6 +249,38 @@ def install_dir(path,target_name=False):
     after_clean(clean)
 
 
+def install_res(path,file_name,target_name=True):
+    install_path=root_res_dir+path
+
+    def build(target):
+        app_path=install_path
+        if target_name:
+            app_path+='/'+target.get('name')
+        if not os.exists(app_path):            
+            os.shell('mkdir',['-p',app_path])
+
+        os.cp(target.get('file-path')+"/"+file_name, app_path)
+
+    before_build(build)
+
+    def link(target):
+        app_path=install_path
+
+        if target_name:
+            app_path+='/'+target.get('name')+'/'
+        os.cp(target.get('file-path')+"/"+file_name, app_path)
+
+    # after_link(link)
+
+    def clean(target):
+        app_path=install_path
+
+        if target_name:
+            app_path+='/'+target.get('name')
+        os.rm(app_path+"/"+target.name()+"/"+file_name)
+
+    after_clean(clean)
+
 def set_type(type):
     if type == "lib":
         set_kind("static")
@@ -333,7 +365,7 @@ def set_type(type):
     on_config(config)
 
 add_buildin('set_type',set_type)
-
+add_buildin('install_res',install_res)
 
 
 target("gcc")

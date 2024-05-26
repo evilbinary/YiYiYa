@@ -69,6 +69,7 @@ apps = [
     'sdl',
     'doom',
     'doom2',
+    'gpsp'
 ]
 
 if arch in ['armv5']:
