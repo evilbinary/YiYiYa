@@ -63,20 +63,21 @@ apps = [
     'cmd','gui','hello', 'test','unitest',
     'microui', 'etk',  'lvgl', 'track',
     'sdl2', 'infones', 'launcher', 'mgba', 
-    'lua', 'scheme', 'quickjs', 'gnuboy',
+    'lua', 'scheme', 'qjs', 'gnuboy',
     'watch',
     #'sdlmine',
     'sdl',
     'doom',
     'doom2',
-    'gpsp'
+    'gpsp',
+    # 'yui'
 ]
 
 if arch in ['armv5']:
     apps=['cmd','gui','hello','test','unitest',
         'microui', 'etk',  'lvgl', 'track',
         'sdl2', 'infones', 'launcher', #'mgba', 
-        'lua',  'quickjs', 'gnuboy',
+        'lua',  'qjs', 'gnuboy',
         'watch',
         'sdl'
     ]
