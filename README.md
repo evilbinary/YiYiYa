@@ -46,10 +46,12 @@ ya -m debug -r qemu
 
 ### 截图
 
+
 <img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/demo/etk-gui.jpeg?raw=true" width="800px" />
 
 <img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/demo/starup.png?raw=true" width="800px" />
 
+<img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/demo/game-dev.jpg?raw=true" width="800px" />
 
 https://user-images.githubusercontent.com/5143386/133922735-972ddceb-eab6-4102-b9a2-2e14e7d86397.mp4
 
