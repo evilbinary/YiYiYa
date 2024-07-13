@@ -342,3 +342,34 @@ def run(target):
     # os.shell('~/dev/c/sunxi-tools/sunxi-fel -p version  uboot ~/dev/c/uboots/f1c200s/u-boot-sunxi-with-spl.bin  write 0x81000000 '+duck_kernel)
 
 on_run(run)
+
+
+
+#esp32 运行
+target("esp32")
+# add_deps("duck.fit")
+add_deps("uImage.img")
+
+def run(target):
+    targetfile = target.targetfile()
+    sourcefiles = target.sourcefiles()
+    arch=target.get_arch()
+    arch_type= target.get_arch_type()
+    mode =target.get_config('mode')
+    plat=target.plat()
+
+    duck_fit="build/"+plat+"/"+arch+"/"+mode+"/duck.fit"
+    duck_kernel="build/"+plat+"/"+arch+"/"+mode+"/kernel"
+    duck_img="build/"+plat+"/"+arch+"/"+mode+"/uImage.img"
+
+    duck_kernel_bin="build/"+plat+"/"+arch+"/"+mode+"/kernel.bin"
+
+
+    print('run '+plat+' fel',duck_kernel)
+
+    os.shell('source /Users/evil/dev/c/esp/esp-idf/export.sh && esptool.py --chip esp32 elf2image --flash_mode="dio" --flash_freq "40m" --flash_size "4MB" -o '+duck_kernel_bin+' '+duck_kernel)
+
+    os.shell('esptool.py --chip esp32 --port /dev/cu.wchusbserial1413100 --baud 115200 --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 40m --flash_size detect 0x1000  '+duck_kernel_bin)
+
+
+on_run(run)
