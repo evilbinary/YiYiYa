@@ -177,7 +177,7 @@ def run_qemu(plat,debug=False):
                 debug_qemu_cmd = run_qemu_cmd +' -S -s'
             
         elif arch_type=='xtensa' :
-            run_qemu_cmd='~/dev/qemu-esp32/build/qemu-system-xtensa -nographic -M esp32 -drive file='+disk_img+',if=mtd,format=raw -s -serial stdio -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor  -D ./qemu.log -drive if=sd,id=sd0,format=raw,file='+disk_img+' -d in_asm -d cpu_reset -d in_asm,int,mmu' #-d in_asm -d cpu_reset -d in_asm,int,mmu
+            run_qemu_cmd='~/dev/qemu-esp32/build/qemu-system-xtensa -nographic -M esp32 -kernel '+kernel_image+' -drive file='+disk_img+',if=mtd,format=raw -s -serial stdio -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor  -D ./qemu.log -drive if=sd,id=sd0,format=raw,file='+disk_img+' -d in_asm -d cpu_reset -d in_asm,int,mmu' #-d in_asm -d cpu_reset -d in_asm,int,mmu
             debug_qemu_cmd = run_qemu_cmd +' -S '
 
         elif arch_type=='general' :

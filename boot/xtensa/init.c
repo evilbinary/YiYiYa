@@ -138,15 +138,7 @@ void read_kernel() {
   //   }
 }
 
-void* memset(void* dest, int c, size_t n) {
-  // must 32 align will Fatal exception (3): LoadStoreError
-  int i;
-  u32* d = dest;
-  for (i = 0; i < n / 4; i++) {
-    d[i] = c;
-  }
-  return dest;
-}
+
 
 void* memmove32(void* s1, const void* s2, u32 n) {
   u32 *dest, *src;
@@ -163,6 +155,15 @@ void init_boot() {
 #ifdef SINGLE_KERNEL
 
 #else
+void* memset(void* dest, int c, size_t n) {
+  // must 32 align will Fatal exception (3): LoadStoreError
+  int i;
+  u32* d = dest;
+  for (i = 0; i < n / 4; i++) {
+    d[i] = c;
+  }
+  return dest;
+}
   bootloader_init();
 #endif
 
@@ -382,7 +383,6 @@ void* load_kernel() {
 
 // start kernel
 void start_kernel() {
-
 #ifdef SINGLE_KERNEL
   // get_segment();
   extern void kstart(int argc, char* argv[], char** envp);
