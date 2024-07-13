@@ -177,7 +177,7 @@ def run_qemu(plat,debug=False):
                 debug_qemu_cmd = run_qemu_cmd +' -S -s'
             
         elif arch_type=='xtensa' :
-            run_qemu_cmd='~/dev/qemu-esp32/build/qemu-system-xtensa -nographic -M esp32 -kernel '+kernel_image+' -drive file='+disk_img+',if=mtd,format=raw -s -serial stdio -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor  -D ./qemu.log -drive if=sd,id=sd0,format=raw,file='+disk_img+' -d in_asm -d cpu_reset -d in_asm,int,mmu' #-d in_asm -d cpu_reset -d in_asm,int,mmu
+            run_qemu_cmd='~/dev/qemu-esp32/build/qemu-system-xtensa -cpu lx6 -nographic -M esp32 -kernel '+kernel_image+' -drive file='+disk_img+',if=mtd,format=raw -s -serial stdio -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor  -D ./qemu.log -drive if=sd,id=sd0,format=raw,file='+disk_img+' -d in_asm -d cpu_reset -d in_asm,int,mmu' #-d in_asm -d cpu_reset -d in_asm,int,mmu
             debug_qemu_cmd = run_qemu_cmd +' -S '
 
         elif arch_type=='general' :
@@ -369,7 +369,7 @@ def run(target):
 
     os.shell('source /Users/evil/dev/c/esp/esp-idf/export.sh && esptool.py --chip esp32 elf2image --flash_mode="dio" --flash_freq "40m" --flash_size "4MB" -o '+duck_kernel_bin+' '+duck_kernel)
 
-    os.shell('esptool.py --chip esp32 --port /dev/cu.wchusbserial1413100 --baud 115200 --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 40m --flash_size detect 0x1000  '+duck_kernel_bin)
+    os.shell('esptool.py --chip esp32 --port /dev/cu.wchusbserial1413100 --baud 115200 --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 40m --flash_size detect 0x1000  '+duck_kernel_bin+'  ')
 
 
 on_run(run)
