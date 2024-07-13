@@ -392,6 +392,12 @@ def config (target):
             ],
             kind = "static"
         )
+    elif arch_type in ['xtensa']:
+        library = find_library("gcc", 
+            ["//Users/evil/.espressif/tools/xtensa-esp32-elf/esp-12.2.0_20230208/xtensa-esp32-elf/lib/gcc/xtensa-esp32-elf/12.2.0/",
+            ],
+            kind = "static"
+        )
     # print('found gcc lib',library)
     if library:
         target.add("ldflags",[

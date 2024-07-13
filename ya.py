@@ -169,8 +169,12 @@ set_description("Enable wayland support")
 option_end()
 
 option("app")
-set_default(true)
-set_showmenu(true)
+if len(apps)==0:
+    set_default(false)
+    set_showmenu(false)
+else:
+    set_default(true)
+    set_showmenu(true)
 set_description("Enable app build")
 option_end()
 
