@@ -47,7 +47,8 @@ support_arch_cflags ={
             '-nostdlib', '-nostdinc',
             '-fno-builtin', '-mcmodel=medany',  
             '-march=rv32imaczicsr','-mabi=ilp32','-DSBI' ],#
-    'general':[]
+    'general':[],
+    'lx6': [],
 }
 
 general_link = []
@@ -64,7 +65,8 @@ support_arch_linkflags ={
     'armv8-a': [],
     'dummy': [],
     'riscv':['-melf32lriscv','-nostdlib',], #'-m elf32lriscv' '-march=rv32imaczicsr', '-mabi=ilp32','-mcmodel=medany'
-    'general': general_link
+    'general': general_link,
+    'lx6': [],
 }
 
 support_platform_cflags ={
@@ -85,6 +87,7 @@ support_platform_cflags ={
     'f1c200s': ['-nostdlib','-nostdinc'],
     't113-s3': ['-nostdlib','-nostdinc','-mapcs-frame'],
     'riscv-virt':[],#-g -Wall
+    'esp32': []
 }
 
 

@@ -52,6 +52,8 @@ elif arch_type in ['dummy','general'] :
     set_toolchains("gcc")
 elif arch_type =='arm64':
     set_toolchains('aarch64-none-elf')
+elif arch_type =='xtensa':
+    set_toolchains('xtensa-esp32-elf')
 else:
     set_toolchains("arm-none-eabi")
 
@@ -73,6 +75,11 @@ apps = [
     # 'yui'
 ]
 
+#构建foot
+foot=[
+    'driver','service'
+]
+
 if arch in ['armv5']:
     apps=['cmd','gui','hello','test','unitest',
         'microui', 'etk',  'lvgl', 'track',
@@ -87,6 +94,11 @@ elif arch in ['riscv']:
         'microui', 'etk',  'lvgl', 'track',
         'sdl2', 'infones', 'launcher', #'mgba',
     ]
+elif arch in ['lx6']:
+    apps=[
+    ]
+    default_libc='c'
+    foot=[]
 
 # cpp应用
 cpp_apps=[
@@ -136,10 +148,7 @@ if plat in['t113-s3','stm32f4xx','v3s']:
 elif arch in['x86']:
     modules+=['ahci','pci','vga']
 
-#构建foot
-foot=[
-    'driver','service'
-]
+
 set_config('foot',foot)
 
 set_config('modules',modules)
