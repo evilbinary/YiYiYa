@@ -126,6 +126,7 @@ modules=[
     # 'fat',
     'fatfs',
     'ipc',
+    'power',
     # 'debug',
     #'ewok'
 ]
