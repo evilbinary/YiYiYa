@@ -105,6 +105,13 @@ def build(target):
 on_build(build)
 
 
+def build_esp32_img(duck_kernel,duck_kernel_bin,kernel_bin_img):
+    os.shell('esptool.py --chip esp32 --trace elf2image --version 3 --min-rev 1  --flash_mode dio  --flash_freq "40m" --flash_size "16MB" -o '+duck_kernel_bin+' '+duck_kernel)
+
+    os.exec('dd if='+duck_kernel_bin+' of='+kernel_bin_img+' bs=1 seek=4k')
+    #os.exec('truncate -s 16K '+kernel_bin_img)
+    os.exec('truncate -s 4M '+kernel_bin_img)
+
 #run
 def run_qemu(plat,debug=False):
 
@@ -120,6 +127,7 @@ def run_qemu(plat,debug=False):
         arch_type= target.get_arch_type()
 
         kernel_image="build/"+plat+"/"+arch+"/"+mode+"/duck.img"
+        kernel_bin="build/"+plat+"/"+arch+"/"+mode+"/duck.img"
         disk_img="image/disk.img"
         
         if is_host('mac'):
@@ -137,6 +145,7 @@ def run_qemu(plat,debug=False):
   
         if has_config('single-kernel') :
             kernel_image= "build/"+plat+"/"+arch+"/"+mode+"/kernel.elf"
+            kernel_bin= "build/"+plat+"/"+arch+"/"+mode+"/kernel.bin"
 
         if arch_type=='x86' :
             if target.get('arch')=='x86-duck' :
@@ -177,8 +186,14 @@ def run_qemu(plat,debug=False):
                 debug_qemu_cmd = run_qemu_cmd +' -S -s'
             
         elif arch_type=='xtensa' :
-            run_qemu_cmd='~/dev/qemu-esp32/build/qemu-system-xtensa -cpu lx6 -nographic -M esp32 -kernel '+kernel_image+' -drive file='+disk_img+',if=mtd,format=raw -s -serial stdio -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor  -D ./qemu.log -drive if=sd,id=sd0,format=raw,file='+disk_img+' -d in_asm -d cpu_reset -d in_asm,int,mmu' #-d in_asm -d cpu_reset -d in_asm,int,mmu
-            debug_qemu_cmd = run_qemu_cmd +' -S '
+            kernel_bin_img=kernel_bin+'.img'
+
+            build_esp32_img(kernel_image,kernel_bin,kernel_bin_img)
+
+            run_qemu_cmd='~/dev/qemu-esp32/build/qemu-system-xtensa -M esp32  --trace "*mtd*" -serial stdio -monitor telnet:localhost:1235,server,nowait -drive file='+kernel_bin_img+',if=mtd,format=raw -m 4M ' #-d in_asm -d cpu_reset -d in_asm,int,mmu
+            run_qemu_cmd+=' -d cpu_reset -d in_asm,int,mmu'
+
+            debug_qemu_cmd = run_qemu_cmd +'  -S -s'
 
         elif arch_type=='general' :
             run_qemu_cmd ='duck/init/kernel.elf'
@@ -198,10 +213,10 @@ def run_qemu(plat,debug=False):
 
         if debug : 
             cprint('${green}run qemu debug ${clear} %s'%debug_qemu_cmd)
-            os.exec(debug_qemu_cmd)
+            os.shell(debug_qemu_cmd)
         else:
             cprint('${green}run qemu ${clear} %s'%run_qemu_cmd)
-            os.exec(run_qemu_cmd)
+            os.shell(run_qemu_cmd)
         
 
     # print('qmeu=>',os.arch() ,plat )
@@ -345,10 +360,10 @@ on_run(run)
 
 
 
+
 #esp32 运行
 target("esp32")
-# add_deps("duck.fit")
-add_deps("uImage.img")
+add_deps("kernel.img")
 
 def run(target):
     targetfile = target.targetfile()
@@ -360,14 +375,17 @@ def run(target):
 
     duck_fit="build/"+plat+"/"+arch+"/"+mode+"/duck.fit"
     duck_kernel="build/"+plat+"/"+arch+"/"+mode+"/kernel"
-    duck_img="build/"+plat+"/"+arch+"/"+mode+"/uImage.img"
+
+    kernel_bin_img="build/"+plat+"/"+arch+"/"+mode+"/kernel.bin.img"
 
     duck_kernel_bin="build/"+plat+"/"+arch+"/"+mode+"/kernel.bin"
 
 
+
     print('run '+plat+' fel',duck_kernel)
 
-    os.shell('source /Users/evil/dev/c/esp/esp-idf/export.sh && esptool.py --chip esp32 elf2image --flash_mode="dio" --flash_freq "40m" --flash_size "4MB" -o '+duck_kernel_bin+' '+duck_kernel)
+    build_esp32_img(duck_kernel,duck_kernel_bin,kernel_bin_img)
+
 
     os.shell('esptool.py --chip esp32 --port /dev/cu.wchusbserial1413100 --baud 115200 --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 40m --flash_size detect 0x1000  '+duck_kernel_bin+'  ')
 

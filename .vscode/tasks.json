@@ -179,6 +179,33 @@
                 }
             }
         },
+
+        {
+            "label": "Build esp32 and run",
+            "dependsOrder":"sequence",
+            "dependsOn": [
+                "Run esp32 QEMU",
+            ]
+        },
+        {
+            "label": "Run esp32 QEMU",
+            "type": "shell",
+            "isBackground": true,
+            "command": "source /Users/evil/dev/c/esp/esp-idf/export.sh  && ya -m debug -p esp32 -r debug",
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(run qemu)",
+                    "line": 1,
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "^(run qemu)",
+                    "endsPattern": "^(run qemu)"
+                }
+            }
+        },
+
+
         {
             "label": "Build vmdk",
             "type": "shell",

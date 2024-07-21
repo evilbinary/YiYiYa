@@ -108,7 +108,7 @@ void init_memory() {
   boot_info->total_memory = 0;
 
   ptr->base = &_data_end ;
-  ptr->length = 0x100000;  // 16M
+  ptr->length = 0x10000;  // 16M
   ptr->type = 1;
   boot_info->total_memory += ptr->length;
   ptr++;
