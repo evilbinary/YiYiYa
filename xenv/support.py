@@ -87,7 +87,7 @@ support_platform_cflags ={
     'f1c200s': ['-nostdlib','-nostdinc'],
     't113-s3': ['-nostdlib','-nostdinc','-mapcs-frame'],
     'riscv-virt':[],#-g -Wall
-    'esp32': []
+    'esp32': ['-mlongcalls','-mtext-section-literals']
 }
 
 

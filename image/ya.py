@@ -191,7 +191,7 @@ def run_qemu(plat,debug=False):
             build_esp32_img(kernel_image,kernel_bin,kernel_bin_img)
 
             run_qemu_cmd='~/dev/qemu-esp32/build/qemu-system-xtensa -M esp32  --trace "*mtd*" -serial stdio -monitor telnet:localhost:1235,server,nowait -drive file='+kernel_bin_img+',if=mtd,format=raw -m 4M ' #-d in_asm -d cpu_reset -d in_asm,int,mmu
-            run_qemu_cmd+=' -d cpu_reset -d in_asm,int,mmu'
+            run_qemu_cmd+=' -d cpu_reset -d in_asm,int,mmu -D ./qemu.log'
 
             debug_qemu_cmd = run_qemu_cmd +'  -S -s'
 
