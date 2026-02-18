@@ -1,0 +1,5 @@
+#ifndef BOOT_X86_CONFIG_H
+#define BOOT_X86_CONFIG_H
+#define KERNEL_BLOCK_SIZE 230
+#define KERNEL_SIZE 117760
+#endif

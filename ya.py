@@ -10,6 +10,7 @@ module_path=['..',
     '../../',
     '../../..',
     'xenv',
+    '/Users/evil/dev/c/ymake/ymake/',
    ]
 sys.path.extend(module_path)
 import xenv.support as support
@@ -72,7 +73,7 @@ apps = [
     'doom',
     'doom2',
     'gpsp',
-    # 'yui'
+    'yui',
 ]
 
 #构建foot

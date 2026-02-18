@@ -87,7 +87,8 @@ support_platform_cflags ={
     'f1c200s': ['-nostdlib','-nostdinc'],
     't113-s3': ['-nostdlib','-nostdinc','-mapcs-frame'],
     'riscv-virt':[],#-g -Wall
-    'esp32': ['-mlongcalls','-mtext-section-literals']
+    'esp32': ['-mlongcalls','-mtext-section-literals','-mabi=call0','-mlongcalls'  #禁用密度指令
+    ]
 }
 
 
