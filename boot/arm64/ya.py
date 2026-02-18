@@ -5,13 +5,14 @@
 # * 邮箱: rootdebug@163.com
 # ********************************************************************
 
-if has_config('single-kernel'): 
+if has_config('single-kernel'):
+    # In single-kernel mode, boot code is linked with kernel
+    # Just compile the assembly, don't create separate elf
     target("boot-init.elf")
     set_kind("object")
-    pass
+    add_files('boot-{arch}.s')
 else:
     target("boot-init.elf")
-    ## set_extensions(".h",".o")
     add_deps('boot-config')
 
     add_files(
@@ -24,11 +25,7 @@ else:
         '../../duck/platform/{plat}'
     )
 
-
-    add_ldflags("-T"+path.join(os.scriptdir(), "../arm/link-{plat}.ld"), force = true)
+    # Use arm64 directory's own link script
+    add_ldflags("-T"+path.join(os.scriptdir(), "link-{plat}.ld"), force = true)
 
     add_rules('objcopy-file')
-        
-
-
-   

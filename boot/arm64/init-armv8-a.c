@@ -1,0 +1,394 @@
+/*******************************************************************
+ * Copyright 2021-present evilbinary
+ * 作者: evilbinary on 01/01/20
+ * 邮箱: rootdebug@163.com
+ ********************************************************************/
+#include "init.h"
+#include "gpio.h"
+
+extern boot_info_t* boot_info;
+static boot_info_t boot_data;
+int cpu_id = 0;
+
+static void io_write32(uint port, u32 data) { *(u32*)port = data; }
+
+static u32 io_read32(uint port) {
+  u32 data;
+  data = *(u32*)port;
+  return data;
+}
+
+#ifdef SINGLE_KERNEL
+extern unsigned int __bss_start, __bss_end;
+extern unsigned int __start, __end;
+
+void init_segment() {
+  int num = boot_data.segments_number++;
+  boot_data.segments[num].start = (unsigned int)&__start;
+  boot_data.segments[num].size = (unsigned int)&__end - (unsigned int)&__start;
+  boot_data.segments[num].type = 1;
+  boot_info->kernel_base = (unsigned int)&__start;
+}
+
+void init_bss() {
+  unsigned* dst = NULL;
+  for (dst = &__bss_start; dst < &__bss_end; dst++) {
+    *dst = 0;
+  }
+}
+#endif
+
+/* Weak memset for boot code - overridden by libkernelcommon if linked */
+__attribute__((weak)) void* memset(void* s, int c, size_t n) {
+  int i;
+  for (i = 0; i < n; i++) ((char*)s)[i] = c;
+  return s;
+}
+
+// Raspberry Pi 3 UART (PL011)
+void uart_init() {
+  register unsigned int r;
+
+  /* initialize UART */
+  *UART0_CR = 0;  // turn off UART0
+
+  /* map UART0 to GPIO pins */
+  r = *GPFSEL1;
+  r &= ~((7 << 12) | (7 << 15));  // gpio14, gpio15
+  r |= (4 << 12) | (4 << 15);     // alt0
+  *GPFSEL1 = r;
+  *GPPUD = 0;  // enable pins 14 and 15
+  r = 150;
+  while (r--) {
+    asm volatile("nop");
+  }
+  *GPPUDCLK0 = (1 << 14) | (1 << 15);
+  r = 150;
+  while (r--) {
+    asm volatile("nop");
+  }
+  *GPPUDCLK0 = 0;  // flush GPIO setup
+
+  *UART0_ICR = 0x7FF;  // clear interrupts
+  *UART0_IBRD = 2;     // 115200 baud
+  *UART0_FBRD = 0xB;
+  *UART0_LCRH = 0b11 << 5;  // 8n1
+  *UART0_CR = 0x301;        // enable Tx, Rx, FIFO
+}
+
+void uart_send_ch(unsigned int c) {
+  while (io_read32(UART0_FR) & 0x20) {
+  }
+  io_write32(UART0_DR, c);
+}
+
+char uart_get_ch() {
+  unsigned int c;
+  while (io_read32(UART0_FR) & 0x10) {
+  }
+  c = io_read32(UART0_DR);
+  return c;
+}
+
+static void print_string(const unsigned char* str) {
+  while (*str) {
+    uart_send_ch(*str);
+    ++str;
+  }
+}
+
+void itoa(char* buf, int base, long d) {
+  char* p = buf;
+  char *p1, *p2;
+  unsigned long ud = d;
+  int divisor = 10;
+
+  if (base == 'd' && d < 0) {
+    *p++ = '-';
+    buf++;
+    ud = -d;
+  } else if (base == 'x')
+    divisor = 16;
+
+  do {
+    int remainder = ud % divisor;
+    *p++ = (remainder < 10) ? remainder + '0' : remainder + 'a' - 10;
+  } while (ud /= divisor);
+
+  *p = 0;
+
+  p1 = buf;
+  p2 = p - 1;
+  while (p1 < p2) {
+    char tmp = *p1;
+    *p1 = *p2;
+    *p2 = tmp;
+    p1++;
+    p2--;
+  }
+}
+
+void printf(const char* format, ...) {
+  char** arg = (char**)&format;
+  int c;
+  char buf[20];
+
+  arg++;
+
+  while ((c = *format++) != 0) {
+    if (c != '%')
+      uart_send_ch(c);
+    else {
+      char* p;
+
+      c = *format++;
+      switch (c) {
+        case 'd':
+        case 'u':
+        case 'x':
+          itoa(buf, c, *((long*)arg++));
+          p = buf;
+          goto string;
+          break;
+
+        case 's':
+          p = *arg++;
+          if (!p) p = "(null)";
+
+        string:
+          while (*p) uart_send_ch(*p++);
+          break;
+
+        default:
+          uart_send_ch(*((int*)arg++));
+          break;
+      }
+    }
+  }
+}
+
+extern void* _stack_svc;
+
+void init_boot_info() {
+  boot_info = &boot_data;
+  boot_info->version = BOOT_VERSION;
+  boot_info->kernel_origin_base = KERNEL_ORIGIN_BASE;
+  boot_info->kernel_base = KERNEL_BASE;
+  boot_info->kernel_size = KERNEL_SIZE * 2;
+  boot_info->tss_number = MAX_CPU;
+  boot_info->second_boot_entry = SECOND_BOOT_ENTRY;
+  boot_info->segments_number = 0;
+  boot_info->kernel_stack = _stack_svc;
+}
+
+void init_disk() {
+  boot_info->disk.hpc = 2;
+  boot_info->disk.spt = 18;
+  boot_info->disk.type = 1;
+}
+
+void init_display() {
+  boot_info->disply.mode = 1;
+  boot_info->disply.video = 0xB8000;
+  boot_info->disply.height = 25;
+  boot_info->disply.width = 80;
+}
+
+void init_memory() {
+  int count = 0;
+  memory_info_t* ptr = boot_info->memory;
+  boot_info->total_memory = 0;
+
+#ifdef RASPI3
+  // Raspberry Pi 3 has 1GB RAM starting at 0
+  ptr->base = 0x00000000;
+  ptr->length = 0x40000000;  // 1GB
+  ptr->type = 1;
+  boot_info->total_memory += ptr->length;
+  ptr++;
+  count++;
+#else
+  ptr->type = 1;
+  ptr->base = 0x0000000;
+  ptr->length = boot_info->kernel_base;
+  boot_info->total_memory += ptr->length;
+  ptr++;
+  count++;
+
+  ptr->type = 2;
+  ptr->base = (u64)boot_info->kernel_base;
+  ptr->length = (u64)boot_info->kernel_size;
+  boot_info->total_memory += ptr->length;
+  ptr++;
+  count++;
+
+  ptr->type = 1;
+  ptr->base = (u64)boot_info->kernel_base + (u64)boot_info->kernel_size;
+  ptr->length = 0xf000000;
+  boot_info->total_memory += ptr->length;
+  ptr++;
+  count++;
+#endif
+
+  boot_info->memory_number = count;
+}
+
+void init_cpu() {
+  // Enable FPU and SIMD for ARM64
+  // ARM64 has these enabled by default, but we can configure
+}
+
+void read_kernel() {}
+
+void init_boot() {
+#ifdef SINGLE_KERNEL
+  init_bss();
+#endif
+
+  uart_init();
+
+  init_boot_info();
+  uart_send_ch('b');
+  uart_send_ch('o');
+  uart_send_ch('o');
+  uart_send_ch('t');
+  uart_send_ch('\n');
+  uart_send_ch('\r');
+  printf("boot info addr %x\n\r", boot_info);
+
+  print_string("init display\n\r");
+  init_display();
+
+  print_string("init memory\n\r");
+  init_memory();
+
+  print_string("init disk\n\r");
+  init_disk();
+
+  print_string("read kernel\n\r");
+  read_kernel();
+
+  print_string("init cpu\n\r");
+  init_cpu();
+
+  print_string("start kernel\n\r");
+  start_kernel();
+
+  for (;;)
+    ;
+}
+
+void init_apu_boot() {
+  printf("boot apu info addr %x\n\r", boot_info);
+  start_apu_kernel();
+  for (;;)
+    ;
+}
+
+void* memmove64(void* s1, const void* s2, u64 n) {
+  u64 *dest, *src;
+  int i;
+  dest = (u64*)s1;
+  src = (u64*)s2;
+  for (i = 0; i < n / 8; i++) {
+    dest[i] = src[i];
+  }
+  return s1;
+}
+
+static void load_elf(Elf64_Ehdr* elf_header) {
+  u8* elf = (u8*)elf_header;
+  Elf64_Phdr* phdr = (Elf64_Phdr*)(elf + elf_header->e_phoff);
+  u64 entry = 0;
+
+  for (int i = 0; i < elf_header->e_phnum; i++) {
+    printf("type:%d\n\r", phdr[i].p_type);
+    switch (phdr[i].p_type) {
+      case PT_NULL: {
+        char* vaddr = (char*)phdr[i].p_vaddr;
+        memset(vaddr, 0, phdr[i].p_memsz);
+      } break;
+      case PT_LOAD: {
+        char* start = (char*)(elf + phdr[i].p_offset);
+        char* vaddr = (char*)phdr[i].p_vaddr;
+
+        entry = phdr[i].p_vaddr;
+        printf("load start:%x vaddr:%x size:%x \n\r", start, vaddr,
+               phdr[i].p_filesz);
+        memmove64(vaddr, start, phdr[i].p_memsz);
+        printf("move end\n\r");
+
+        int num = boot_data.segments_number++;
+        boot_data.segments[num].start = vaddr;
+        boot_data.segments[num].size = phdr[i].p_memsz;
+        boot_data.segments[num].type = 1;
+      } break;
+      default:
+        break;
+    }
+  }
+
+  Elf64_Shdr* shdr = (Elf64_Shdr*)(elf + elf_header->e_shoff);
+  for (int i = 0; i < elf_header->e_shnum; i++) {
+    if (SHT_NOBITS == shdr[i].sh_type) {
+      char* vaddr = (char*)shdr[i].sh_addr;
+      memset(vaddr, 0, shdr[i].sh_size);
+    } else if (entry != shdr[i].sh_addr && SHT_PROGBITS == shdr[i].sh_type &&
+               shdr[i].sh_flags & SHF_ALLOC && shdr[i].sh_flags) {
+      char* start = (char*)(elf + shdr[i].sh_offset);
+      char* vaddr = (char*)shdr[i].sh_addr;
+      printf("load shdr start:%x vaddr:%x size:%x \n\r", start, vaddr,
+             shdr[i].sh_size);
+      memmove64(vaddr, start, shdr[i].sh_size);
+    }
+  }
+}
+
+void* load_kernel() {
+#ifdef KERNEL_MOVE
+  u64* elf = boot_info->kernel_origin_base;
+#else
+  u64* elf = boot_info->kernel_base;
+#endif
+  printf("kernel base %x\n\r", elf);
+
+  Elf64_Ehdr* elf_header = (Elf64_Ehdr*)elf;
+  if (elf_header->e_ident[0] == ELFMAG0 || elf_header->e_ident[1] == ELFMAG1) {
+    load_elf(elf_header);
+    return (void*)elf_header->e_entry;
+  } else {
+    printf("bin kernel\n\r");
+    return elf;
+  }
+}
+
+void start_kernel() {
+#ifdef SINGLE_KERNEL
+  init_segment();
+  extern void kstart(int argc, char* argv[], char** envp);
+  entry start = kstart;
+  boot_info->kernel_entry = start;
+  printf("kernel entry %x\n\r", boot_info->kernel_entry);
+#else
+  boot_info->kernel_entry = load_kernel();
+  entry start = boot_info->kernel_entry;
+  printf("kernel entry %x\n\r", boot_info->kernel_entry);
+#endif
+  int argc = 0;
+  char** argv = 0;
+  char* envp[10];
+  envp[0] = (char*)boot_info;
+  envp[1] = (char*)(long)cpu_id++;
+  start(argc, argv, envp);
+}
+
+void start_apu_kernel() {
+  printf("start apu kernel entry %x\n\r", boot_info->kernel_entry);
+  entry start = boot_info->kernel_entry;
+  int argc = 0;
+  char** argv = 0;
+  char* envp[10];
+  envp[0] = (char*)boot_info;
+  envp[1] = (char*)(long)cpu_id++;
+  start(argc, argv, envp);
+}

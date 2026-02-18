@@ -1,0 +1,5 @@
+#ifndef BOOT_ARM64_CONFIG_H
+#define BOOT_ARM64_CONFIG_H
+#define KERNEL_BLOCK_SIZE 358
+#define KERNEL_SIZE 183296
+#endif

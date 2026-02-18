@@ -185,6 +185,16 @@ def run_qemu(plat,debug=False):
                 ## run_qemu_cmd =run_qemu_cmd+' -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor'
                 debug_qemu_cmd = run_qemu_cmd +' -S -s'
             
+        elif arch_type =='arm64' :
+
+            if target.plat() == 'raspi3' :
+                run_qemu_cmd='qemu-system-aarch64 -name YiYiYa -M raspi3b  -rtc base=localtime -kernel '+kernel_image+'  -serial stdio   -D ./qemu.log -drive if=sd,id=sd0,format=raw,file='+disk_img+' -d in_asm,int,mmu' # -d in_asm -d cpu_reset -d in_asm,int,mmu
+                #run_qemu_cmd =run_qemu_cmd+' -monitor tcp:127.0.0.1:55555,server,nowait'
+                # run_qemu_cmd =run_qemu_cmd+' -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor'
+                debug_qemu_cmd = run_qemu_cmd +' -S -s'
+            else:
+                print('no support arm64 platform:', target.plat())
+            
         elif arch_type=='xtensa' :
             kernel_bin_img=kernel_bin+'.img'
 
@@ -257,6 +267,13 @@ target("raspi2")
 add_deps("duck.img","disk.img")
 add_rules("arch")
 run_qemu('raspi2')
+
+
+target("raspi3")
+
+add_deps("duck.img","disk.img")
+add_rules("arch")
+run_qemu('raspi3')
 
 
 
