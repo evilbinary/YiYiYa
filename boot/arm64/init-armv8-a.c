@@ -28,6 +28,7 @@ void init_segment() {
   boot_data.segments[num].size = (unsigned int)&__end - (unsigned int)&__start;
   boot_data.segments[num].type = 1;
   boot_info->kernel_base = (unsigned int)&__start;
+  boot_info->kernel_size = (unsigned int)&__end - (unsigned int)&__start;
 }
 
 void init_bss() {
