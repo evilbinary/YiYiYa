@@ -21,15 +21,28 @@ static u32 io_read32(uint port) {
 #ifdef SINGLE_KERNEL
 extern unsigned int __bss_start, __bss_end;
 extern unsigned int __start, __end;
-extern unsigned int _sdata, _edata, _sidata;
+// Data section symbols defined by linker script
+extern char _sdata[];
+extern char _edata[];
+extern char _sidata[];
 
 void init_data() {
   // Copy .data section from FLASH/ROM (load address) to RAM (virtual address)
-  unsigned long *src = (unsigned long *)&_sidata;
-  unsigned long *dst = (unsigned long *)&_sdata;
-  while (dst < (unsigned long *)&_edata) {
+  char *src = _sidata;
+  char *dst = _sdata;
+  char *end = _edata;
+  
+  uart_send_ch('D');
+  printf("init_data: src=%p dst=%p end=%p\n", src, dst, end);
+  
+  while (dst < end) {
     *dst++ = *src++;
   }
+  
+  // Verify - check first and last word
+  printf("verify: _sdata[0]=%p _edata[-1]=%p\n", 
+         ((unsigned long *)_sdata)[0], 
+         ((unsigned long *)_edata)[-1]);
 }
 
 void init_segment() {
@@ -46,6 +59,12 @@ void init_bss() {
   for (dst = &__bss_start; dst < &__bss_end; dst++) {
     *dst = 0;
   }
+}
+#else
+void* memset(void* s, int c, size_t n) {
+  int i;
+  for (i = 0; i < n; i++) ((char*)s)[i] = c;
+  return s;
 }
 #endif
 
@@ -252,8 +271,10 @@ void init_cpu() {
 void read_kernel() {}
 
 void init_boot() {
-#ifdef SINGLE_KERNEL
+  // 初始化 data 段（从 FLASH 复制到 RAM）
   init_data();
+  
+#ifdef SINGLE_KERNEL
   init_bss();
 #endif
 

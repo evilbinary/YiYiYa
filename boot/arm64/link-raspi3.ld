@@ -17,8 +17,11 @@ SECTIONS
     }
 
     .data : {
+        _sdata = .;
         *(.data .data.* .gnu.linkonce.d*)
+        _edata = .;
     }
+    _sidata = LOADADDR(.data);
 
     .bss : {
         __bss_start = .;
