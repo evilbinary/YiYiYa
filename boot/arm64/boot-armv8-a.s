@@ -85,8 +85,9 @@ drop_to_el1_from_el3:
     msr     scr_el3, x0
     isb                          // Ensure SCR_EL3 update is visible
 
-    // Set SPSR_EL3 to enter EL1 in AArch64 mode
-    mov     x0, #0x5             // EL1h mode (EL1 with SP_EL1)
+    // Set SPSR_EL3 to enter EL1 in AArch64 mode with interrupts disabled
+    // EL1h mode (0x5) | DAIF mask bits (0x3C0 = D|A|I|F at bits 9:6)
+    mov     x0, #0x3C5           // EL1h mode with IRQ/FIQ/SError/Debug masked
     msr     spsr_el3, x0
 
     adr     x0, el1_from_el3_return
@@ -111,8 +112,9 @@ drop_to_el2:
     msr     scr_el3, x0
     isb                          // Ensure SCR_EL3 update is visible
 
-    // Set SPSR_EL3 to enter EL2 in AArch64 mode
-    mov     x0, #0x9             // EL2h mode (EL2 with SP_EL2)
+    // Set SPSR_EL3 to enter EL2 in AArch64 mode with interrupts disabled
+    // EL2h mode (0x9) | DAIF mask bits (0x3C0 = D|A|I|F at bits 9:6)
+    mov     x0, #0x3C9           // EL2h mode with IRQ/FIQ/SError/Debug masked
     msr     spsr_el3, x0
 
     adr     x0, el2_return
@@ -136,8 +138,9 @@ drop_to_el1:
     ldr     x0, =_estack
     msr     sp_el1, x0
 
-    // Set SPSR_EL2 to enter EL1 in AArch64 mode
-    mov     x0, #0x5             // EL1h mode (EL1 with SP_EL1)
+    // Set SPSR_EL2 to enter EL1 in AArch64 mode with interrupts disabled
+    // EL1h mode (0x5) | DAIF mask bits (0x3C0 = D|A|I|F at bits 9:6)
+    mov     x0, #0x3C5           // EL1h mode with IRQ/FIQ/SError/Debug masked
     msr     spsr_el2, x0
 
     adr     x0, el1_return
@@ -255,8 +258,9 @@ drop_to_el1_from_el3_ap:
     msr     scr_el3, x0
     isb
 
-    // Set SPSR_EL3 to enter EL1 in AArch64 mode
-    mov     x0, #0x5             // EL1h mode
+    // Set SPSR_EL3 to enter EL1 in AArch64 mode with interrupts disabled
+    // EL1h mode (0x5) | DAIF mask bits (0x3C0 = D|A|I|F at bits 9:6)
+    mov     x0, #0x3C5           // EL1h mode with IRQ/FIQ/SError/Debug masked
     msr     spsr_el3, x0
 
     adr     x0, ap_el1_return

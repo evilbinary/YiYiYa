@@ -21,6 +21,16 @@ static u32 io_read32(uint port) {
 #ifdef SINGLE_KERNEL
 extern unsigned int __bss_start, __bss_end;
 extern unsigned int __start, __end;
+extern unsigned int _sdata, _edata, _sidata;
+
+void init_data() {
+  // Copy .data section from FLASH/ROM (load address) to RAM (virtual address)
+  unsigned long *src = (unsigned long *)&_sidata;
+  unsigned long *dst = (unsigned long *)&_sdata;
+  while (dst < (unsigned long *)&_edata) {
+    *dst++ = *src++;
+  }
+}
 
 void init_segment() {
   int num = boot_data.segments_number++;
@@ -243,6 +253,7 @@ void read_kernel() {}
 
 void init_boot() {
 #ifdef SINGLE_KERNEL
+  init_data();
   init_bss();
 #endif
 
