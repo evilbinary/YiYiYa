@@ -59,10 +59,50 @@
             }
         },
         {
+            "label": "Run QEMU arm64",
+            "type": "shell",
+            "isBackground": true,
+            "windows": {
+                "command": "ya -m debug -p raspi3 -r raspi3-debug"
+            },
+            "linux": {
+                "command": "ya -m debug -p raspi3 -r raspi3-debug"
+            },
+            // "osx":{
+            //     "command": "echo Starting QEMU & qemu-system-i386  -S -s -bios /Volumes/android/u-boot/u-boot.rom -net nic -net user,tftp=/Users/evil/dev/c/duck-os/kernel,bootfile=kernel -monitor stdio -D ./qemu.log "
+            // },
+            "osx":{
+                "command": "ya -m debug -p raspi3 -r raspi3-debug"
+                // "command": "echo Starting QEMU & qemu-system-i386  -S -s  -drive file=image/duck.img,if=floppy,index=0,media=disk,format=raw -monitor stdio -D ./qemu.log "
+
+               
+                // "command": "echo Starting QEMU & bochs -q -f ./bochsrc "
+
+            },
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(run qemu)",
+                    "line": 1,
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "^(run qemu)",
+                    "endsPattern": "^(run qemu)"
+                }
+            }
+        },
+        {
             "label": "Build and run",
             "dependsOrder":"sequence",
             "dependsOn": [
                 "Run QEMU",
+            ]
+        },
+        {
+            "label": "Build and run arm64",
+            "dependsOrder":"sequence",
+            "dependsOn": [
+                "Run QEMU arm64",
             ]
         },
         {

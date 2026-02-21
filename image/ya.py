@@ -276,6 +276,18 @@ add_rules("arch")
 run_qemu('raspi3')
 
 
+target("raspi3-debug")
+
+add_deps("duck.img","disk.img")
+add_rules("arch")
+
+plat=get_plat()
+if not plat:
+    plat='raspi3'
+
+
+run_qemu(plat,True)
+
 
 target("disk.img")
 
