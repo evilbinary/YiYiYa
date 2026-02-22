@@ -9,6 +9,9 @@ SECTIONS
 
     .text : {
         KEEP(*(.text.boot))
+        /* ARM64 exception vector table must be 2KB (0x800) aligned. */
+        . = ALIGN(2048);
+        KEEP(*(.text.vectors))
         *(.text .text.* .gnu.linkonce.t*)
     }
 
