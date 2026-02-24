@@ -7,9 +7,14 @@ raspi2:
 v3s:
 	ya -m debug -r v3s -p v3s
 
+raspi3:
+	ya -m debug -p raspi3  -r raspi3
 
 i386-pc:
 	ya -m debug -r qemu -p i386-pc
+
+dump-raspi3:
+	aarch64-none-elf-objdump -D build/raspi3/armv8-a/debug/kernel.elf >kernel.txt.c
 
 img:
 	qemu-img create  image/disk.img 512m
