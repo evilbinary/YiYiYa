@@ -101,6 +101,11 @@ elif arch in ['lx6']:
     default_libc='c'
     foot=[]
 
+elif plat in ['stm32f4xx']:
+    apps=[
+    ]
+    default_libc='c'
+    foot=[]
 # cpp应用
 cpp_apps=[
     'xtrack','gmenu2x',

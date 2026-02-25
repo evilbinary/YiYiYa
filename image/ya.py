@@ -420,3 +420,33 @@ def run(target):
 
 
 on_run(run)
+
+
+#stm32f407 运行
+target("stm32f4xx")
+add_deps("kernel.elf")
+
+def run(target):
+    targetfile = target.targetfile()
+    sourcefiles = target.sourcefiles()
+    arch=target.get_arch()
+    arch_type= target.get_arch_type()
+    mode =target.get_config('mode')
+    plat=target.plat()
+
+    
+    duck_kernel="build/"+plat+"/"+arch+"/"+mode+"/kernel"
+    duck_kernel_bin="build/"+plat+"/"+arch+"/"+mode+"/kernel.bin"
+
+
+
+
+    os.shell(' arm-none-eabi-objcopy -O binary '+duck_kernel+'  '+duck_kernel_bin+' ')
+
+    print('run '+plat+' fel',duck_kernel_bin)
+
+
+    os.shell('dfu-util -a 0 -s 0x08000000:leave  -D '+duck_kernel_bin+'  ')
+
+
+on_run(run)
