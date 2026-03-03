@@ -76,6 +76,8 @@ apps = [
     'yui',
 ]
 
+em_apps=[]
+
 #构建foot
 foot=[
     'driver','service'
@@ -101,8 +103,11 @@ elif arch in ['lx6']:
     default_libc='c'
     foot=[]
 
-elif plat in ['stm32f4xx']:
+elif plat in ['stm32f4xx','esp32']:
     apps=[
+    ]
+    em_apps=[
+        'emapp/lcd'
     ]
     default_libc='c'
     foot=[]
@@ -240,7 +245,7 @@ add_ldflags(arch_ldflags)
 set_config('cflags',arch_cflags,plat_cflags)
 set_config('cpp-apps',cpp_apps)
 set_config('apps',apps)
-
+set_config('em-apps',em_apps)
 
 #apply debug and release modes
 add_rules("mode.debug", "mode.release","arch")

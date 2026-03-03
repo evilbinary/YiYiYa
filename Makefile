@@ -16,6 +16,12 @@ i386-pc:
 dump-raspi3:
 	aarch64-none-elf-objdump -D build/raspi3/armv8-a/debug/kernel.elf >kernel.txt.c
 
+
+stm32:
+	ya -m debug -p stm32f4xx -r stm32f4xx
+
+dump-stm32:
+	arm-none-eabi-objdump -D build/stm32f4xx/armv7/debug/kernel.elf >kernel.txt.c
 img:
 	qemu-img create  image/disk.img 512m
 	mkfs.vfat -n YIYIYA image/disk.img 
