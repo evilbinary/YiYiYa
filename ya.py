@@ -102,8 +102,14 @@ elif arch in ['lx6']:
     ]
     default_libc='c'
     foot=[]
+else:
+    apps=[
+    ]
+    default_libc='c'
+    foot=[]
+    pass
 
-elif plat in ['stm32f4xx','esp32']:
+if plat in ['stm32f4xx','esp32']:
     apps=[
     ]
     em_apps=[
