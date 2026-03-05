@@ -63,6 +63,7 @@ default_libc = 'musl'  # musl c newlib
 
 #应用
 apps = [              
+    'init',#内核应用
     'cmd','gui','hello', 'test','unitest',
     'microui', 'etk',  'lvgl', 'track',
     'sdl2', 'infones', 'launcher', 'mgba', 
@@ -102,18 +103,10 @@ elif arch in ['lx6']:
     ]
     default_libc='c'
     foot=[]
-else:
-    apps=[
-    ]
-    default_libc='c'
-    foot=[]
-    pass
 
 if plat in ['stm32f4xx','esp32']:
     apps=[
-    ]
-    em_apps=[
-        'emapp_lcd'
+        'emapp'
     ]
     default_libc='c'
     foot=[]
@@ -246,12 +239,9 @@ if plat_cflags:
 
 add_ldflags(arch_ldflags)
 
-
-
 set_config('cflags',arch_cflags,plat_cflags)
 set_config('cpp-apps',cpp_apps)
 set_config('apps',apps)
-set_config('em-apps',em_apps)
 
 #apply debug and release modes
 add_rules("mode.debug", "mode.release","arch")

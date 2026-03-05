@@ -5,6 +5,7 @@ MEMORY
   ccm (rwx) : ORIGIN = 0x10000000, LENGTH = 64K
 }
 
+_estack = ORIGIN(ram) + LENGTH(ram);
 
 ENTRY(_start)
 SECTIONS
