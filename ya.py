@@ -113,7 +113,7 @@ if plat in ['stm32f4xx','esp32']:
     apps=[
     ]
     em_apps=[
-        'emapp/lcd'
+        'emapp_lcd'
     ]
     default_libc='c'
     foot=[]

@@ -23,7 +23,8 @@ clean-esp32:
 	rm -rf build/esp32/lx6/debug/objs/
 stm32:
 	ya -m debug -p stm32f4xx -r stm32f4xx
-
+clean-stm32:
+	rm -rf build/stm32f4xx/armv7/debug/objs/
 dump-stm32:
 	arm-none-eabi-objdump -D build/stm32f4xx/armv7/debug/kernel.elf >kernel.txt.c
 img:
