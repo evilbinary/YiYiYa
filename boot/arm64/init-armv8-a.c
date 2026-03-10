@@ -19,44 +19,65 @@ static u32 io_read32(uint port) {
 }
 
 #ifdef SINGLE_KERNEL
-extern unsigned int __bss_start, __bss_end;
-extern unsigned int __start, __end;
-// Data section symbols defined by linker script
-extern char _sdata[];
-extern char _edata[];
-extern char _sidata[];
+// Linker script symbols - these are absolute addresses, use & to get the address value
+extern unsigned long __bss_start;
+extern unsigned long __bss_end;
+extern unsigned long __start;
+extern unsigned long __end;
+extern unsigned long _sdata;
+extern unsigned long _edata;
+extern unsigned long _sidata;
+
+static void print_hex(unsigned long val) {
+  const char *hex = "0123456789abcdef";
+  for (int i = 60; i >= 0; i -= 4) {
+    uart_send_ch(hex[(val >> i) & 0xf]);
+  }
+}
 
 void init_data() {
   // Copy .data section from FLASH/ROM (load address) to RAM (virtual address)
-  char *src = _sidata;
-  char *dst = _sdata;
-  char *end = _edata;
-  
+  // For QEMU raspi3, kernel is loaded directly to RAM, so this is typically a no-op
+  char *src = (char *)&_sidata;
+  char *dst = (char *)&_sdata;
+  char *end = (char *)&_edata;
+
   uart_send_ch('D');
-  printf("init_data: src=%p dst=%p end=%p\n", src, dst, end);
-  
-  while (dst < end) {
-    *dst++ = *src++;
+  uart_send_ch('i');
+  uart_send_ch('n');
+  uart_send_ch('i');
+  uart_send_ch('t');
+  uart_send_ch(':');
+  uart_send_ch(' ');
+  print_hex((unsigned long)src);
+  uart_send_ch(' ');
+  print_hex((unsigned long)dst);
+  uart_send_ch(' ');
+  print_hex((unsigned long)end);
+  uart_send_ch('\n');
+  uart_send_ch('\r');
+
+  // Skip copy if source equals destination (kernel already in RAM)
+  if (src != dst) {
+    while (dst < end) {
+      *dst++ = *src++;
+    }
   }
-  
-  // Verify - check first and last word
-  printf("verify: _sdata[0]=%p _edata[-1]=%p\n", 
-         ((unsigned long *)_sdata)[0], 
-         ((unsigned long *)_edata)[-1]);
 }
 
 void init_segment() {
   int num = boot_data.segments_number++;
-  boot_data.segments[num].start = (unsigned int)&__start;
-  boot_data.segments[num].size = (unsigned int)&__end - (unsigned int)&__start;
+  boot_data.segments[num].start = (unsigned long)&__start;
+  boot_data.segments[num].size = (unsigned long)&__end - (unsigned long)&__start;
   boot_data.segments[num].type = 1;
-  boot_info->kernel_base = (unsigned int)&__start;
-  boot_info->kernel_size = (unsigned int)&__end - (unsigned int)&__start;
+  boot_info->kernel_base = (unsigned long)&__start;
+  boot_info->kernel_size = (unsigned long)&__end - (unsigned long)&__start;
 }
 
 void init_bss() {
-  unsigned* dst = NULL;
-  for (dst = &__bss_start; dst < &__bss_end; dst++) {
+  // Clear BSS section to zero
+  unsigned long *dst;
+  for (dst = (unsigned long *)&__bss_start; dst < (unsigned long *)&__bss_end; dst++) {
     *dst = 0;
   }
 }
@@ -274,9 +295,8 @@ void init_boot() {
   // 初始化 data 段（从 FLASH 复制到 RAM）
   init_data();
   
-#ifdef SINGLE_KERNEL
-  init_bss();
-#endif
+  // Note: BSS is already cleared in boot-armv8-a.s before calling init_boot()
+  // Do NOT call init_bss() here to avoid double-clearing
 
   uart_init();
 

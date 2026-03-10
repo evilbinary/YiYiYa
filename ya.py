@@ -150,7 +150,8 @@ modules=[
     'ipc',
     'power',
     # 'debug',
-    #'ewok'
+    #'ewok',
+    'net'
 ]
 
 if plat in['t113-s3','stm32f4xx','v3s']:

@@ -24,7 +24,9 @@ SECTIONS
         *(.data .data.* .gnu.linkonce.d*)
         _edata = .;
     }
-    _sidata = LOADADDR(.data);
+    /* For a simple flat binary, load address equals virtual address.
+       If using ROM/RAM split, use: .data : AT(_sidata) { ... } */
+    _sidata = _sdata;  /* Load address same as virtual address for QEMU */
 
     .bss : {
         __bss_start = .;
