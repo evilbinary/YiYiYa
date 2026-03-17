@@ -152,13 +152,16 @@ modules=[
     # 'debug',
     #'ewok',
     'net',
-    'xwin'
+    'xwin',
+    'usb',
 ]
 
 if plat in['t113-s3','stm32f4xx','v3s']:
     modules+=['lcd']
 elif arch in['x86']:
     modules+=['ahci','pci','vga']
+
+
 
 
 set_config('foot',foot)
