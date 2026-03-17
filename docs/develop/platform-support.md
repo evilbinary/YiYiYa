@@ -133,7 +133,8 @@
 | 驱动 | 支持平台 | 状态 |
 |------|---------|------|
 | GPIO Keyboard | 所有平台 | ✅ 支持 |
-| USB HID | RasPi | 🚧 开发中 |
+| USB HID Mouse | RasPi3 | ✅ 支持 |
+| USB HID Keyboard | RasPi3 | 🚧 开发中 |
 
 ## 编译和运行
 
