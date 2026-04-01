@@ -398,6 +398,17 @@ def config (target):
             ],
             kind = "static"
         )
+    elif arch_type in['arm64']:
+        library = find_library("gcc", 
+            [
+                "/opt/local/lib/gcc/aarch64-none-elf/*/",
+                "/usr/lib/gcc/aarch64-none-elf/*/",
+                "/usr/lib/gcc/*/",
+                "/usr/local/lib/gcc/*/",
+                "/Applications/ArmGNUToolchain/12.2.rel1/aarch64-none-elf/bin/../lib/gcc/aarch64-none-elf/12.2.1/"
+            ],
+            kind = "static"
+            )
     # print('found gcc lib',library)
     if library:
         target.add("ldflags",[

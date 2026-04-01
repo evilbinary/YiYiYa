@@ -15,7 +15,8 @@ i386-pc:
 
 dump-raspi3:
 	aarch64-none-elf-objdump -D build/raspi3/armv8-a/debug/kernel.elf >kernel.txt.c
-
+dump-raspi3-ls:
+	aarch64-none-elf-objdump -D build/raspi3/armv8-a/debug/ls  >ls.txt.c
 esp32:
 	ya -m debug -p esp32 -r esp32
 
