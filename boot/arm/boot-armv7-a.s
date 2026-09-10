@@ -38,13 +38,13 @@ _start:
    // set sp in sys mode.
     bic r1, r0, #0x1F
     orr r1, r1, #0x1F
-    msr cpsr_c, r0
+    msr cpsr_c, r1
     ldr sp,= _stack_sys
 
     // set sp in svc mode.
     bic r1, r0, #0x1F
     orr r1, r1, #0x13
-    msr cpsr_c, r0
+    msr cpsr_c, r1
     ldr sp,= _stack_svc
 
     //disable mmu
