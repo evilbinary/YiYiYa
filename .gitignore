@@ -91,3 +91,5 @@ ls.txt.c
 .cache/cache.db-wal
 .cache/cache.db-shm
 tools/qemu_out.txt
+.codebuddy/
+.vscode/

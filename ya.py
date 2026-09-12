@@ -88,7 +88,7 @@ foot=[
 ]
 
 if arch in ['armv5']:
-    apps=['cmd','gui','hello','test','unitest',
+    apps=['init','cmd','gui','hello','test','unitest',
         'microui', 'etk',  'lvgl', 'track',
         'sdl2', 'infones', 'launcher', #'mgba', 
         'lua',  'qjs', 'gnuboy',

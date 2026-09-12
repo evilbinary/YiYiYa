@@ -1,5 +1,11 @@
 .section ".text.boot"
 .global _start
+/* 【入口别名】各板的 xlinker 链接脚本用的是 ENTRY(_kstart)
+ * （见 app/xlinker/link-*.ld），而本文件导出的是 _start ⇒ arm-none-eabi-ld 会
+ * 警告 "cannot find entry symbol _kstart" 并退化为"取镜像首地址"。
+ * 补一个等价别名，既满足脚本、又不破坏既有对 _start 的引用。 */
+.global _kstart
+_kstart = _start
 
 .equ stack_size,0x200
 
