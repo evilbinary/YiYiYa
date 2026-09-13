@@ -5,6 +5,16 @@
 ### ARM 平台
 
 #### Raspberry Pi 系列
+- **Raspberry Pi 5** (BCM2712, ARM Cortex-A76)
+  - 架构: ARM64 (AArch64, armv8-a)
+  - 中断: GIC-400 (GICD 0x1FFF90000 / GICC 0x1FFFA000)，定时器 PPI27，IPI 用 SGI
+  - MMIO: 传统外设镜像 0xFC000000（GPIO/UART 偏移同 raspi3），GPIO 无 GPPUD，用 GPIO_PUP_PDN_CNTRL_REGx
+  - UART0 时钟 50MHz，GPIO14/15 115200 8N1
+  - 加载地址: 0x80000（固件从 SD 卡加载 kernel_2712.img）
+  - SMP: 固件 spin-table（0xd8 + 8*core）
+  - QEMU: 暂不支持 BCM2712，需真机 SD 卡启动
+  - 状态: 🚧 移植中（内核编译通过，待真机验证）
+
 - **Raspberry Pi 3** (BCM2837, ARM Cortex-A53)
   - 架构: ARM64 (AArch64)
   - 主频: 1.2 GHz

@@ -166,6 +166,15 @@ if plat in['t113-s3','stm32f4xx','v3s']:
 elif arch in['x86']:
     modules+=['ahci','pci','vga']
 
+if plat == 'raspi5':
+    # raspi5 移植初期先不构建 yui（其依赖 mquickjs/jsmodule 尚未适配 aarch64）
+    apps=[a for a in apps if a != 'yui']
+
+if plat == 'raspi5':
+    # raspi5 移植初期：无 DWC2 USB / BCM2837 网络（Pi5 用 xHCI/PCIe），
+    # 暂不构建这两个模块
+    modules=[m for m in modules if m not in ('net','usb')]
+
 
 
 
@@ -260,5 +269,8 @@ includes('./boot/ya.py')
 includes('./duck/ya.py')
 add_subs('./image/ya.py')
 add_subs('./eggs/ya.py')
+add_subs('./app/ya.py')
+add_subs('./foot/ya.py')
+
 add_subs('./app/ya.py')
 add_subs('./foot/ya.py')

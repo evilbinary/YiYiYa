@@ -96,7 +96,7 @@ __attribute__((weak)) void* memset(void* s, int c, size_t n) {
   return s;
 }
 
-// Raspberry Pi 3 UART (PL011)
+// Raspberry Pi 3/5 UART (PL011)
 void uart_init() {
   register unsigned int r;
 
@@ -108,6 +108,24 @@ void uart_init() {
   r &= ~((7 << 12) | (7 << 15));  // gpio14, gpio15
   r |= (4 << 12) | (4 << 15);     // alt0
   *GPFSEL1 = r;
+
+#ifdef RASPI5
+  /* Pi 5: no GPPUD/GPPUDCLK, use GPIO_PUP_PDN_CNTRL_REG0 for pins 14/15 */
+  r = *GPIO_PUP_PDN_CNTRL_REG0;
+  r &= ~((3 << 28) | (3 << 30));  // no pull on gpio14/gpio15
+  *GPIO_PUP_PDN_CNTRL_REG0 = r;
+  r = 150;
+  while (r--) {
+    asm volatile("nop");
+  }
+
+  *UART0_ICR = 0x7FF;  // clear interrupts
+  /* 50MHz UARTCLK -> 115200 baud */
+  *UART0_IBRD = 27;
+  *UART0_FBRD = 8;
+  *UART0_LCRH = 0b11 << 5;  // 8n1
+  *UART0_CR = 0x301;        // enable Tx, Rx, FIFO
+#else
   *GPPUD = 0;  // enable pins 14 and 15
   r = 150;
   while (r--) {
@@ -125,6 +143,7 @@ void uart_init() {
   *UART0_FBRD = 0xB;
   *UART0_LCRH = 0b11 << 5;  // 8n1
   *UART0_CR = 0x301;        // enable Tx, Rx, FIFO
+#endif
 }
 
 void uart_send_ch(unsigned int c) {
@@ -250,7 +269,18 @@ void init_memory() {
   memory_info_t* ptr = boot_info->memory;
   boot_info->total_memory = 0;
 
-#ifdef RASPI3
+#ifdef RASPI5
+  // Raspberry Pi 5 (BCM2712): DRAM starts at 0.
+  // NOTE: use 0xF0000000 instead of the full 4GB (0x100000000) because the
+  // physical allocator still truncates mem->length to u32, and boot_info
+  // total_memory is i32. Raise this once the allocator is 64-bit aware.
+  ptr->base = 0x00000000;
+  ptr->length = 0xF0000000ULL;  // ~3.75GB (u32-safe)
+  ptr->type = 1;
+  boot_info->total_memory += ptr->length;
+  ptr++;
+  count++;
+#elif defined(RASPI3)
   // Raspberry Pi 3 has 1GB RAM starting at 0
   ptr->base = 0x00000000;
   ptr->length = 0x40000000;  // 1GB

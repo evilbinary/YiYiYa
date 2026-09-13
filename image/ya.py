@@ -212,6 +212,20 @@ def run_qemu(plat,debug=False):
                 #run_qemu_cmd =run_qemu_cmd+' -monitor tcp:127.0.0.1:55555,server,nowait'
                 # run_qemu_cmd =run_qemu_cmd+' -chardev socket,id=monitor,path=monitor.sock,server,nowait -monitor chardev:monitor'
                 debug_qemu_cmd = run_qemu_cmd +' -S -s'
+            elif target.plat() == 'raspi5' :
+                # QEMU does not support BCM2712 yet, boot from real SD card.
+                # Generate kernel_2712.img for the Pi5 firmware.
+                kernel_bin = "build/"+plat+"/"+arch+"/"+mode+"/kernel.bin"
+                sd_kernel = "build/"+plat+"/"+arch+"/"+mode+"/kernel_2712.img"
+                if os.exists(kernel_bin):
+                    os.cp(kernel_bin, sd_kernel)
+                    print('raspi5: generated '+sd_kernel)
+                cprint('${green}raspi5: QEMU has no BCM2712 machine, boot on real hardware:${clear}')
+                cprint('  1. format an SD card with FAT32')
+                cprint('  2. copy '+sd_kernel+' as kernel_2712.img to the SD card')
+                cprint('  3. create config.txt with: arm_64bit=1 / kernel=kernel_2712.img')
+                cprint('  4. serial console on GPIO14/15 (UART0) at 115200 8N1')
+                return
             else:
                 print('no support arm64 platform:', target.plat())
             
@@ -304,6 +318,26 @@ add_rules("arch")
 plat=get_plat()
 if not plat:
     plat='raspi3'
+
+
+run_qemu(plat,True)
+
+
+target("raspi5")
+
+add_qemu_deps()
+add_rules("arch")
+run_qemu('raspi5')
+
+
+target("raspi5-debug")
+
+add_qemu_deps()
+add_rules("arch")
+
+plat=get_plat()
+if not plat:
+    plat='raspi5'
 
 
 run_qemu(plat,True)

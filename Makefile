@@ -21,6 +21,12 @@ raspi3-d:
 	aarch64-none-elf-objdump -D build/raspi3/armv8-a/debug/kernel.elf >kernel.txt.c
 	aarch64-none-elf-objdump -D build/raspi3/armv8-a/debug/ls >ls.txt.c
 
+raspi5:
+	ya -m debug -p raspi5 -r raspi5
+
+raspi5-d:
+	aarch64-none-elf-objdump -D build/raspi5/armv8-a/debug/kernel.elf >kernel.txt.c
+
 raspi3-ls-d:
 	aarch64-none-elf-objdump -D build/raspi3/armv8-a/debug/ls  >ls.txt.c
 esp32:

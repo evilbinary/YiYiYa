@@ -18,6 +18,7 @@ support_platform = {
     'esp32': 'lx6',
     'v3s': 'armv7-a',
     'raspi3': 'armv8-a',
+    'raspi5': 'armv8-a',
     'rk3128': 'armv7-a',
     'cubieboard2': 'armv7-a',
     'dmulator': 'general',
@@ -42,6 +43,11 @@ support_arch_cflags ={
                 '-mfloat-abi=softfp'
             ],
     'armv8-a': ['-mcpu=cortex-a53', '-mtune=cortex-a53',
+            # linux-gnu 交叉编译器默认 PIE/-fPIE + outline atomics：
+            # -fPIE 会为全局变量生成 GOT 间接寻址（内核链接脚本没有 .got 处理），
+            # outline atomics 依赖 libatomic（裸机没有），都必须关掉
+            '-fno-pie',
+            '-mno-outline-atomics',
             '-Wno-error=implicit-function-declaration','-Wno-error=incompatible-pointer-types','-Wno-error=int-conversion'],#'-mfpu=vfpv4', '-mfloat-abi=softfp'
     'dummy':[],
     'riscv':['-fstack-protector',
@@ -73,6 +79,7 @@ support_arch_linkflags ={
 support_platform_cflags ={
     'raspi2': ['-nostdlib','-nostdinc','-mapcs-frame','-DBACKTRACE'],# #specs=nosys.specs
     'raspi3': ['-mcpu=cortex-a53','-mtune=cortex-a53'],
+    'raspi5': ['-mcpu=cortex-a76','-mtune=cortex-a76'],
     'stm32f4xx': ['-specs=nosys.specs',  '-nostdlib', '-nostdinc' ,'-fno-builtin', '-DUSE_HAL_DRIVER','-DSTM32F401xC'],#'-nolibc',
     'android' : [],
     'v3s':['-nostdlib','-nostdinc'],

@@ -11,12 +11,18 @@
 
 #define READ_BLOCK_SIZE 512
 
-#define KERNEL_BASE 0x100000
-
-#ifdef RASPI3
+#if defined(RASPI3) || defined(RASPI5)
+/* Kernel image is loaded directly into RAM by firmware/QEMU */
 #define KERNEL_ORIGIN_BASE 0
 #else
 #define KERNEL_ORIGIN_BASE 0x10000+512*12
+#endif
+
+#ifdef RASPI5
+/* Pi5 firmware loads the raw kernel image at 0x80000 */
+#define KERNEL_BASE 0x80000
+#else
+#define KERNEL_BASE 0x100000
 #endif
 
 #define PDT_BASE 0x9000
