@@ -7,6 +7,9 @@
 #define INIT_H
 
 #include "arch/arch.h"
+
+/* KERNEL_SIZE 已改为运行时由链接符号 __start/__end 计算（见 init-armv8-a.c），
+ * config.h 仅作兼容兜底（其构建期生成挂钩不可靠，值可能陈旧） */
 #include "config.h"
 
 #define READ_BLOCK_SIZE 512

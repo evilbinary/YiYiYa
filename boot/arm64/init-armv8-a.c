@@ -244,7 +244,14 @@ void init_boot_info() {
   boot_info->version = BOOT_VERSION;
   boot_info->kernel_origin_base = KERNEL_ORIGIN_BASE;
   boot_info->kernel_base = KERNEL_BASE;
-  boot_info->kernel_size = KERNEL_SIZE * 2;
+  /* 内核实际大小直接由链接符号计算：config.h 的 KERNEL_SIZE 是构建期生成
+   * 的陈旧值（生成挂钩经常不触发）， 曾导致 heap 起点切进 .bss/.stack，
+   * 线程创建时把内核内存踩坏 */
+  {
+    extern unsigned long __start;
+    extern unsigned long __end;
+    boot_info->kernel_size = (unsigned long)&__end - (unsigned long)&__start;
+  }
   boot_info->tss_number = MAX_CPU;
   boot_info->second_boot_entry = SECOND_BOOT_ENTRY;
   boot_info->segments_number = 0;

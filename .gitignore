@@ -93,3 +93,4 @@ ls.txt.c
 tools/qemu_out.txt
 .codebuddy/
 .vscode/
+*.sh
