@@ -68,8 +68,12 @@ halt_core0:
 
 // Drop from EL3 to EL1 directly (for QEMU raspi3 compatibility)
 drop_to_el1_from_el3:
-    // Setup EL1 stack
-    ldr     x0, =_estack
+    // Setup EL1 stack (per-core: core0 → _estack，AP → _stack_other+n*8KB)
+    mrs     x1, mpidr_el1
+    and     x1, x1, #3
+    ldr     x0, =_stack_other
+    lsl     x2, x1, #13
+    add     x0, x0, x2
     msr     sp_el1, x0
 
     // Initialize EL1 control registers
@@ -135,8 +139,12 @@ drop_to_el1:
     msr     hcr_el2, x0
     isb                          // Ensure HCR_EL2 update is visible
 
-    // Setup EL1 stack
-    ldr     x0, =_estack
+    // Setup EL1 stack (per-core)
+    mrs     x1, mpidr_el1
+    and     x1, x1, #3
+    ldr     x0, =_stack_other
+    lsl     x2, x1, #13
+    add     x0, x0, x2
     msr     sp_el1, x0
 
     // Set SPSR_EL2 to enter EL1 in AArch64 mode with interrupts disabled
@@ -204,7 +212,7 @@ apu_entry:
 
     // Setup stack for AP immediately at current EL
     ldr     x2, =_stack_other
-    lsl     x3, x1, #12          // core_id * 4096 (4KB stack per core)
+    lsl     x3, x1, #13          // core_id * 8192 (8KB stack per core，与链接脚本 __stack_size 一致)
     add     x2, x2, x3
     mov     sp, x2
     mov     x29, x2
@@ -231,8 +239,12 @@ ap_el1_ready:
     mov     x0, #(3 << 20)       // FPEN = 0b11
     msr     cpacr_el1, x0
     isb
-    // AP cores wait in WFI state until properly initialized
-    // Do not call init_apu_boot as VBAR_EL1 is not set
+    // 【恢复】AP 必须进入 C 层：init_apu_boot 内部 WFE 等待 boot_info/
+    // kernel_entry 就绪（cpu0 在 mm_init 前设置），随后 start_apu_kernel
+    // → arch_init(cpu≠0) → ap_init → lcpu_wait_start 轮询 ap_release。
+    // 之前 raspi5 移植时把这里改成了 WFI 停车循环，raspi3 的 AP 因此
+    // 永远无法初始化（"ap N kernel init" 消失、系统崩溃）。
+    bl      init_apu_boot
 halt_ap_loop:
     wfi
     b       halt_ap_loop
@@ -243,8 +255,13 @@ halt_ap:
 
 // Drop from EL3 to EL1 directly for AP cores
 drop_to_el1_from_el3_ap:
-    // Setup EL1 stack for AP
-    ldr     x0, =_estack
+    // Setup EL1 stack for AP（每核独立：_stack_other + core*8KB，
+    // 之前误用 _estack 会让所有 AP 共用 core0 的栈）
+    mrs     x1, mpidr_el1
+    and     x1, x1, #3
+    ldr     x0, =_stack_other
+    lsl     x2, x1, #13
+    add     x0, x0, x2
     msr     sp_el1, x0
 
     // Initialize EL1 control registers
