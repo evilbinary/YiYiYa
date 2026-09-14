@@ -123,8 +123,12 @@ void uart_init() {
   /* 50MHz UARTCLK -> 115200 baud */
   *UART0_IBRD = 27;
   *UART0_FBRD = 8;
-  *UART0_LCRH = 0b11 << 5;  // 8n1
-  *UART0_CR = 0x301;        // enable Tx, Rx, FIFO
+  /* 8n1 + FIFO 使能(FEN=bit4) —— 必须带 FEN：QEMU 的 PL011 在 FIFO
+   * 未使能时 can_receive() 恒为假，主机侧的输入不会进入 RX FIFO，
+   * 表现为 FR 恒为 0x90(RXFE=1)、shell 轮询 read(0) 永远拿不到字符
+   * （即"shell 无法输入"）。FIFO 位在 LCRH，不在 CR。 */
+  *UART0_LCRH = (0b11 << 5) | (1 << 4);  // 8n1 + FIFO enable
+  *UART0_CR = 0x301;        // enable Uart, Tx, Rx
 #else
   *GPPUD = 0;  // enable pins 14 and 15
   r = 150;
@@ -141,8 +145,9 @@ void uart_init() {
   *UART0_ICR = 0x7FF;  // clear interrupts
   *UART0_IBRD = 2;     // 115200 baud
   *UART0_FBRD = 0xB;
-  *UART0_LCRH = 0b11 << 5;  // 8n1
-  *UART0_CR = 0x301;        // enable Tx, Rx, FIFO
+  /* 8n1 + FIFO 使能(FEN=bit4)：理由同上（QEMU PL011 无 FEN 时不接收 RX） */
+  *UART0_LCRH = (0b11 << 5) | (1 << 4);  // 8n1 + FIFO enable
+  *UART0_CR = 0x301;        // enable Uart, Tx, Rx
 #endif
 }
 

@@ -56,16 +56,17 @@ def build (target):
         arch_type = target.get('arch_type')
 
 
-    ## 生成头文件内容
-    content = "#ifndef BOOT_"+string.upper(arch_type) +"_CONFIG_H\n"
-    content= content + "#define BOOT_"+string.upper(arch_type)  +"_CONFIG_H\n"
+    ## 生成头文件内容（按平台独立生成，避免 raspi3/raspi5 共用同一文件互相覆盖）
+    plat = get_plat() or target.get('plat') or ''
+    content = "#ifndef BOOT_"+string.upper(arch_type) +"_"+string.upper(plat)+"_CONFIG_H\n"
+    content= content + "#define BOOT_"+string.upper(arch_type) + "_" + string.upper(plat)  +"_CONFIG_H\n"
     content= content + "#define KERNEL_BLOCK_SIZE "+ str(block_512_size)+"\n"
     content= content + "#define KERNEL_SIZE "+str(kernel_size)+"\n"
     content= content + "#endif"
 
 
     script_dir = path.directory(os.scriptdir())
-    header_file = path.join(script_dir,"boot/"+str(arch_type)+"/")+ "/config.h"
+    header_file = path.join(script_dir,"boot/"+str(arch_type)+"/")+ "/config-"+str(plat)+".h"
 
     file = io.open(header_file, "w")
     file.write(content)
