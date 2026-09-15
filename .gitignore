@@ -94,3 +94,4 @@ tools/qemu_out.txt
 .codebuddy/
 .vscode/
 *.sh
+.vscode/settings.json

@@ -282,20 +282,30 @@ void init_memory() {
   boot_info->total_memory = 0;
 
 #ifdef RASPI5
-  // Raspberry Pi 5 (BCM2712): DRAM starts at 0.
-  // NOTE: use 0xF0000000 instead of the full 4GB (0x100000000) because the
-  // physical allocator still truncates mem->length to u32, and boot_info
-  // total_memory is i32. Raise this once the allocator is 64-bit aware.
+  // Raspberry Pi 5 (BCM2712): DRAM 从 0 开始，本机 1GB → [0, 0x40000000)。
+  // 上界必须同时满足两条，否则都会踩到"把非 RAM 当 RAM"的坑：
+  //  1) ≤ 本机真实 DRAM：超出部分分配器会发出去（写即总线外部中止）；
+  //  2) < 传统外设镜像 MMIO_BASE = 0xFC000000（platform/raspi5/gpio.h），
+  //     否则 GPIO/UART 寄存器会被当普通内存页分配。
+  // 1GB 机型两条都满足。换机型时改这里：2GB→0x80000000、
+  // 4GB 及以上→0xF0000000（u32 安全上限；分配器尚未 64 位化：
+  // mem->length 截断 u32、boot_info->total_memory 为 i32）。
   ptr->base = 0x00000000;
-  ptr->length = 0xF0000000ULL;  // ~3.75GB (u32-safe)
+  ptr->length = 0x40000000ULL;  // 1GB
   ptr->type = 1;
   boot_info->total_memory += ptr->length;
   ptr++;
   count++;
 #elif defined(RASPI3)
-  // Raspberry Pi 3 has 1GB RAM starting at 0
+  // Raspberry Pi 3 (BCM2837): DRAM 从 0 开始 1GB，但 0x3F000000-0x40000000
+  // 是外设 MMIO 窗口（MMIO_BASE 0x3F000000 + MMIO_LENGTH 0x1000000，见
+  // duck/platform/raspi3/gpio.h）——不属于页分配器，绝不能划进 RAM。
+  // 可分配区间 = [0, 0x3F000000) = 1008MB。
+  // 【原先写 0x40000000 的后果】外设窗口被当成普通 RAM 发出去：分配到该
+  // 区间即写坏 UART/GPIO 寄存器；0x40000000 本身更在 DRAM 之外 →
+  // 访问触发同步外部中止（总线错误），缺页风暴拖死系统。
   ptr->base = 0x00000000;
-  ptr->length = 0x40000000;  // 1GB
+  ptr->length = 0x3F000000;  // 1008MB = 1GB - 16MB 外设窗口
   ptr->type = 1;
   boot_info->total_memory += ptr->length;
   ptr++;

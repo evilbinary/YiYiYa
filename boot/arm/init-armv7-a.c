@@ -397,8 +397,13 @@ void init_memory() {
   ptr++;
   count++;
 #elif defined(RASPI2)
+  // 与 raspi3 同一坑：1GB DRAM，但 0x3F000000-0x40000000 是外设 MMIO 窗口
+  // （MMIO_BASE 0x3F000000 + MMIO_LENGTH 0x1000000，见
+  // duck/platform/raspi2/gpio.h），不能划进页分配器。
+  // 真机长期没炸只是因为分配自池底向上、尚未碰到池尾（池尾那 16MB 一旦
+  // 被发出即写坏外设寄存器）。可分配区间 = [0, 0x3F000000) = 1008MB。
   ptr->base = 0x00000000;
-  ptr->length = 0x10000000 * 4;  // 256m*4
+  ptr->length = 0x3F000000;  // 1008MB = 1GB - 16MB 外设窗口
   ptr->type = 1;
   boot_info->total_memory += ptr->length;
   ptr++;
