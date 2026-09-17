@@ -101,6 +101,32 @@ def build(target):
         else:
             cmd='mkimage -n YiYiYa -A arm -O u-boot -T kernel -C none -a 0x42000000 -e 0x42000000 -d '+sourcefiles[0]+' '+targetfile
             os.exec(cmd)
+    elif arch_type=='arm64':
+        # 树莓派 arm64：-a/-e 必须与 boot/arm64/init.h 的 KERNEL_BASE 一致，
+        # 否则内核会被加载到错误地址（raspi5 固件就固定从 0x80000 取裸内核）。
+        if plat == 'raspi5':
+            origin = '0x80000'
+        else:
+            origin = '0x100000'
+        cmd='mkimage -n YiYiYa -A arm64 -O u-boot -T kernel -C none -a '+origin+' -e '+origin+' -d '+sourcefiles[0]+' '+targetfile
+        os.exec(cmd)
+
+        # 树莓派固件是按【文件名】找内核的，内容都是同一份裸二进制（kernel.bin，无
+        # 任何头，与 uImage.img 不同）。真机日志（Pi5，config.txt 未写 kernel=）：
+        #   Loading 'kernel_2712.img' ...  Read kernel_2712.img bytes 465104
+        #   MESS: Kernel relocated to 0x80000
+        # → Pi5 固件按 kernel_2712.img 找，并重定位到 0x80000，与
+        #   boot/arm64/init.h 的 KERNEL_BASE(raspi5=0x80000) 一致。
+        # raspi3 走 Pi3 的 64 位固件默认名 kernel8.img。
+        build_dir = targetfile.rsplit('/', 1)[0]
+        sd_names = ['kernel_2712.img'] if plat == 'raspi5' else ['kernel8.img']
+        for sd_name in sd_names:
+            sd_kernel = build_dir + '/' + sd_name
+            os.cp(sourcefiles[0], sd_kernel)
+            print('generated '+sd_kernel)
+
+        # 树莓派固件读 SD 卡 boot 分区根目录的 config.txt（与内核放同一目录）
+        write_pi_config(build_dir + '/config.txt', plat)
 
 on_build(build)
 
@@ -128,6 +154,62 @@ def build_disk_img(target):
         os.exec('mkfs.vfat -n YIYIYA ' + disk_img)
     else:
         os.exec('mformat.exe -i ' + disk_img + ' -n YIYIYA ::')
+
+def write_pi_config(cfg, plat):
+    """生成树莓派 SD 卡用的 config.txt（幂等，不需要先删文件）。
+
+    - 内容与模板一致           → 什么都不做；
+    - 内容不同但首行是本脚本标记 → 直接改写（调整模板后无需删文件）；
+    - 首行不是本脚本标记         → 认为是你自己的 config.txt，完全不碰。
+    """
+    if plat == 'raspi5':
+        cfg_lines = [
+            '# YiYiYa - Raspberry Pi 5 (BCM2712, AArch64)',
+            '# 拷贝到 SD 卡 boot 分区根目录（与 kernel_2712.img 同目录）',
+            '# Pi5 固件默认就找 kernel_2712.img（真机日志证实），这里显式写出',
+            'arm_64bit=1',
+            'kernel=kernel_2712.img',
+            '# 固件会把内核重定位到 0x80000，与 boot/arm64/init.h 的',
+            '# KERNEL_BASE(raspi5=0x80000) 一致；显式写出便于核对',
+            'kernel_address=0x80000',
+            '# 让固件使能 RP1 的 UART0 并配好 GPIO14/15（内核 uart_send 直接写',
+            '# RP1 窗口内的 UART0，引脚复用依赖固件完成）',
+            'enable_uart=1',
+        ]
+    else:
+        cfg_lines = [
+            '# YiYiYa - Raspberry Pi 3 (BCM2837, AArch64)',
+            '# 拷贝到 SD 卡 boot 分区根目录（与 kernel8.img 同目录）',
+            'arm_64bit=1',
+            'kernel=kernel8.img',
+            '# 必须与 boot/arm64/init.h 的 KERNEL_BASE 一致：raspi3=0x100000',
+            '# （树莓派 64 位固件默认 0x80000，不写这行会加载到错误地址）',
+            'kernel_address=0x100000',
+            '# 让固件使能 UART0 并固定 UART 时钟：驱动保留固件设好的分频',
+            '# （见 duck/platform/raspi3/init.c "typical 48MHz UARTCLK"）',
+            'enable_uart=1',
+        ]
+    content = '\n'.join(cfg_lines) + '\n'
+    if os.exists(cfg):
+        f = open(cfg, 'r')
+        old = f.read()
+        f.close()
+        if old == content:
+            print('config.txt up to date: '+cfg)
+            return
+        if not old.startswith('# YiYiYa - '):
+            print('config.txt kept (looks hand-written): '+cfg)
+            return
+        f = open(cfg, 'w')
+        f.write(content)
+        f.close()
+        print('config.txt updated: '+cfg)
+        return
+    f = open(cfg, 'w')
+    f.write(content)
+    f.close()
+    print('generated '+cfg)
+
 
 def run_qemu(plat,debug=False):
 
@@ -220,10 +302,12 @@ def run_qemu(plat,debug=False):
                 if os.exists(kernel_bin):
                     os.cp(kernel_bin, sd_kernel)
                     print('raspi5: generated '+sd_kernel)
+                # 同目录一并产出 config.txt（已存在则不覆盖）
+                write_pi_config(sd_kernel.rsplit('/', 1)[0] + '/config.txt', 'raspi5')
                 cprint('${green}raspi5: QEMU has no BCM2712 machine, boot on real hardware:${clear}')
                 cprint('  1. format an SD card with FAT32')
                 cprint('  2. copy '+sd_kernel+' as kernel_2712.img to the SD card')
-                cprint('  3. create config.txt with: arm_64bit=1 / kernel=kernel_2712.img')
+                cprint('  3. copy config.txt (same dir) to the SD card boot partition')
                 cprint('  4. serial console on GPIO14/15 (UART0) at 115200 8N1')
                 return
             else:
@@ -306,6 +390,7 @@ run_qemu('raspi2')
 target("raspi3")
 
 add_qemu_deps()
+add_deps("uImage.img")
 add_rules("arch")
 run_qemu('raspi3')
 
@@ -313,6 +398,7 @@ run_qemu('raspi3')
 target("raspi3-debug")
 
 add_qemu_deps()
+add_deps("uImage.img")
 add_rules("arch")
 
 plat=get_plat()
@@ -326,6 +412,7 @@ run_qemu(plat,True)
 target("raspi5")
 
 add_qemu_deps()
+add_deps("uImage.img")
 add_rules("arch")
 run_qemu('raspi5')
 
@@ -333,6 +420,7 @@ run_qemu('raspi5')
 target("raspi5-debug")
 
 add_qemu_deps()
+add_deps("uImage.img")
 add_rules("arch")
 
 plat=get_plat()
