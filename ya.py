@@ -146,6 +146,7 @@ modules=[
     'trace',
     'perf',
     'backtrace',
+    'irq',
     'keyboard',
     'log',
     'hello',
@@ -244,10 +245,21 @@ def_arch_type=arch_type.replace( "-", "_").upper()
 add_defines(def_arch)
 add_defines(def_arch_type)
 
-# 哪些平台有网卡驱动（与 duck/modules/net/ya.py 的 plat_source 对应）：
+# 哪些平台有【真正可用】的网卡驱动（与 duck/modules/net/ya.py 的 plat_source 对应）：
 # 只有这些平台才在 app/init/module.c 里注册 net 模块。net 模块是静态库，
 # 一旦引用 net_module 就会拉入 net.o 并要求 net_init_device 有实现。
-net_driver_plats = ['v3s', 'raspi2', 'raspi3', 'qemu', 'dmulator', 'versatilepb']
+#
+# 【2026-09-19 收窄为只有 v3s】原先还列了 raspi2/raspi3（走 bcm2837.c）、
+# qemu/dmulator/versatilepb（走 e1000.c），但那几个都是骨架驱动：
+#   · bcm2837.c（248 行、3 处 "In a real implementation"）一进 net_init() 就去读
+#     未映射的 USB OTG 窗口 0x3F980000 ⇒ 实测 raspi2 在 QEMU 里直接
+#     "module run net → kernel memory fault at 3f980010 / pte 3f980000 -> 0" 断掉，
+#     启动再也走不下去；
+#   · e1000.c 只有 85 行，同样是骨架。
+# 注意：module.c 里"今天之前"根本没有 net 注册，所以把平台列进来本身就是"新开功能"，
+# 会给该平台引入启动风险。等某个驱动真正实现（至少先 page_map 自己的寄存器窗口，
+# 并做到 init 失败可返回）再把它的平台加回来。
+net_driver_plats = ['v3s']
 if plat in net_driver_plats:
     add_defines('NET_DRIVER')
 

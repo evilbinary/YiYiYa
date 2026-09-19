@@ -236,10 +236,17 @@ def run_qemu(plat,debug=False):
             os.exec('hdiutil attach '+disk_img)
             os.cp('app/resource/*', '/Volumes/YIYIYA/')
             os.exec('hdiutil eject /Volumes/YIYIYA')
+        # 【不要加 -n（no-overwrite）】这里必须覆盖：raspi2/raspi3/raspi5 的引导阶段
+        # 是"从 SD 镜像里读 kernel.elf 再跳过去执行"，而镜像里同名文件一旦存在：
+        #   · 带 -n ⇒ mcopy 静默跳过 ⇒ 镜像里永远是【第一次】拷进去的那份内核；
+        #   · 于是"改代码 → 重新 build → 跑 QEMU"实际仍在跑旧内核，
+        #     表现为"某个提交之后就一直挂"（实测：所有提交都停在完全相同的 637 字节，
+        #     换提交、换代码都毫无变化 —— 就是同一个旧内核在被反复启动）。
+        # app/resource/* 都是构建产物，覆盖是正确语义。
         elif is_host('linux') :
-            os.shell('mcopy -snmo  -i image/disk.img app/resource/* ::')
+            os.shell('mcopy -smo  -i image/disk.img app/resource/* ::')
         else:
-            os.exec('mcopy.exe -snmo  -i image/disk.img app/resource/* ::')
+            os.exec('mcopy.exe -smo  -i image/disk.img app/resource/* ::')
         
 
         run_qemu_cmd=''
