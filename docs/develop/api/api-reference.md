@@ -126,13 +126,39 @@ int device_ioctl(device_t* dev, u32 cmd, void* args);
 
 ### 中断处理
 
-#### 中断注册
+统一中断框架（详见 `docs/develop/architecture/中断子系统设计.md`）。
+驱动**按真实 IRQ 号**注册，不再改平台文件；tick 由框架通过 `irq_set_tick()` 认领。
+
+#### 注册 / 使能 / 屏蔽
 ```c
-int interrupt_register(u32 no, interrupt_handler_t handler, void* data);
-int interrupt_unregister(u32 no);
-void interrupt_enable(u32 no);
-void interrupt_disable(u32 no);
+typedef int (*irq_handler_t)(u32 irq, void *arg);   /* 返回 1 = 已处理（共享中断用） */
+
+int irq_register(u32 irq, irq_handler_t fn, void *arg, const char *name, u32 flags);
+int irq_unregister(u32 irq, irq_handler_t fn, void *arg);
+int irq_enable(u32 irq);    /* 控制器 unmask */
+int irq_disable(u32 irq);   /* 控制器 mask，保留注册 */
+int irq_mask(u32 irq);      /* 只动控制器，不记 enabled */
+int irq_unmask(u32 irq);
+int irq_set_priority(u32 irq, u32 prio);   /* 语义透传给控制器，不承诺统一量纲 */
+int irq_set_type(u32 irq, u32 type);       /* IRQ_TYPE_LEVEL_HIGH/EDGE_RISING/... */
+int irq_set_affinity(u32 irq, u32 cpu);    /* 单核平台返回 -1 */
 ```
+
+#### 查询 / 诊断
+```c
+u32 irq_get_count(u32 irq);
+const char *irq_get_name(u32 irq);   /* tick 号返回 "tick" */
+int irq_in_interrupt(void);
+void irq_dump(void);                 /* 内核侧打印整张表（kprintf） */
+/* 用户态：cat /dev/irq —— 每号一行：COUNT/UNHANDLED/SPURIOUS/MASK/EN/NAME */
+```
+
+未注册中断的策略：计数 + `irq_warn_once()` 告警一行 + **自动 mask**
+（`IRQ_FLAG_NO_AUTO_MASK` 可关闭）。
+
+#### 未再提供的旧接口
+本文档此前列出的 `interrupt_register()/interrupt_unregister()/interrupt_enable()/
+interrupt_disable()` **从未实现**（全仓无此符号），已删除；请使用上面的 `irq_*` 接口。
 
 ### 时间管理
 
