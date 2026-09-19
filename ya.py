@@ -131,6 +131,7 @@ modules=[
     'i2c',
     'spi',
     'loader',
+    'sysconf',
     'posix',
     'test',
     'gpu',
@@ -242,6 +243,13 @@ def_arch_type=arch_type.replace( "-", "_").upper()
 
 add_defines(def_arch)
 add_defines(def_arch_type)
+
+# 哪些平台有网卡驱动（与 duck/modules/net/ya.py 的 plat_source 对应）：
+# 只有这些平台才在 app/init/module.c 里注册 net 模块。net 模块是静态库，
+# 一旦引用 net_module 就会拉入 net.o 并要求 net_init_device 有实现。
+net_driver_plats = ['v3s', 'raspi2', 'raspi3', 'qemu', 'dmulator', 'versatilepb']
+if plat in net_driver_plats:
+    add_defines('NET_DRIVER')
 
 arch_cflags=support.get_arch_cflags(arch)
 plat_cflags=support.get_platform_cflags(plat)
