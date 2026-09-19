@@ -51,7 +51,11 @@ riscv-virt:
 
 t113-s3:
 	ya -m debug -p t113-s3 -b t113-s3
-	
+
+versatilepb:
+	ya -m debug -p versatilepb -r qemu
+
+
 img:
 	qemu-img create  image/disk.img 512m
 	mkfs.vfat -n YIYIYA image/disk.img 
