@@ -216,8 +216,14 @@ void init_memory() {
   count++;
 
 #elif defined(VERSATILEPB)
+  /* 【修复】这里原来写的是 `0x10000000 * 4` = 0x4000_0000 = **1GB**（注释却是
+   * "128"），而 QEMU versatilepb 的 RAM 只有 **128MB**（`info mtree`：
+   * `0000000000000000-0000000007ffffff (ram): versatile.ram`）。于是内核把
+   * 1GB 全交给页分配器，其中 128MB 以上 **根本不存在**（写下去就是外部中止），
+   * 而且 `mm_page_in_ram()` 用的是同一张表 ⇒ 越界页也能通过校验。
+   * 正确值：RAM(0x0-0x07ffffff) 减去低端 64KB（留给内核镜像前的引导区）。 */
   ptr->base = 0x00010000;
-  ptr->length = 0x10000000 * 4;  // 128
+  ptr->length = 0x08000000 - 0x00010000; /* 128MB - 64KB（RAM 顶 = 0x08000000） */
   ptr->type = 1;
   boot_info->total_memory += ptr->length;
   ptr++;

@@ -93,7 +93,10 @@ if arch in ['armv5']:
         'sdl2', 'infones', 'launcher', #'mgba', 
         'lua',  'qjs', 'gnuboy',
         'watch',
-        'sdl'
+        'sdl',
+        # yui（ymain/ymario/yqjs 目标在 app/yui/ya.py）：armv5 之前被整体排除，
+        # 导致 `ya -p versatilepb -b ymain` 报 "not found target ymain"
+        'yui'
     ]
 elif arch in ['riscv']:
     apps=[
