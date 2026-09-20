@@ -289,6 +289,12 @@ def set_type(type):
         print('not support')
 
     default_libc=get_config('default_libc')
+    # 【通用原子实现】armv5 等无 LDREX/LDREXD 的架构，GCC 会把 __atomic_xxx /
+    # __sync_xxx 编成库调用，而 arm-none-eabi 的 libgcc 不提供 ⇒ SDL2、miniaudio
+    # 这类库会链接失败。统一由 eggs/libatomic 提供（非 ARMv5 平台该文件编译为空，
+    # 不会重复定义）。目标仅在有 app 时存在，故此处判断一下。
+    if has_config('app'):
+        add_deps('atomic')
     if default_libc=='musl':
         add_deps('gcc')
         add_cflags(
