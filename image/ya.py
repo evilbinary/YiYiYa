@@ -234,7 +234,13 @@ def run_qemu(plat,debug=False):
         
         if is_host('mac'):
             os.exec('hdiutil attach '+disk_img)
-            os.cp('app/resource/*', '/Volumes/YIYIYA/')
+            # 不要用通配符：os.exec()/os.cp() 都是把命令切成 argv 直接
+            # exec（见调试日志 exec cmd =>[...]），不经过 shell，
+            # "app/resource/*" 会被当字面文件名 ⇒
+            #   cp: app/resource/*: No such file or directory
+            # 用 "app/resource/."（POSIX 约定＝该目录的内容）作字面路径即可；
+            # os.cp 内部是 cp -r，可递归拷 app/ bin/ conf/ 等子目录。
+            os.cp('app/resource/.', '/Volumes/YIYIYA/')
             os.exec('hdiutil eject /Volumes/YIYIYA')
         # 【不要加 -n（no-overwrite）】这里必须覆盖：raspi2/raspi3/raspi5 的引导阶段
         # 是"从 SD 镜像里读 kernel.elf 再跳过去执行"，而镜像里同名文件一旦存在：
