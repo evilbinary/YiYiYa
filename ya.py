@@ -75,7 +75,6 @@ apps = [
     'doom2',
     'gpsp',
     'yui',
-
     #lvglapp
     # 'lvglapp'
 ]
@@ -87,18 +86,7 @@ foot=[
     'driver','service'
 ]
 
-if arch in ['armv5']:
-    apps=['init','cmd','gui','hello','test','unitest',
-        'microui', 'etk',  'lvgl', 'track',
-        'sdl2', 'infones', 'launcher', #'mgba', 
-        'lua',  'qjs', 'gnuboy',
-        'watch',
-        'sdl',
-        # yui（ymain/ymario/yqjs 目标在 app/yui/ya.py）：armv5 之前被整体排除，
-        # 导致 `ya -p versatilepb -b ymain` 报 "not found target ymain"
-        'yui'
-    ]
-elif arch in ['riscv']:
+if arch in ['riscv']:
     apps=[
         'cmd','gui','hello','test','unitest',
         'microui', 'etk',  'lvgl', 'track',
@@ -120,7 +108,7 @@ if plat in ['stm32f4xx','esp32']:
 cpp_apps=[
     'xtrack','gmenu2x',
     'monogui','testcpp',
-    'commander'
+    'commander','fceux'
 ]
 
 wayland_apps={
