@@ -147,7 +147,26 @@ def add_qemu_deps():
 def build_disk_img(target):
     disk_img = target.targetfile()
     if os.exists(disk_img):
-        return
+        # YiYiYa: 原逻辑"disk.img 存在就直接跳过"会让改了 app/resource（如
+        # /bin/sh 的引号修复）后的重建【不重新打包】⇒ 烧进去的还是旧文件系统 ✗
+        # （实测：sh 修复因此一直不生效）。改为：app/resource 里有文件比
+        # disk.img 新 ⇒ 视为过期，重新打包。
+        import os as _pyos
+        newest = 0.0
+        for _root, _dirs, _files in _pyos.walk('app/resource'):
+            for _f in _files:
+                try:
+                    _m = _pyos.path.getmtime(_pyos.path.join(_root, _f))
+                except OSError:
+                    continue
+                if _m > newest:
+                    newest = _m
+        try:
+            if newest <= _pyos.path.getmtime(disk_img):
+                return
+        except OSError:
+            pass
+        print('disk.img outdated (app/resource changed), rebuilding...')
     print('make disk.img')
     os.exec('qemu-img create ' + disk_img + ' 512m')
     if is_host('mac') or is_host('linux'):
