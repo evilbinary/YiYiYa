@@ -69,6 +69,10 @@ qemu:
 run: duck.img
 	ya -m debug -r qemu
 
+cp-miyoo:
+	cp -r /Users/evil/dev/c/YiYiYa/build/miyoo/armv7-a/debug/kernel*  "/Volumes/NO NAME/"
+	cp -r /Users/evil/dev/c/YiYiYa/app/resource/bin/  "/Volumes/NO NAME/bin"
+	hdiutil unmount /Volumes/NO\ NAME/
 
 com:
 	minicom -D /dev/tty.usbserial 
