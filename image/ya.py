@@ -113,13 +113,13 @@ def build(target):
 
         # 树莓派固件是按【文件名】找内核的，内容都是同一份裸二进制（kernel.bin，无
         # 任何头，与 uImage.img 不同）。真机日志（Pi5，config.txt 未写 kernel=）：
-        #   Loading 'kernel_2712.img' ...  Read kernel_2712.img bytes 465104
+        #   Loading 'kernel8.img' ...  Read kernel8.img bytes 465104
         #   MESS: Kernel relocated to 0x80000
-        # → Pi5 固件按 kernel_2712.img 找，并重定位到 0x80000，与
+        # → Pi5 固件按 kernel8.img 找，并重定位到 0x80000，与
         #   boot/arm64/init.h 的 KERNEL_BASE(raspi5=0x80000) 一致。
         # raspi3 走 Pi3 的 64 位固件默认名 kernel8.img。
         build_dir = targetfile.rsplit('/', 1)[0]
-        sd_names = ['kernel_2712.img'] if plat == 'raspi5' else ['kernel8.img']
+        sd_names = ['kernel8.img'] if plat == 'raspi5' else ['kernel8.img']
         for sd_name in sd_names:
             sd_kernel = build_dir + '/' + sd_name
             os.cp(sourcefiles[0], sd_kernel)
@@ -184,10 +184,10 @@ def write_pi_config(cfg, plat):
     if plat == 'raspi5':
         cfg_lines = [
             '# YiYiYa - Raspberry Pi 5 (BCM2712, AArch64)',
-            '# 拷贝到 SD 卡 boot 分区根目录（与 kernel_2712.img 同目录）',
-            '# Pi5 固件默认就找 kernel_2712.img（真机日志证实），这里显式写出',
+            '# 拷贝到 SD 卡 boot 分区根目录（与 kernel8.img 同目录）',
+            '# Pi5 固件默认就找 kernel8.img（真机日志证实），这里显式写出',
             'arm_64bit=1',
-            'kernel=kernel_2712.img',
+            'kernel=kernel8.img',
             '# 固件会把内核重定位到 0x80000，与 boot/arm64/init.h 的',
             '# KERNEL_BASE(raspi5=0x80000) 一致；显式写出便于核对',
             'kernel_address=0x80000',
@@ -328,9 +328,9 @@ def run_qemu(plat,debug=False):
                 debug_qemu_cmd = run_qemu_cmd +' -S -s'
             elif target.plat() == 'raspi5' :
                 # QEMU does not support BCM2712 yet, boot from real SD card.
-                # Generate kernel_2712.img for the Pi5 firmware.
+                # Generate kernel8.img for the Pi5 firmware.
                 kernel_bin = "build/"+plat+"/"+arch+"/"+mode+"/kernel.bin"
-                sd_kernel = "build/"+plat+"/"+arch+"/"+mode+"/kernel_2712.img"
+                sd_kernel = "build/"+plat+"/"+arch+"/"+mode+"/kernel8.img"
                 if os.exists(kernel_bin):
                     os.cp(kernel_bin, sd_kernel)
                     print('raspi5: generated '+sd_kernel)
@@ -338,7 +338,7 @@ def run_qemu(plat,debug=False):
                 write_pi_config(sd_kernel.rsplit('/', 1)[0] + '/config.txt', 'raspi5')
                 cprint('${green}raspi5: QEMU has no BCM2712 machine, boot on real hardware:${clear}')
                 cprint('  1. format an SD card with FAT32')
-                cprint('  2. copy '+sd_kernel+' as kernel_2712.img to the SD card')
+                cprint('  2. copy '+sd_kernel+' as kernel8.img to the SD card')
                 cprint('  3. copy config.txt (same dir) to the SD card boot partition')
                 cprint('  4. serial console on GPIO14/15 (UART0) at 115200 8N1')
                 return
