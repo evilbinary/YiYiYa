@@ -74,14 +74,21 @@ cp-miyoo:
 	cp -r /Users/evil/dev/c/YiYiYa/app/resource/bin/  "/Volumes/NO NAME/bin"
 	hdiutil unmount /Volumes/NO\ NAME/
 
-cp-v3s:
+cp-v3s: 
 	cp -r /Users/evil/dev/c/YiYiYa/build/v3s/armv7-a/debug/kernel*  "/Volumes/YIYIYA"
 	cp -r /Users/evil/dev/c/YiYiYa/app/resource/bin/  "/Volumes/YIYIYA"
 	hdiutil unmount /Volumes/YIYIYA 
 
-cp-t113-s3:
+cp-t113-s3: t113-s3
 	cp -r /Users/evil/dev/c/YiYiYa/build/t113-s3/armv7-a/debug/kernel*  "/Volumes/YIYIYA"
 	cp -r /Users/evil/dev/c/YiYiYa/app/resource/bin/  "/Volumes/YIYIYA"
+		hdiutil unmount /Volumes/YIYIYA 
+
+cp-raspi5: raspi5
+	cp -r /Users/evil/dev/c/YiYiYa/build/raspi5/armv8-a/debug/kernel8.img  "/Volumes/bootfs"
+	#cp -r /Users/evil/dev/c/YiYiYa/app/resource/bin/  "/Volumes/bootfs"
+	hdiutil unmount /Volumes/bootfs 
+
 com:
 	minicom -D /dev/tty.usbserial 
 
