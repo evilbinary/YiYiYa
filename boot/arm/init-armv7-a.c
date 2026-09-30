@@ -410,7 +410,11 @@ void init_memory() {
   count++;
 #elif defined(MIYOO)
   ptr->base = 0x20000000;
-  ptr->length = 0x8000000;  // 128
+  /* 【必须排除 LCD 显存】miyoo 的显示缓冲在 PA 0x27c00000（ssd202d.c 的
+   * vga->pframbuffer；u-boot sys_init 也在写 0x27c00000）。它落在 128MB
+   * RAM 区间内，如果整段都交给页分配器，显存会被当普通页发出去 ⇒ 屏幕
+   * 数据被写花。可分配区间 = [0x20000000, 0x27c00000) = 124MB。 */
+  ptr->length = 0x7C00000;  // 124MB = 128MB - 顶部 4MB（LCD FB 及保留）
   ptr->type = 1;
   boot_info->total_memory += ptr->length;
   ptr++;
