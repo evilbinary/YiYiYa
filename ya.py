@@ -75,6 +75,7 @@ apps = [
     'doom2',
     'gpsp',
     'yui',
+    'yllm',   # 轻量 LLM 推理（app/yllm，纯 C，标量路径）
     #lvglapp
     # 'lvglapp'
 ]
