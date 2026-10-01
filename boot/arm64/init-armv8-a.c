@@ -474,7 +474,7 @@ void init_boot() {
   /* 【版本串】用来确认卡上烧的是哪一次构建（改一次构建就 +1）。
    * v6 = 诊断探针全部收掉（kprintf 通路已证实可用），保留真正的修复：
    *      serial10 控制台 + 提前装异常向量 + [EXC] 直写报错 + 栈加大到 32KB。 */
-  print_string("YIYIYA-RS5 v14 (heap block alignment + early-fault report)\n\r");
+  print_string("YIYIYA-RS5\n\r");
 #endif
 
   // 初始化 data 段（从 FLASH 复制到 RAM）
