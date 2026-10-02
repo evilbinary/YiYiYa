@@ -55,6 +55,9 @@ t113-s3:
 versatilepb:
 	ya -m debug -p versatilepb -r qemu
 
+miyoo:
+	ya -m debug -p miyoo -b kernel.elf
+
 
 img:
 	qemu-img create  image/disk.img 512m
@@ -69,7 +72,7 @@ qemu:
 run: duck.img
 	ya -m debug -r qemu
 
-cp-miyoo:
+cp-miyoo: miyoo
 	cp -r /Users/evil/dev/c/YiYiYa/build/miyoo/armv7-a/debug/kernel*  "/Volumes/NO NAME/"
 	cp -r /Users/evil/dev/c/YiYiYa/app/resource/bin/  "/Volumes/NO NAME/bin"
 	hdiutil unmount /Volumes/NO\ NAME/
