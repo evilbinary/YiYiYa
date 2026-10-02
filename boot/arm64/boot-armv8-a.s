@@ -4,13 +4,29 @@
 
 .equ stack_size, 0x4000
 
+// x1 = logical core id. Clobbers x9.
+// Pi 3 / A53: core id is Aff0 (MPIDR & 0xff), Aff1 is 0.
+// Pi 5 / BCM2712 A76: Aff0 is 0 on every core, core id is Aff1
+// (DT reg 0x000 / 0x100 / 0x200 / 0x300). Masking with #3 makes every
+// Pi 5 core look like core 0, so they all share one stack and all run kmain.
+.macro load_core_index
+    mrs     x1, mpidr_el1
+    and     x9, x1, #0xff
+    cbnz    x9, 91f
+    lsr     x1, x1, #8
+    and     x1, x1, #0xff
+    b       92f
+91:
+    and     x1, x1, #3
+92:
+.endm
+
 // ARM64 (AArch64) boot code for Raspberry Pi 3
 // Raspberry Pi 3 starts in EL2 or EL3, need to setup EL1
 
 _start:
     // Check processor ID, only core 0 runs boot code
-    mrs     x1, mpidr_el1
-    and     x1, x1, #3
+    load_core_index
     cbnz    x1, apu_entry        // if not core 0, jump to AP init
 
     // Core 0 init - Setup stack immediately at current EL
@@ -69,8 +85,7 @@ halt_core0:
 // Drop from EL3 to EL1 directly (for QEMU raspi3 compatibility)
 drop_to_el1_from_el3:
     // Setup EL1 stack (per-core: core0 → _estack，AP → _stack_other+n*8KB)
-    mrs     x1, mpidr_el1
-    and     x1, x1, #3
+    load_core_index
     ldr     x0, =_stack_other
     lsl     x2, x1, #13
     add     x0, x0, x2
@@ -140,8 +155,7 @@ drop_to_el1:
     isb                          // Ensure HCR_EL2 update is visible
 
     // Setup EL1 stack (per-core)
-    mrs     x1, mpidr_el1
-    and     x1, x1, #3
+    load_core_index
     ldr     x0, =_stack_other
     lsl     x2, x1, #13
     add     x0, x0, x2
@@ -207,8 +221,7 @@ inv_dcache_loop_way:
 // AP (Other cores) entry point
 apu_entry:
     // Calculate core ID for stack offset
-    mrs     x1, mpidr_el1
-    and     x1, x1, #3
+    load_core_index
 
     // Setup stack for AP immediately at current EL
     ldr     x2, =_stack_other
@@ -257,8 +270,7 @@ halt_ap:
 drop_to_el1_from_el3_ap:
     // Setup EL1 stack for AP（每核独立：_stack_other + core*8KB，
     // 之前误用 _estack 会让所有 AP 共用 core0 的栈）
-    mrs     x1, mpidr_el1
-    and     x1, x1, #3
+    load_core_index
     ldr     x0, =_stack_other
     lsl     x2, x1, #13
     add     x0, x0, x2
