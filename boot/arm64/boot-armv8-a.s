@@ -149,13 +149,44 @@ drop_to_el1:
     // Disable EL2 traps
     msr     hcr_el2, xzr
 
-    // Set EL1 to AArch64
-    mov     x0, #(1 << 31)       // RW bit
+    // EL1 用 AArch64。只置 RW。不要置 SWIO：它会把 dc isw 升级成
+    // dc cisw，开缓存前的作废会把固件旧行写回内存，盖掉关 MMU 时写的页表。
+    mov     x0, #(1 << 31)
     msr     hcr_el2, x0
     isb                          // Ensure HCR_EL2 update is visible
 
-    // Setup EL1 stack (per-core)
+    // 固件可能把 SCTLR_EL1.M 留着。降到 EL1 后这条才生效，不关的话
+    // 主核会带着固件页表一直跑到 mm_page_enable。RES1 位照 Circle：
+    // M=C=I=0，后面 mm_page_enable 设好 MAIR/TCR/TTBR 再开。
+    mov     x0, #0x0800
+    movk    x0, #0x30d0, lsl #16
+    msr     sctlr_el1, x0
+    isb
+
+    // 主核：EL2 的 M 和 C 要一起关。只关 C、留着 M，访问会按非缓存
+    // 打到已经缓存的行上，这行以后不再侦听。先按当前翻译把内核映像
+    // 写到 PoC，再两个位一起清。从核不走这里的清缓存。
     load_core_index
+    cbnz    x1, 1f
+    mrs     x0, sctlr_el2
+    tbnz    x0, #0, 2f           // M
+    tbz     x0, #2, 1f           // C 也是 0 就跳过。#5 不是合法逻辑立即数
+2:
+    ldr     x2, =__start
+    ldr     x3, =__end
+3:
+    dc      civac, x2
+    add     x2, x2, #64
+    cmp     x2, x3
+    b.lo    3b
+    dsb     sy
+    mrs     x0, sctlr_el2
+    bic     x0, x0, #1           // M
+    bic     x0, x0, #(1 << 2)    // C
+    msr     sctlr_el2, x0
+    isb
+1:
+    // Setup EL1 stack (per-core)
     ldr     x0, =_stack_other
     lsl     x2, x1, #13
     add     x0, x0, x2
@@ -173,47 +204,10 @@ drop_to_el1:
 el1_return:
     ret
 
-// Invalidate caches
+// Instruction cache only. A76 CCSIDR is the CCIDX format; a set/way
+// invalidate here used the old field layout and did not hit the data cache.
 invalidate_caches:
-    // Invalidate instruction cache
     ic      iallu
-    dsb     sy
-    isb
-    
-    // Invalidate data cache (by set/way)
-    mov     x0, #0
-    msr     csselr_el1, x0       // Select L1 data cache
-    isb
-    
-    mrs     x0, ccsidr_el1       // Read cache size
-    mov     x1, x0
-    and     x2, x1, #7           // Line size
-    add     x2, x2, #4           // Log2(line_size) + 4
-    lsl     x2, x2, #1           // Words per line
-    
-    ubfx    x3, x1, #3, #10      // Number of sets - 1
-    add     x3, x3, #1           // Number of sets
-    
-    ubfx    x1, x1, #13, #15     // Number of ways - 1
-    add     x1, x1, #1           // Number of ways
-    
-    clz     x4, x1               // Way position
-    
-    mov     x5, #0               // Set counter
-inv_dcache_loop_set:
-    mov     x6, #0               // Way counter
-inv_dcache_loop_way:
-    lsl     x7, x6, x4
-    orr     x7, x7, x5
-    lsl     x7, x7, x2
-    dc      isw, x7
-    add     x6, x6, #1
-    cmp     x6, x1
-    b.lt    inv_dcache_loop_way
-    add     x5, x5, #1
-    cmp     x5, x3
-    b.lt    inv_dcache_loop_set
-    
     dsb     sy
     isb
     ret
@@ -252,6 +246,29 @@ ap_el1_ready:
     mov     x0, #(3 << 20)       // FPEN = 0b11
     msr     cpacr_el1, x0
     isb
+    // 【实验】从核在进任何 C 代码之前先开 MMU+cache。此前从核以 M=C=0
+    // 跑完 apu_entry→init_apu_boot→…→page_init 整段 C，所有数据访问都是
+    // 非缓存，会把主核已缓存的行从侦听域里拆掉，事后 SH=3/civac 都救不回
+    // 来。这里只非缓存读 ap_ttbr 这一条 64B 行（cpu0 放行前写好
+    // ttbr0/mair/tcr 并清缓存，之后不再重写），随即在汇编里开 MMU，之后
+    // 进 C 的访问全部走缓存，与主核同一侦听域。ap_ttbr==0（raspi3 不发
+    // 布，见 init.c）则跳过整块，保持原路径。
+    ldr     x9, =ap_ttbr
+    ldr     x0, [x9]             // ttbr0；一行三值一起进来，只碰这一条缓存行
+    cbz     x0, 5f
+    msr     ttbr0_el1, x0
+    ldr     x0, [x9, #8]         // mair
+    msr     mair_el1, x0
+    ldr     x0, [x9, #16]        // tcr
+    msr     tcr_el1, x0
+    isb
+    tlbi    vmalle1is
+    dsb     sy
+    ldr     x0, =0x30d01805      // 与 mm_page_enable 相同：M|C|I|SPAN|RES1
+    msr     sctlr_el1, x0
+    dsb     sy
+    isb
+5:
     // 【恢复】AP 必须进入 C 层：init_apu_boot 内部 WFE 等待 boot_info/
     // kernel_entry 就绪（cpu0 在 mm_init 前设置），随后 start_apu_kernel
     // → arch_init(cpu≠0) → ap_init → lcpu_wait_start 轮询 ap_release。
@@ -301,3 +318,10 @@ ap_el1_return:
     b       ap_el1_ready
 
 .data
+    // 【实验】主核在 lcpu_send_start 放行前写好 {ttbr0, mair, tcr} 并清缓
+    // 存；从核进门只非缓存读这一条 64B 行，随后在汇编里开 MMU。之后不再
+    // 写。raspi3 不写它（保持 0），从核在 ap_el1_ready 跳过该块，行为不变。
+    .align 6
+    .global ap_ttbr
+ap_ttbr:
+    .quad 0, 0, 0
