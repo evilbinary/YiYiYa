@@ -145,6 +145,7 @@ modules=[
     'sound',
     'dma',
     # 'fat',
+    'partition',
     'fatfs',
     'ipc',
     'power',
