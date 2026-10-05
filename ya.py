@@ -147,6 +147,7 @@ modules=[
     # 'fat',
     'partition',
     'fatfs',
+    'ext',
     'ipc',
     'power',
     # 'trace',
