@@ -169,6 +169,11 @@ if plat == 'raspi5':
 if plat == 'raspi5':
     # raspi5 还没有 xHCI，USB 先不编。网口是 RP1 GEM，见 duck/modules/net/rp1_gem.c。
     modules=[m for m in modules if m not in ('usb',)]
+    # 【raspi5 专属模块】fan（RP1 PWM1 风扇）与 cpu（firmware mailbox 温度）。
+    # 必须列在这里：duck/modules/ya.py 按 modules 列表 add_deps('mod-'+m)，
+    # 不列的话 mod-fan/mod-cpu 编出来了也不会链进 kernel.elf（实测
+    # `undefined reference to fan_module`）。其它平台不注册、空库无碍。
+    modules+=['fan','cpu']
 
 
 
