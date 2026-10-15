@@ -276,6 +276,56 @@ def install_res(path,file_name,target_name=True):
 
     after_clean(clean)
 
+# 各架构的裸机交叉编译器：编译器自带的头文件（arm_neon.h / arm_fp16.h /
+# stddef.h / stdarg.h / float.h ...）与 libgcc 都随这套工具链分发。
+gcc_cmds = {
+    'arm': 'arm-none-eabi-gcc',
+    'riscv': 'riscv64-unknown-elf-gcc',
+    'xtensa': 'xtensa-esp32-elf-gcc',
+    'arm64': 'aarch64-none-elf-gcc',
+}
+
+builtin_include_cache={}
+
+def compiler_builtin_includedir(arch_type=None):
+    '''返回交叉编译器自带 include 目录 <toolchain>/lib/gcc/<triple>/<ver>/include。
+
+    只用于补偿 set_type() 给目标加的 -nostdinc：GCC 会把这个目录从搜索序列里
+    摘掉，于是只在这儿的头（arm_neon.h、arm_acle.h 等）就找不到了。
+    '''
+    if not arch_type:
+        arch_type = get_arch_type()
+    if arch_type in builtin_include_cache:
+        return builtin_include_cache.get(arch_type)
+    import glob as _glob
+    import os as _os
+    import subprocess as _sub
+    cands=[]
+    gcc = gcc_cmds.get(arch_type)
+    if gcc:
+        try:
+            out = _sub.check_output([gcc, '-print-file-name=include'],
+                stderr=_sub.DEVNULL)
+            cands.append(out.decode().strip())
+        except:
+            pass
+    # 工具链不在 PATH 里时按常见安装位置兜底（macOS 的 Arm GNU Toolchain）
+    for pattern in (
+        '/Applications/ArmGNUToolchain/*/*/lib/gcc/*/*/include',
+        '/opt/local/lib/gcc/*/*/include',
+        '/usr/local/lib/gcc/*/*/include',
+        '/usr/lib/gcc/*/*/include',
+    ):
+        cands += _glob.glob(pattern)
+    found=''
+    for d in cands:
+        if d and _os.path.isdir(d):
+            found=d
+            break
+    builtin_include_cache[arch_type]=found
+    return found
+
+
 def set_type(type):
     if type == "lib":
         set_kind("static")
@@ -373,13 +423,20 @@ set_kind('lib')
 def config (target):
     arch_type=target.arch_type()
     library=None
-    gcc_cmds = {
-        'arm': 'arm-none-eabi-gcc',
-        'riscv': 'riscv64-unknown-elf-gcc',
-        'xtensa': 'xtensa-esp32-elf-gcc',
-        'arm64': 'aarch64-none-elf-gcc',
-    }
+    # gcc_cmds 提到模块级了（compiler_builtin_includedir 也要用同一份映射）
     gcc = gcc_cmds.get(arch_type)
+    # 【编译器自带 include 目录】arm_neon.h / arm_fp16.h / arm_acle.h 这些
+    # 只在交叉编译器里（<toolchain>/lib/gcc/<triple>/<ver>/include），而
+    # set_type() 给目标带的 -nostdinc 会把它从搜索序列里摘掉：
+    #   platform.c / matvec.c / vision/*.c 的 #if defined(__aarch64__) 分支
+    #   ⇒ fatal error: arm_neon.h: No such file or directory
+    # 在这里作为 gcc 依赖的 includedirs 下发，所有 add_deps('gcc') 的目标
+    # （set_type 的 musl / newlib / c 三个分支都会加）都能拿到这个 -I。
+    # 注意是 includedirs（复数）：ymake 只读这个键，上面几处 add("includedir")
+    # 是单数，实际没进编译命令行。
+    builtin_incdir = compiler_builtin_includedir(arch_type)
+    if builtin_incdir:
+        target.add("includedirs", [builtin_incdir])
     if gcc:
         try:
             import subprocess
