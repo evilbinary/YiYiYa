@@ -76,6 +76,7 @@ apps = [
     'gpsp',
     'yui',
     'yllm',   # 轻量 LLM 推理（app/yllm，纯 C，标量路径）
+    'ltp',    # LTP (Linux Test Project) 合规性验证套件
     #lvglapp
     # 'lvglapp'
 ]
@@ -147,6 +148,7 @@ modules=[
     # 'fat',
     'partition',
     'fatfs',
+    'swap',
     'ext',
     'ipc',
     'power',
