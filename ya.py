@@ -258,7 +258,7 @@ add_defines(def_arch_type)
 # 注意：module.c 里"今天之前"根本没有 net 注册，所以把平台列进来本身就是"新开功能"，
 # 会给该平台引入启动风险。等某个驱动真正实现（至少先 page_map 自己的寄存器窗口，
 # 并做到 init 失败可返回）再把它的平台加回来。
-net_driver_plats = ['v3s', 'raspi5']
+net_driver_plats = ['v3s', 'raspi5','raspi3']
 if plat in net_driver_plats:
     add_defines('NET_DRIVER')
 
