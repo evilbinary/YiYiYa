@@ -98,6 +98,8 @@ def drain(s, secs=30):
 
 
 if __name__ == "__main__":
+    marker = os.environ.get("MARKER")  # 第一条命令后等日志出现该标记再继续
+    marker_wait = float(os.environ.get("MARK_WAIT", "600"))
     start_qemu()
     s = connect()
     boot = boot_wait(s)
@@ -105,11 +107,36 @@ if __name__ == "__main__":
     lf.write(b"===== boot =====\n" + boot + b"\n===== boot done =====\n")
     if not handshake(s):
         print("WARN: shell handshake timeout")
-    for cmd in sys.argv[1:]:
-        out = run_cmd(s, cmd, wait=120)
-        extra = drain(s, 30)
+    for i, cmd in enumerate(sys.argv[1:]):
+        # guest 时钟远慢于墙钟（TCG 约 1s guest ≈ 80s wall），
+        # 固定 120s 窗口常不够 ⇒ 用 WAIT/DRAIN 环境变量调
+        wait = int(os.environ.get("WAIT", "120"))
+        out = run_cmd(s, cmd, wait=wait)
+        extra = drain(s, int(os.environ.get("DRAIN", "30")))
         lf.write(b"\n>>> " + cmd.encode() + b"\n" + out + extra + b"\n")
+        lf.flush()  # MARKER 轮询读的是磁盘文件，必须先落盘
         print(">>>", cmd)
         sys.stdout.write((out + extra).decode(errors="replace")[-4000:] + "\n")
+        if marker and i == 0:
+            m = marker.encode()
+            deadline = time.time() + marker_wait
+            ok = False
+            tail = bytearray()
+            # 必须持续泵串口：不 recv 的话 QEMU 的 TCP 发送缓冲填满后
+            # guest 串口写阻塞，整个 guest 会冻住；期间日志边收边落盘
+            while time.time() < deadline:
+                try:
+                    d = s.recv(8192)
+                    if d:
+                        tail.extend(d)
+                        lf.write(d)
+                        lf.flush()
+                        if m in bytes(tail):
+                            ok = True
+                            break
+                except socket.timeout:
+                    pass
+                time.sleep(0.2)
+            print("marker", marker, "found" if ok else "TIMEOUT", flush=True)
     s.close()
     lf.close()
