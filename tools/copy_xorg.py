@@ -36,6 +36,29 @@ FILE_SRCS = ["/usr/bin/xsetroot", "/usr/bin/xkbcomp", "/usr/bin/xauth",
 # 库闭包的搜索路径（顺序即 musl/glibc 惯例）
 LIB_DIRS = ["/lib/aarch64-linux-gnu", "/usr/lib/aarch64-linux-gnu",
             "/lib", "/usr/lib"]
+
+# ---------------- 最小 X 桌面（--desktop）----------------
+# 窗口管理器 openbox + 终端 lxterminal（GTK3）。两者都不是 Xorg 的依赖，
+# 所以单独列一份：不开 --desktop 时镜像体积与原行为完全一致。
+DESKTOP_FILES = ["/usr/bin/openbox", "/usr/bin/lxterminal"]
+# GTK3 应用跑起来需要的数据文件，缺任意一类就会"能启动但看不见/没字"：
+#   字体 + fontconfig 配置   → 有字（否则窗口只有空白）
+#   gdk-pixbuf loaders       → PNG/XPM 解码（图标、光标、窗口装饰）
+#   glib schemas             → GSettings 默认值（主题/字体/光标名从这里取）
+#   themes/icons             → GTK 主题与图标
+#   openbox/lxterminal 配置  → 窗口边框、终端默认字号/颜色
+#   X11 字体                 → Xorg 光标字体（缺了会 (WW) 且默认光标缺失）
+DESKTOP_TREES = [
+    "/etc/fonts",
+    "/usr/share/fonts/truetype/dejavu",
+    "/usr/share/fonts/X11",
+    "/usr/lib/aarch64-linux-gnu/gdk-pixbuf-2.0",
+    "/usr/share/glib-2.0/schemas",
+    "/usr/share/themes",
+    "/usr/share/icons/hicolor",
+    "/etc/xdg/openbox",
+    "/etc/xdg/lxterminal",
+]
 # nsswitch.conf 用我们自己的最小内容（glibc 2.41 已内置 nss_files，
 # 发行版默认的 "files systemd" 在缺 libnss_systemd 时会让 getpwnam 失败）
 NSSWITCH = "passwd: files\ngroup: files\nshadow: files\ngai: files\n"
@@ -357,6 +380,9 @@ def main():
         os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
         "image/disk.img"))
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--desktop", action="store_true",
+                    help="同时拷最小 X 桌面：openbox 窗口管理器 + lxterminal 终端"
+                         "（含 GTK3 依赖闭包、字体、主题、图标、fontconfig）")
     args = ap.parse_args()
 
     if not os.path.exists(args.src):
@@ -381,7 +407,8 @@ def main():
 
     # 1. 目录树清单
     trees = []
-    for src in TREE_SRCS:
+    want_trees = list(TREE_SRCS) + (DESKTOP_TREES if args.desktop else [])
+    for src in want_trees:
         if ext4.lookup(src) is None:
             print("  warn: tree missing", src)
             continue
@@ -392,22 +419,38 @@ def main():
     if server is None:
         raise SystemExit("/usr/lib/xorg/Xorg not found in src")
     seed.append(server)
-    for src in ["/usr/bin/xsetroot", "/usr/bin/xkbcomp", "/usr/bin/xauth"]:
+    want_elfs = ["/usr/bin/xsetroot", "/usr/bin/xkbcomp", "/usr/bin/xauth"]
+    files = list(FILE_SRCS)
+    if args.desktop:
+        want_elfs += DESKTOP_FILES
+        files += DESKTOP_FILES
+    for src in want_elfs:
         c = ext4.read_file(src)
         if c is not None:
             seed.append(c)
+        else:
+            print("  warn: file missing", src)
     libs, order = lib_closure(ext4, seed)
     print("trees: %s" % ", ".join(trees))
     print("libs (%d): %s" % (len(order), " ".join(order)))
     total = sum(len(v) for v in libs.values())
     print("closure size: %.1fMB" % (total / 1048576.0))
+    if args.desktop:
+        # 数据文件（字体/主题/图标/gdk-pixbuf/配置）也要估一下，FAT 只有 512MB
+        data = 0
+        for src in trees:
+            for rel, content in ext4.walk(src):
+                if content:
+                    data += len(content)
+        print("data size: %.1fMB (total %.1fMB)"
+              % (data / 1048576.0, (data + total) / 1048576.0))
     if args.dry_run:
         return
 
     # 3. 写回 FAT
     mnt = fat_mount(args.disk)
     try:
-        n = copy_into(mnt, trees, FILE_SRCS, libs, ext4)
+        n = copy_into(mnt, trees, files, libs, ext4)
         fat_cleanup(mnt)
         print("copied %d files into %s" % (n, args.disk))
     finally:

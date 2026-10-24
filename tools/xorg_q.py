@@ -3,8 +3,16 @@ HOST, PORT = "127.0.0.1", 4460
 KERNEL = "/Users/evil/dev/c/YiYiYa/build/raspi3/armv8-a/debug/kernel.elf"
 DISK = "/Users/evil/dev/c/YiYiYa/image/disk.img"
 LOG = "/tmp/xorg_qemu.log"
-QEMU_CMD = ["qemu-system-aarch64", "-name", "YiYiYa-xorg", "-M", "raspi3b", "-rtc", "base=localtime", "-kernel", KERNEL, "-serial", "tcp:127.0.0.1:%d,server,nowait" % PORT, "-drive", "if=sd,id=sd0,format=raw,file=" + DISK, "-display", "none"]
+QEMU_CMD = ["qemu-system-aarch64", "-name", "YiYiYa-xorg", "-M", "raspi3b", "-rtc", "base=localtime", "-kernel", KERNEL, "-serial", "tcp:127.0.0.1:%d,server,nowait" % PORT, "-drive", "if=sd,id=sd0,format=raw,file=" + DISK]
 import os
+# 显示方式：none（默认，只看串口）/ cocoa（macOS 本机窗口）/ vnc（远程 VNC）
+DISPLAY_MODE = os.environ.get("DISPLAY_MODE", "none")
+if DISPLAY_MODE == "cocoa":
+    QEMU_CMD += ["-display", "cocoa", "-device", "VGA"]
+elif DISPLAY_MODE == "vnc":
+    QEMU_CMD += ["-vnc", os.environ.get("VNC_ADDR", ":1")]
+else:
+    QEMU_CMD += ["-display", "none"]
 if os.environ.get("GDB"):
     QEMU_CMD.insert(1, "-s")  # gdbstub on :1234
 
@@ -126,6 +134,20 @@ if __name__ == "__main__":
         lf.flush()  # MARKER 轮询读的是磁盘文件，必须先落盘
         print(">>>", cmd)
         sys.stdout.write((out + extra).decode(errors="replace")[-4000:] + "\n")
+        # SLEEP=秒：额外等待一段时间（墙钟），期间持续泵串口。
+        # 桌面这类"启动即常驻"的程序在 guest 里初始化很慢，而 init 的 shell
+        # 不等子进程 ⇒ 必须靠这里给它时间，否则下一条命令会抢在初始化前面。
+        slp = float(os.environ.get("SLEEP", "0"))
+        end = time.time() + slp
+        while slp > 0 and time.time() < end:
+            try:
+                d = s.recv(8192)
+                if d:
+                    lf.write(d)
+                    lf.flush()
+            except socket.timeout:
+                pass
+            time.sleep(0.2)
         if marker and i == 0:
             m = marker.encode()
             deadline = time.time() + marker_wait
