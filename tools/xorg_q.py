@@ -17,6 +17,11 @@ def start_qemu():
     print("qemu pid", p.pid)
 
 
+def qemu_running():
+    r = subprocess.run(["pgrep", "-f", "YiYiYa-xorg"], capture_output=True)
+    return r.returncode == 0
+
+
 def connect(retries=30):
     for _ in range(retries):
         try:
@@ -100,7 +105,11 @@ def drain(s, secs=30):
 if __name__ == "__main__":
     marker = os.environ.get("MARKER")  # 第一条命令后等日志出现该标记再继续
     marker_wait = float(os.environ.get("MARK_WAIT", "600"))
-    start_qemu()
+    reuse = os.environ.get("REUSE") == "1"
+    if reuse and qemu_running():
+        print("reuse running qemu")
+    else:
+        start_qemu()
     s = connect()
     boot = boot_wait(s)
     lf = open(LOG, "ab")
