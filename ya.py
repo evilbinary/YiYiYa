@@ -77,6 +77,7 @@ apps = [
     'yui',
     'yllm',   # 轻量 LLM 推理（app/yllm，纯 C，标量路径）
     'ltp',    # LTP (Linux Test Project) 合规性验证套件
+    'x11',    # 自研极简 X11 桌面组件（app/x11：wall 背景等）
     #lvglapp
     # 'lvglapp'
 ]
