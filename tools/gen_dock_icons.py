@@ -36,6 +36,38 @@ def save(im, path, size=N):
     print('->', path)
 
 
+def center_content(im, tol=8):
+    """按实际绘制内容的包围盒把图案平移到画布正中。
+
+    亚像素坐标不同，各图标"看起来"的高度就不一致：比如 wifi 的弧顶到
+    底下圆点整体重心偏下，直接居中摆会显得比电池/音量低。这里统一按
+    真实内容居中，三个状态图标就对齐了。"""
+    w, h = im.size
+    px = im.load()
+    minx, miny, maxx, maxy = w, h, -1, -1
+    for y in range(h):
+        for x in range(w):
+            r, g, b = px[x, y]
+            if abs(r - BG[0]) + abs(g - BG[1]) + abs(b - BG[2]) > tol:
+                if x < minx:
+                    minx = x
+                if y < miny:
+                    miny = y
+                if x > maxx:
+                    maxx = x
+                if y > maxy:
+                    maxy = y
+    if maxx < 0:
+        return im
+    dx = int(round(w / 2.0 - (minx + maxx + 1) / 2.0))
+    dy = int(round(h / 2.0 - (miny + maxy + 1) / 2.0))
+    if dx == 0 and dy == 0:
+        return im
+    out = Image.new('RGB', (w, h), BG)
+    out.paste(im, (dx, dy))
+    return out
+
+
 def rounded_grad(im, box, radius, top, bottom):
     """在 im 上贴一个垂直渐变的圆角矩形（box 为超采样坐标）。"""
     x0, y0, x1, y1 = box
@@ -93,9 +125,12 @@ def icon_eyes():
     im, d = body((0x6c, 0xb4, 0xf2), (0x2c, 0x66, 0xc8))
     for cx in (12.5, 23.5):
         d.ellipse([(cx - 5.4) * S, 13.6 * S, (cx + 5.4) * S, 22.4 * S], fill=FG)
-        r = 2.5
+        r = 2.05
         d.ellipse([(cx - r) * S, (18 - r) * S, (cx + r) * S, (18 + r) * S],
-                  fill=(0x1a, 0x3c, 0x74))
+                  fill=(0x17, 0x33, 0x63))
+        hr = 0.62  # 瞳孔高光
+        d.ellipse([(cx - 0.75 - hr) * S, (17.25 - hr) * S,
+                   (cx - 0.75 + hr) * S, (17.25 + hr) * S], fill=FG)
     return im
 
 
@@ -129,15 +164,14 @@ def icon_wifi():
 
 
 def icon_battery():
-    """电池：圆角外壳 + 右侧触片 + 三格电量"""
+    """电池：圆角外壳 + 右侧触片 + 内部电量块（macOS 那种整块填充）"""
     im, d = new_canvas(BAR)
     d.rounded_rectangle([2 * S, 5.6 * S, 13.6 * S, 12.4 * S], radius=1.8 * S,
                         outline=FG, width=int(1.15 * S))
     d.rounded_rectangle([14.2 * S, 8 * S, 15.8 * S, 10 * S], radius=0.5 * S,
                         fill=FG)
-    for x in (3.9, 6.3, 8.7):
-        d.rounded_rectangle([x * S, 7.2 * S, (x + 1.7) * S, 10.8 * S],
-                            radius=0.4 * S, fill=FG)
+    d.rounded_rectangle([3.6 * S, 7.1 * S, 10.4 * S, 10.9 * S], radius=0.7 * S,
+                        fill=FG)
     return im
 
 
@@ -163,7 +197,8 @@ def main():
         save(fn(), os.path.join(out, 'dock-%s.bmp' % name))
     for name, fn in (('wifi', icon_wifi), ('battery', icon_battery),
                      ('volume', icon_volume)):
-        save(fn(), os.path.join(out, 'bar-%s.bmp' % name), size=BAR)
+        save(center_content(fn()), os.path.join(out, 'bar-%s.bmp' % name),
+             size=BAR)
 
 
 if __name__ == '__main__':
