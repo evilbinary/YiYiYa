@@ -130,6 +130,7 @@ modules=[
     'test',
     'gpu',
     'mouse',
+    'input',
     'sdhci',
     'rtc',
     'gpio',
