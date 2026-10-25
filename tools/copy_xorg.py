@@ -55,13 +55,57 @@ DESKTOP_TREES = [
     "/usr/lib/aarch64-linux-gnu/gdk-pixbuf-2.0",
     "/usr/share/glib-2.0/schemas",
     "/usr/share/themes",
+    "/usr/share/pixmaps",
     "/usr/share/icons/hicolor",
     "/etc/xdg/openbox",
     "/etc/xdg/lxterminal",
+    # 家目录：openbox/GTK 启动时要写 ~/.cache、~/.config，HOME(=root) 不存在
+    # 会一路 "Unable to change to home directory /root" + 每 10s 会话保存失败。
+    "/root",
+    # 光标：/usr/share/icons/default/index.theme 指向 Adwaita，缺了它 Xcursor
+    # 找不到 left_ptr/resize 之类（openbox 每次建窗口边框都查一遍，刷 error）。
+    "/usr/share/icons/default",
+    "/usr/share/icons/Adwaita/cursors",
+    # terminfo：lxterminal 里的 vte 需要它来给子进程定 TERM（缺了 curses
+    # 程序全部 "unknown terminal"）。
+    "/usr/share/terminfo",
 ]
 # nsswitch.conf 用我们自己的最小内容（glibc 2.41 已内置 nss_files，
 # 发行版默认的 "files systemd" 在缺 libnss_systemd 时会让 getpwnam 失败）
 NSSWITCH = "passwd: files\ngroup: files\nshadow: files\ngai: files\n"
+
+# 用户级 openbox 菜单（写到 /root/.config/openbox/menu.xml）。
+# 发行版的 /etc/xdg/openbox/menu.xml 依赖 debian-menu.xml 与 obamenu（python），
+# 两者在镜像里都没有 ⇒ 右键菜单只有空壳。用户级配置优先于 /etc/xdg，这里给
+# 一份纯静态菜单，只列镜像里真实存在的程序。
+OPENBOX_MENU = """<?xml version="1.0" encoding="UTF-8"?>
+<openbox_menu xmlns="http://openbox.org/"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://openbox.org/ file:///usr/share/openbox/menu.xsd">
+<menu id="root-menu" label="Openbox 3">
+  <item label="Terminal">
+    <action name="Execute"><command>lxterminal</command></action>
+  </item>
+  <separator />
+  <item label="xclock">
+    <action name="Execute"><command>xclock</command></action>
+  </item>
+  <item label="xeyes">
+    <action name="Execute"><command>xeyes</command></action>
+  </item>
+  <separator />
+  <item label="Reconfigure">
+    <action name="Reconfigure" />
+  </item>
+  <item label="Restart">
+    <action name="Restart" />
+  </item>
+  <item label="Exit">
+    <action name="Exit" />
+  </item>
+</menu>
+</openbox_menu>
+"""
 
 
 class Ext4:
@@ -330,7 +374,7 @@ def fat_cleanup(root):
                 dirnames.remove(n)
 
 
-def copy_into(mnt, plan_trees, plan_files, libs, ext4):
+def copy_into(mnt, plan_trees, plan_files, libs, ext4, desktop=False):
     # 清掉旧版本脚本层级算错时误写到 FAT 根的残留（真目录在 usr/ 下）
     for stale in ("xorg", "X11"):
         p = os.path.join(mnt, stale)
@@ -369,6 +413,11 @@ def copy_into(mnt, plan_trees, plan_files, libs, ext4):
         n += 1
     w("/etc/nsswitch.conf", NSSWITCH.encode())
     os.makedirs(os.path.join(mnt, "tmp"), exist_ok=True)
+    if desktop:
+        # 用户级 openbox 配置：静态根菜单（见 OPENBOX_MENU 注释）
+        w("/root/.config/openbox/menu.xml", OPENBOX_MENU.encode())
+        os.makedirs(os.path.join(mnt, "root/.cache"), exist_ok=True)
+        n += 1
     return n
 
 
@@ -450,7 +499,7 @@ def main():
     # 3. 写回 FAT
     mnt = fat_mount(args.disk)
     try:
-        n = copy_into(mnt, trees, files, libs, ext4)
+        n = copy_into(mnt, trees, files, libs, ext4, desktop=args.desktop)
         fat_cleanup(mnt)
         print("copied %d files into %s" % (n, args.disk))
     finally:
