@@ -168,7 +168,9 @@ def build_disk_img(target):
             pass
         print('disk.img outdated (app/resource changed), rebuilding...')
     print('make disk.img')
-    os.exec('qemu-img create ' + disk_img + ' 512m')
+    # 1024m：app/resource 已 336M（bin 189M + 字体/roms/视频），再加上
+    # raspios 那批 /lib、/usr（162M），512M 会写满（实测 cp 报 ENOSPC）。
+    os.exec('qemu-img create ' + disk_img + ' 1024m')
     if is_host('mac') or is_host('linux'):
         os.exec('mkfs.vfat -n YIYIYA ' + disk_img)
     else:
@@ -579,7 +581,7 @@ def run(target):
     build_esp32_img(duck_kernel,duck_kernel_bin,kernel_bin_img)
 
 
-    os.shell('esptool.py --chip esp32 --port /dev/cu.wchusbserial141400 --baud 115200 --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 40m --flash_size detect 0x1000  '+duck_kernel_bin+'  ')
+    os.shell('esptool.py --chip esp32 --port /dev/cu.wchusbserial141100 --baud 115200 --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 40m --flash_size detect 0x1000  '+duck_kernel_bin+'  ')
 
 
 on_run(run)

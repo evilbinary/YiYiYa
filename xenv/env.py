@@ -5,6 +5,9 @@
 # * 邮箱. rootdebug@163.com
 # ********************************************************************
 from detect import find_library
+# 架构相关映射（含 musl 动态链接器命名）在这个模块里；显式导入，
+# 不依赖调用方命名空间里恰好有 support。
+import support
 
 rule("objcopy-file")
 
@@ -326,7 +329,7 @@ def compiler_builtin_includedir(arch_type=None):
     return found
 
 
-def set_type(type):
+def set_type(type, dynamic=False):
     if type == "lib":
         set_kind("static")
     elif type == "app":
@@ -347,23 +350,37 @@ def set_type(type):
         add_deps('atomic')
     if default_libc=='musl':
         add_deps('gcc')
+        # dynamic=True：链接成动态可执行文件。musl 的 libc.so（= 动态链接器
+        # /lib/ld-musl-<arch>.so.1，由 eggs/libmusl 的 --enable-shared 产出）
+        # 负责重定位与 dlopen，-export-dynamic 把本程序的符号导出给 dlopen 的
+        # .so 用。解释器路径按架构取（见 support.musl_ldso_path，arm/riscv/x86
+        # 都有对应名字，不写死 aarch64）。
         add_cflags(
             '-DDUCK -DDLIBC_POSIX',
              ' -D__LIB_MUSL__ ',
-             '-static',
+             *( [] if dynamic else ['-static'] ),
              '-nostdlib',
              '-nostdinc'
             )
         add_cxxflags(
             '-DDUCK -DDLIBC_POSIX',
                 ' -D__LIB_MUSL__ ',
-                '-static',
+                *( [] if dynamic else ['-static'] ),
                 '-nostdlib',
                 '-nostdinc'
             )
-        add_ldflags(
-            '-static'
-        )
+        if dynamic:
+            # 直接调 ld（不是 gcc 驱动），所以用 ld 自己的选项形式：
+            #   -dynamic-linker  → 生成 PT_INTERP
+            #   -export-dynamic  → 符号进 .dynsym，dlopen 的 .so 才能解析本程序符号
+            add_ldflags(
+                '-dynamic-linker=' + support.musl_ldso_path(get_arch_type()),
+                '-export-dynamic'
+            )
+        else:
+            add_ldflags(
+                '-static'
+            )
     elif default_libc=='newlib':
         add_deps('gcc')
         add_cflags(

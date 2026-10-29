@@ -18,6 +18,8 @@ QEMU_CMD = [
     "-rtc", "base=localtime",
     "-kernel", KERNEL,
     "-serial", f"tcp:127.0.0.1:{PORT},server,nowait",
+    # HMP monitor：读内核全局计数器（nm 取地址后 xp），不依赖串口时序
+    "-monitor", "tcp:127.0.0.1:4449,server,nowait",
     "-drive", "if=sd,id=sd0,format=raw,file=/Users/evil/dev/c/YiYiYa/image/disk.img",
     "-display", "none",
 ]
@@ -114,7 +116,10 @@ def run_one(s, name, timeout, logf):
     s.sendall(b"\n")
     time.sleep(1.0)
     pump(s, logf, bytearray())
-    s.sendall(f"/bin/ltp {name}\n".encode())
+    # 以 / 开头的名字按完整命令原样执行（自研诊断命令如 /bin/scmtest），
+    # 其余按 LTP 测试名走 /bin/ltp 前缀（设备端按子串匹配 wrapper）
+    cmd = name if name.startswith("/") else f"/bin/ltp {name}"
+    s.sendall(f"{cmd}\n".encode())
     start = time.time()
     last_data = time.time()
     tail = bytearray()

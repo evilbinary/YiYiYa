@@ -134,6 +134,20 @@ def icon_eyes():
     return im
 
 
+def icon_calc():
+    """计算器：浅灰渐变 + 深色显示条 + 4x3 按键点"""
+    im, d = body((0xe9, 0xee, 0xf6), (0xc4, 0xcf, 0xe0))
+    ink = (0x38, 0x40, 0x4e)
+    d.rounded_rectangle([9 * S, 9 * S, 27 * S, 15.5 * S], radius=1.6 * S, fill=ink)
+    for r in range(3):
+        for c in range(4):
+            x = 9.6 + c * 4.6
+            y = 18.4 + r * 4.2
+            d.rounded_rectangle([x * S, y * S, (x + 3.2) * S, (y + 2.6) * S],
+                                radius=0.7 * S, fill=ink)
+    return im
+
+
 def icon_win():
     """窗口按钮：浅灰渐变 + 深色窗口轮廓、标题分隔线与两个控制点"""
     im, d = body((0xe9, 0xee, 0xf6), (0xc4, 0xcf, 0xe0))
@@ -193,7 +207,8 @@ def main():
         'app/resource/res')
     os.makedirs(out, exist_ok=True)
     for name, fn in (('term', icon_term), ('clock', icon_clock),
-                     ('eyes', icon_eyes), ('win', icon_win)):
+                     ('eyes', icon_eyes), ('win', icon_win),
+                     ('calc', icon_calc)):
         save(fn(), os.path.join(out, 'dock-%s.bmp' % name))
     for name, fn in (('wifi', icon_wifi), ('battery', icon_battery),
                      ('volume', icon_volume)):
