@@ -369,12 +369,22 @@ def set_type(type, dynamic=False):
                 '-nostdlib',
                 '-nostdinc'
             )
+        # 【解释器路径统一在这里给，不要散落到各 app 的 ya.py】
+        # musl 是 --enable-shared 构建，cli/app 目标即使没声明 dynamic=True，
+        # 链接时也会解析到 libc.so ⇒ 产物实际是动态可执行文件。这种情况下若
+        # 不给 -dynamic-linker，ld 会写它自己的裸机默认值 /lib/ld.so.1（镜像里
+        # 只有 /lib/ld-musl-<arch>.so.1），内核加载时直接 "load interp failed
+        # /lib/ld.so.1"，程序连用户态都进不去。
+        # 所以所有二进制目标（lib 是静态库，不会有 PT_INTERP）都显式给解释器
+        # 路径；真的链成静态时该选项不产生 PT_INTERP，无副作用。
+        if type != "lib":
+            add_ldflags(
+                '-dynamic-linker=' + support.musl_ldso_path(get_arch_type())
+            )
         if dynamic:
             # 直接调 ld（不是 gcc 驱动），所以用 ld 自己的选项形式：
-            #   -dynamic-linker  → 生成 PT_INTERP
             #   -export-dynamic  → 符号进 .dynsym，dlopen 的 .so 才能解析本程序符号
             add_ldflags(
-                '-dynamic-linker=' + support.musl_ldso_path(get_arch_type()),
                 '-export-dynamic'
             )
         else:
