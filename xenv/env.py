@@ -338,6 +338,13 @@ def set_type(type, dynamic=False):
     elif type == "cli":
         set_kind("binary")
         install_dir("bin")
+    elif type == "libexec":
+        # 辅助进程（shell 拉起的 helper 客户端，如 weston-desktop-shell /
+        # weston-keyboard）：调用方是按 LIBEXECDIR（/usr/libexec）的绝对路径
+        # fork 它们的，放 /bin 里只会在运行时报 "Couldn't launch client"。
+        # 这种目标只装到 usr/libexec，不再往 bin 里放一份。
+        set_kind("binary")
+        install_dir("usr/libexec")
     else:
         print('not support')
 
