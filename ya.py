@@ -201,6 +201,16 @@ set_showmenu(true)
 set_description("Enable wayland support")
 option_end()
 
+# wayland 图形套（要 cairo）：desktop-shell 模块 + weston-desktop-shell 客户端。
+# 不开这个选项就是精简套（weston + kiosk-shell/headless/fbdev，产物里零 cairo）；
+# 开了之后精简套依然会产出，两者并存，互不影响。
+# 它只控制这两件产物编不编 —— cairo 库本身在 app 构建里常备，见 eggs/ya.py。
+option("wayland-desktop")
+set_default(false)
+set_showmenu(true)
+set_description("Enable wayland desktop shell set (needs cairo)")
+option_end()
+
 option("app")
 if len(apps)==0:
     set_default(false)
