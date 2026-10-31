@@ -7,6 +7,12 @@ DISK = os.environ.get("DISK", "/Users/evil/dev/c/YiYiYa/image/disk.img")
 LOG = "/tmp/xorg_qemu.log"
 QEMU_CMD = ["qemu-system-aarch64", "-name", "YiYiYa-xorg", "-M", "raspi3b", "-rtc", "base=localtime", "-kernel", KERNEL, "-serial", "tcp:127.0.0.1:%d,server,nowait" % PORT, "-drive", "if=sd,id=sd0,format=raw,file=" + DISK, "-device", "usb-mouse"]
 import os
+# QEMU_EXTRA：额外 QEMU 参数（空格分隔），调试异常时用：
+#   QEMU_EXTRA="-d int,cpu_reset -D /tmp/qemu_dbg.log"
+#   QEMU_EXTRA="-d in_asm -dfilter 0x100000-0x300000 -D /tmp/qemu_asm.log"
+_extra = os.environ.get("QEMU_EXTRA")
+if _extra:
+    QEMU_CMD += _extra.split()
 # 显示方式：none（默认，只看串口）/ cocoa（macOS 本机窗口）/ vnc（远程 VNC）
 DISPLAY_MODE = os.environ.get("DISPLAY_MODE", "none")
 if DISPLAY_MODE == "cocoa":

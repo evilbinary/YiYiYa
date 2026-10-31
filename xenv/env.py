@@ -443,7 +443,13 @@ def set_type(type, dynamic=False):
     add_packages(default_libc)
 
     def config (target):
-        if type=='cli' or type=='app':
+        # 【libexec 也必须用用户链接脚本】user-<plat>.ld 把 .text 放到
+        # K_VIR_ADDR（如 0x71000000，落在本内核的用户 VA 窗口内）。漏掉
+        # libexec 时（weston-desktop-shell / weston-keyboard /
+        # ivi-shell-user-interface）会走 ld 默认基址 0x400000，叠加 64K
+        # 的 p_align 后头段落在 0x3f0000 —— 正好压在内核映像/内核堆的
+        # 物理恒等映射上，加载器照搬 p_vaddr 就会把内核内存清零。
+        if type in ('cli', 'app', 'libexec'):
             target.add('ldflags','-Tapp/xlinker/user-'+ target.plat()+'.ld', force=true)
 
     on_config(config)
