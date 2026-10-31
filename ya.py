@@ -138,7 +138,7 @@ modules=[
     'pty',
     'ipc',
     'musl',
-    'gaga',
+    'foot',
     'trace',
     'perf',
     'backtrace',
