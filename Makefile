@@ -90,6 +90,9 @@ cp-t113-s3: t113-s3
 cp-raspi5: raspi5
 	cp -r ./build/raspi5/armv8-a/debug/kernel8.img  "/Volumes/bootfs"
 	cp -r ./build/raspi5/armv8-a/debug/v3dd "/Volumes/bootfs/bin"
+	cp -r ./build/raspi5/armv8-a/debug/config "/Volumes/bootfs/bin"
+	cp -r ./build/raspi5/armv8-a/debug/test-v3d "/Volumes/bootfs/bin"
+	cp -r ./build/raspi5/armv8-a/debug/fand "/Volumes/bootfs/bin"
 	#cp -r ./app/resource/bin/  "/Volumes/YIYIYA"
 	hdiutil unmount /Volumes/bootfs 
 
