@@ -93,6 +93,9 @@ cp-raspi5: raspi5
 	cp -r ./build/raspi5/armv8-a/debug/config "/Volumes/bootfs/bin"
 	cp -r ./build/raspi5/armv8-a/debug/test-gpu "/Volumes/bootfs/bin"
 	cp -r ./build/raspi5/armv8-a/debug/fand "/Volumes/bootfs/bin"
+	cp -r ./build/raspi5/armv8-a/debug/test-mesa "/Volumes/bootfs/bin"
+	cp -r ./build/raspi5/armv8-a/debug/test-v3d "/Volumes/bootfs/bin"
+	
 	#cp -r ./app/resource/bin/  "/Volumes/YIYIYA"
 	hdiutil unmount /Volumes/bootfs 
 
