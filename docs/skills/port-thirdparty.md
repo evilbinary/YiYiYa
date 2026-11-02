@@ -121,6 +121,49 @@ if _old_stamp != _fp:
 
 **注意**：`after_build` 在「产物已存在」的分支里**也会被调用**（`automake.py:54-60`），所以钩子里要自己加幂等判断，否则每次 ya 都白干活（比如重拷 169 个头文件）。
 
+### 4.1 config 反复执行的五种原因（重要，按顺序排查）
+
+> 「怎么又 configure 了」是移植期最常遇到的困惑。**先分类，再改**，
+> 否则很容易去改根本没问题的 configure 参数。
+
+| # | 现象 | 根因 | 确诊 | 修法 |
+|---|---|---|---|---|
+| 1 | 每次 `ya` 都 configure，产物每次重建 | `automake(name)` 的 name **不是产物名**（例如想表达"用 C 编译器"写成 `automake("c")`，而产物是 `libcrypto.a`） | 看 ymake 拼出的判定路径 `<build>/<target>/lib/lib<name>.a` 是否存在 | name 改成真实产物名 |
+| 2 | 每次 configure，但产物明明在 | wrapper **漏了「已配置就跳过」** | 打开 `<build>/<target>-oot/configure`，看开头有没有 `[ -f config.status ]` | 补跳过判断（见 §4 开头） |
+| 3 | 改了参数，但 configure **不**重跑 | 产物存在时 `automake.build()` 直接 return，**指纹删掉 config.status 也白删**（那次配置根本不会被执行） | 产物时间戳早于参数修改时间 | **手动删产物**再跑：`rm -f <build>/<target>/lib/libxxx.a` |
+| 4 | 上次手动 Ctrl-C 过，这次又从头配 | configure 没跑完 → `config.status` 不存在 → wrapper 只能重跑 | `ls <build>/<target>-oot/config.status` 不存在 | 正常行为，**让它跑完一次** |
+| 5 | configure 报 `C compiler cannot create executables` / `cannot compute suffix of executables`，但**手工用同样 flags 链接是成功的** | 执行环境干扰：VSCode 的 trash 插件（日志里 `[safe-delete] ... genie-trash failed`）把 configure 的 `conftest.c` / `conftest.err` 删了 | 日志里搜 `sed: conftest.c: No such file` 或大量 `safe-delete` | **在独立终端跑**（不要经过 IDE 的命令执行通道），或临时关掉该插件 |
+
+**第 3 条要特别注意**：它和「配置幂等」是一对矛盾。
+
+- 幂等：产物在 → 跳过，避免重配
+- 生效：改了 `LDFLAGS`/`LIBS`/裁剪项 → 期望重配
+
+ymake 的判定只看「产物存在」，所以**改参数后必须手动删产物**。指纹逻辑只能删 `config.status`，删不掉「build() 直接 return」这个行为。可以把它理解成：
+
+```sh
+# 改了 configure 参数后的标准操作
+rm -f build/<plat>/<arch>/<mode>/<target>/lib/libxxx.a   # 让 ymake 认为"没构建过"
+ya ... -j8                                                # 指纹发现参数变了 → 重配 → 重编
+```
+
+**第 2 条的检查清单**（wrapper 应该长这样）：
+
+```sh
+#!/bin/sh
+if [ -f config.status ] && [ -f Makefile ]; then   # ← 缺这两行，就每次都配
+    echo "already configured, skip"
+    exit 0
+fi
+"$SRC/configure" $ARGS "$@" || exit $?
+<可选的 Makefile 后处理>
+exit 0
+```
+
+**第 1 条是最隐蔽的**：它不会报错，只是「永远差一个文件」，表现为每次构建都从头来。
+`eggs/libopenssl` 就踩过——`automake("c")` 让 ymake 去找 `libc.a`，而实际产物是 `libcrypto.a`，
+于是 Configure 被反复执行了十几分钟。
+
 ---
 
 ## 5. 产物路径对齐（`filename`）
@@ -155,6 +198,8 @@ automake("sshd", filename="../bin/sshd")   # 用 ../ 回退一层直接指到真
 | `make install` 极慢 | 在装 man 手册（几千个文件） | configure 加 `no-docs no-demos` |
 | `apps/openssl` 链接失败 | 命令行工具需要 crt，我们不需要它 | 加 `no-apps`；**注意** libcrypto.a 在这之前已经 install 成功 |
 | `make: No targets specified and no makefile found` | `set_sourcedir` 用了相对路径 | 改成 `os.path.abspath(...)` |
+| 目标机启动报 `elf64 precheck reject ... vaddr [400000,...)` | gcc 默认把静态 ET_EXEC 链接到 `0x400000`，低于内核 `EXEC_ADDR = 0x60000000`（`duck/kernel/memory.h`） | LDFLAGS 加 `-Wl,-Ttext-segment=0x60000000` |
+| configure 报 `C compiler cannot create executables`，但手工链接成功 | VSCode trash 插件删了 `conftest.c/.err`（日志有 `[safe-delete]`） | 在独立终端跑，别经过 IDE 执行通道 |
 
 ---
 
@@ -240,3 +285,9 @@ after_build(_deploy)
 
 > **产物名对齐 + 配置幂等 + 链接顺序**，这三件事做对，90% 的移植问题不会出现；
 > 剩下 10% 全在 `config.log` 里，`tail -30` 就能看见。
+>
+> 两个最容易浪费时间的坑：
+> 1. **`automake(name)` 写错名字** → 每次都重跑 configure（不报错，只是慢）；
+> 2. **改了参数不删产物** → 新参数永远不生效（还会误以为是参数写错了）。
+>
+> 遇到「怎么又 configure」先查 §4.1 的五种原因，别急着改 configure 参数。
