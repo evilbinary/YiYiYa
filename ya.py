@@ -135,6 +135,7 @@ modules=[
     'input',
     'sdhci',
     'rtc',
+    'watchdog',
     'gpio',
     'pty',
     'ipc',
