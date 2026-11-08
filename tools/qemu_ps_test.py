@@ -31,6 +31,7 @@ elif PLAT == "raspi3":
         "-drive", "if=sd,id=sd0,format=raw,file=" + DISK,
         "-device", "usb-mouse",
         "-display", "none",
+        "-d", "int", "-D", "/tmp/qemu_exc.log",
     ]
 elif PLAT == "raspi5":
     cmd = [
@@ -40,6 +41,7 @@ elif PLAT == "raspi5":
         "-serial", "stdio",
         "-drive", "if=sd,id=sd0,format=raw,file=" + DISK,
         "-display", "none",
+        "-d", "int", "-D", "/tmp/qemu_exc.log",
     ]
 else:
     print("unknown PLAT: %s" % PLAT)

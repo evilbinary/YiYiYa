@@ -178,8 +178,9 @@ if plat == 'raspi5':
     apps=[a for a in apps if a != 'yui']
 
 if plat == 'raspi5':
-    # raspi5 还没有 xHCI，USB 先不编。网口是 RP1 GEM，见 duck/modules/net/rp1_gem.c。
-    modules=[m for m in modules if m not in ('usb',)]
+    # raspi5 的 USB-A 口在 RP1 上（snps,dwc3 / xHCI）。USB core/HID/鼠标
+    # 复用 raspi3 的通用实现，平台 HCD 用 usb/rp1_usb.c（xHCI bring-up）。
+    pass
 
 
 
