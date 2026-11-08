@@ -60,8 +60,8 @@ miyoo:
 
 
 img:
-	qemu-img create  image/disk.img 512m
-	mkfs.vfat -n YIYIYA image/disk.img 
+	qemu-img create  image/disk.img 2048m
+	mkfs.vfat -F 32 -n YIYIYA image/disk.img 
 
 duck.img:
 	ya -m debug -b duck.img
