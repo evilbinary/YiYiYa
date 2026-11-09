@@ -168,9 +168,9 @@ def build_disk_img(target):
             pass
         print('disk.img outdated (app/resource changed), rebuilding...')
     print('make disk.img')
-    # 1024m：app/resource 已 336M（bin 189M + 字体/roms/视频），再加上
-    # raspios 那批 /lib、/usr（162M），512M 会写满（实测 cp 报 ENOSPC）。
-    os.exec('qemu-img create ' + disk_img + ' 1024m')
+    # 2048m：app/resource 336M + raspios /lib,/usr 162M + 桌面/GL demo
+    # 一堆 10M 级的 weston 客户端，1G 也会写满（实测 cp 报 ENOSPC）。
+    os.exec('qemu-img create ' + disk_img + ' 2048m')
     if is_host('mac') or is_host('linux'):
         os.exec('mkfs.vfat -n YIYIYA ' + disk_img)
     else:
