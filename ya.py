@@ -296,6 +296,10 @@ set_config('apps',apps)
 #apply debug and release modes
 add_rules("mode.debug", "mode.release","arch")
 
+# ---- 内核 target 统一 -O2（按 target 名字过滤，用户态不加）----
+# kernel/mod-* 使用 -O2 + 禁止编译器生成 FP/SIMD（保护用户线程 q0-q31 现场）。
+# 不把 pragma 放进头文件；也不写进每个模块的 ya.py，集中在这里。
+# boot-init.elf 是 object kind（single-kernel 用），不参与。
 _KERNEL_OPT_TARGETS = {
     'kernel.elf', 'kernel', 'arch', 'platform',
     'archcommon', 'kernelcommon', 'algorithm',
