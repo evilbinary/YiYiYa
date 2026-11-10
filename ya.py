@@ -296,6 +296,25 @@ set_config('apps',apps)
 #apply debug and release modes
 add_rules("mode.debug", "mode.release","arch")
 
+_KERNEL_OPT_TARGETS = {
+    'kernel.elf', 'kernel', 'arch', 'platform',
+    'archcommon', 'kernelcommon', 'algorithm',
+}
+
+def _kernel_opt_config(target):
+    name = target.get('name') or ''
+    if name in _KERNEL_OPT_TARGETS or name.startswith('mod-'):
+        target.add('cflags', '-O2')
+        target.add('cflags', '-mgeneral-regs-only')
+        target.add('cflags', '-fno-strict-aliasing')
+        target.add('cflags', '-fno-delete-null-pointer-checks')
+        target.add('cflags', '-fno-omit-frame-pointer')
+
+rule('kernel-opt')
+on_config(_kernel_opt_config)
+rule_end()
+add_rules('kernel-opt')
+
 includes('./boot/ya.py')
 includes('./duck/ya.py')
 add_subs('./image/ya.py')
