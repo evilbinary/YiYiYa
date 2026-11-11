@@ -95,3 +95,9 @@ tools/qemu_out.txt
 .vscode/
 *.sh
 .vscode/settings.json
+tools/qpudis/gen_2d
+tools/qpudis/gen_ladder
+tools/qpudis/gen_mini
+tools/qpudis/pf
+tools/qpudis/qpuasm
+tools/qpudis/gen_copy1

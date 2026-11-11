@@ -46,6 +46,8 @@ ya -m debug -r qemu
 
 ### 截图
 
+<img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/demo/wayland-desktop1.jpg?raw=true" width="800px" />
+
 
 <img src="https://github.com/evilbinary/YiYiYa/blob/main/docs/demo/etk-gui.jpeg?raw=true" width="800px" />
 
