@@ -162,12 +162,14 @@ static const u64 pi5_console_bases[] = {
      *   /chosen stdout-path = serial10，/soc@107c000000/serial@7d001000
      *   ⇒ CPU 侧 = 0x107C000000 + 0x7D001000 = 0x107D001000
      * 固件自己就是在这条口上打印的（用户 USB-TTL 也在这条上）。
-     * 旧代码写的 0x7D001000 漏了父节点前缀 ⇒ 写进 DRAM，这是"一个字都不出"的根因。 */
+     * 旧代码写的 0x7D001000 漏了父节点前缀 ⇒ 写进 DRAM，这是"一个字都不出"的根因。
+     *
+     * 【只保留 serial10】此前还往 0x1F00030000 / 0x1C00030000 两个 RP1/PCIe
+     * 窗口广播。真机实测：这两个地址没有设备应答，posted 写超时会以异步
+     * SError(esr=0xbe000411) 上报，正好在 AP 第一次 eret 进 idle 时被取到。
+     * QEMU 不模拟 PCIe 外部中止，所以只在真机复现。串口已确认只有 serial10
+     * 是活的，死地址一个都不留。 */
     0x107D001000ULL,
-    /* B/C：RP1 UART0 两个窗口（GPIO14/15，固件未选它当控制台；保留作兜底，
-     * 只写不读，posted 写不会中止）。 */
-    0x1F00030000ULL,
-    0x1C00030000ULL,
 };
 #define PI5_CONSOLE_N \
   (sizeof(pi5_console_bases) / sizeof(pi5_console_bases[0]))

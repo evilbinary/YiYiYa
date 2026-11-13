@@ -97,6 +97,15 @@ drop_to_el1_from_el3:
     // Enable FP/SIMD at EL2/EL1 from EL3
     mov     x0, #0               // No traps for FP/SIMD
     msr     cptr_el3, x0
+    /* 若 EL2 已实现，EL1 的 FP/SIMD 还可能被 CPTR_EL2.TFP trap 到 EL2。
+     * EL3 直降 EL1 的路径也必须清；EL2 不存在时写 CPTR_EL2 是
+     * UNDEFINED，先查 ID_AA64PFR0_EL1.EL2（bits[11:8]）。 */
+    mrs     x0, id_aa64pfr0_el1
+    ubfx    x0, x0, #8, #4
+    cbz     x0, 93f
+    mov     x0, #0
+    msr     cptr_el2, x0
+93:
 
     // Setup SCR_EL3 for EL1 entry
     // RW=1 (bit 10): lower ELs are AArch64
@@ -146,7 +155,12 @@ el2_return:
 
 // Drop from EL2 to EL1
 drop_to_el1:
-    // Disable EL2 traps
+    // Disable EL2 traps.
+    // 【清 CPTR_EL2.TFP】固件可能留下 FP/SIMD trap：EL1 执行 stp qN
+    // （线程切换保存 q0-q31）会 trap 到 EL2。QEMU 通常不设，真机
+    // 固件可能设；这里统一清掉，避免依赖固件默认值。
+    mov     x0, #0
+    msr     cptr_el2, x0
     msr     hcr_el2, xzr
 
     // EL1 用 AArch64。只置 RW。不要置 SWIO：它会把 dc isw 升级成
@@ -299,6 +313,15 @@ drop_to_el1_from_el3_ap:
     // Enable FP/SIMD at EL2/EL1 from EL3
     mov     x0, #0               // No traps for FP/SIMD
     msr     cptr_el3, x0
+    /* 若 EL2 已实现，EL1 的 FP/SIMD 还可能被 CPTR_EL2.TFP trap 到 EL2。
+     * EL3 直降 EL1 的路径也必须清；EL2 不存在时写 CPTR_EL2 是
+     * UNDEFINED，先查 ID_AA64PFR0_EL1.EL2（bits[11:8]）。 */
+    mrs     x0, id_aa64pfr0_el1
+    ubfx    x0, x0, #8, #4
+    cbz     x0, 93f
+    mov     x0, #0
+    msr     cptr_el2, x0
+93:
 
     // Setup SCR_EL3 for EL1 entry
     mov     x0, #(1 << 10)        // RW bit, lower ELs are AArch64
