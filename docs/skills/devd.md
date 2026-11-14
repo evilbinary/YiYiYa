@@ -83,6 +83,35 @@ curl -H "X-Direct: 1" -T kernel8.img http://192.168.1.250:9004/kernel8.img
 curl http://192.168.1.250:9004/kernel8.img -o /tmp/k8.bak
 ```
 
+### MD5 校验（不用把文件拉回来）
+
+新版 devd 在 PUT 时边收边算 MD5，200 响应直接返回：
+
+```text
+OK
+md5=4e12b3b55ee4fd80f0b30ab6f352ccf4
+size=631634
+```
+
+也可以单独查设备上的文件：
+
+```sh
+curl http://192.168.1.250:9004/md5/bin/gpud
+# md5=2f4da9fd821cc10e177066323b348de3
+# size=227144
+```
+
+推荐用脚本：本地先算 MD5，再和 PUT 响应/`/md5` 比对：
+
+```sh
+tools/devd_push.sh app/resource/res/wallpaper-dark.png /res/wallpaper-dark.png
+PORT=9005 tools/devd_push.sh build/raspi5/armv8-a/debug/gpud /bin/gpud
+DIRECT=1 tools/devd_push.sh build/raspi5/armv8-a/debug/kernel8.img /kernel8.img
+```
+
+`devd` 更新后如果旧进程还占着 9004，新进程会自动落到 9005；重启后
+`init.conf` 里的 `/bin/devd` 会重新占回 9004。
+
 ### 下载
 
 ```sh
