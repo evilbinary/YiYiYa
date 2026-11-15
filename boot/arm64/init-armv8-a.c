@@ -429,8 +429,7 @@ void init_memory() {
   //  2) < 传统外设镜像 MMIO_BASE = 0xFC000000（platform/raspi5/gpio.h），
   //     否则 GPIO/UART 寄存器会被当普通内存页分配。
   // 1GB 机型两条都满足。换机型时改这里：2GB→0x80000000、
-  // 4GB 及以上→0xF0000000（u32 安全上限；分配器尚未 64 位化：
-  // mem->length 截断 u32、boot_info->total_memory 为 i32）。
+  // 4GB 及以上→0xF0000000（外设窗口）。total_memory 是 u64，这段长度可以放下。
   /* 【不能从 0 报】bring-up 实测：ya_alloc_init 会把 [0,kernel_base) 也切成
    * 空闲块 ⇒ mm_add_block 在【物理地址 0】写块头，真机直接卡死（QEMU 不检查）。
    * 这段只有 512KB，直接从 kernel_base 报起；ya_alloc_init 的 kernel 切分
