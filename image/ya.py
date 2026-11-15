@@ -106,6 +106,8 @@ def build(target):
         # 否则内核会被加载到错误地址（raspi5 固件就固定从 0x80000 取裸内核）。
         if plat == 'raspi5':
             origin = '0x80000'
+        elif plat == 'rk3568':
+            origin = '0x02080000'
         else:
             origin = '0x100000'
         cmd='mkimage -n YiYiYa -A arm64 -O u-boot -T kernel -C none -a '+origin+' -e '+origin+' -d '+sourcefiles[0]+' '+targetfile
@@ -119,14 +121,12 @@ def build(target):
         #   boot/arm64/init.h 的 KERNEL_BASE(raspi5=0x80000) 一致。
         # raspi3 走 Pi3 的 64 位固件默认名 kernel8.img。
         build_dir = targetfile.rsplit('/', 1)[0]
-        sd_names = ['kernel8.img'] if plat == 'raspi5' else ['kernel8.img']
-        for sd_name in sd_names:
-            sd_kernel = build_dir + '/' + sd_name
+        if plat in ('raspi3', 'raspi5'):
+            sd_kernel = build_dir + '/kernel8.img'
             os.cp(sourcefiles[0], sd_kernel)
             print('generated '+sd_kernel)
-
-        # 树莓派固件读 SD 卡 boot 分区根目录的 config.txt（与内核放同一目录）
-        write_pi_config(build_dir + '/config.txt', plat)
+            # 树莓派固件读 SD 卡 boot 分区根目录的 config.txt（与内核放同一目录）
+            write_pi_config(build_dir + '/config.txt', plat)
 
 on_build(build)
 
