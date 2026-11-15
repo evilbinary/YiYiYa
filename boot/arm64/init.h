@@ -14,16 +14,20 @@
 
 #define READ_BLOCK_SIZE 512
 
-#if defined(RASPI3) || defined(RASPI5)
-/* Kernel image is loaded directly into RAM by firmware/QEMU */
+#if defined(RASPI3) || defined(RASPI5) || defined(RK3568)
+/* Kernel image is loaded directly into RAM by firmware/U-Boot */
 #define KERNEL_ORIGIN_BASE 0
 #else
 #define KERNEL_ORIGIN_BASE 0x10000+512*12
 #endif
 
-#ifdef RASPI5
+#if defined(RASPI5)
 /* Pi5 firmware loads the raw kernel image at 0x80000 */
 #define KERNEL_BASE 0x80000
+#elif defined(RK3568)
+/* RK3568 U-Boot：kernel_addr_r = 0x02080000（Rockchip 标准布局）。
+ * uImage.img 的 -a/-e 以及 app/xlinker/link-rk3568.ld 都用这个地址。 */
+#define KERNEL_BASE 0x02080000
 #else
 #define KERNEL_BASE 0x100000
 #endif

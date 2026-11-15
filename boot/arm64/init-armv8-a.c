@@ -186,9 +186,17 @@ void pi5_console_selfid(void) {
 }
 #endif
 
-// Raspberry Pi 3/5 UART (PL011)
+// Raspberry Pi 3/5 (PL011) / RK3568 (DW APB 16550)
 void uart_init() {
-#ifdef RASPI5
+#ifdef RK3568
+  /* RK3568 U-Boot 已经用 UART2（0xFE660000，1500000 8N1）做控制台并配好
+   * 引脚复用/分频。这里绝对不要重写 DLL/DLH：保留 U-Boot 的波特率。
+   * 只幂等重设 8N1/FIFO，并关闭 UART 中断（内核控制台走轮询）。 */
+  io_write32(UART0_BASE + UART_IER, 0x00);
+  io_write32(UART0_BASE + UART_LCR, UART_LCR_8N1);
+  io_write32(UART0_BASE + UART_FCR, UART_FCR_8);
+  return;
+#elif defined(RASPI5)
   /* 【Pi5：绝不能碰 legacy GPIO 寄存器 —— 这是"BL31 之后一个字都没有"的根因】
    * Pi5 的外设都在 RP1 南桥里，CPU 侧窗口 0x1C00000000：
    *   UART0 = 窗口 +0x30000 ✓ 有效（固件自己就用它打印）；
@@ -241,7 +249,18 @@ void uart_init() {
 }
 
 void uart_send_ch(unsigned int c) {
-#ifdef RASPI5
+#ifdef RK3568
+  /* UART2 是真实设备：LSR.THRE(bit5)=1 表示发送 FIFO 有空位。
+   * 有界等待（2000 次）而不是死等，防止 UART 时钟被门控时焊死整机。 */
+  for (int t = 0; t < 2000; t++) {
+    if ((io_read32(UART0_BASE + UART_LSR) & UART_LSR_THRE) != 0) {
+      break;
+    }
+  }
+  io_write32(UART0_BASE + UART_THR, c);
+  asm volatile("dsb sy" ::: "memory");
+  return;
+#elif defined(RASPI5)
   /* 【候选 A 已确认为活控制台（实测串口先打出 AAA）】对它做有界 FR 等待：
    * 不做的话 16 字节 FIFO 会被连续写入冲爆 —— 实测"前 ~30 字符正常、
    * 之后乱码"（Dinit: ...000f7000 00000000tbnretyd）。
@@ -273,11 +292,18 @@ void uart_send_ch(unsigned int c) {
 }
 
 char uart_get_ch() {
+#ifdef RK3568
+  /* DW APB：LSR.DR(bit0)=1 表示接收 FIFO 非空。 */
+  while ((io_read32(UART0_BASE + UART_LSR) & UART_LSR_DR) == 0) {
+  }
+  return io_read32(UART0_BASE + UART_RBR) & 0xFF;
+#else
   unsigned int c;
   while (io_read32(UART0_FR) & 0x10) {
   }
   c = io_read32(UART0_DR);
   return c;
+#endif
 }
 
 static void print_string(const unsigned char* str) {
@@ -411,6 +437,16 @@ void init_memory() {
    * 逻辑会自动只加 [kernel_end, 1GB) 一块。 */
   ptr->base = KERNEL_BASE;                    // 0x80000
   ptr->length = 0x40000000ULL - KERNEL_BASE;  // 1GB - 512KB
+  ptr->type = 1;
+  boot_info->total_memory += ptr->length;
+  ptr++;
+  count++;
+#elif defined(RK3568)
+  /* Z96A：4GB LPDDR。低地址有 ATF/OP-TEE，外设从 0xF0000000 起
+   * （GIC 0xFD400000、UART2 0xFE660000）。只把 [内核, 外设窗口) 报成 RAM，
+   * 不从物理地址 0 报，避免在 0 上写分配器块头。 */
+  ptr->base = KERNEL_BASE;
+  ptr->length = 0xF0000000ULL - KERNEL_BASE;
   ptr->type = 1;
   boot_info->total_memory += ptr->length;
   ptr++;

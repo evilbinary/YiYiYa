@@ -19,6 +19,7 @@ support_platform = {
     'v3s': 'armv7-a',
     'raspi3': 'armv8-a',
     'raspi5': 'armv8-a',
+    'rk3568': 'armv8-a',
     'rk3128': 'armv7-a',
     'cubieboard2': 'armv7-a',
     'dmulator': 'general',
@@ -84,6 +85,9 @@ support_platform_cflags ={
     'raspi2': ['-nostdlib','-nostdinc','-mapcs-frame','-DBACKTRACE'],# #specs=nosys.specs
     'raspi3': ['-mcpu=cortex-a53','-mtune=cortex-a53'],
     'raspi5': ['-mcpu=cortex-a76','-mtune=cortex-a76'],
+    # RK3568: 4 x Cortex-A55 (ARMv8.2-A). 和 raspi5 一样走裸机 arm64 工具链，
+    # 必须带 -nostdlib/-nostdinc 才能完全不用宿主/目标 libc 头文件。
+    'rk3568': ['-mcpu=cortex-a55','-mtune=cortex-a55','-nostdlib','-nostdinc','-fno-builtin'],
     'stm32f4xx': ['-specs=nosys.specs',  '-nostdlib', '-nostdinc' ,'-fno-builtin', '-DUSE_HAL_DRIVER','-DSTM32F401xC'],#'-nolibc',
     'android' : [],
     'v3s':['-nostdlib','-nostdinc'],
