@@ -195,9 +195,14 @@ def main():
             if not os.path.isfile(src):
                 raise OSError("missing " + src)
             parent = dest.rsplit("/", 1)[0] if "/" in dest else ""
-            if parent and parent not in made:
-                uboot(fd, rx, "fatmkdir mmc 0:1 " + parent, 5)
-                made.add(parent)
+            if parent:
+                acc = ""
+                for part in parent.split("/"):
+                    acc = part if not acc else acc + "/" + part
+                    if acc in made:
+                        continue
+                    uboot(fd, rx, "fatmkdir mmc 0:1 " + acc, 5)
+                    made.add(acc)
             n = send_file(fd, rx, src, LOAD_ADDR)
             uboot(fd, rx, "fatwrite mmc 0:1 0x%x %s 0x%x" % (LOAD_ADDR, dest, n), 60)
             sys.stderr.write("wrote %s (%d)\n" % (dest, n))
