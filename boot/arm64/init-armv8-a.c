@@ -441,11 +441,15 @@ void init_memory() {
   ptr++;
   count++;
 #elif defined(RK3568)
-  /* Z96A：4GB LPDDR。低地址有 ATF/OP-TEE，外设从 0xF0000000 起
-   * （GIC 0xFD400000、UART2 0xFE660000）。只把 [内核, 外设窗口) 报成 RAM，
-   * 不从物理地址 0 报，避免在 0 上写分配器块头。 */
+  /* Z96A：4GB LPDDR。低地址有 ATF/OP-TEE，外设从 0xF0000000 起。
+   * 恒等映射必须停在 EXEC_ADDR（duck/kernel/memory.h，0x60000000）之前。
+   * 树莓派 5 的 DRAM 只到 0x40000000，天然在这条线下面。RK3568 若把
+   * [0x60000000, 0xF0000000) 也恒等映射，就和用户程序的链接地址
+   * 0x71000000、堆 0x70100000 重叠。exec 回收这块 VA 时会把内核正在
+   * 用的物理页摘掉，堆锁再也不放（ya_heap lock stuck）。
+   * 线以上的物理页这次先不用。 */
   ptr->base = KERNEL_BASE;
-  ptr->length = 0xF0000000ULL - KERNEL_BASE;
+  ptr->length = 0x60000000ULL - KERNEL_BASE; //todo 4GB full memory
   ptr->type = 1;
   boot_info->total_memory += ptr->length;
   ptr++;

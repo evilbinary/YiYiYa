@@ -161,7 +161,8 @@ def main():
             send_block(fd, rx, STX, seq, blob[off:off + 1024])
             off += 1024
             seq = (seq + 1) & 0xFF
-            sys.stderr.write("\r%d/%d" % (min(off, len(blob)), len(blob)))
+            if off >= len(blob) or (off & 0xFFFF) == 0:
+                sys.stderr.write("\r%d/%d" % (min(off, len(blob)), len(blob)))
         sys.stderr.write("\n")
         os.write(fd, bytes([EOT]))
         rx.take((ACK,), 10)
