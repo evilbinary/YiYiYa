@@ -27,6 +27,15 @@ raspi5:
 raspi5-d:
 	aarch64-none-elf-objdump -D build/raspi5/armv8-a/debug/kernel.elf >kernel.txt.c
 
+rk3568:
+	ya -m debug -p rk3568 -b rk3568
+
+rk3568-d:
+	aarch64-none-elf-objdump -D build/rk3568/armv8-a/debug/kernel.elf >kernel.txt.c
+
+rk3568-run:
+	ya -m debug -p rk3568 -r rk3568
+
 raspi3-ls-d:
 	aarch64-none-elf-objdump -D build/raspi3/armv8-a/debug/ls  >ls.txt.c
 esp32:
