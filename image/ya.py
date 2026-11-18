@@ -465,6 +465,25 @@ if not plat:
 run_qemu(plat,True)
 
 
+#rk3568 / Z96A：只打包 uImage.img，启动靠 U-Boot
+target("rk3568")
+add_deps("uImage.img")
+
+def run(target):
+    arch=target.get_arch()
+    mode=target.get_config('mode')
+    plat=target.plat()
+    duck_img="build/"+plat+"/"+arch+"/"+mode+"/uImage.img"
+    print('RK3568 Z96A image: '+duck_img)
+    print('U-Boot:')
+    print('  load mmc 0:1 0x02080000 uImage.img')
+    print('  bootm 0x02080000')
+    print('（或 tftp 0x02080000 uImage.img; bootm 0x02080000）')
+
+
+on_run(run)
+
+
 target("disk.img", **{'build-dir': '.'})
 set_filename('image/disk.img')
 

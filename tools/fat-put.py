@@ -108,7 +108,9 @@ def send_file(fd, rx, path, addr):
 
 
 def open_port():
-    fd = os.open(ym.PORT, os.O_RDWR | os.O_NOCTTY)
+    port = os.environ.get("FAT_PORT", ym.PORT)
+    sys.stderr.write("serial port %s\n" % port)
+    fd = os.open(port, os.O_RDWR | os.O_NOCTTY)
     attrs = ym.termios.tcgetattr(fd)
     attrs[0] = 0
     attrs[1] = 0
